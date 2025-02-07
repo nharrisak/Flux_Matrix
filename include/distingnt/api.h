@@ -50,6 +50,9 @@ enum _NT_selector
 struct _NT_globals
 {
 	uint32_t	sampleRate;
+	uint32_t	maxFramesPerStep;
+	float*		workBuffer;
+	uint32_t	workBufferSizeBytes;
 };
 
 struct _NT_algorithmRequirements
