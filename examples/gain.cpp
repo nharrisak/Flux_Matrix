@@ -11,8 +11,18 @@ struct _gainAlgorithm : public _NT_algorithm
 	float gain;
 };
 
-static const _NT_parameter	parameters[1] = {
-	{ .unit = 0, .scaling = 0, .min = 0, .max = 100, .def = 50, .name = "Gain", .enumStrings = NULL },
+enum
+{
+	kParamInput,
+	kParamOutput,
+	kParamOutputMode,
+	kParamGain,
+};
+
+static const _NT_parameter	parameters[] = {
+	NT_PARAMETER_AUDIO_INPUT( "Input", 1, 1 )
+	NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output", 1, 13 )
+	{ .name = "Gain", .min = 0, .max = 100, .def = 50, .unit = kNT_unitPercent, .scaling = 0, .enumStrings = NULL },
 };
 
 void	calculateRequirements( _NT_algorithmRequirements& req )
@@ -34,7 +44,7 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 void	parameterChanged( _NT_algorithm* self, int p )
 {
 	_gainAlgorithm* pThis = (_gainAlgorithm*)self;
-	pThis->gain = pThis->v[0] / 100.0f;
+	pThis->gain = pThis->v[kParamGain] / 100.0f;
 }
 
 void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
@@ -42,8 +52,19 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	_gainAlgorithm* pThis = (_gainAlgorithm*)self;
 	float gain = pThis->gain;
 	int numFrames = numFramesBy4 * 4;
-	for ( int i=0; i<numFrames; ++i )
-		busFrames[i] *= gain;
+	const float* in = busFrames + ( pThis->v[kParamInput] - 1 ) * numFrames;
+	float* out = busFrames + ( pThis->v[kParamOutput] - 1 ) * numFrames;
+	bool replace = pThis->v[kParamOutputMode];
+	if ( !replace )
+	{
+		for ( int i=0; i<numFrames; ++i )
+			out[i] += in[i] * gain;
+	}
+	else
+	{
+		for ( int i=0; i<numFrames; ++i )
+			out[i] = in[i] * gain;
+	}
 }
 
 static const _NT_factory factory = 

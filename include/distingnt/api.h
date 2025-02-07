@@ -71,6 +71,31 @@ struct _NT_algorithmMemoryPtrs
 
 enum
 {
+	kNT_unitNone,
+	kNT_unitEnum,
+	kNT_unitDb,
+	kNT_unitDb_minInf,
+	kNT_unitPercent,
+	kNT_unitHz,
+	kNT_unitSemitones,
+	kNT_unitCents,
+	kNT_unitMs,
+	kNT_unitSeconds,
+	kNT_unitFrames,
+	kNT_unitMIDINote,
+	kNT_unitMillivolts,
+	kNT_unitVolts,
+	kNT_unitBPM,
+
+	kNT_unitAudioInput = 100,
+	kNT_unitCvInput,
+	kNT_unitAudioOutput,
+	kNT_unitCvOutput,
+	kNT_unitOutputMode,
+};
+
+enum
+{
 	kNT_scalingNone,
 	kNT_scaling10,
 	kNT_scaling100,
@@ -79,14 +104,30 @@ enum
 
 struct _NT_parameter
 {
-	uint8_t     			unit;
-	uint8_t					scaling;
+	const char* 			name;
 	int16_t	 				min;
 	int16_t					max;
 	int16_t					def;
-	const char* 			name;
+	uint8_t     			unit;
+	uint8_t					scaling;
 	char const * const *	enumStrings;
 };
+
+#define NT_PARAMETER_IO( n, m, d, u )	\
+		{ .name = n, .min = m, .max = 28, .def = d, .unit = u, .scaling = 0, .enumStrings = NULL },
+#define NT_PARAMETER_OUTPUT_MODE( n )	\
+		{ .name = n, .min = 0, .max = 1, .def = 0, .unit = kNT_unitOutputMode, .scaling = 0, .enumStrings = NULL },
+
+#define NT_PARAMETER_AUDIO_INPUT( n, m, d )		NT_PARAMETER_IO( n, m, d, kNT_unitAudioInput )
+#define NT_PARAMETER_CV_INPUT( n, m, d )		NT_PARAMETER_IO( n, m, d, kNT_unitCvInput )
+#define NT_PARAMETER_AUDIO_OUTPUT( n, m, d )	NT_PARAMETER_IO( n, m, d, kNT_unitAudioOutput )
+#define NT_PARAMETER_CV_OUTPUT( n, m, d )		NT_PARAMETER_IO( n, m, d, kNT_unitCvOutput )
+#define NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( n, m, d )	\
+	NT_PARAMETER_IO( n, m, d, kNT_unitAudioOutput )		\
+	NT_PARAMETER_OUTPUT_MODE( n " mode" )
+#define NT_PARAMETER_CV_OUTPUT_WITH_MODE( n, m, d )		\
+	NT_PARAMETER_IO( n, m, d, kNT_unitCvOutput )		\
+	NT_PARAMETER_OUTPUT_MODE( n " mode" )
 
 struct _NT_algorithm
 {
