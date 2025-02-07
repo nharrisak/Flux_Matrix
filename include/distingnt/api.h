@@ -113,6 +113,19 @@ struct _NT_parameter
 	char const * const *	enumStrings;
 };
 
+struct _NT_parameterPage
+{
+	const char* 	name;
+	uint8_t			numParams;
+	const uint8_t*	params;
+};
+
+struct _NT_parameterPages
+{
+	uint32_t					numPages;
+	const _NT_parameterPage*	pages;
+};
+
 #define NT_PARAMETER_IO( n, m, d, u )	\
 		{ .name = n, .min = m, .max = 28, .def = d, .unit = u, .scaling = 0, .enumStrings = NULL },
 #define NT_PARAMETER_OUTPUT_MODE( n )	\
@@ -131,9 +144,10 @@ struct _NT_parameter
 
 struct _NT_algorithm
 {
-	const _NT_parameter*	parameters;
-	const int16_t*			vIncludingCommon;
-	const int16_t*			v;
+	const _NT_parameter*		parameters;
+	const _NT_parameterPages*	parameterPages;
+	const int16_t*				vIncludingCommon;
+	const int16_t*				v;
 };
 
 struct _NT_factory

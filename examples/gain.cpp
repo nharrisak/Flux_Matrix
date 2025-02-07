@@ -25,6 +25,19 @@ static const _NT_parameter	parameters[] = {
 	{ .name = "Gain", .min = 0, .max = 100, .def = 50, .unit = kNT_unitPercent, .scaling = 0, .enumStrings = NULL },
 };
 
+static const uint8_t page1[] = { kParamGain };
+static const uint8_t page2[] = { kParamInput, kParamOutput, kParamOutputMode };
+
+static const _NT_parameterPage pages[] = {
+	{ .name = "Gain", .numParams = ARRAY_SIZE(page1), .params = page1 },
+	{ .name = "Routing", .numParams = ARRAY_SIZE(page2), .params = page2 },
+};
+
+static const _NT_parameterPages parameterPages = {
+	.numPages = ARRAY_SIZE(pages),
+	.pages = pages,
+};
+
 void	calculateRequirements( _NT_algorithmRequirements& req )
 {
 	req.numParameters = ARRAY_SIZE(parameters);
@@ -38,6 +51,7 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 {
 	_gainAlgorithm* alg = new (ptrs.sram) _gainAlgorithm();
 	alg->parameters = parameters;
+	alg->parameterPages = &parameterPages;
 	return alg;
 }
 
