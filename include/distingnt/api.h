@@ -81,11 +81,11 @@ struct _NT_parameter
 {
 	uint8_t     			unit;
 	uint8_t					scaling;
-    int16_t	 				min;
-    int16_t					max;
-    int16_t					def;
-    const char* 			name;
-    char const * const *	enumStrings;
+	int16_t	 				min;
+	int16_t					max;
+	int16_t					def;
+	const char* 			name;
+	char const * const *	enumStrings;
 };
 
 struct _NT_algorithm
@@ -101,10 +101,10 @@ struct _NT_factory
 	const char*		name;
 	const char*		description;
 
-    void			(*calculateRequirements)( _NT_algorithmRequirements& req );
-    _NT_algorithm*	(*construct)( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req );
-    void			(*parameterChanged)( _NT_algorithm* self, int p );
-    void 			(*step)( _NT_algorithm* self, float* busFrames, int numFramesBy4 );
+	void			(*calculateRequirements)( _NT_algorithmRequirements& req );
+	_NT_algorithm*	(*construct)( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req );
+	void			(*parameterChanged)( _NT_algorithm* self, int p );
+	void 			(*step)( _NT_algorithm* self, float* busFrames, int numFramesBy4 );
 };
 
 extern "C" {
