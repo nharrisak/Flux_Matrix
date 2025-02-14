@@ -1,0 +1,17 @@
+
+export NT_API_PATH = ../..
+
+export FAUSTARCH = ../
+
+inputs := $(wildcard *dsp)
+outputs := $(patsubst %.dsp,plugins/%.o,$(inputs))
+
+all: $(outputs)
+
+clean:
+	rm -f $(outputs)
+	rm temp.cpp
+
+plugins/%.o: %.dsp
+	mkdir -p $(@D)
+	../faust2distingnt $^ $@
