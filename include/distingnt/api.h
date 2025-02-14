@@ -178,9 +178,14 @@ struct _NT_factory
 };
 
 extern "C" {
+
 typedef uintptr_t (_pluginEntry)( _NT_selector selector, uint32_t data );
-uintptr_t pluginEntry( _NT_selector selector, uint32_t data );
+uintptr_t 	pluginEntry( _NT_selector selector, uint32_t data );
+
+void		NT_setParameterRange( _NT_parameter* ptr, float init, float min, float max, float step );
+
 extern const _NT_globals NT_globals;
+
 }
 
 #endif // _DISTINGNT_API_H

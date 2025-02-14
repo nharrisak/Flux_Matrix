@@ -1,5 +1,7 @@
 
-export NT_API_PATH = ../..
+ifndef NT_API_PATH
+	export NT_API_PATH = ../..
+endif
 
 export FAUSTARCH = ../
 

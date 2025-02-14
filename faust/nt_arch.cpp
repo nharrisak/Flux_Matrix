@@ -31,46 +31,8 @@ struct UI
 
     void add(const char* label, FAUSTFLOAT* zone, FAUSTFLOAT init, FAUSTFLOAT min, FAUSTFLOAT max, FAUSTFLOAT step)
     {
-    	int scaling;
-    	float mult;
-    	if ( step < 0.005f )
-    	{
-    		scaling = kNT_scaling1000;
-    		mult = 1.0e3f;
-    	}
-    	else if ( step < 0.05f )
-    	{
-    		scaling = kNT_scaling100;
-    		mult = 1.0e2f;
-    	}
-    	else if ( step < 0.5f )
-    	{
-    		scaling = kNT_scaling10;
-    		mult = 1.0e1f;
-    	}
-    	else
-    	{
-    		scaling = kNT_scalingNone;
-    		mult = 1.0f;
-    	}
-    	int def, mi, ma;
-    	for ( ;; )
-    	{
-    		def = init * mult;
-    		mi = min * mult;
-    		ma = max * mult;
-    		if ( scaling <= kNT_scalingNone )
-    			break;
-    		if ( def >= -32768 && def <= 32767 && mi >= -32768 && mi <= 32767 && ma >= -32768 && ma <= 32767 )
-    			break;
-   			scaling -= 1;
-   			mult /= 10.0f;
-    	}
+    	NT_setParameterRange( ptr, init, min, max, step );
     	ptr->unit = 0;
-    	ptr->scaling = scaling;
-    	ptr->min = std::max( -32768, mi );
-    	ptr->max = std::min( 32767, ma );
-    	ptr->def = def;
     	ptr->name = label;
     	ptr->enumStrings = 0;
     	ptr++;
