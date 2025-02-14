@@ -55,6 +55,16 @@ struct _NT_globals
 	uint32_t	workBufferSizeBytes;
 };
 
+struct _NT_staticRequirements
+{
+	uint32_t	dram;
+};
+
+struct _NT_staticMemoryPtrs
+{
+	uint8_t*	dram;
+};
+
 struct _NT_algorithmRequirements
 {
 	uint32_t	numParameters;
@@ -159,6 +169,8 @@ struct _NT_factory
 	const char*		name;
 	const char*		description;
 
+	void			(*calculateStaticRequirements)( _NT_staticRequirements& req );
+	void			(*initialise)( _NT_staticMemoryPtrs& ptrs, const _NT_staticRequirements& req );
 	void			(*calculateRequirements)( _NT_algorithmRequirements& req );
 	_NT_algorithm*	(*construct)( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req );
 	void			(*parameterChanged)( _NT_algorithm* self, int p );
