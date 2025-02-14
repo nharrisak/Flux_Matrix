@@ -144,7 +144,7 @@ struct dsp_memory_manager
 			}
 			return;
 		}
-		if ( writes == 0 )
+		if ( writes == 0 )		// TODO check this logic with some more examples
 			return;				// class static table
 		if ( first )
 		{
@@ -208,6 +208,11 @@ struct _fauseAlgorithm : public _NT_algorithm
 	
 	_NT_parameter	parameterDefs[ FAUST_ACTIVES + FAUST_INPUTS + 2 * FAUST_OUTPUTS ];
 	float*			actives[FAUST_ACTIVES];
+	
+	uint8_t 			page1[ FAUST_ACTIVES ];
+	uint8_t 			page2[ FAUST_INPUTS + 2 * FAUST_OUTPUTS ];
+	_NT_parameterPage 	pages[ 2 ];
+	_NT_parameterPages	ppages;
 };
 
 void	calculateRequirements( _NT_algorithmRequirements& req )
@@ -240,6 +245,10 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 	UI ui( alg->parameterDefs, alg->actives );
 	alg->dsp->buildUserInterface( &ui );
 	
+	for ( int i=0; i<FAUST_ACTIVES; ++i )
+	{
+		alg->page1[ i ] = i;
+	}
 	for ( int i=0; i<FAUST_INPUTS; ++i )
 	{
 		_NT_parameter& p = alg->parameterDefs[ kParamFirstInput + i ];
@@ -250,6 +259,7 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 		p.unit = kNT_unitAudioInput;
 		p.scaling = 0;
 		p.enumStrings = NULL;
+		alg->page2[ i ] = FAUST_ACTIVES + i;
 	}
 	for ( int i=0; i<FAUST_OUTPUTS; ++i )
 	{
@@ -269,9 +279,21 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 		pm.unit = kNT_unitOutputMode;
 		pm.scaling = 0;
 		pm.enumStrings = NULL;
+		alg->page2[ FAUST_INPUTS + 2*i + 0 ] = FAUST_ACTIVES + FAUST_INPUTS + 2*i + 0;
+		alg->page2[ FAUST_INPUTS + 2*i + 1 ] = FAUST_ACTIVES + FAUST_INPUTS + 2*i + 1;
 	}
 	
 	alg->parameters = alg->parameterDefs;
+
+	alg->pages[0].name = "Program";
+	alg->pages[0].numParams = ARRAY_SIZE(alg->page1);
+	alg->pages[0].params = alg->page1;
+	alg->pages[1].name = "Routing";
+	alg->pages[1].numParams = ARRAY_SIZE(alg->page2);
+	alg->pages[1].params = alg->page2;
+	alg->ppages.numPages = ARRAY_SIZE(alg->pages);
+	alg->ppages.pages = alg->pages;
+	alg->parameterPages = &alg->ppages;
 	
 	alg->dsp->instanceInit( NT_globals.sampleRate );
 	
