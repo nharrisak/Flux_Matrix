@@ -9,6 +9,7 @@
 . faustpath
 
 faust -a $FAUSTARCH/nt_arch.cpp -uim -nvi -mem -o temp.cpp $1
+python3 $FAUSTARCH/remove_small_arrays.py temp.cpp
 python3 $FAUSTARCH/apply_metadata.py temp.cpp
 arm-none-eabi-c++ -std=c++11 -mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -fno-exceptions -Os -fPIC -Wall -I$NT_API_PATH/include -c -o $2 temp.cpp
 rm temp.cpp
