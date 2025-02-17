@@ -12,7 +12,6 @@ all: $(outputs)
 
 clean:
 	rm -f $(outputs)
-	rm temp.cpp
 
 plugins/%.o: %.dsp
 	mkdir -p $(@D)
