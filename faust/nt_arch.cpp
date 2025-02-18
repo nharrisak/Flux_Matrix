@@ -74,6 +74,7 @@ struct UI
 };
 
 #define FAUST_UIMACROS
+#define FAUST_ADDBUTTON( n, v )
 #define FAUST_ADDCHECKBOX( n, v )
 #define FAUST_ADDVERTICALSLIDER( n, v, def, min, max, step )
 #define FAUST_ADDHORIZONTALSLIDER( n, v, def, min, max, step )
