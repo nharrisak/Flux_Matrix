@@ -56,6 +56,14 @@ enum _NT_textAlignment
 	kNT_textRight,
 };
 
+enum _NT_shape
+{
+	kNT_point,
+	kNT_line,
+	kNT_box,			// unfilled
+	kNT_rectangle,		// filled
+};
+
 #define NT_MULTICHAR( a, b, c, d )	( ( (uint32_t)a << 0 ) | ( (uint32_t)b << 8 ) | ( (uint32_t)c << 16 ) | ( (uint32_t)d << 24 ) )
 
 #if !defined(ARRAY_SIZE)
@@ -212,6 +220,12 @@ extern uint8_t NT_screen[128*64];
 
 // draw text using internal font
 void		NT_drawText( int x, int y, const char* str, int colour=15, _NT_textAlignment align=kNT_textLeft, _NT_textSize size=kNT_textNormal );
+
+// draw a shape (integer coordinates, not antialiased)
+void		NT_drawShapeI( _NT_shape shape, int x0, int y0, int x1, int y1, int colour=15 );
+
+// draw a shape (float coordinates, antialiased)
+void		NT_drawShapeF( _NT_shape shape, float x0, float y0, float x1, float y1, float colour=15 );
 
 }
 

@@ -89,7 +89,10 @@ bool	draw( _NT_algorithm* self )
 		NT_screen[ 128 * 20 + i ] = 0xa5;
 		
 	NT_drawText( 10, 40, "Gain" );
-	NT_drawText( 256, 64, "OK", 1, kNT_textRight, kNT_textLarge );
+	NT_drawText( 256, 64, "OK", 8, kNT_textRight, kNT_textLarge );
+	
+	NT_drawShapeI( kNT_line, 20, 45, 50, 55, 8 );
+	NT_drawShapeF( kNT_line, 20, 50, 50, 60 );
 		
 	return false;
 }
