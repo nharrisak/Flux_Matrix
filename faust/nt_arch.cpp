@@ -80,6 +80,7 @@ struct UI
 #define FAUST_ADDHORIZONTALSLIDER( n, v, def, min, max, step )
 #define FAUST_ADDNUMENTRY( n, v, def, min, max, step )
 #define FAUST_ADDHORIZONTALBARGRAPH( n, v, min, max )
+#define FAUST_ADDVERTICALBARGRAPH( n, v, min, max )
 
 struct dsp_memory_manager
 {
