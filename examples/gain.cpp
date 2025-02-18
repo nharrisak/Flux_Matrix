@@ -84,8 +84,13 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 bool	draw( _NT_algorithm* self )
 {
 	_gainAlgorithm* pThis = (_gainAlgorithm*)self;
+	
 	for ( int i=0; i<pThis->v[kParamGain]; ++i )
 		NT_screen[ 128 * 20 + i ] = 0xa5;
+		
+	NT_drawText( 10, 40, "Gain" );
+	NT_drawText( 256, 64, "OK", 1, kNT_textRight, kNT_textLarge );
+		
 	return false;
 }
 

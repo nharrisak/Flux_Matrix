@@ -42,6 +42,20 @@ enum _NT_selector
 	kNT_selector_factoryInfo,
 };
 
+enum _NT_textSize
+{
+	kNT_textTiny,
+	kNT_textNormal,
+	kNT_textLarge,
+};
+
+enum _NT_textAlignment
+{
+	kNT_textLeft,
+	kNT_textCentre,
+	kNT_textRight,
+};
+
 #define NT_MULTICHAR( a, b, c, d )	( ( (uint32_t)a << 0 ) | ( (uint32_t)b << 8 ) | ( (uint32_t)c << 16 ) | ( (uint32_t)d << 24 ) )
 
 #if !defined(ARRAY_SIZE)
@@ -50,10 +64,10 @@ enum _NT_selector
 
 struct _NT_globals
 {
-	uint32_t	sampleRate;
-	uint32_t	maxFramesPerStep;
-	float*		workBuffer;
-	uint32_t	workBufferSizeBytes;
+	uint32_t	sampleRate;				// sample rate in Hz
+	uint32_t	maxFramesPerStep;		// maximum number of frames per step() call
+	float*		workBuffer;				// buffer available for internal use during step() - does not persist
+	uint32_t	workBufferSizeBytes;	// size of workBuffer in bytes
 };
 
 struct _NT_staticRequirements
@@ -186,9 +200,18 @@ uintptr_t 	pluginEntry( _NT_selector selector, uint32_t data );
 
 void		NT_setParameterRange( _NT_parameter* ptr, float init, float min, float max, float step );
 
+// global structure - always available
 extern const _NT_globals NT_globals;
 
+// drawing - use from within draw() only
+//
+
+// direct access to screen memory
+// screen is 256x64 - each byte contains two pixels
 extern uint8_t NT_screen[128*64];
+
+// draw text using internal font
+void		NT_drawText( int x, int y, const char* str, int colour=15, _NT_textAlignment align=kNT_textLeft, _NT_textSize size=kNT_textNormal );
 
 }
 
