@@ -182,6 +182,7 @@ void	calculateRequirements( _NT_algorithmRequirements& req )
 	dsp_memory_manager mem( dsp_memory_manager::kMemInstance );
 	mydsp::fManager = &mem;
 	mydsp::memoryInfo(); // instance
+	mydsp::fManager = 0;
 
 	req.numParameters = ARRAY_SIZE(_fauseAlgorithm::parameterDefs);
 	req.sram = sizeof(_fauseAlgorithm);
@@ -203,6 +204,7 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 	mem.total = (size_t)ptrs.dram;
 	mydsp::fManager = &mem;
 	alg->dsp->memoryCreate();
+	mydsp::fManager = 0;
 
 	UI ui( alg->parameterDefs, alg->actives );
 	alg->dsp->buildUserInterface( &ui );
@@ -325,6 +327,7 @@ void	calculateStaticRequirements( _NT_staticRequirements& req )
 	dsp_memory_manager mem( dsp_memory_manager::kMemClass );
 	mydsp::fManager = &mem;
 	mydsp::memoryInfo(); // class
+	mydsp::fManager = 0;
 	
 	req.dram = mem.total;
 }
@@ -335,6 +338,7 @@ void	initialise( _NT_staticMemoryPtrs& ptrs, const _NT_staticRequirements& req )
 	mem.total = (size_t)ptrs.dram;
 	mydsp::fManager = &mem;
 	mydsp::classInit( NT_globals.sampleRate );
+	mydsp::fManager = 0;
 }
 
 static const _NT_factory factory = 

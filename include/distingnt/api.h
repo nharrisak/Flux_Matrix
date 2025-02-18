@@ -30,8 +30,9 @@ SOFTWARE.
 enum _NT_version
 {
 	kNT_apiVersion1 			= 1,
+	kNT_apiVersion2,
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion1
+	kNT_apiVersionCurrent 		= kNT_apiVersion2
 };
 
 enum _NT_selector
@@ -175,6 +176,7 @@ struct _NT_factory
 	_NT_algorithm*	(*construct)( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req );
 	void			(*parameterChanged)( _NT_algorithm* self, int p );
 	void 			(*step)( _NT_algorithm* self, float* busFrames, int numFramesBy4 );
+    bool			(*draw)( _NT_algorithm* self );
 };
 
 extern "C" {
@@ -185,6 +187,8 @@ uintptr_t 	pluginEntry( _NT_selector selector, uint32_t data );
 void		NT_setParameterRange( _NT_parameter* ptr, float init, float min, float max, float step );
 
 extern const _NT_globals NT_globals;
+
+extern uint8_t NT_screen[128*64];
 
 }
 

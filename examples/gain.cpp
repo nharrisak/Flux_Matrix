@@ -81,6 +81,14 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	}
 }
 
+bool	draw( _NT_algorithm* self )
+{
+	_gainAlgorithm* pThis = (_gainAlgorithm*)self;
+	for ( int i=0; i<pThis->v[kParamGain]; ++i )
+		NT_screen[ 128 * 20 + i ] = 0xa5;
+	return false;
+}
+
 static const _NT_factory factory = 
 {
 	.guid = NT_MULTICHAR( 'E', 'x', 'g', 'a' ),
@@ -90,6 +98,7 @@ static const _NT_factory factory =
 	.construct = construct,
 	.parameterChanged = parameterChanged,
 	.step = step,
+	.draw = draw,
 };
 
 uintptr_t pluginEntry( _NT_selector selector, uint32_t data )
