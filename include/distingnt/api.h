@@ -31,8 +31,9 @@ enum _NT_version
 {
 	kNT_apiVersion1 			= 1,
 	kNT_apiVersion2,
+	kNT_apiVersion3,				// Adds MIDI handling. Compatible with v2.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion2
+	kNT_apiVersionCurrent 		= kNT_apiVersion3
 };
 
 enum _NT_selector
@@ -199,6 +200,8 @@ struct _NT_factory
 	void			(*parameterChanged)( _NT_algorithm* self, int p );
 	void 			(*step)( _NT_algorithm* self, float* busFrames, int numFramesBy4 );
     bool			(*draw)( _NT_algorithm* self );
+    void			(*midiRealtime)( _NT_algorithm* self, uint8_t byte );
+    void			(*midiMessage)( _NT_algorithm* self, uint8_t byte0, uint8_t byte1, uint8_t byte2 );
 };
 
 extern "C" {
