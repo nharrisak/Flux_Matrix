@@ -24,14 +24,21 @@ enum
 	kParamOutput,
 	kParamOutputMode,
 	kParamMidiChannel,
+	kParamWaveform,
+};
+
+static char const * const enumStringsWaveform[] = {
+	"Square",
+	"Sawtooth",
 };
 
 static const _NT_parameter	parameters[] = {
 	NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output", 1, 13 )
 	{ .name = "MIDI channel", .min = 1, .max = 16, .def = 1, .unit = kNT_unitNone, .scaling = 0, .enumStrings = NULL },
+	{ .name = "Waveform", .min = 0, .max = 1, .def = 0, .unit = kNT_unitEnum, .scaling = 0, .enumStrings = enumStringsWaveform },
 };
 
-static const uint8_t page1[] = { kParamMidiChannel };
+static const uint8_t page1[] = { kParamMidiChannel, kParamWaveform };
 static const uint8_t page2[] = { kParamOutput, kParamOutputMode };
 
 static const _NT_parameterPage pages[] = {
@@ -98,12 +105,17 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	bool replace = pThis->v[kParamOutputMode];
 	
 	float target = dtc->gate ? 1.0f : 0.0f;
+	bool saw = pThis->v[kParamWaveform];
 	
 	for ( int i=0; i<numFrames; ++i )
 	{
 		dtc->phase += dtc->inc;
 		
-		float v = (int)dtc->phase < 0 ? -5.0f : 5.0f;
+		float v;
+		if ( saw )
+			v = (int)dtc->phase * (5.0f/(1<<31));
+		else
+			v = (int)dtc->phase < 0 ? -5.0f : 5.0f;
 	
 		dtc->env = target + 0.99f * ( dtc->env - target );
 	
