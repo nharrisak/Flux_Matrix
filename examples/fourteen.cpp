@@ -29,24 +29,25 @@ enum
 {
     kParamOutput,      // CV output
     kParamOutputMode,  // CV output mode (add/replace)
-    kParamMsbCC,       // MSB CC number
-    kParamLsbCC,       // LSB CC number
+    kParamCC,          // CC number
     kParamMidiChannel, // MIDI channel (0 = all, 1-16 = specific)
     kParamBipolar,     // Bipolar mode (on/off)
     kParamSmoothing,   // Smoothing amount
 };
 
+// clang-format off
 // Parameter definitions
 _NT_parameter parameters[] = {
-    NT_PARAMETER_CV_OUTPUT_WITH_MODE("CV Output", 1, 13){.name = "MSB CC", .min = 0, .max = 127, .def = 1, .unit = kNT_unitNone, .scaling = 0, .enumStrings = NULL},
-    {.name = "LSB CC", .min = 0, .max = 127, .def = 33, .unit = kNT_unitNone, .scaling = 0, .enumStrings = NULL},
+    NT_PARAMETER_CV_OUTPUT_WITH_MODE("CV Output", 1, 13)
+    {.name = "CC", .min = 0, .max = 127, .def = 1, .unit = kNT_unitNone, .scaling = 0, .enumStrings = NULL},
     {.name = "MIDI Ch", .min = 0, .max = 16, .def = 0, .unit = kNT_unitNone, .scaling = 0, .enumStrings = NULL},
     {.name = "Bipolar", .min = 0, .max = 1, .def = 0, .unit = kNT_unitNone, .scaling = 0, .enumStrings = NULL},
     {.name = "Smoothing", .min = 0, .max = 100, .def = 0, .unit = kNT_unitPercent, .scaling = 0, .enumStrings = NULL},
 };
+// clang-format on
 
 // Parameter pages
-uint8_t page1[] = {kParamMsbCC, kParamLsbCC, kParamMidiChannel};
+uint8_t page1[] = {kParamCC, kParamMidiChannel};
 uint8_t page2[] = {kParamBipolar, kParamSmoothing};
 uint8_t page3[] = {kParamOutput, kParamOutputMode};
 
@@ -92,7 +93,7 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
         int channel = byte0 & 0x0F;
 
         // Get the MIDI channel parameter (0 = all channels, 1-16 = specific channel)
-        int midiChannel = (int)pThis->v[kParamMidiChannel];
+        int midiChannel = pThis->v[kParamMidiChannel];
 
         // Skip if we're filtering by channel and this isn't our channel
         if (midiChannel > 0 && channel != (midiChannel - 1))
@@ -101,12 +102,12 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
         }
 
         // Extract CC number and value
-        int cc_number = byte1 & 0x7F; // Ensure 7-bit value
-        int cc_value = byte2 & 0x7F;  // Ensure 7-bit value
+        int cc_number = byte1;
+        int cc_value = byte2;
 
-        // Get MSB and LSB CC numbers from parameters
-        int msb_cc = (int)pThis->v[kParamMsbCC];
-        int lsb_cc = (int)pThis->v[kParamLsbCC];
+        // Get MSB from parameters, LSB is always MSB + 32
+        int msb_cc = pThis->v[kParamCC];
+        int lsb_cc = msb_cc + 32;
 
         // Check for reset controllers message (CC 121) or all notes off (CC 123)
         if (cc_number == 121 || (cc_number == 123 && cc_value == 0))
@@ -157,7 +158,7 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
             float normalized = (float)value_14bit / 16383.0f;
 
             // Apply bipolar setting if enabled
-            if (pThis->v[kParamBipolar] > 0.5f)
+            if (pThis->v[kParamBipolar])
             {
                 // -5V to +5V range
                 pThis->current_voltage = (normalized * 10.0f) - 5.0f;
@@ -178,14 +179,14 @@ void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
     int numFrames = numFramesBy4 * 4;
 
     // Get output destinations with bounds checking
-    int cvOutputIdx = (int)pThis->v[kParamOutput] - 1;
-    if (cvOutputIdx < 0 || cvOutputIdx >= 28)
+    int cvOutputIdx = pThis->v[kParamOutput] - 1;
+    if (cvOutputIdx < 0)
     {
         return; // Invalid output
     }
 
     float *cvOutput = busFrames + cvOutputIdx * numFrames;
-    bool cvReplace = pThis->v[kParamOutputMode] > 0.5f;
+    bool cvReplace = pThis->v[kParamOutputMode];
 
     // Get smoothing value (0-1)
     float smoothing = pThis->v[kParamSmoothing] / 100.0f;
@@ -209,15 +210,7 @@ void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
 
     for (int i = 0; i < numFrames; ++i)
     {
-        // Apply simple smoothing if enabled
-        if (smoothing > 0.0f)
-        {
-            current_voltage = current_voltage + (smooth_coef * (target_voltage - current_voltage));
-        }
-        else
-        {
-            current_voltage = target_voltage;
-        }
+        current_voltage = current_voltage + (smooth_coef * (target_voltage - current_voltage));
 
         // Output to CV
         if (cvReplace)
