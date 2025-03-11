@@ -12,6 +12,7 @@ struct _midiCcConverterAlgorithm : public _NT_algorithm
         msb_received = false;
         lsb_received = false;
         current_voltage = 0.0f;
+        smoothing_coef = 1.0f;
     }
 
     // MIDI state
@@ -22,6 +23,7 @@ struct _midiCcConverterAlgorithm : public _NT_algorithm
 
     // Output state
     float current_voltage; // Current output voltage
+    float smoothing_coef;  // Cached smoothing coefficient
 };
 
 // Parameter indices
@@ -172,6 +174,39 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
     }
 }
 
+// Add parameter changed handler
+void parameterChanged(_NT_algorithm *self, int p)
+{
+    _midiCcConverterAlgorithm *pThis = (_midiCcConverterAlgorithm *)self;
+
+    if (p == kParamSmoothing)
+    {
+        // Get smoothing value (0-100%)
+        float smoothing = pThis->v[kParamSmoothing] / 100.0f;
+
+        // Calculate smoothing coefficient using exponential approach
+        if (smoothing > 0.0f)
+        {
+            // Convert percentage to time constant in milliseconds (1% = 1ms, 100% = 500ms)
+            float timeConstantMs = smoothing * 500.0f;
+            if (timeConstantMs < 1.0f)
+                timeConstantMs = 1.0f;
+
+            // Time constant formula: alpha = exp(-T/tau)
+            // For a simple single-frame approach, T is 1/sampleRate
+            float sampleRate = (float)NT_globals.sampleRate;
+            float timeConstantSamples = (timeConstantMs / 1000.0f) * sampleRate;
+
+            // This gives us a coefficient that determines how quickly we approach the target
+            pThis->smoothing_coef = 1.0f - expf(-1.0f / timeConstantSamples);
+        }
+        else
+        {
+            pThis->smoothing_coef = 1.0f; // No smoothing
+        }
+    }
+}
+
 // DSP processing function
 void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
 {
@@ -188,29 +223,14 @@ void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
     float *cvOutput = busFrames + cvOutputIdx * numFrames;
     bool cvReplace = pThis->v[kParamOutputMode];
 
-    // Get smoothing value (0-1)
-    float smoothing = pThis->v[kParamSmoothing] / 100.0f;
-
-    // Calculate simple smoothing coefficient
-    float smooth_coef = 0.0f;
-    if (smoothing > 0.0f)
-    {
-        // Convert to a simple exponential smoothing coefficient
-        // Higher smoothing = slower response
-        smooth_coef = 1.0f - (smoothing * 0.99f);
-    }
-    else
-    {
-        smooth_coef = 1.0f; // No smoothing
-    }
-
-    // Apply CV to output bus with optional smoothing
+    // Apply CV to output bus with exponential smoothing
     float target_voltage = pThis->current_voltage;
     float current_voltage = pThis->current_voltage;
 
     for (int i = 0; i < numFrames; ++i)
     {
-        current_voltage = current_voltage + (smooth_coef * (target_voltage - current_voltage));
+        // One-pole lowpass filter: y[n] = y[n-1] + α(x[n] - y[n-1])
+        current_voltage = current_voltage + (pThis->smoothing_coef * (target_voltage - current_voltage));
 
         // Output to CV
         if (cvReplace)
@@ -234,7 +254,7 @@ _NT_factory factory = {
     .description = "Converts 14-bit MIDI CC messages to CV",
     .calculateRequirements = calculateRequirements,
     .construct = construct,
-    .parameterChanged = NULL,
+    .parameterChanged = parameterChanged,
     .step = step,
     .draw = NULL,
     .midiMessage = midiMessage,
