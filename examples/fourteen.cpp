@@ -22,8 +22,9 @@ struct _midiCcConverterAlgorithm : public _NT_algorithm
     bool lsb_received; // Flag to track if we've received an LSB message
 
     // Output state
-    float current_voltage; // Current output voltage
-    float smoothing_coef;  // Cached smoothing coefficient
+    float current_voltage;  // Current output voltage
+    float previous_voltage; // Previous output voltage
+    float smoothing_coef;   // Cached smoothing coefficient
 };
 
 // Parameter indices
@@ -134,27 +135,10 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
             pThis->lsb_received = true;
         }
 
-        // Calculate the voltage if we have received any CC messages
-        if (pThis->msb_received || pThis->lsb_received)
+        // Calculate 14-bit value (0-16383) only when we have both values
+        if (pThis->msb_received && pThis->lsb_received)
         {
-            // Calculate 14-bit value (0-16383)
-            int value_14bit = 0;
-
-            if (pThis->msb_received && pThis->lsb_received)
-            {
-                // We have both MSB and LSB - ideal case
-                value_14bit = (pThis->msb_value << 7) | pThis->lsb_value;
-            }
-            else if (pThis->msb_received)
-            {
-                // We only have MSB, scale it up
-                value_14bit = pThis->msb_value << 7;
-            }
-            else
-            {
-                // We only have LSB, just use it at low resolution
-                value_14bit = pThis->lsb_value;
-            }
+            int value_14bit = (pThis->msb_value << 7) | pThis->lsb_value;
 
             // Normalize to 0.0-1.0 range
             float normalized = (float)value_14bit / 16383.0f;
@@ -170,6 +154,10 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
                 // 0V to +10V range
                 pThis->current_voltage = normalized * 10.0f;
             }
+
+            // Reset flags for next pair of messages
+            pThis->msb_received = false;
+            pThis->lsb_received = false;
         }
     }
 }
@@ -223,28 +211,27 @@ void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
     float *cvOutput = busFrames + cvOutputIdx * numFrames;
     bool cvReplace = pThis->v[kParamOutputMode];
 
-    // Apply CV to output bus with exponential smoothing
-    float target_voltage = pThis->current_voltage;
-    float current_voltage = pThis->current_voltage;
+    float target_voltage = pThis->current_voltage; // x[n] - target to move towards
+    float filter_state = pThis->previous_voltage;  // y[n-1] - current filter state
 
     for (int i = 0; i < numFrames; ++i)
     {
-        // One-pole lowpass filter: y[n] = y[n-1] + α(x[n] - y[n-1])
-        current_voltage = current_voltage + (pThis->smoothing_coef * (target_voltage - current_voltage));
+        // IIR One-pole lowpass filter: y[n] = y[n-1] + α(x[n] - y[n-1])
+        filter_state = filter_state + (pThis->smoothing_coef * (target_voltage - filter_state));
 
         // Output to CV
         if (cvReplace)
         {
-            cvOutput[i] = current_voltage;
+            cvOutput[i] = filter_state;
         }
         else
         {
-            cvOutput[i] += current_voltage;
+            cvOutput[i] += filter_state;
         }
     }
 
-    // Save the last voltage for next time (for smoothing)
-    pThis->current_voltage = current_voltage;
+    // Save the filter state for next time
+    pThis->previous_voltage = filter_state;
 }
 
 // Factory information
