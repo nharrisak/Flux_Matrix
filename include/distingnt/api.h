@@ -361,6 +361,13 @@ void		NT_drawShapeI( _NT_shape shape, int x0, int y0, int x1, int y1, int colour
 // draw a shape (float coordinates, antialiased)
 void		NT_drawShapeF( _NT_shape shape, float x0, float y0, float x1, float y1, float colour=15 );
 
+// string formatting helpers
+// NT_xxxToString() return the length of the resulting string
+//
+
+int			NT_intToString( char* buffer, int32_t value );
+int			NT_floatToString( char* buffer, float value, int decimalPlaces=2 );
+
 }
 
 #endif // _DISTINGNT_API_H
