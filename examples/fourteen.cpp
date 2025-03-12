@@ -3,18 +3,8 @@
 #include <distingnt/api.h>
 
 // Algorithm state
-struct _midiCcConverterAlgorithm : public _NT_algorithm
+struct _midiCcConverterAlgorithm_DTC
 {
-    _midiCcConverterAlgorithm()
-    {
-        msb_value = 0;
-        lsb_value = 0;
-        msb_received = false;
-        lsb_received = false;
-        current_voltage = 0.0f;
-        smoothing_coef = 1.0f;
-    }
-
     // MIDI state
     int msb_value;     // Most significant byte value (0-127)
     int lsb_value;     // Least significant byte value (0-127)
@@ -25,6 +15,22 @@ struct _midiCcConverterAlgorithm : public _NT_algorithm
     float current_voltage;  // Current output voltage
     float previous_voltage; // Previous output voltage
     float smoothing_coef;   // Cached smoothing coefficient
+};
+
+struct _midiCcConverterAlgorithm : public _NT_algorithm
+{
+    _midiCcConverterAlgorithm(_midiCcConverterAlgorithm_DTC *dtc_) : dtc(dtc_)
+    {
+        dtc->msb_value = 0;
+        dtc->lsb_value = 0;
+        dtc->msb_received = false;
+        dtc->lsb_received = false;
+        dtc->current_voltage = 0.0f;
+        dtc->smoothing_coef = 1.0f;
+        dtc->previous_voltage = 0.0f;
+    }
+
+    _midiCcConverterAlgorithm_DTC *dtc;
 };
 
 // Parameter indices
@@ -71,14 +77,14 @@ void calculateRequirements(_NT_algorithmRequirements &req)
     req.numParameters = ARRAY_SIZE(parameters);
     req.sram = sizeof(_midiCcConverterAlgorithm);
     req.dram = 0;
-    req.dtc = 0;
+    req.dtc = sizeof(_midiCcConverterAlgorithm_DTC);
     req.itc = 0;
 }
 
 // Construct the algorithm
 _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &ptrs, const _NT_algorithmRequirements &req)
 {
-    _midiCcConverterAlgorithm *alg = new (ptrs.sram) _midiCcConverterAlgorithm();
+    _midiCcConverterAlgorithm *alg = new (ptrs.sram) _midiCcConverterAlgorithm((_midiCcConverterAlgorithm_DTC *)ptrs.dtc);
     alg->parameters = parameters;
     alg->parameterPages = &parameterPages;
     return alg;
@@ -88,6 +94,7 @@ _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &ptrs, const _NT_algorith
 void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte2)
 {
     _midiCcConverterAlgorithm *pThis = (_midiCcConverterAlgorithm *)self;
+    _midiCcConverterAlgorithm_DTC *dtc = pThis->dtc;
 
     // Only process CC messages (0xB0-0xBF)
     if ((byte0 & 0xF0) == 0xB0)
@@ -115,30 +122,30 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
         // Check for reset controllers message (CC 121) or all notes off (CC 123)
         if (cc_number == 121 || (cc_number == 123 && cc_value == 0))
         {
-            pThis->msb_value = 0;
-            pThis->lsb_value = 0;
-            pThis->msb_received = false;
-            pThis->lsb_received = false;
-            pThis->current_voltage = 0.0f;
+            dtc->msb_value = 0;
+            dtc->lsb_value = 0;
+            dtc->msb_received = false;
+            dtc->lsb_received = false;
+            dtc->current_voltage = 0.0f;
             return;
         }
 
         // Check if this is our MSB or LSB CC number
         if (cc_number == msb_cc)
         {
-            pThis->msb_value = cc_value;
-            pThis->msb_received = true;
+            dtc->msb_value = cc_value;
+            dtc->msb_received = true;
         }
         else if (cc_number == lsb_cc)
         {
-            pThis->lsb_value = cc_value;
-            pThis->lsb_received = true;
+            dtc->lsb_value = cc_value;
+            dtc->lsb_received = true;
         }
 
         // Calculate 14-bit value (0-16383) only when we have both values
-        if (pThis->msb_received && pThis->lsb_received)
+        if (dtc->msb_received && dtc->lsb_received)
         {
-            int value_14bit = (pThis->msb_value << 7) | pThis->lsb_value;
+            int value_14bit = (dtc->msb_value << 7) | dtc->lsb_value;
 
             // Normalize to 0.0-1.0 range
             float normalized = (float)value_14bit / 16383.0f;
@@ -147,17 +154,17 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
             if (pThis->v[kParamBipolar])
             {
                 // -5V to +5V range
-                pThis->current_voltage = (normalized * 10.0f) - 5.0f;
+                dtc->current_voltage = (normalized * 10.0f) - 5.0f;
             }
             else
             {
                 // 0V to +10V range
-                pThis->current_voltage = normalized * 10.0f;
+                dtc->current_voltage = normalized * 10.0f;
             }
 
             // Reset flags for next pair of messages
-            pThis->msb_received = false;
-            pThis->lsb_received = false;
+            dtc->msb_received = false;
+            dtc->lsb_received = false;
         }
     }
 }
@@ -166,6 +173,7 @@ void midiMessage(_NT_algorithm *self, uint8_t byte0, uint8_t byte1, uint8_t byte
 void parameterChanged(_NT_algorithm *self, int p)
 {
     _midiCcConverterAlgorithm *pThis = (_midiCcConverterAlgorithm *)self;
+    _midiCcConverterAlgorithm_DTC *dtc = pThis->dtc;
 
     if (p == kParamSmoothing)
     {
@@ -186,11 +194,11 @@ void parameterChanged(_NT_algorithm *self, int p)
             float timeConstantSamples = (timeConstantMs / 1000.0f) * sampleRate;
 
             // This gives us a coefficient that determines how quickly we approach the target
-            pThis->smoothing_coef = 1.0f - expf(-1.0f / timeConstantSamples);
+            dtc->smoothing_coef = 1.0f - expf(-1.0f / timeConstantSamples);
         }
         else
         {
-            pThis->smoothing_coef = 1.0f; // No smoothing
+            dtc->smoothing_coef = 1.0f; // No smoothing
         }
     }
 }
@@ -199,6 +207,7 @@ void parameterChanged(_NT_algorithm *self, int p)
 void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
 {
     _midiCcConverterAlgorithm *pThis = (_midiCcConverterAlgorithm *)self;
+    _midiCcConverterAlgorithm_DTC *dtc = pThis->dtc;
     int numFrames = numFramesBy4 * 4;
 
     // Get output destinations with bounds checking
@@ -211,13 +220,13 @@ void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
     float *cvOutput = busFrames + cvOutputIdx * numFrames;
     bool cvReplace = pThis->v[kParamOutputMode];
 
-    float target_voltage = pThis->current_voltage; // x[n] - target to move towards
-    float filter_state = pThis->previous_voltage;  // y[n-1] - current filter state
+    float target_voltage = dtc->current_voltage; // x[n] - target to move towards
+    float filter_state = dtc->previous_voltage;  // y[n-1] - current filter state
 
     for (int i = 0; i < numFrames; ++i)
     {
         // IIR One-pole lowpass filter: y[n] = y[n-1] + α(x[n] - y[n-1])
-        filter_state = filter_state + (pThis->smoothing_coef * (target_voltage - filter_state));
+        filter_state = filter_state + (dtc->smoothing_coef * (target_voltage - filter_state));
 
         // Output to CV
         if (cvReplace)
@@ -231,7 +240,7 @@ void step(_NT_algorithm *self, float *busFrames, int numFramesBy4)
     }
 
     // Save the filter state for next time
-    pThis->previous_voltage = filter_state;
+    dtc->previous_voltage = filter_state;
 }
 
 // Factory information
