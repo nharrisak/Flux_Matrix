@@ -1,0 +1,54 @@
+name: Make Plug-ins Archive
+
+on:
+  push:
+    tags:
+      - 'v*'  # Runs action on pushed tags starting with 'v'
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies via Homebrew
+        run: |
+          brew update
+          brew install faust
+          brew install --cask gcc-arm-embedded
+
+      - name: Verify installation
+        run: |
+          arm-none-eabi-g++ --version
+          faust --version
+
+      - name: Run make in directories
+        run: |
+          DIRECTORIES=("examples" "faust/examples")  # Replace with your actual directories
+          for DIR in "${DIRECTORIES[@]}"; do
+            echo "Building in $DIR"
+            (cd "$DIR" && make clean && make)
+          done
+
+      - name: Prepare directory structure for zip
+        run: |
+          mkdir -p release/programs/plug-ins
+          DIRECTORIES=("examples" "faust/examples")  # Use your actual directories here
+          for DIR in "${DIRECTORIES[@]}"; do
+            find "$DIR" -type f -name "*.o" -exec cp {} release/programs/plug-ins/ \;
+          done
+
+      - name: Zip artifacts
+        run: |
+          cd release
+          zip -r ../plug-ins.zip programs
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: plug-ins.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
