@@ -35,8 +35,9 @@ enum _NT_version
 	kNT_apiVersion1 			= 1,
 	kNT_apiVersion2,
 	kNT_apiVersion3,				// Adds MIDI handling. Compatible with v2.
+	kNT_apiVersion4,				// Add specifications. Breaks compatibility.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion3
+	kNT_apiVersionCurrent 		= kNT_apiVersion4
 };
 
 /*
@@ -78,6 +79,7 @@ enum _NT_shape
 	kNT_line,
 	kNT_box,			// unfilled
 	kNT_rectangle,		// filled
+	kNT_circle,			// unfilled
 };
 
 /*
@@ -249,6 +251,28 @@ struct _NT_algorithm
 };
 
 /*
+ * Values for the type field of _NT_specification.
+ */
+enum
+{
+	kNT_typeGeneric,
+	kNT_typeSeconds,
+	kNT_typeBoolean,
+};
+
+/*
+ * Structure that defines an algorithm specification.
+ */
+struct _NT_specification
+{
+	const char* 	name;							// The specification name
+	int32_t			min;							// Minimum value
+	int32_t			max;							// Maximum value
+	int32_t			def;							// Default value
+	int32_t			type;							// Type (kNT_typeGeneric etc.)
+};
+
+/*
  * Structure that defines an algorithm factory.
  *
  * Returned from pluginEntry().
@@ -257,9 +281,11 @@ struct _NT_algorithm
  */
 struct _NT_factory
 {
-	uint32_t		guid;				// Algorithm guid. Use NT_MULTICHAR(). Four ASCII characters - stored in the JSON as a string.
-	const char*		name;				// Algorithm name
-	const char*		description;		// Algorithm description
+	uint32_t					guid;				// Algorithm guid. Use NT_MULTICHAR(). Four ASCII characters - stored in the JSON as a string.
+	const char*					name;				// Algorithm name
+	const char*					description;		// Algorithm description
+	uint32_t					numSpecifications;	// The number of elements in specifications[], if not NULL
+	const _NT_specification*	specifications;		// Algorithm specifications (can be NULL)
 
 	/*
 	 * Called during plug-in scan, and loading.
@@ -281,7 +307,7 @@ struct _NT_factory
 	 * This will be during preset loading, or when browsing the 'add algorithm' or 'respecify' menus.
 	 * It should be a lightweight function as it may be called frequently.
 	 */
-	void			(*calculateRequirements)( _NT_algorithmRequirements& req );
+	void			(*calculateRequirements)( _NT_algorithmRequirements& req, const int32_t* specifications );
 
 	/*
 	 * Called to construct a new plug-in instance. Not optional - this method must be implemented.
@@ -290,7 +316,7 @@ struct _NT_factory
 	 * The function should use one of the allocations to prepare an _NT_algorithm (or subclass thereof),
 	 * and return a pointer to this object.
 	 */
-	_NT_algorithm*	(*construct)( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req );
+	_NT_algorithm*	(*construct)( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications );
 
 	/*
 	 * Called by the host when a parameter value changes.
