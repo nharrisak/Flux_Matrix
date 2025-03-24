@@ -15,7 +15,7 @@ struct _algorithm2 : public _NT_algorithm
 	~_algorithm2() {}
 };
 
-void	calculateRequirements1( _NT_algorithmRequirements& req )
+void	calculateRequirements1( _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	req.numParameters = 0;
 	req.sram = sizeof(_algorithm1);
@@ -24,7 +24,7 @@ void	calculateRequirements1( _NT_algorithmRequirements& req )
 	req.itc = 0;
 }
 
-void	calculateRequirements2( _NT_algorithmRequirements& req )
+void	calculateRequirements2( _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	req.numParameters = 0;
 	req.sram = sizeof(_algorithm2);
@@ -33,13 +33,13 @@ void	calculateRequirements2( _NT_algorithmRequirements& req )
 	req.itc = 0;
 }
 
-_NT_algorithm*	construct1( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req )
+_NT_algorithm*	construct1( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	_algorithm1* alg = new (ptrs.sram) _algorithm1();
 	return alg;
 }
 
-_NT_algorithm*	construct2( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req )
+_NT_algorithm*	construct2( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	_algorithm2* alg = new (ptrs.sram) _algorithm2();
 	return alg;
@@ -72,6 +72,7 @@ static const _NT_factory factory1 =
 	.guid = NT_MULTICHAR( 'E', 'x', 'm', '1' ),
 	.name = "Multiple 1",
 	.description = "Test of multiple factories, pt1",
+	.numSpecifications = 0,
 	.calculateRequirements = calculateRequirements1,
 	.construct = construct1,
 	.parameterChanged = NULL,
@@ -85,6 +86,7 @@ static const _NT_factory factory2 =
 	.guid = NT_MULTICHAR( 'E', 'x', 'm', '2' ),
 	.name = "Multiple 2",
 	.description = "Test of multiple factories, pt2",
+	.numSpecifications = 0,
 	.calculateRequirements = calculateRequirements2,
 	.construct = construct2,
 	.parameterChanged = NULL,

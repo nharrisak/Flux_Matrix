@@ -72,7 +72,7 @@ _NT_parameterPages parameterPages = {
 };
 
 // Calculate memory requirements for the algorithm
-void calculateRequirements(_NT_algorithmRequirements &req)
+void calculateRequirements(_NT_algorithmRequirements &req, const int32_t* specifications)
 {
     req.numParameters = ARRAY_SIZE(parameters);
     req.sram = sizeof(_midiCcConverterAlgorithm);
@@ -82,7 +82,7 @@ void calculateRequirements(_NT_algorithmRequirements &req)
 }
 
 // Construct the algorithm
-_NT_algorithm *construct(const _NT_algorithmMemoryPtrs &ptrs, const _NT_algorithmRequirements &req)
+_NT_algorithm *construct(const _NT_algorithmMemoryPtrs &ptrs, const _NT_algorithmRequirements &req, const int32_t* specifications)
 {
     _midiCcConverterAlgorithm *alg = new (ptrs.sram) _midiCcConverterAlgorithm((_midiCcConverterAlgorithm_DTC *)ptrs.dtc);
     alg->parameters = parameters;
@@ -248,6 +248,7 @@ _NT_factory factory = {
     .guid = NT_MULTICHAR('T', 'h', '1', '4'),
     .name = "14-bit CC to CV",
     .description = "Converts 14-bit MIDI CC messages to CV",
+	.numSpecifications = 0,
     .calculateRequirements = calculateRequirements,
     .construct = construct,
     .parameterChanged = parameterChanged,

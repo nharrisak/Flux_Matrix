@@ -51,7 +51,7 @@ static const _NT_parameterPages parameterPages = {
 	.pages = pages,
 };
 
-void	calculateRequirements( _NT_algorithmRequirements& req )
+void	calculateRequirements( _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	req.numParameters = ARRAY_SIZE(parameters);
 	req.sram = sizeof(_monosynthAlgorithm);
@@ -60,7 +60,7 @@ void	calculateRequirements( _NT_algorithmRequirements& req )
 	req.itc = 0;
 }
 
-_NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req )
+_NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	_monosynthAlgorithm* alg = new (ptrs.sram) _monosynthAlgorithm( (_monosynthAlgorithm_DTC*)ptrs.dtc );
 	alg->parameters = parameters;
@@ -131,6 +131,7 @@ static const _NT_factory factory =
 	.guid = NT_MULTICHAR( 'E', 'x', 'm', 's' ),
 	.name = "Monosynth",
 	.description = "Very simple MIDI synth",
+	.numSpecifications = 0,
 	.calculateRequirements = calculateRequirements,
 	.construct = construct,
 	.parameterChanged = NULL,

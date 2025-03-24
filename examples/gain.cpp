@@ -38,7 +38,7 @@ static const _NT_parameterPages parameterPages = {
 	.pages = pages,
 };
 
-void	calculateRequirements( _NT_algorithmRequirements& req )
+void	calculateRequirements( _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	req.numParameters = ARRAY_SIZE(parameters);
 	req.sram = sizeof(_gainAlgorithm);
@@ -47,7 +47,7 @@ void	calculateRequirements( _NT_algorithmRequirements& req )
 	req.itc = 0;
 }
 
-_NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req )
+_NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	_gainAlgorithm* alg = new (ptrs.sram) _gainAlgorithm();
 	alg->parameters = parameters;
@@ -58,7 +58,8 @@ _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorit
 void	parameterChanged( _NT_algorithm* self, int p )
 {
 	_gainAlgorithm* pThis = (_gainAlgorithm*)self;
-	pThis->gain = pThis->v[kParamGain] / 100.0f;
+	if ( p == kParamGain )
+		pThis->gain = pThis->v[kParamGain] / 100.0f;
 }
 
 void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
@@ -102,6 +103,7 @@ static const _NT_factory factory =
 	.guid = NT_MULTICHAR( 'E', 'x', 'g', 'a' ),
 	.name = "Gain",
 	.description = "Applies gain",
+	.numSpecifications = 0,
 	.calculateRequirements = calculateRequirements,
 	.construct = construct,
 	.parameterChanged = parameterChanged,
