@@ -179,7 +179,7 @@ struct _fauseAlgorithm : public _NT_algorithm
 	_NT_parameterPages	ppages;
 };
 
-void	calculateRequirements( _NT_algorithmRequirements& req )
+void	calculateRequirements( _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	dsp_memory_manager mem( dsp_memory_manager::kMemInstance );
 	mydsp::fManager = &mem;
@@ -193,7 +193,7 @@ void	calculateRequirements( _NT_algorithmRequirements& req )
 	req.itc = 0;
 }
 
-_NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req )
+_NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	if ( FAUST_OUTPUTS * NT_globals.maxFramesPerStep * sizeof(float) > NT_globals.workBufferSizeBytes )
 		return NULL;
@@ -348,6 +348,7 @@ static const _NT_factory factory =
 	.guid = NT_MULTICHAR( 'F', 'a', 'u', 's' ),
 	.name = "faust",
 	.description = "faust",
+	.numSpecifications = 0,
 	.calculateStaticRequirements = calculateStaticRequirements,
 	.initialise = initialise,
 	.calculateRequirements = calculateRequirements,
