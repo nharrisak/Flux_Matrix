@@ -1,0 +1,183 @@
+
+import os
+
+path = 'reports'
+files = os.listdir( path )
+files = [ f for f in files if os.path.isfile( os.path.join( path, f ) ) and f.endswith( '.txt' ) ]
+files.sort()
+
+srcPath = '../airwindows/plugins/MacAU/'
+
+skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'ConsoleXBuss', 'ConsoleXChannel', 'ConsoleXPre', 'DynamicsMono', 'Mastering' ]
+
+def matchCurly( t ):
+	s = ''
+	b = 0
+	for c in t:
+		s += c
+		if c == '{':
+			b += 1
+		elif c == '}':
+			b -= 1
+			if b == 0:
+				return s
+	return ''
+
+guids = []
+
+for f in files:
+	name = f.replace( '.txt', '' )
+	if name in skipList:
+		continue
+	with open( os.path.join( path, f ), 'r' ) as F:
+		lines = F.readlines()
+		numEnums = 0
+		firstParamLine = 2
+		if ( lines[1] == "ENUMS\n" ):
+			numEnums = int( lines[2].strip() )
+			firstParamLine = 4 + numEnums
+		numParameters = int( lines[firstParamLine-1].strip() )
+
+		fname = name
+		if fname == 'Point':
+			fname = 'Poynt'
+		src = srcPath + name + '/' + fname + '.cpp'
+
+		enums = ''
+		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
+			content = G.read()
+			while True:
+				bits = content.split( 'enum {' )
+				if len(bits) < 2:
+					break;
+				bits = bits[1].split( '}' )
+				enums += 'enum {\n' + bits[0] + '};\n'
+				content = bits[1]
+
+		privates = ''
+		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
+			content = G.read()
+			bits = content.split( 'private:' )
+			if len(bits) != 2:
+				bits = content.split( 'Reset();' )
+			if len(bits) == 2:
+				bits = '{' + bits[1]
+				privates = matchCurly( bits )[1:-1]
+
+		consts = ''
+		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
+			content = G.readlines()
+			content = [ c for c in content if c.startswith( 'const int' ) or c.startswith( 'static const int' ) ]
+			consts = ''.join( content )
+
+		while len( name ) < 3:
+			name += ' '
+		guid = [ 'A', name[0], name[1], name[2] ]
+		while guid in guids:
+			i = ord( guid[3] ) + 1
+			while i in [ ord("'"), ord('"') ]:
+				i += 1
+			i = ord(' ') + ( ( i - ord(' ') ) % ( ord('z') - ord(' ') ) )
+			guid[3] = chr( i )
+		guids.append( guid )
+
+		if ( lines[0] == 'STEREO\n' ):
+			with open( src, 'r', encoding='mac_roman' ) as G:
+				content = G.read()
+				bits = content.split( '(Float32*)(outBuffer.mBuffers[1].mData);' )
+				bits = bits[1].split( 'return noErr;' )
+				renderCall = bits[0]
+				bits = content.split( '::Reset(AudioUnitScope inScope, AudioUnitElement inElement)' )
+				resetCall = bits[1].split( '//~~~~~~~~~~~' )[0]
+
+			with open( os.path.join( '../src', f.replace( '.txt', '.cpp' ) ), 'w' ) as G:
+				G.write( '#include <math.h>\n#include <new>\n#include <distingnt/api.h>\n' )
+				G.write( '#define AIRWINDOWS_NAME "' + name + '"\n' )
+				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
+				G.write( enums )
+				G.write( consts )
+				G.write( 'enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,\n' )
+				for i in range( numParameters ):
+					G.write( f'kParam{i}, ' )
+				G.write( '};\n' )
+				if numEnums > 0:
+					G.write( ''.join( lines[3:3+numEnums] ) )
+				G.write( 'static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };\n' )
+				G.write( 'static const _NT_parameter	parameters[] = {\n' )
+				G.write( 'NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )\n' )
+				G.write( 'NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )\n' )
+				G.write( 'NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )\n' )
+				G.write( 'NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )\n' )
+				G.write( ''.join( lines[firstParamLine:] ) )
+				G.write( '};\n' )
+				G.write( 'static const uint8_t page1[] = {\n' )
+				for i in range( numParameters ):
+					G.write( f'kParam{i}, ' )
+				G.write( '};\n' )
+				G.write( 'enum { kNumTemplateParameters = 6 };\n' )
+				G.write( '#include "../include/template1.h"\n' )
+				G.write( privates )
+				G.write( '#include "../include/template2.h"\n' )
+				G.write( '#include "../include/templateStereo.h"\n' )
+				G.write( 'void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {\n')
+				G.write( renderCall )
+				G.write( '};\n' )
+				G.write( 'int _airwindowsAlgorithm::reset(void) {\n')
+				G.write( resetCall )
+				G.write( '};\n' )
+		
+		elif ( lines[0] == 'KERNELS\n' ):
+			with open( src, 'r', encoding='mac_roman' ) as G:
+				content = G.read()
+				bits = content.split( 'Kernel::Process(' )
+				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
+				renderCall = matchCurly( bits )
+				bits = content.split( 'Kernel::Reset()', maxsplit=1 )
+				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
+				resetCall = matchCurly( bits )
+
+			with open( os.path.join( '../src', f.replace( '.txt', '.cpp' ) ), 'w' ) as G:
+				G.write( '#include <math.h>\n#include <new>\n#include <distingnt/api.h>\n' )
+				G.write( '#define AIRWINDOWS_NAME "' + name + '"\n' )
+				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
+				G.write( '#define AIRWINDOWS_KERNELS\n' )
+				G.write( enums )
+				G.write( consts )
+				G.write( 'enum { kParamInput1, kParamOutput1, kParamOutput1mode,\n' )
+				for i in range( numParameters ):
+					G.write( f'kParam{i}, ' )
+				G.write( '};\n' )
+				if numEnums > 0:
+					G.write( ''.join( lines[3:3+numEnums] ) )
+				G.write( 'static const uint8_t page2[] = { kParamInput1, kParamOutput1, kParamOutput1mode };\n' )
+				G.write( 'static const _NT_parameter	parameters[] = {\n' )
+				G.write( 'NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )\n' )
+				G.write( 'NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )\n' )
+				G.write( ''.join( lines[firstParamLine:] ) )
+				G.write( '};\n' )
+				G.write( 'static const uint8_t page1[] = {\n' )
+				for i in range( numParameters ):
+					G.write( f'kParam{i}, ' )
+				G.write( '};\n' )
+				G.write( 'enum { kNumTemplateParameters = 3 };\n' )
+				G.write( '#include "../include/template1.h"\n' )
+				G.write( 'struct _kernel {\n' )
+				G.write( '\tvoid render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess );\n' )
+				G.write( '\tvoid reset(void);\n' )
+				G.write( '\tfloat GetParameter( int index ) { return owner->GetParameter( index ); }\n' )
+				G.write( '\t_airwindowsAlgorithm* owner;\n' )
+				G.write( privates )
+				G.write( '};\n' )
+				G.write( '_kernel kernels[1];\n' )
+				G.write( '\n#include "../include/template2.h"\n' )
+				G.write( '#include "../include/templateKernels.h"\n' )
+				G.write( 'void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {\n')
+				G.write( '#define inNumChannels (1)\n')
+				G.write( renderCall )
+				G.write( '\n}\n' )
+				G.write( 'void _airwindowsAlgorithm::_kernel::reset(void) {\n')
+				G.write( resetCall )
+				G.write( '\n};\n' )
+
+		else:
+			pass
