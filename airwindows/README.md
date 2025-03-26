@@ -9,3 +9,5 @@ In `make_plugins`:
 
 In `src`:
 * `make`
+
+Please join the Discord for discussion - see [here](https://www.modwiggler.com/forum/viewtopic.php?t=287914).
