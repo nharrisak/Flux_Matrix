@@ -31,7 +31,7 @@ files.sort()
 
 srcPath = '../airwindows/plugins/MacAU/'
 
-skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'ConsoleXBuss', 'ConsoleXChannel', 'ConsoleXPre', 'DynamicsMono', 'Mastering' ]
+skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'ConsoleXBuss', 'ConsoleXChannel', 'ConsoleXPre', 'DynamicsMono', 'PocketVerbs' ]
 
 def matchCurly( t ):
 	s = ''
@@ -86,6 +86,7 @@ for f in files:
 			if len(bits) == 2:
 				bits = '{' + bits[1]
 				privates = matchCurly( bits )[1:-1]
+		privates = privates.replace( 'long double ', 'double ' )
 
 		consts = ''
 		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
@@ -110,6 +111,7 @@ for f in files:
 				bits = content.split( '(Float32*)(outBuffer.mBuffers[1].mData);' )
 				bits = bits[1].split( 'return noErr;' )
 				renderCall = bits[0]
+				renderCall = renderCall.replace( 'long double ', 'double ' )
 				bits = content.split( '::Reset(AudioUnitScope inScope, AudioUnitElement inElement)' )
 				resetCall = bits[1].split( '//~~~~~~~~~~~' )[0]
 
@@ -155,6 +157,7 @@ for f in files:
 				bits = content.split( 'Kernel::Process(' )
 				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
 				renderCall = matchCurly( bits )
+				renderCall = renderCall.replace( 'long double ', 'double ' )
 				bits = content.split( 'Kernel::Reset()', maxsplit=1 )
 				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
 				resetCall = matchCurly( bits )
