@@ -70,6 +70,19 @@ def adjustFloatTypes( text ):
 		text = text.replace( 'Float64', 'Float32' )
 		text = re.sub( r'(\d+\.\d+)(\W)', repl_fconst, text )
 		text = re.sub( r'(\d+\.\d+e-?\d+)(\W)', repl_fconst, text )
+		# remove dither
+		while True:
+			bits = text.split( '//begin 32 bit floating point dither', maxsplit=1 )
+			if len(bits) == 2:
+				text = bits[0] + bits[1].split( '//end 32 bit floating point dither', maxsplit=1 )[1]
+			else:
+				break
+		while True:
+			bits = text.split( '//begin 32 bit stereo floating point dither', maxsplit=1 )
+			if len(bits) == 2:
+				text = bits[0] + bits[1].split( '//end 32 bit stereo floating point dither', maxsplit=1 )[1]
+			else:
+				break
 	return text
 
 def repl( m ):

@@ -60,11 +60,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 		//mojo is the one that flattens WAAAAY out very softly before wavefolding
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += static_cast<int32_t>(fpd) * 5.960464655174751e-36L * pow(2,expon+62);
-		//end 32 bit floating point dither
+		
 		
 		*destP = inputSample;
 		

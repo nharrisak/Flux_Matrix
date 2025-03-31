@@ -93,11 +93,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//and we'll do the harshest of hardclips to cope with how intense the new peaks can get,
 		//without in any way dialing back the ruthless brightness the exciter can create.
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit floating point dither
+		
 		
 		*destP = inputSample;
 		

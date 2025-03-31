@@ -107,11 +107,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//FathomFive is the original Airwindows deep bass booster algorithm:
 		//further ones work to rein in that DC offset issue.
 				
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)outputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		outputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit floating point dither
+		
 		
 		sourceP += inNumChannels;
 		*destP = outputSample;

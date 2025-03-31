@@ -58,11 +58,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (outputSample > 1.0f) outputSample = 1.0f;
 		if (outputSample < -1.0f) outputSample = -1.0f;
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)outputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		outputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit floating point dither
+		
 		
 		*destP = outputSample;
 		sourceP += inNumChannels; destP += inNumChannels;

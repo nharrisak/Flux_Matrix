@@ -86,11 +86,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//this is part of the Purest line: stuff that is on every track
 		//needs to be DAMN LOW ON MATH srsly guys
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit floating point dither
+		
 		
 		*destP = inputSample;
 		//force 80 bit into 32 bit output

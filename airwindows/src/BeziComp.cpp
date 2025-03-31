@@ -138,14 +138,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		lastSampleR = intermediateR[0]; //run a little buffer to handle this
 		//end ClipOnly2 stereo as a little, compressed chunk that can be dropped into code
 
-		//begin 32 bit stereo floating point dither
-		int expon; frexpf((float)inputSampleL, &expon);
-		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		frexpf((float)inputSampleR, &expon);
-		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit stereo floating point dither
+		
 		
 		*outputL = inputSampleL;
 		*outputR = inputSampleR;

@@ -67,11 +67,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		for (int x = spacing; x > 0; x--) intermediate[x-1] = intermediate[x];
 		lastSample = intermediate[0]; //run a little buffer to handle this
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit floating point dither
+		
 		
 		*destP = inputSample;
 		

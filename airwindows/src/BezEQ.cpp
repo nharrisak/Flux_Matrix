@@ -131,11 +131,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSampleL = (bass*bassGain) + (mid*midGain) + (treble*trebleGain);
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSampleL, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSampleL += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
-		//end 32 bit floating point dither
+		
 		
 		*destP = inputSampleL;
 		

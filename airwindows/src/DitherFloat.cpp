@@ -100,19 +100,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 
 		
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSample, &expon);
-		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += (fpd*3.4e-36l*pow(2,expon+62) * blend);	//remove 'blend' for real use, it's for the demo	
-		//end 32 bit floating point dither
+		
 
 		/* copy and paste into code, fpd is a uint32_t initialized as 17 (NOT 0)
 		 
-		//begin 32 bit floating point dither
-		int expon; frexpf((float)inputSample, &expon);
-		fpd ^= fpd<<13; fpd ^= fpd>>17; fpd ^= fpd<<5;
-		inputSample += (fpd*3.4e-36l*pow(2,expon+62));	
-		//end 32 bit floating point dither
+		
 		
 		//begin 64 bit floating point dither
 		int expon; frexp((float)inputSample, &expon);
