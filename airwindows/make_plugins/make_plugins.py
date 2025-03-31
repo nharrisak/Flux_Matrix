@@ -129,7 +129,7 @@ for f in files:
 					# look for arrays with symbols as sizes
 					# assume these are big
 					# though this is defintely not the case for all examples
-					pat = r'\s*' + t + r'\s+([\d\w]+)\[([\w\d]+)\];'
+					pat = r'\s*' + t + r'\s+([\d\w]+)\[([\w\d\+]+)\];'
 					m = re.match( pat, p )
 					if m:
 						dram += p + '\n'

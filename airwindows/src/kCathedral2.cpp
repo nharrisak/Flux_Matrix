@@ -32,39 +32,7 @@ enum { kNumTemplateParameters = 6 };
  	double gainOutR;
 	
 	
-	double eAL[shortA+5];
-	double eBL[shortB+5];
-	double eCL[shortC+5];
-	double eDL[shortD+5];
-	double eEL[shortE+5];
-	double eFL[shortF+5];
-	double eGL[shortG+5];
-	double eHL[shortH+5];
-	double eIL[shortI+5];
-	double eJL[shortJ+5];
-	double eKL[shortK+5];
-	double eLL[shortL+5];
-	double eML[shortM+5];
-	double eNL[shortN+5];
-	double eOL[shortO+5];
-	double ePL[shortP+5];
 	
-	double eAR[shortA+5];
-	double eBR[shortB+5];
-	double eCR[shortC+5];
-	double eDR[shortD+5];
-	double eER[shortE+5];
-	double eFR[shortF+5];
-	double eGR[shortG+5];
-	double eHR[shortH+5];
-	double eIR[shortI+5];
-	double eJR[shortJ+5];
-	double eKR[shortK+5];
-	double eLR[shortL+5];
-	double eMR[shortM+5];
-	double eNR[shortN+5];
-	double eOR[shortO+5];
-	double ePR[shortP+5];
 
 	int shortAL;
 	int shortBL;
@@ -103,63 +71,9 @@ enum { kNumTemplateParameters = 6 };
 	
 	
 		
-	double aAL[delayA+5];
-	double aBL[delayB+5];
-	double aCL[delayC+5];
-	double aDL[delayD+5];
-	double aEL[delayE+5];
-	double aFL[delayF+5];
-	double aGL[delayG+5];
-	double aHL[delayH+5];
-	double aIL[delayI+5];
-	double aJL[delayJ+5];
-	double aKL[delayK+5];
-	double aLL[delayL+5];
-	double aML[delayM+5];
-	double aNL[delayN+5];
-	double aOL[delayO+5];
-	double aPL[delayP+5];
-	double aQL[delayQ+5];
-	double aRL[delayR+5];
-	double aSL[delayS+5];
-	double aTL[delayT+5];
-	double aUL[delayU+5];
-	double aVL[delayV+5];
-	double aWL[delayW+5];
-	double aXL[delayX+5];
-	double aYL[delayY+5];
 	
-	double aAR[delayA+5];
-	double aBR[delayB+5];
-	double aCR[delayC+5];
-	double aDR[delayD+5];
-	double aER[delayE+5];
-	double aFR[delayF+5];
-	double aGR[delayG+5];
-	double aHR[delayH+5];
-	double aIR[delayI+5];
-	double aJR[delayJ+5];
-	double aKR[delayK+5];
-	double aLR[delayL+5];
-	double aMR[delayM+5];
-	double aNR[delayN+5];
-	double aOR[delayO+5];
-	double aPR[delayP+5];
-	double aQR[delayQ+5];
-	double aRR[delayR+5];
-	double aSR[delayS+5];
-	double aTR[delayT+5];
-	double aUR[delayU+5];
-	double aVR[delayV+5];
-	double aWR[delayW+5];
-	double aXR[delayX+5];
-	double aYR[delayY+5];
 	
-	double aZL[predelay+5];
-	double aZR[predelay+5];
 	
-	double aVLFL[vlfpredelay+5];
-	double aVLFR[vlfpredelay+5];
 	
 	
 	double feedbackAL;
@@ -304,7 +218,93 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdR;
 
 	struct _dram {
-		double pearA[pear_total]; //probably worth just using a number here
+		double eAL[shortA+5];
+	double eBL[shortB+5];
+	double eCL[shortC+5];
+	double eDL[shortD+5];
+	double eEL[shortE+5];
+	double eFL[shortF+5];
+	double eGL[shortG+5];
+	double eHL[shortH+5];
+	double eIL[shortI+5];
+	double eJL[shortJ+5];
+	double eKL[shortK+5];
+	double eLL[shortL+5];
+	double eML[shortM+5];
+	double eNL[shortN+5];
+	double eOL[shortO+5];
+	double ePL[shortP+5];
+	double eAR[shortA+5];
+	double eBR[shortB+5];
+	double eCR[shortC+5];
+	double eDR[shortD+5];
+	double eER[shortE+5];
+	double eFR[shortF+5];
+	double eGR[shortG+5];
+	double eHR[shortH+5];
+	double eIR[shortI+5];
+	double eJR[shortJ+5];
+	double eKR[shortK+5];
+	double eLR[shortL+5];
+	double eMR[shortM+5];
+	double eNR[shortN+5];
+	double eOR[shortO+5];
+	double ePR[shortP+5];
+	double aAL[delayA+5];
+	double aBL[delayB+5];
+	double aCL[delayC+5];
+	double aDL[delayD+5];
+	double aEL[delayE+5];
+	double aFL[delayF+5];
+	double aGL[delayG+5];
+	double aHL[delayH+5];
+	double aIL[delayI+5];
+	double aJL[delayJ+5];
+	double aKL[delayK+5];
+	double aLL[delayL+5];
+	double aML[delayM+5];
+	double aNL[delayN+5];
+	double aOL[delayO+5];
+	double aPL[delayP+5];
+	double aQL[delayQ+5];
+	double aRL[delayR+5];
+	double aSL[delayS+5];
+	double aTL[delayT+5];
+	double aUL[delayU+5];
+	double aVL[delayV+5];
+	double aWL[delayW+5];
+	double aXL[delayX+5];
+	double aYL[delayY+5];
+	double aAR[delayA+5];
+	double aBR[delayB+5];
+	double aCR[delayC+5];
+	double aDR[delayD+5];
+	double aER[delayE+5];
+	double aFR[delayF+5];
+	double aGR[delayG+5];
+	double aHR[delayH+5];
+	double aIR[delayI+5];
+	double aJR[delayJ+5];
+	double aKR[delayK+5];
+	double aLR[delayL+5];
+	double aMR[delayM+5];
+	double aNR[delayN+5];
+	double aOR[delayO+5];
+	double aPR[delayP+5];
+	double aQR[delayQ+5];
+	double aRR[delayR+5];
+	double aSR[delayS+5];
+	double aTR[delayT+5];
+	double aUR[delayU+5];
+	double aVR[delayV+5];
+	double aWR[delayW+5];
+	double aXR[delayX+5];
+	double aYR[delayY+5];
+	double aZL[predelay+5];
+	double aZR[predelay+5];
+	double aVLFL[vlfpredelay+5];
+	double aVLFR[vlfpredelay+5];
+	double pearA[pear_total]; //probably worth just using a number here
 	double pearB[pear_total]; //probably worth just using a number here
 	double pearC[pear_total]; //probably worth just using a number here
 	double pearD[pear_total]; //probably worth just using a number here
@@ -353,11 +353,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		cycle++;
 		if (cycle == cycleEnd) { //hit the end point and we do a reverb sample
 			//predelay
-			aZL[countZ] = inputSampleL;
-			aZR[countZ] = inputSampleR;
+			dram->aZL[countZ] = inputSampleL;
+			dram->aZR[countZ] = inputSampleR;
 			countZ++; if (countZ < 0 || countZ > adjPredelay) countZ = 0;
-			inputSampleL = aZL[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
-			inputSampleR = aZR[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
+			inputSampleL = dram->aZL[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
+			inputSampleR = dram->aZR[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
 			//end predelay
 			
 			//begin SubTight section
@@ -390,23 +390,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			inputSampleR -= outSampleR;
 			//end SubTight section
 			
-			double earlyAL = inputSampleL - (eAL[(shortAL+1)-((shortAL+1 > shortA)?shortA+1:0)]*0.618033988749894848204586);
-			double earlyBL = inputSampleL - (eBL[(shortBL+1)-((shortBL+1 > shortB)?shortB+1:0)]*0.618033988749894848204586);
-			double earlyCL = inputSampleL - (eCL[(shortCL+1)-((shortCL+1 > shortC)?shortC+1:0)]*0.618033988749894848204586);
-			double earlyDL = inputSampleL - (eDL[(shortDL+1)-((shortDL+1 > shortD)?shortD+1:0)]*0.618033988749894848204586);
-			double earlyDR = inputSampleR - (eDR[(shortDR+1)-((shortDR+1 > shortD)?shortD+1:0)]*0.618033988749894848204586);
-			double earlyHR = inputSampleR - (eHR[(shortHR+1)-((shortHR+1 > shortH)?shortH+1:0)]*0.618033988749894848204586);
-			double earlyLR = inputSampleR - (eLR[(shortLR+1)-((shortLR+1 > shortL)?shortL+1:0)]*0.618033988749894848204586);
-			double earlyPR = inputSampleR - (ePR[(shortPR+1)-((shortPR+1 > shortP)?shortP+1:0)]*0.618033988749894848204586);
+			double earlyAL = inputSampleL - (dram->eAL[(shortAL+1)-((shortAL+1 > shortA)?shortA+1:0)]*0.618033988749894848204586);
+			double earlyBL = inputSampleL - (dram->eBL[(shortBL+1)-((shortBL+1 > shortB)?shortB+1:0)]*0.618033988749894848204586);
+			double earlyCL = inputSampleL - (dram->eCL[(shortCL+1)-((shortCL+1 > shortC)?shortC+1:0)]*0.618033988749894848204586);
+			double earlyDL = inputSampleL - (dram->eDL[(shortDL+1)-((shortDL+1 > shortD)?shortD+1:0)]*0.618033988749894848204586);
+			double earlyDR = inputSampleR - (dram->eDR[(shortDR+1)-((shortDR+1 > shortD)?shortD+1:0)]*0.618033988749894848204586);
+			double earlyHR = inputSampleR - (dram->eHR[(shortHR+1)-((shortHR+1 > shortH)?shortH+1:0)]*0.618033988749894848204586);
+			double earlyLR = inputSampleR - (dram->eLR[(shortLR+1)-((shortLR+1 > shortL)?shortL+1:0)]*0.618033988749894848204586);
+			double earlyPR = inputSampleR - (dram->ePR[(shortPR+1)-((shortPR+1 > shortP)?shortP+1:0)]*0.618033988749894848204586);
 						
-			eAL[shortAL] = earlyAL; earlyAL *= 0.618033988749894848204586;
-			eBL[shortBL] = earlyBL; earlyBL *= 0.618033988749894848204586;
-			eCL[shortCL] = earlyCL; earlyCL *= 0.618033988749894848204586;
-			eDL[shortDL] = earlyDL; earlyDL *= 0.618033988749894848204586;
-			eDR[shortDR] = earlyDR; earlyDR *= 0.618033988749894848204586;
-			eHR[shortHR] = earlyHR; earlyHR *= 0.618033988749894848204586;
-			eLR[shortLR] = earlyLR; earlyLR *= 0.618033988749894848204586;
-			ePR[shortPR] = earlyPR; earlyPR *= 0.618033988749894848204586;
+			dram->eAL[shortAL] = earlyAL; earlyAL *= 0.618033988749894848204586;
+			dram->eBL[shortBL] = earlyBL; earlyBL *= 0.618033988749894848204586;
+			dram->eCL[shortCL] = earlyCL; earlyCL *= 0.618033988749894848204586;
+			dram->eDL[shortDL] = earlyDL; earlyDL *= 0.618033988749894848204586;
+			dram->eDR[shortDR] = earlyDR; earlyDR *= 0.618033988749894848204586;
+			dram->eHR[shortHR] = earlyHR; earlyHR *= 0.618033988749894848204586;
+			dram->eLR[shortLR] = earlyLR; earlyLR *= 0.618033988749894848204586;
+			dram->ePR[shortPR] = earlyPR; earlyPR *= 0.618033988749894848204586;
 			
 			shortAL++; if (shortAL < 0 || shortAL > shortA) shortAL = 0;
 			shortBL++; if (shortBL < 0 || shortBL > shortB) shortBL = 0;
@@ -417,32 +417,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			shortLR++; if (shortLR < 0 || shortLR > shortL) shortLR = 0;
 			shortPR++; if (shortPR < 0 || shortPR > shortP) shortPR = 0;
 			
-			earlyAL += eAL[shortAL-((shortAL > shortA)?shortA+1:0)];
-			earlyBL += eBL[shortBL-((shortBL > shortB)?shortB+1:0)];
-			earlyCL += eCL[shortCL-((shortCL > shortC)?shortC+1:0)];
-			earlyDL += eDL[shortDL-((shortDL > shortD)?shortD+1:0)];
-			earlyDR += eDR[shortDR-((shortDR > shortD)?shortD+1:0)];
-			earlyHR += eHR[shortHR-((shortHR > shortH)?shortH+1:0)];
-			earlyLR += eLR[shortLR-((shortLR > shortL)?shortL+1:0)];
-			earlyPR += ePR[shortPR-((shortPR > shortP)?shortP+1:0)];
+			earlyAL += dram->eAL[shortAL-((shortAL > shortA)?shortA+1:0)];
+			earlyBL += dram->eBL[shortBL-((shortBL > shortB)?shortB+1:0)];
+			earlyCL += dram->eCL[shortCL-((shortCL > shortC)?shortC+1:0)];
+			earlyDL += dram->eDL[shortDL-((shortDL > shortD)?shortD+1:0)];
+			earlyDR += dram->eDR[shortDR-((shortDR > shortD)?shortD+1:0)];
+			earlyHR += dram->eHR[shortHR-((shortHR > shortH)?shortH+1:0)];
+			earlyLR += dram->eLR[shortLR-((shortLR > shortL)?shortL+1:0)];
+			earlyPR += dram->ePR[shortPR-((shortPR > shortP)?shortP+1:0)];
 			
-			double earlyEL = (earlyAL - (earlyBL + earlyCL + earlyDL)) - (eEL[(shortEL+1)-((shortEL+1 > shortE)?shortE+1:0)]*0.618033988749894848204586);
-			double earlyFL = (earlyBL - (earlyAL + earlyCL + earlyDL)) - (eFL[(shortFL+1)-((shortFL+1 > shortF)?shortF+1:0)]*0.618033988749894848204586);
-			double earlyGL = (earlyCL - (earlyAL + earlyBL + earlyDL)) - (eGL[(shortGL+1)-((shortGL+1 > shortG)?shortG+1:0)]*0.618033988749894848204586);
-			double earlyHL = (earlyDL - (earlyAL + earlyBL + earlyCL)) - (eHL[(shortHL+1)-((shortHL+1 > shortH)?shortH+1:0)]*0.618033988749894848204586);
-			double earlyCR = (earlyDR - (earlyHR + earlyLR + earlyPR)) - (eCR[(shortCR+1)-((shortCR+1 > shortC)?shortC+1:0)]*0.618033988749894848204586);
-			double earlyGR = (earlyHR - (earlyDR + earlyLR + earlyPR)) - (eGR[(shortGR+1)-((shortGR+1 > shortG)?shortG+1:0)]*0.618033988749894848204586);
-			double earlyKR = (earlyLR - (earlyDR + earlyHR + earlyPR)) - (eKR[(shortKR+1)-((shortKR+1 > shortK)?shortK+1:0)]*0.618033988749894848204586);
-			double earlyOR = (earlyPR - (earlyDR + earlyHR + earlyLR)) - (eOR[(shortOR+1)-((shortOR+1 > shortO)?shortO+1:0)]*0.618033988749894848204586);
+			double earlyEL = (earlyAL - (earlyBL + earlyCL + earlyDL)) - (dram->eEL[(shortEL+1)-((shortEL+1 > shortE)?shortE+1:0)]*0.618033988749894848204586);
+			double earlyFL = (earlyBL - (earlyAL + earlyCL + earlyDL)) - (dram->eFL[(shortFL+1)-((shortFL+1 > shortF)?shortF+1:0)]*0.618033988749894848204586);
+			double earlyGL = (earlyCL - (earlyAL + earlyBL + earlyDL)) - (dram->eGL[(shortGL+1)-((shortGL+1 > shortG)?shortG+1:0)]*0.618033988749894848204586);
+			double earlyHL = (earlyDL - (earlyAL + earlyBL + earlyCL)) - (dram->eHL[(shortHL+1)-((shortHL+1 > shortH)?shortH+1:0)]*0.618033988749894848204586);
+			double earlyCR = (earlyDR - (earlyHR + earlyLR + earlyPR)) - (dram->eCR[(shortCR+1)-((shortCR+1 > shortC)?shortC+1:0)]*0.618033988749894848204586);
+			double earlyGR = (earlyHR - (earlyDR + earlyLR + earlyPR)) - (dram->eGR[(shortGR+1)-((shortGR+1 > shortG)?shortG+1:0)]*0.618033988749894848204586);
+			double earlyKR = (earlyLR - (earlyDR + earlyHR + earlyPR)) - (dram->eKR[(shortKR+1)-((shortKR+1 > shortK)?shortK+1:0)]*0.618033988749894848204586);
+			double earlyOR = (earlyPR - (earlyDR + earlyHR + earlyLR)) - (dram->eOR[(shortOR+1)-((shortOR+1 > shortO)?shortO+1:0)]*0.618033988749894848204586);
 			
-			eEL[shortEL] = earlyEL; earlyEL *= 0.618033988749894848204586;
-			eFL[shortFL] = earlyFL; earlyFL *= 0.618033988749894848204586;
-			eGL[shortGL] = earlyGL; earlyGL *= 0.618033988749894848204586;
-			eHL[shortHL] = earlyHL; earlyHL *= 0.618033988749894848204586;
-			eCR[shortCR] = earlyCR; earlyCR *= 0.618033988749894848204586;
-			eGR[shortGR] = earlyGR; earlyGR *= 0.618033988749894848204586;
-			eKR[shortKR] = earlyKR; earlyKR *= 0.618033988749894848204586;
-			eOR[shortOR] = earlyOR; earlyOR *= 0.618033988749894848204586;
+			dram->eEL[shortEL] = earlyEL; earlyEL *= 0.618033988749894848204586;
+			dram->eFL[shortFL] = earlyFL; earlyFL *= 0.618033988749894848204586;
+			dram->eGL[shortGL] = earlyGL; earlyGL *= 0.618033988749894848204586;
+			dram->eHL[shortHL] = earlyHL; earlyHL *= 0.618033988749894848204586;
+			dram->eCR[shortCR] = earlyCR; earlyCR *= 0.618033988749894848204586;
+			dram->eGR[shortGR] = earlyGR; earlyGR *= 0.618033988749894848204586;
+			dram->eKR[shortKR] = earlyKR; earlyKR *= 0.618033988749894848204586;
+			dram->eOR[shortOR] = earlyOR; earlyOR *= 0.618033988749894848204586;
 			
 			shortEL++; if (shortEL < 0 || shortEL > shortE) shortEL = 0;
 			shortFL++; if (shortFL < 0 || shortFL > shortF) shortFL = 0;
@@ -453,32 +453,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			shortKR++; if (shortKR < 0 || shortKR > shortK) shortKR = 0;
 			shortOR++; if (shortOR < 0 || shortOR > shortO) shortOR = 0;
 			
-			earlyEL += eEL[shortEL-((shortEL > shortE)?shortE+1:0)];
-			earlyFL += eFL[shortFL-((shortFL > shortF)?shortF+1:0)];
-			earlyGL += eGL[shortGL-((shortGL > shortG)?shortG+1:0)];
-			earlyHL += eHL[shortHL-((shortHL > shortH)?shortH+1:0)];
-			earlyCR += eCR[shortCR-((shortCR > shortC)?shortC+1:0)];
-			earlyGR += eGR[shortGR-((shortGR > shortG)?shortG+1:0)];
-			earlyKR += eKR[shortKR-((shortKR > shortK)?shortK+1:0)];
-			earlyOR += eOR[shortOR-((shortOR > shortO)?shortO+1:0)];
+			earlyEL += dram->eEL[shortEL-((shortEL > shortE)?shortE+1:0)];
+			earlyFL += dram->eFL[shortFL-((shortFL > shortF)?shortF+1:0)];
+			earlyGL += dram->eGL[shortGL-((shortGL > shortG)?shortG+1:0)];
+			earlyHL += dram->eHL[shortHL-((shortHL > shortH)?shortH+1:0)];
+			earlyCR += dram->eCR[shortCR-((shortCR > shortC)?shortC+1:0)];
+			earlyGR += dram->eGR[shortGR-((shortGR > shortG)?shortG+1:0)];
+			earlyKR += dram->eKR[shortKR-((shortKR > shortK)?shortK+1:0)];
+			earlyOR += dram->eOR[shortOR-((shortOR > shortO)?shortO+1:0)];
 			
-			double earlyIL = (earlyEL - (earlyFL + earlyGL + earlyHL)) - (eIL[(shortIL+1)-((shortIL+1 > shortI)?shortI+1:0)]*0.618033988749894848204586);
-			double earlyJL = (earlyFL - (earlyEL + earlyGL + earlyHL)) - (eJL[(shortJL+1)-((shortJL+1 > shortJ)?shortJ+1:0)]*0.618033988749894848204586);
-			double earlyKL = (earlyGL - (earlyEL + earlyFL + earlyHL)) - (eKL[(shortKL+1)-((shortKL+1 > shortK)?shortK+1:0)]*0.618033988749894848204586);
-			double earlyLL = (earlyHL - (earlyEL + earlyFL + earlyGL)) - (eLL[(shortLL+1)-((shortLL+1 > shortL)?shortL+1:0)]*0.618033988749894848204586);
-			double earlyBR = (earlyCR - (earlyGR + earlyKR + earlyOR)) - (eBR[(shortBR+1)-((shortBR+1 > shortB)?shortB+1:0)]*0.618033988749894848204586);
-			double earlyFR = (earlyGR - (earlyCR + earlyKR + earlyOR)) - (eFR[(shortFR+1)-((shortFR+1 > shortF)?shortF+1:0)]*0.618033988749894848204586);
-			double earlyJR = (earlyKR - (earlyCR + earlyGR + earlyOR)) - (eJR[(shortJR+1)-((shortJR+1 > shortJ)?shortJ+1:0)]*0.618033988749894848204586);
-			double earlyNR = (earlyOR - (earlyCR + earlyGR + earlyKR)) - (eNR[(shortNR+1)-((shortNR+1 > shortN)?shortN+1:0)]*0.618033988749894848204586);
+			double earlyIL = (earlyEL - (earlyFL + earlyGL + earlyHL)) - (dram->eIL[(shortIL+1)-((shortIL+1 > shortI)?shortI+1:0)]*0.618033988749894848204586);
+			double earlyJL = (earlyFL - (earlyEL + earlyGL + earlyHL)) - (dram->eJL[(shortJL+1)-((shortJL+1 > shortJ)?shortJ+1:0)]*0.618033988749894848204586);
+			double earlyKL = (earlyGL - (earlyEL + earlyFL + earlyHL)) - (dram->eKL[(shortKL+1)-((shortKL+1 > shortK)?shortK+1:0)]*0.618033988749894848204586);
+			double earlyLL = (earlyHL - (earlyEL + earlyFL + earlyGL)) - (dram->eLL[(shortLL+1)-((shortLL+1 > shortL)?shortL+1:0)]*0.618033988749894848204586);
+			double earlyBR = (earlyCR - (earlyGR + earlyKR + earlyOR)) - (dram->eBR[(shortBR+1)-((shortBR+1 > shortB)?shortB+1:0)]*0.618033988749894848204586);
+			double earlyFR = (earlyGR - (earlyCR + earlyKR + earlyOR)) - (dram->eFR[(shortFR+1)-((shortFR+1 > shortF)?shortF+1:0)]*0.618033988749894848204586);
+			double earlyJR = (earlyKR - (earlyCR + earlyGR + earlyOR)) - (dram->eJR[(shortJR+1)-((shortJR+1 > shortJ)?shortJ+1:0)]*0.618033988749894848204586);
+			double earlyNR = (earlyOR - (earlyCR + earlyGR + earlyKR)) - (dram->eNR[(shortNR+1)-((shortNR+1 > shortN)?shortN+1:0)]*0.618033988749894848204586);
 			
-			eIL[shortIL] = earlyIL; earlyIL *= 0.618033988749894848204586;
-			eJL[shortJL] = earlyJL; earlyJL *= 0.618033988749894848204586;
-			eKL[shortKL] = earlyKL; earlyKL *= 0.618033988749894848204586;
-			eLL[shortLL] = earlyLL; earlyLL *= 0.618033988749894848204586;
-			eBR[shortBR] = earlyBR; earlyBR *= 0.618033988749894848204586;
-			eFR[shortFR] = earlyFR; earlyFR *= 0.618033988749894848204586;
-			eJR[shortJR] = earlyJR; earlyJR *= 0.618033988749894848204586;
-			eNR[shortNR] = earlyNR; earlyNR *= 0.618033988749894848204586;
+			dram->eIL[shortIL] = earlyIL; earlyIL *= 0.618033988749894848204586;
+			dram->eJL[shortJL] = earlyJL; earlyJL *= 0.618033988749894848204586;
+			dram->eKL[shortKL] = earlyKL; earlyKL *= 0.618033988749894848204586;
+			dram->eLL[shortLL] = earlyLL; earlyLL *= 0.618033988749894848204586;
+			dram->eBR[shortBR] = earlyBR; earlyBR *= 0.618033988749894848204586;
+			dram->eFR[shortFR] = earlyFR; earlyFR *= 0.618033988749894848204586;
+			dram->eJR[shortJR] = earlyJR; earlyJR *= 0.618033988749894848204586;
+			dram->eNR[shortNR] = earlyNR; earlyNR *= 0.618033988749894848204586;
 			
 			shortIL++; if (shortIL < 0 || shortIL > shortI) shortIL = 0;
 			shortJL++; if (shortJL < 0 || shortJL > shortJ) shortJL = 0;
@@ -489,32 +489,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			shortJR++; if (shortJR < 0 || shortJR > shortJ) shortJR = 0;
 			shortNR++; if (shortNR < 0 || shortNR > shortN) shortNR = 0;
 			
-			earlyIL += eIL[shortIL-((shortIL > shortI)?shortI+1:0)];
-			earlyJL += eJL[shortJL-((shortJL > shortJ)?shortJ+1:0)];
-			earlyKL += eKL[shortKL-((shortKL > shortK)?shortK+1:0)];
-			earlyLL += eLL[shortLL-((shortLL > shortL)?shortL+1:0)];
-			earlyBR += eBR[shortBR-((shortBR > shortB)?shortB+1:0)];
-			earlyFR += eFR[shortFR-((shortFR > shortF)?shortF+1:0)];
-			earlyJR += eJR[shortJR-((shortJR > shortJ)?shortJ+1:0)];
-			earlyNR += eNR[shortNR-((shortNR > shortN)?shortN+1:0)];
+			earlyIL += dram->eIL[shortIL-((shortIL > shortI)?shortI+1:0)];
+			earlyJL += dram->eJL[shortJL-((shortJL > shortJ)?shortJ+1:0)];
+			earlyKL += dram->eKL[shortKL-((shortKL > shortK)?shortK+1:0)];
+			earlyLL += dram->eLL[shortLL-((shortLL > shortL)?shortL+1:0)];
+			earlyBR += dram->eBR[shortBR-((shortBR > shortB)?shortB+1:0)];
+			earlyFR += dram->eFR[shortFR-((shortFR > shortF)?shortF+1:0)];
+			earlyJR += dram->eJR[shortJR-((shortJR > shortJ)?shortJ+1:0)];
+			earlyNR += dram->eNR[shortNR-((shortNR > shortN)?shortN+1:0)];
 			
-			double earlyML = (earlyIL - (earlyJL + earlyKL + earlyLL)) - (eML[(shortML+1)-((shortML+1 > shortM)?shortM+1:0)]*0.618033988749894848204586);
-			double earlyNL = (earlyJL - (earlyIL + earlyKL + earlyLL)) - (eNL[(shortNL+1)-((shortNL+1 > shortN)?shortN+1:0)]*0.618033988749894848204586);
-			double earlyOL = (earlyKL - (earlyIL + earlyJL + earlyLL)) - (eOL[(shortOL+1)-((shortOL+1 > shortO)?shortO+1:0)]*0.618033988749894848204586);
-			double earlyPL = (earlyLL - (earlyIL + earlyJL + earlyKL)) - (ePL[(shortPL+1)-((shortPL+1 > shortP)?shortP+1:0)]*0.618033988749894848204586);
-			double earlyAR = (earlyBR - (earlyFR + earlyJR + earlyNR)) - (eAR[(shortAR+1)-((shortAR+1 > shortA)?shortA+1:0)]*0.618033988749894848204586);
-			double earlyER = (earlyFR - (earlyBR + earlyJR + earlyNR)) - (eER[(shortER+1)-((shortER+1 > shortE)?shortE+1:0)]*0.618033988749894848204586);
-			double earlyIR = (earlyJR - (earlyBR + earlyFR + earlyNR)) - (eIR[(shortIR+1)-((shortIR+1 > shortI)?shortI+1:0)]*0.618033988749894848204586);
-			double earlyMR = (earlyNR - (earlyBR + earlyFR + earlyJR)) - (eMR[(shortMR+1)-((shortMR+1 > shortM)?shortM+1:0)]*0.618033988749894848204586);
+			double earlyML = (earlyIL - (earlyJL + earlyKL + earlyLL)) - (dram->eML[(shortML+1)-((shortML+1 > shortM)?shortM+1:0)]*0.618033988749894848204586);
+			double earlyNL = (earlyJL - (earlyIL + earlyKL + earlyLL)) - (dram->eNL[(shortNL+1)-((shortNL+1 > shortN)?shortN+1:0)]*0.618033988749894848204586);
+			double earlyOL = (earlyKL - (earlyIL + earlyJL + earlyLL)) - (dram->eOL[(shortOL+1)-((shortOL+1 > shortO)?shortO+1:0)]*0.618033988749894848204586);
+			double earlyPL = (earlyLL - (earlyIL + earlyJL + earlyKL)) - (dram->ePL[(shortPL+1)-((shortPL+1 > shortP)?shortP+1:0)]*0.618033988749894848204586);
+			double earlyAR = (earlyBR - (earlyFR + earlyJR + earlyNR)) - (dram->eAR[(shortAR+1)-((shortAR+1 > shortA)?shortA+1:0)]*0.618033988749894848204586);
+			double earlyER = (earlyFR - (earlyBR + earlyJR + earlyNR)) - (dram->eER[(shortER+1)-((shortER+1 > shortE)?shortE+1:0)]*0.618033988749894848204586);
+			double earlyIR = (earlyJR - (earlyBR + earlyFR + earlyNR)) - (dram->eIR[(shortIR+1)-((shortIR+1 > shortI)?shortI+1:0)]*0.618033988749894848204586);
+			double earlyMR = (earlyNR - (earlyBR + earlyFR + earlyJR)) - (dram->eMR[(shortMR+1)-((shortMR+1 > shortM)?shortM+1:0)]*0.618033988749894848204586);
 			
-			eML[shortML] = earlyML; earlyML *= 0.618033988749894848204586;
-			eNL[shortNL] = earlyNL; earlyNL *= 0.618033988749894848204586;
-			eOL[shortOL] = earlyOL; earlyOL *= 0.618033988749894848204586;
-			ePL[shortPL] = earlyPL; earlyPL *= 0.618033988749894848204586;
-			eAR[shortAR] = earlyAR; earlyAR *= 0.618033988749894848204586;
-			eER[shortER] = earlyER; earlyER *= 0.618033988749894848204586;
-			eIR[shortIR] = earlyIR; earlyIR *= 0.618033988749894848204586;
-			eMR[shortMR] = earlyMR; earlyMR *= 0.618033988749894848204586;
+			dram->eML[shortML] = earlyML; earlyML *= 0.618033988749894848204586;
+			dram->eNL[shortNL] = earlyNL; earlyNL *= 0.618033988749894848204586;
+			dram->eOL[shortOL] = earlyOL; earlyOL *= 0.618033988749894848204586;
+			dram->ePL[shortPL] = earlyPL; earlyPL *= 0.618033988749894848204586;
+			dram->eAR[shortAR] = earlyAR; earlyAR *= 0.618033988749894848204586;
+			dram->eER[shortER] = earlyER; earlyER *= 0.618033988749894848204586;
+			dram->eIR[shortIR] = earlyIR; earlyIR *= 0.618033988749894848204586;
+			dram->eMR[shortMR] = earlyMR; earlyMR *= 0.618033988749894848204586;
 			
 			shortML++; if (shortML < 0 || shortML > shortM) shortML = 0;
 			shortNL++; if (shortNL < 0 || shortNL > shortN) shortNL = 0;
@@ -525,42 +525,42 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			shortIR++; if (shortIR < 0 || shortIR > shortI) shortIR = 0;
 			shortMR++; if (shortMR < 0 || shortMR > shortM) shortMR = 0;
 			
-			earlyML += eML[shortML-((shortML > shortM)?shortM+1:0)];
-			earlyNL += eNL[shortNL-((shortNL > shortN)?shortN+1:0)];
-			earlyOL += eOL[shortOL-((shortOL > shortO)?shortO+1:0)];
-			earlyPL += ePL[shortPL-((shortPL > shortP)?shortP+1:0)];
-			earlyAR += eAR[shortAR-((shortAR > shortA)?shortA+1:0)];
-			earlyER += eER[shortER-((shortER > shortE)?shortE+1:0)];
-			earlyIR += eIR[shortIR-((shortIR > shortI)?shortI+1:0)];
-			earlyMR += eMR[shortMR-((shortMR > shortM)?shortM+1:0)];
+			earlyML += dram->eML[shortML-((shortML > shortM)?shortM+1:0)];
+			earlyNL += dram->eNL[shortNL-((shortNL > shortN)?shortN+1:0)];
+			earlyOL += dram->eOL[shortOL-((shortOL > shortO)?shortO+1:0)];
+			earlyPL += dram->ePL[shortPL-((shortPL > shortP)?shortP+1:0)];
+			earlyAR += dram->eAR[shortAR-((shortAR > shortA)?shortA+1:0)];
+			earlyER += dram->eER[shortER-((shortER > shortE)?shortE+1:0)];
+			earlyIR += dram->eIR[shortIR-((shortIR > shortI)?shortI+1:0)];
+			earlyMR += dram->eMR[shortMR-((shortMR > shortM)?shortM+1:0)];
 			
 			double earlyReflectionsL = -(earlyML + earlyNL + earlyOL + earlyPL)/8.0;
 			double earlyReflectionsR = -(earlyAR + earlyER + earlyIR + earlyMR)/8.0;
 			//and take the final combined sum of outputs, corrected for Householder gain
 						
 			//VLF predelay
-			aVLFL[countVLF] = outSampleL;
-			aVLFR[countVLF] = outSampleR;
+			dram->aVLFL[countVLF] = outSampleL;
+			dram->aVLFR[countVLF] = outSampleR;
 			countVLF++; if (countVLF < 0 || countVLF > adjSubDelay) countVLF = 0;
-			outSampleL = aVLFL[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0;
-			outSampleR = aVLFR[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0;
+			outSampleL = dram->aVLFL[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0;
+			outSampleR = dram->aVLFR[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0;
 			//end VLF predelay
 						
 			inputSampleL += outSampleL;
 			inputSampleR += outSampleR;
 			//having re-added our VLF delayed channel we can now re-use outSample
 			
-			aAL[countAL] = inputSampleL + (feedbackAL * 0.000285);
-			aBL[countBL] = inputSampleL + (feedbackBL * 0.000285);
-			aCL[countCL] = inputSampleL + (feedbackCL * 0.000285);
-			aDL[countDL] = inputSampleL + (feedbackDL * 0.000285);
-			aEL[countEL] = inputSampleL + (feedbackEL * 0.000285);
+			dram->aAL[countAL] = inputSampleL + (feedbackAL * 0.000285);
+			dram->aBL[countBL] = inputSampleL + (feedbackBL * 0.000285);
+			dram->aCL[countCL] = inputSampleL + (feedbackCL * 0.000285);
+			dram->aDL[countDL] = inputSampleL + (feedbackDL * 0.000285);
+			dram->aEL[countEL] = inputSampleL + (feedbackEL * 0.000285);
 			
-			aER[countER] = inputSampleR + (feedbackER * 0.000285);
-			aJR[countJR] = inputSampleR + (feedbackJR * 0.000285);
-			aOR[countOR] = inputSampleR + (feedbackOR * 0.000285);
-			aTR[countTR] = inputSampleR + (feedbackTR * 0.000285);
-			aYR[countYR] = inputSampleR + (feedbackYR * 0.000285);
+			dram->aER[countER] = inputSampleR + (feedbackER * 0.000285);
+			dram->aJR[countJR] = inputSampleR + (feedbackJR * 0.000285);
+			dram->aOR[countOR] = inputSampleR + (feedbackOR * 0.000285);
+			dram->aTR[countTR] = inputSampleR + (feedbackTR * 0.000285);
+			dram->aYR[countYR] = inputSampleR + (feedbackYR * 0.000285);
 			
 			countAL++; if (countAL < 0 || countAL > delayA) countAL = 0;
 			countBL++; if (countBL < 0 || countBL > delayB) countBL = 0;
@@ -574,31 +574,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countTR++; if (countTR < 0 || countTR > delayT) countTR = 0;
 			countYR++; if (countYR < 0 || countYR > delayY) countYR = 0;
 			
-			double outAL = aAL[countAL-((countAL > delayA)?delayA+1:0)];
-			double outBL = aBL[countBL-((countBL > delayB)?delayB+1:0)];
-			double outCL = aCL[countCL-((countCL > delayC)?delayC+1:0)];
-			double outDL = aDL[countDL-((countDL > delayD)?delayD+1:0)];
-			double outEL = aEL[countEL-((countEL > delayE)?delayE+1:0)];
+			double outAL = dram->aAL[countAL-((countAL > delayA)?delayA+1:0)];
+			double outBL = dram->aBL[countBL-((countBL > delayB)?delayB+1:0)];
+			double outCL = dram->aCL[countCL-((countCL > delayC)?delayC+1:0)];
+			double outDL = dram->aDL[countDL-((countDL > delayD)?delayD+1:0)];
+			double outEL = dram->aEL[countEL-((countEL > delayE)?delayE+1:0)];
 			
-			double outER = aER[countER-((countER > delayE)?delayE+1:0)];
-			double outJR = aJR[countJR-((countJR > delayJ)?delayJ+1:0)];
-			double outOR = aOR[countOR-((countOR > delayO)?delayO+1:0)];
-			double outTR = aTR[countTR-((countTR > delayT)?delayT+1:0)];
-			double outYR = aYR[countYR-((countYR > delayY)?delayY+1:0)];
+			double outER = dram->aER[countER-((countER > delayE)?delayE+1:0)];
+			double outJR = dram->aJR[countJR-((countJR > delayJ)?delayJ+1:0)];
+			double outOR = dram->aOR[countOR-((countOR > delayO)?delayO+1:0)];
+			double outTR = dram->aTR[countTR-((countTR > delayT)?delayT+1:0)];
+			double outYR = dram->aYR[countYR-((countYR > delayY)?delayY+1:0)];
 			
 			//-------- one
 						
-			aFL[countFL] = ((outAL*3.0) - ((outBL + outCL + outDL + outEL)*2.0));
-			aGL[countGL] = ((outBL*3.0) - ((outAL + outCL + outDL + outEL)*2.0));
-			aHL[countHL] = ((outCL*3.0) - ((outAL + outBL + outDL + outEL)*2.0));
-			aIL[countIL] = ((outDL*3.0) - ((outAL + outBL + outCL + outEL)*2.0));
-			aJL[countJL] = ((outEL*3.0) - ((outAL + outBL + outCL + outDL)*2.0));
+			dram->aFL[countFL] = ((outAL*3.0) - ((outBL + outCL + outDL + outEL)*2.0));
+			dram->aGL[countGL] = ((outBL*3.0) - ((outAL + outCL + outDL + outEL)*2.0));
+			dram->aHL[countHL] = ((outCL*3.0) - ((outAL + outBL + outDL + outEL)*2.0));
+			dram->aIL[countIL] = ((outDL*3.0) - ((outAL + outBL + outCL + outEL)*2.0));
+			dram->aJL[countJL] = ((outEL*3.0) - ((outAL + outBL + outCL + outDL)*2.0));
 			
-			aDR[countDR] = ((outER*3.0) - ((outJR + outOR + outTR + outYR)*2.0));
-			aIR[countIR] = ((outJR*3.0) - ((outER + outOR + outTR + outYR)*2.0));
-			aNR[countNR] = ((outOR*3.0) - ((outER + outJR + outTR + outYR)*2.0));
-			aSR[countSR] = ((outTR*3.0) - ((outER + outJR + outOR + outYR)*2.0));
-			aXR[countXR] = ((outYR*3.0) - ((outER + outJR + outOR + outTR)*2.0));
+			dram->aDR[countDR] = ((outER*3.0) - ((outJR + outOR + outTR + outYR)*2.0));
+			dram->aIR[countIR] = ((outJR*3.0) - ((outER + outOR + outTR + outYR)*2.0));
+			dram->aNR[countNR] = ((outOR*3.0) - ((outER + outJR + outTR + outYR)*2.0));
+			dram->aSR[countSR] = ((outTR*3.0) - ((outER + outJR + outOR + outYR)*2.0));
+			dram->aXR[countXR] = ((outYR*3.0) - ((outER + outJR + outOR + outTR)*2.0));
 			
 			countFL++; if (countFL < 0 || countFL > delayF) countFL = 0;
 			countGL++; if (countGL < 0 || countGL > delayG) countGL = 0;
@@ -612,31 +612,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countSR++; if (countSR < 0 || countSR > delayS) countSR = 0;
 			countXR++; if (countXR < 0 || countXR > delayX) countXR = 0;
 			
-			double outFL = aFL[countFL-((countFL > delayF)?delayF+1:0)];
-			double outGL = aGL[countGL-((countGL > delayG)?delayG+1:0)];
-			double outHL = aHL[countHL-((countHL > delayH)?delayH+1:0)];
-			double outIL = aIL[countIL-((countIL > delayI)?delayI+1:0)];
-			double outJL = aJL[countJL-((countJL > delayJ)?delayJ+1:0)];
+			double outFL = dram->aFL[countFL-((countFL > delayF)?delayF+1:0)];
+			double outGL = dram->aGL[countGL-((countGL > delayG)?delayG+1:0)];
+			double outHL = dram->aHL[countHL-((countHL > delayH)?delayH+1:0)];
+			double outIL = dram->aIL[countIL-((countIL > delayI)?delayI+1:0)];
+			double outJL = dram->aJL[countJL-((countJL > delayJ)?delayJ+1:0)];
 			
-			double outDR = aDR[countDR-((countDR > delayD)?delayD+1:0)];
-			double outIR = aIR[countIR-((countIR > delayI)?delayI+1:0)];
-			double outNR = aNR[countNR-((countNR > delayN)?delayN+1:0)];
-			double outSR = aSR[countSR-((countSR > delayS)?delayS+1:0)];
-			double outXR = aXR[countXR-((countXR > delayX)?delayX+1:0)];
+			double outDR = dram->aDR[countDR-((countDR > delayD)?delayD+1:0)];
+			double outIR = dram->aIR[countIR-((countIR > delayI)?delayI+1:0)];
+			double outNR = dram->aNR[countNR-((countNR > delayN)?delayN+1:0)];
+			double outSR = dram->aSR[countSR-((countSR > delayS)?delayS+1:0)];
+			double outXR = dram->aXR[countXR-((countXR > delayX)?delayX+1:0)];
 			
 			//-------- two
 			
-			aKL[countKL] = ((outFL*3.0) - ((outGL + outHL + outIL + outJL)*2.0));
-			aLL[countLL] = ((outGL*3.0) - ((outFL + outHL + outIL + outJL)*2.0));
-			aML[countML] = ((outHL*3.0) - ((outFL + outGL + outIL + outJL)*2.0));
-			aNL[countNL] = ((outIL*3.0) - ((outFL + outGL + outHL + outJL)*2.0));
-			aOL[countOL] = ((outJL*3.0) - ((outFL + outGL + outHL + outIL)*2.0));
+			dram->aKL[countKL] = ((outFL*3.0) - ((outGL + outHL + outIL + outJL)*2.0));
+			dram->aLL[countLL] = ((outGL*3.0) - ((outFL + outHL + outIL + outJL)*2.0));
+			dram->aML[countML] = ((outHL*3.0) - ((outFL + outGL + outIL + outJL)*2.0));
+			dram->aNL[countNL] = ((outIL*3.0) - ((outFL + outGL + outHL + outJL)*2.0));
+			dram->aOL[countOL] = ((outJL*3.0) - ((outFL + outGL + outHL + outIL)*2.0));
 			
-			aCR[countCR] = ((outDR*3.0) - ((outIR + outNR + outSR + outXR)*2.0));
-			aHR[countHR] = ((outIR*3.0) - ((outDR + outNR + outSR + outXR)*2.0));
-			aMR[countMR] = ((outNR*3.0) - ((outDR + outIR + outSR + outXR)*2.0));
-			aRR[countRR] = ((outSR*3.0) - ((outDR + outIR + outNR + outXR)*2.0));
-			aWR[countWR] = ((outXR*3.0) - ((outDR + outIR + outNR + outSR)*2.0));
+			dram->aCR[countCR] = ((outDR*3.0) - ((outIR + outNR + outSR + outXR)*2.0));
+			dram->aHR[countHR] = ((outIR*3.0) - ((outDR + outNR + outSR + outXR)*2.0));
+			dram->aMR[countMR] = ((outNR*3.0) - ((outDR + outIR + outSR + outXR)*2.0));
+			dram->aRR[countRR] = ((outSR*3.0) - ((outDR + outIR + outNR + outXR)*2.0));
+			dram->aWR[countWR] = ((outXR*3.0) - ((outDR + outIR + outNR + outSR)*2.0));
 			
 			countKL++; if (countKL < 0 || countKL > delayK) countKL = 0;
 			countLL++; if (countLL < 0 || countLL > delayL) countLL = 0;
@@ -650,31 +650,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countRR++; if (countRR < 0 || countRR > delayR) countRR = 0;
 			countWR++; if (countWR < 0 || countWR > delayW) countWR = 0;
 			
-			double outKL = aKL[countKL-((countKL > delayK)?delayK+1:0)];
-			double outLL = aLL[countLL-((countLL > delayL)?delayL+1:0)];
-			double outML = aML[countML-((countML > delayM)?delayM+1:0)];
-			double outNL = aNL[countNL-((countNL > delayN)?delayN+1:0)];
-			double outOL = aOL[countOL-((countOL > delayO)?delayO+1:0)];
+			double outKL = dram->aKL[countKL-((countKL > delayK)?delayK+1:0)];
+			double outLL = dram->aLL[countLL-((countLL > delayL)?delayL+1:0)];
+			double outML = dram->aML[countML-((countML > delayM)?delayM+1:0)];
+			double outNL = dram->aNL[countNL-((countNL > delayN)?delayN+1:0)];
+			double outOL = dram->aOL[countOL-((countOL > delayO)?delayO+1:0)];
 			
-			double outCR = aCR[countCR-((countCR > delayC)?delayC+1:0)];
-			double outHR = aHR[countHR-((countHR > delayH)?delayH+1:0)];
-			double outMR = aMR[countMR-((countMR > delayM)?delayM+1:0)];
-			double outRR = aRR[countRR-((countRR > delayR)?delayR+1:0)];
-			double outWR = aWR[countWR-((countWR > delayW)?delayW+1:0)];
+			double outCR = dram->aCR[countCR-((countCR > delayC)?delayC+1:0)];
+			double outHR = dram->aHR[countHR-((countHR > delayH)?delayH+1:0)];
+			double outMR = dram->aMR[countMR-((countMR > delayM)?delayM+1:0)];
+			double outRR = dram->aRR[countRR-((countRR > delayR)?delayR+1:0)];
+			double outWR = dram->aWR[countWR-((countWR > delayW)?delayW+1:0)];
 			
 			//-------- three
 			
-			aPL[countPL] = ((outKL*3.0) - ((outLL + outML + outNL + outOL)*2.0));
-			aQL[countQL] = ((outLL*3.0) - ((outKL + outML + outNL + outOL)*2.0));
-			aRL[countRL] = ((outML*3.0) - ((outKL + outLL + outNL + outOL)*2.0));
-			aSL[countSL] = ((outNL*3.0) - ((outKL + outLL + outML + outOL)*2.0));
-			aTL[countTL] = ((outOL*3.0) - ((outKL + outLL + outML + outNL)*2.0));
+			dram->aPL[countPL] = ((outKL*3.0) - ((outLL + outML + outNL + outOL)*2.0));
+			dram->aQL[countQL] = ((outLL*3.0) - ((outKL + outML + outNL + outOL)*2.0));
+			dram->aRL[countRL] = ((outML*3.0) - ((outKL + outLL + outNL + outOL)*2.0));
+			dram->aSL[countSL] = ((outNL*3.0) - ((outKL + outLL + outML + outOL)*2.0));
+			dram->aTL[countTL] = ((outOL*3.0) - ((outKL + outLL + outML + outNL)*2.0));
 			
-			aBR[countBR] = ((outCR*3.0) - ((outHR + outMR + outRR + outWR)*2.0));
-			aGR[countGR] = ((outHR*3.0) - ((outCR + outMR + outRR + outWR)*2.0));
-			aLR[countLR] = ((outMR*3.0) - ((outCR + outHR + outRR + outWR)*2.0));
-			aQR[countQR] = ((outRR*3.0) - ((outCR + outHR + outMR + outWR)*2.0));
-			aVR[countVR] = ((outWR*3.0) - ((outCR + outHR + outMR + outRR)*2.0));
+			dram->aBR[countBR] = ((outCR*3.0) - ((outHR + outMR + outRR + outWR)*2.0));
+			dram->aGR[countGR] = ((outHR*3.0) - ((outCR + outMR + outRR + outWR)*2.0));
+			dram->aLR[countLR] = ((outMR*3.0) - ((outCR + outHR + outRR + outWR)*2.0));
+			dram->aQR[countQR] = ((outRR*3.0) - ((outCR + outHR + outMR + outWR)*2.0));
+			dram->aVR[countVR] = ((outWR*3.0) - ((outCR + outHR + outMR + outRR)*2.0));
 			
 			countPL++; if (countPL < 0 || countPL > delayP) countPL = 0;
 			countQL++; if (countQL < 0 || countQL > delayQ) countQL = 0;
@@ -688,38 +688,38 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countQR++; if (countQR < 0 || countQR > delayQ) countQR = 0;
 			countVR++; if (countVR < 0 || countVR > delayV) countVR = 0;
 			
-			double outPL = aPL[countPL-((countPL > delayP)?delayP+1:0)];
-			double outQL = aQL[countQL-((countQL > delayQ)?delayQ+1:0)];
-			double outRL = aRL[countRL-((countRL > delayR)?delayR+1:0)];
-			double outSL = aSL[countSL-((countSL > delayS)?delayS+1:0)];
-			double outTL = aTL[countTL-((countTL > delayT)?delayT+1:0)];
+			double outPL = dram->aPL[countPL-((countPL > delayP)?delayP+1:0)];
+			double outQL = dram->aQL[countQL-((countQL > delayQ)?delayQ+1:0)];
+			double outRL = dram->aRL[countRL-((countRL > delayR)?delayR+1:0)];
+			double outSL = dram->aSL[countSL-((countSL > delayS)?delayS+1:0)];
+			double outTL = dram->aTL[countTL-((countTL > delayT)?delayT+1:0)];
 			
-			double outBR = aBR[countBR-((countBR > delayB)?delayB+1:0)];
-			double outGR = aGR[countGR-((countGR > delayG)?delayG+1:0)];
-			double outLR = aLR[countLR-((countLR > delayL)?delayL+1:0)];
-			double outQR = aQR[countQR-((countQR > delayQ)?delayQ+1:0)];
-			double outVR = aVR[countVR-((countVR > delayV)?delayV+1:0)];
+			double outBR = dram->aBR[countBR-((countBR > delayB)?delayB+1:0)];
+			double outGR = dram->aGR[countGR-((countGR > delayG)?delayG+1:0)];
+			double outLR = dram->aLR[countLR-((countLR > delayL)?delayL+1:0)];
+			double outQR = dram->aQR[countQR-((countQR > delayQ)?delayQ+1:0)];
+			double outVR = dram->aVR[countVR-((countVR > delayV)?delayV+1:0)];
 						
 			//-------- four
 			
-			aVL[countVL] = ((outQL*3.0) - ((outPL + outRL + outSL + outTL)*2.0));
-			aWL[countWL] = ((outRL*3.0) - ((outPL + outQL + outSL + outTL)*2.0));
-			aXL[countXL] = ((outSL*3.0) - ((outPL + outQL + outRL + outTL)*2.0));
-			aYL[countYL] = ((outTL*3.0) - ((outPL + outQL + outRL + outSL)*2.0));
+			dram->aVL[countVL] = ((outQL*3.0) - ((outPL + outRL + outSL + outTL)*2.0));
+			dram->aWL[countWL] = ((outRL*3.0) - ((outPL + outQL + outSL + outTL)*2.0));
+			dram->aXL[countXL] = ((outSL*3.0) - ((outPL + outQL + outRL + outTL)*2.0));
+			dram->aYL[countYL] = ((outTL*3.0) - ((outPL + outQL + outRL + outSL)*2.0));
 			
-			aAR[countAR] = ((outBR*3.0) - ((outGR + outLR + outQR + outVR)*2.0));
-			aFR[countFR] = ((outGR*3.0) - ((outBR + outLR + outQR + outVR)*2.0));
-			aKR[countKR] = ((outLR*3.0) - ((outBR + outGR + outQR + outVR)*2.0));
-			aPR[countPR] = ((outQR*3.0) - ((outBR + outGR + outLR + outVR)*2.0));
+			dram->aAR[countAR] = ((outBR*3.0) - ((outGR + outLR + outQR + outVR)*2.0));
+			dram->aFR[countFR] = ((outGR*3.0) - ((outBR + outLR + outQR + outVR)*2.0));
+			dram->aKR[countKR] = ((outLR*3.0) - ((outBR + outGR + outQR + outVR)*2.0));
+			dram->aPR[countPR] = ((outQR*3.0) - ((outBR + outGR + outLR + outVR)*2.0));
 			
-			double outUL = ((outPL*3.0) - ((outQL + outRL + outSL + outTL)*2.0)) - (aUL[(countUL+1)-((countUL+1 > delayU)?delayU+1:0)]*0.618033988749894848204586);
-			double outUR = ((outVR*3.0) - ((outBR + outGR + outLR + outQR)*2.0)) - (aUR[(countUR+1)-((countUR+1 > delayU)?delayU+1:0)]*0.618033988749894848204586);
-			aUL[countUL] = outUL; outUL *= 0.618033988749894848204586;
-			aUR[countUR] = outUR; outUR *= 0.618033988749894848204586;
+			double outUL = ((outPL*3.0) - ((outQL + outRL + outSL + outTL)*2.0)) - (dram->aUL[(countUL+1)-((countUL+1 > delayU)?delayU+1:0)]*0.618033988749894848204586);
+			double outUR = ((outVR*3.0) - ((outBR + outGR + outLR + outQR)*2.0)) - (dram->aUR[(countUR+1)-((countUR+1 > delayU)?delayU+1:0)]*0.618033988749894848204586);
+			dram->aUL[countUL] = outUL; outUL *= 0.618033988749894848204586;
+			dram->aUR[countUR] = outUR; outUR *= 0.618033988749894848204586;
 			countUL++; if (countUL < 0 || countUL > delayU) countUL = 0;
 			countUR++; if (countUR < 0 || countUR > delayU) countUR = 0;
-			outUL += aUL[countUL-((countUL > delayU)?delayU+1:0)];
-			outUR += aUR[countUR-((countUR > delayU)?delayU+1:0)];
+			outUL += dram->aUL[countUL-((countUL > delayU)?delayU+1:0)];
+			outUR += dram->aUR[countUR-((countUR > delayU)?delayU+1:0)];
 			//the 11-length delay slot becomes a sole allpass
 			
 			vibBL = vibAL; vibAL = outUL;
@@ -745,15 +745,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countKR++; if (countKR < 0 || countKR > delayK) countKR = 0;
 			countPR++; if (countPR < 0 || countPR > delayP) countPR = 0;
 			
-			double outVL = aVL[countVL-((countVL > delayV)?delayV+1:0)];
-			double outWL = aWL[countWL-((countWL > delayW)?delayW+1:0)];
-			double outXL = aXL[countXL-((countXL > delayX)?delayX+1:0)];
-			double outYL = aYL[countYL-((countYL > delayY)?delayY+1:0)];
+			double outVL = dram->aVL[countVL-((countVL > delayV)?delayV+1:0)];
+			double outWL = dram->aWL[countWL-((countWL > delayW)?delayW+1:0)];
+			double outXL = dram->aXL[countXL-((countXL > delayX)?delayX+1:0)];
+			double outYL = dram->aYL[countYL-((countYL > delayY)?delayY+1:0)];
 			
-			double outAR = aAR[countAR-((countAR > delayA)?delayA+1:0)];
-			double outFR = aFR[countFR-((countFR > delayF)?delayF+1:0)];
-			double outKR = aKR[countKR-((countKR > delayK)?delayK+1:0)];
-			double outPR = aPR[countPR-((countPR > delayP)?delayP+1:0)];
+			double outAR = dram->aAR[countAR-((countAR > delayA)?delayA+1:0)];
+			double outFR = dram->aFR[countFR-((countFR > delayF)?delayF+1:0)];
+			double outKR = dram->aKR[countKR-((countKR > delayK)?delayK+1:0)];
+			double outPR = dram->aPR[countPR-((countPR > delayP)?delayP+1:0)];
 			
 			//-------- five
 			
@@ -932,22 +932,22 @@ int _airwindowsAlgorithm::reset(void) {
 {
 	gainOutL = gainOutR = 1.0;
 	
-	for(int count = 0; count < shortA+2; count++) {eAL[count] = 0.0; eAR[count] = 0.0;}
-	for(int count = 0; count < shortB+2; count++) {eBL[count] = 0.0; eBR[count] = 0.0;}
-	for(int count = 0; count < shortC+2; count++) {eCL[count] = 0.0; eCR[count] = 0.0;}
-	for(int count = 0; count < shortD+2; count++) {eDL[count] = 0.0; eDR[count] = 0.0;}
-	for(int count = 0; count < shortE+2; count++) {eEL[count] = 0.0; eER[count] = 0.0;}
-	for(int count = 0; count < shortF+2; count++) {eFL[count] = 0.0; eFR[count] = 0.0;}
-	for(int count = 0; count < shortG+2; count++) {eGL[count] = 0.0; eGR[count] = 0.0;}
-	for(int count = 0; count < shortH+2; count++) {eHL[count] = 0.0; eHR[count] = 0.0;}
-	for(int count = 0; count < shortI+2; count++) {eIL[count] = 0.0; eIR[count] = 0.0;}
-	for(int count = 0; count < shortJ+2; count++) {eJL[count] = 0.0; eJR[count] = 0.0;}
-	for(int count = 0; count < shortK+2; count++) {eKL[count] = 0.0; eKR[count] = 0.0;}
-	for(int count = 0; count < shortL+2; count++) {eLL[count] = 0.0; eLR[count] = 0.0;}
-	for(int count = 0; count < shortM+2; count++) {eML[count] = 0.0; eMR[count] = 0.0;}
-	for(int count = 0; count < shortN+2; count++) {eNL[count] = 0.0; eNR[count] = 0.0;}
-	for(int count = 0; count < shortO+2; count++) {eOL[count] = 0.0; eOR[count] = 0.0;}
-	for(int count = 0; count < shortP+2; count++) {ePL[count] = 0.0; ePR[count] = 0.0;}		
+	for(int count = 0; count < shortA+2; count++) {dram->eAL[count] = 0.0; dram->eAR[count] = 0.0;}
+	for(int count = 0; count < shortB+2; count++) {dram->eBL[count] = 0.0; dram->eBR[count] = 0.0;}
+	for(int count = 0; count < shortC+2; count++) {dram->eCL[count] = 0.0; dram->eCR[count] = 0.0;}
+	for(int count = 0; count < shortD+2; count++) {dram->eDL[count] = 0.0; dram->eDR[count] = 0.0;}
+	for(int count = 0; count < shortE+2; count++) {dram->eEL[count] = 0.0; dram->eER[count] = 0.0;}
+	for(int count = 0; count < shortF+2; count++) {dram->eFL[count] = 0.0; dram->eFR[count] = 0.0;}
+	for(int count = 0; count < shortG+2; count++) {dram->eGL[count] = 0.0; dram->eGR[count] = 0.0;}
+	for(int count = 0; count < shortH+2; count++) {dram->eHL[count] = 0.0; dram->eHR[count] = 0.0;}
+	for(int count = 0; count < shortI+2; count++) {dram->eIL[count] = 0.0; dram->eIR[count] = 0.0;}
+	for(int count = 0; count < shortJ+2; count++) {dram->eJL[count] = 0.0; dram->eJR[count] = 0.0;}
+	for(int count = 0; count < shortK+2; count++) {dram->eKL[count] = 0.0; dram->eKR[count] = 0.0;}
+	for(int count = 0; count < shortL+2; count++) {dram->eLL[count] = 0.0; dram->eLR[count] = 0.0;}
+	for(int count = 0; count < shortM+2; count++) {dram->eML[count] = 0.0; dram->eMR[count] = 0.0;}
+	for(int count = 0; count < shortN+2; count++) {dram->eNL[count] = 0.0; dram->eNR[count] = 0.0;}
+	for(int count = 0; count < shortO+2; count++) {dram->eOL[count] = 0.0; dram->eOR[count] = 0.0;}
+	for(int count = 0; count < shortP+2; count++) {dram->ePL[count] = 0.0; dram->ePR[count] = 0.0;}		
 	
 	
 	shortAL = 1;
@@ -985,34 +985,34 @@ int _airwindowsAlgorithm::reset(void) {
 	shortPR = 1;
 	
 	
-	for(int count = 0; count < delayA+2; count++) {aAL[count] = 0.0; aAR[count] = 0.0;}
-	for(int count = 0; count < delayB+2; count++) {aBL[count] = 0.0; aBR[count] = 0.0;}
-	for(int count = 0; count < delayC+2; count++) {aCL[count] = 0.0; aCR[count] = 0.0;}
-	for(int count = 0; count < delayD+2; count++) {aDL[count] = 0.0; aDR[count] = 0.0;}
-	for(int count = 0; count < delayE+2; count++) {aEL[count] = 0.0; aER[count] = 0.0;}
-	for(int count = 0; count < delayF+2; count++) {aFL[count] = 0.0; aFR[count] = 0.0;}
-	for(int count = 0; count < delayG+2; count++) {aGL[count] = 0.0; aGR[count] = 0.0;}
-	for(int count = 0; count < delayH+2; count++) {aHL[count] = 0.0; aHR[count] = 0.0;}
-	for(int count = 0; count < delayI+2; count++) {aIL[count] = 0.0; aIR[count] = 0.0;}
-	for(int count = 0; count < delayJ+2; count++) {aJL[count] = 0.0; aJR[count] = 0.0;}
-	for(int count = 0; count < delayK+2; count++) {aKL[count] = 0.0; aKR[count] = 0.0;}
-	for(int count = 0; count < delayL+2; count++) {aLL[count] = 0.0; aLR[count] = 0.0;}
-	for(int count = 0; count < delayM+2; count++) {aML[count] = 0.0; aMR[count] = 0.0;}
-	for(int count = 0; count < delayN+2; count++) {aNL[count] = 0.0; aNR[count] = 0.0;}
-	for(int count = 0; count < delayO+2; count++) {aOL[count] = 0.0; aOR[count] = 0.0;}
-	for(int count = 0; count < delayP+2; count++) {aPL[count] = 0.0; aPR[count] = 0.0;}
-	for(int count = 0; count < delayQ+2; count++) {aQL[count] = 0.0; aQR[count] = 0.0;}
-	for(int count = 0; count < delayR+2; count++) {aRL[count] = 0.0; aRR[count] = 0.0;}
-	for(int count = 0; count < delayS+2; count++) {aSL[count] = 0.0; aSR[count] = 0.0;}
-	for(int count = 0; count < delayT+2; count++) {aTL[count] = 0.0; aTR[count] = 0.0;}
-	for(int count = 0; count < delayU+2; count++) {aUL[count] = 0.0; aUR[count] = 0.0;}
-	for(int count = 0; count < delayV+2; count++) {aVL[count] = 0.0; aVR[count] = 0.0;}
-	for(int count = 0; count < delayW+2; count++) {aWL[count] = 0.0; aWR[count] = 0.0;}
-	for(int count = 0; count < delayX+2; count++) {aXL[count] = 0.0; aXR[count] = 0.0;}
-	for(int count = 0; count < delayY+2; count++) {aYL[count] = 0.0; aYR[count] = 0.0;}
+	for(int count = 0; count < delayA+2; count++) {dram->aAL[count] = 0.0; dram->aAR[count] = 0.0;}
+	for(int count = 0; count < delayB+2; count++) {dram->aBL[count] = 0.0; dram->aBR[count] = 0.0;}
+	for(int count = 0; count < delayC+2; count++) {dram->aCL[count] = 0.0; dram->aCR[count] = 0.0;}
+	for(int count = 0; count < delayD+2; count++) {dram->aDL[count] = 0.0; dram->aDR[count] = 0.0;}
+	for(int count = 0; count < delayE+2; count++) {dram->aEL[count] = 0.0; dram->aER[count] = 0.0;}
+	for(int count = 0; count < delayF+2; count++) {dram->aFL[count] = 0.0; dram->aFR[count] = 0.0;}
+	for(int count = 0; count < delayG+2; count++) {dram->aGL[count] = 0.0; dram->aGR[count] = 0.0;}
+	for(int count = 0; count < delayH+2; count++) {dram->aHL[count] = 0.0; dram->aHR[count] = 0.0;}
+	for(int count = 0; count < delayI+2; count++) {dram->aIL[count] = 0.0; dram->aIR[count] = 0.0;}
+	for(int count = 0; count < delayJ+2; count++) {dram->aJL[count] = 0.0; dram->aJR[count] = 0.0;}
+	for(int count = 0; count < delayK+2; count++) {dram->aKL[count] = 0.0; dram->aKR[count] = 0.0;}
+	for(int count = 0; count < delayL+2; count++) {dram->aLL[count] = 0.0; dram->aLR[count] = 0.0;}
+	for(int count = 0; count < delayM+2; count++) {dram->aML[count] = 0.0; dram->aMR[count] = 0.0;}
+	for(int count = 0; count < delayN+2; count++) {dram->aNL[count] = 0.0; dram->aNR[count] = 0.0;}
+	for(int count = 0; count < delayO+2; count++) {dram->aOL[count] = 0.0; dram->aOR[count] = 0.0;}
+	for(int count = 0; count < delayP+2; count++) {dram->aPL[count] = 0.0; dram->aPR[count] = 0.0;}
+	for(int count = 0; count < delayQ+2; count++) {dram->aQL[count] = 0.0; dram->aQR[count] = 0.0;}
+	for(int count = 0; count < delayR+2; count++) {dram->aRL[count] = 0.0; dram->aRR[count] = 0.0;}
+	for(int count = 0; count < delayS+2; count++) {dram->aSL[count] = 0.0; dram->aSR[count] = 0.0;}
+	for(int count = 0; count < delayT+2; count++) {dram->aTL[count] = 0.0; dram->aTR[count] = 0.0;}
+	for(int count = 0; count < delayU+2; count++) {dram->aUL[count] = 0.0; dram->aUR[count] = 0.0;}
+	for(int count = 0; count < delayV+2; count++) {dram->aVL[count] = 0.0; dram->aVR[count] = 0.0;}
+	for(int count = 0; count < delayW+2; count++) {dram->aWL[count] = 0.0; dram->aWR[count] = 0.0;}
+	for(int count = 0; count < delayX+2; count++) {dram->aXL[count] = 0.0; dram->aXR[count] = 0.0;}
+	for(int count = 0; count < delayY+2; count++) {dram->aYL[count] = 0.0; dram->aYR[count] = 0.0;}
 	
-	for(int count = 0; count < predelay+2; count++) {aZL[count] = 0.0; aZR[count] = 0.0;}
-	for(int count = 0; count < vlfpredelay+2; count++) {aVLFL[count] = 0.0; aVLFR[count] = 0.0;}
+	for(int count = 0; count < predelay+2; count++) {dram->aZL[count] = 0.0; dram->aZR[count] = 0.0;}
+	for(int count = 0; count < vlfpredelay+2; count++) {dram->aVLFL[count] = 0.0; dram->aVLFR[count] = 0.0;}
 	
 	feedbackAL = 0.0;
 	feedbackBL = 0.0;

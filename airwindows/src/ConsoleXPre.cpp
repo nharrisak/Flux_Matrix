@@ -160,8 +160,6 @@ enum { kNumTemplateParameters = 6 };
 		biqs_outL, biqs_outR, biqs_total
 	};
 	
-	double dBaL[dscBuf+5];
-	double dBaR[dscBuf+5];
 	double dBaPosL;
 	double dBaPosR;
 	int dBaXL;
@@ -184,6 +182,8 @@ enum { kNumTemplateParameters = 6 };
 	double hmid[biqs_total];
 	double lmid[biqs_total];
 	double bass[biqs_total];
+	double dBaL[dscBuf+5];
+	double dBaR[dscBuf+5];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -755,20 +755,20 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		inputSampleL *= topdB;
 		if (inputSampleL < -0.222) inputSampleL = -0.222; if (inputSampleL > 0.222) inputSampleL = 0.222;
-		dBaL[dBaXL] = inputSampleL; dBaPosL *= 0.5; dBaPosL += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*0.5);
+		dram->dBaL[dBaXL] = inputSampleL; dBaPosL *= 0.5; dBaPosL += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*0.5);
 		int dBdly = floor(dBaPosL*dscBuf);
 		double dBi = (dBaPosL*dscBuf)-dBdly;
-		inputSampleL = dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
-		dBdly++; inputSampleL += dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*dBi;
+		inputSampleL = dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		dBdly++; inputSampleL += dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBaXL++; if (dBaXL < 0 || dBaXL >= dscBuf) dBaXL = 0;
 		inputSampleL /= topdB;		
 		inputSampleR *= topdB;
 		if (inputSampleR < -0.222) inputSampleR = -0.222; if (inputSampleR > 0.222) inputSampleR = 0.222;
-		dBaR[dBaXR] = inputSampleR; dBaPosR *= 0.5; dBaPosR += fabs((inputSampleR*((inputSampleR*0.25)-0.5))*0.5);
+		dram->dBaR[dBaXR] = inputSampleR; dBaPosR *= 0.5; dBaPosR += fabs((inputSampleR*((inputSampleR*0.25)-0.5))*0.5);
 		dBdly = floor(dBaPosR*dscBuf);
 		dBi = (dBaPosR*dscBuf)-dBdly;
-		inputSampleR = dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
-		dBdly++; inputSampleR += dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*dBi;
+		inputSampleR = dram->dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		dBdly++; inputSampleR += dram->dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*dBi;
 		dBaXR++; if (dBaXR < 0 || dBaXR >= dscBuf) dBaXR = 0;
 		inputSampleR /= topdB;		
 		//top dB processing for distributed discontinuity modeling air nonlinearity
@@ -836,8 +836,8 @@ int _airwindowsAlgorithm::reset(void) {
 	}
 	
 	for(int count = 0; count < dscBuf+2; count++) {
-		dBaL[count] = 0.0;
-		dBaR[count] = 0.0;
+		dram->dBaL[count] = 0.0;
+		dram->dBaR[count] = 0.0;
 	}
 	dBaPosL = 0.0;
 	dBaPosR = 0.0;

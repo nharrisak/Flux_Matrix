@@ -31,22 +31,22 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		double dBaL[dscBuf+5];
 		double dBaPosL;
 		int dBaXL;		
 		
-		double dBbL[dscBuf+5];
 		double dBbPosL;
 		int dBbXL;		
 		
-		double dBcL[dscBuf+5];
 		double dBcPosL;
 		int dBcXL;		
 				
 		uint32_t fpd;
 	
 	struct _dram {
-		};
+			double dBaL[dscBuf+5];
+		double dBbL[dscBuf+5];
+		double dBcL[dscBuf+5];
+	};
 	_dram* dram;
 };
 _kernel kernels[1];
@@ -73,25 +73,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample *= topdB;
 		if (inputSample < -0.222) inputSample = -0.222; if (inputSample > 0.222) inputSample = 0.222;
 		//Air Discontinuity A begin
-		dBaL[dBaXL] = inputSample; dBaPosL *= 0.5; dBaPosL += fabs((inputSample*((inputSample*0.25)-0.5))*0.5);
+		dram->dBaL[dBaXL] = inputSample; dBaPosL *= 0.5; dBaPosL += fabs((inputSample*((inputSample*0.25)-0.5))*0.5);
 		int dBdly = floor(dBaPosL*dscBuf);
 		double dBi = (dBaPosL*dscBuf)-dBdly;
-		inputSample = dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
-		dBdly++; inputSample += dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*dBi;
+		inputSample = dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		dBdly++; inputSample += dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBaXL++; if (dBaXL < 0 || dBaXL >= dscBuf) dBaXL = 0;
 		//Air Discontinuity A end
 		//Air Discontinuity B begin
-		dBbL[dBbXL] = inputSample;  dBbPosL *= 0.5; dBbPosL += fabs((inputSample*((inputSample*0.25)-0.5))*0.5);
+		dram->dBbL[dBbXL] = inputSample;  dBbPosL *= 0.5; dBbPosL += fabs((inputSample*((inputSample*0.25)-0.5))*0.5);
 		dBdly = floor(dBbPosL*dscBuf); dBi = (dBbPosL*dscBuf)-dBdly;
-		inputSample = dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
-		dBdly++; inputSample += dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*dBi;
+		inputSample = dram->dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		dBdly++; inputSample += dram->dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBbXL++; if (dBbXL < 0 || dBbXL >= dscBuf) dBbXL = 0;
 		//Air Discontinuity B end
 		//Air Discontinuity C begin
-		dBcL[dBcXL] = inputSample;  dBcPosL *= 0.5; dBcPosL += fabs((inputSample*((inputSample*0.25)-0.5))*0.5);
+		dram->dBcL[dBcXL] = inputSample;  dBcPosL *= 0.5; dBcPosL += fabs((inputSample*((inputSample*0.25)-0.5))*0.5);
 		dBdly = floor(dBcPosL*dscBuf); dBi = (dBcPosL*dscBuf)-dBdly;
-		inputSample = dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
-		dBdly++; inputSample += dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*dBi;
+		inputSample = dram->dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		dBdly++; inputSample += dram->dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBcXL++; if (dBcXL < 0 || dBcXL >= dscBuf) dBcXL = 0;
 		//Air Discontinuity C end
 		inputSample /= topdB;
@@ -111,9 +111,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	for(int count = 0; count < dscBuf+2; count++) {
-		dBaL[count] = 0.0;
-		dBbL[count] = 0.0;
-		dBcL[count] = 0.0;
+		dram->dBaL[count] = 0.0;
+		dram->dBbL[count] = 0.0;
+		dram->dBcL[count] = 0.0;
 	}
 	dBaPosL = 0.0;
 	dBbPosL = 0.0;

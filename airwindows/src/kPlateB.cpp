@@ -42,25 +42,7 @@ enum { kNumTemplateParameters = 6 };
 	double gainOutL;
 	double gainOutR;
 	
-	double eAL[earlyA+5];
-	double eBL[earlyB+5];
-	double eCL[earlyC+5];
-	double eDL[earlyD+5];
-	double eEL[earlyE+5];
-	double eFL[earlyF+5];
-	double eGL[earlyG+5];
-	double eHL[earlyH+5];
-	double eIL[earlyI+5];
 	
-	double eAR[earlyA+5];
-	double eBR[earlyB+5];
-	double eCR[earlyC+5];
-	double eDR[earlyD+5];
-	double eER[earlyE+5];
-	double eFR[earlyF+5];
-	double eGR[earlyG+5];
-	double eHR[earlyH+5];
-	double eIR[earlyI+5];
 	
 	int earlyAL, earlyAR;
 	int earlyBL, earlyBR;
@@ -72,60 +54,8 @@ enum { kNumTemplateParameters = 6 };
 	int earlyHL, earlyHR;
 	int earlyIL, earlyIR;
 	
-	double aAL[delayA+5];
-	double aBL[delayB+5];
-	double aCL[delayC+5];
-	double aDL[delayD+5];
-	double aEL[delayE+5];
-	double aFL[delayF+5];
-	double aGL[delayG+5];
-	double aHL[delayH+5];
-	double aIL[delayI+5];
-	double aJL[delayJ+5];
-	double aKL[delayK+5];
-	double aLL[delayL+5];
-	double aML[delayM+5];
-	double aNL[delayN+5];
-	double aOL[delayO+5];
-	double aPL[delayP+5];
-	double aQL[delayQ+5];
-	double aRL[delayR+5];
-	double aSL[delayS+5];
-	double aTL[delayT+5];
-	double aUL[delayU+5];
-	double aVL[delayV+5];
-	double aWL[delayW+5];
-	double aXL[delayX+5];
-	double aYL[delayY+5];
 	
-	double aAR[delayA+5];
-	double aBR[delayB+5];
-	double aCR[delayC+5];
-	double aDR[delayD+5];
-	double aER[delayE+5];
-	double aFR[delayF+5];
-	double aGR[delayG+5];
-	double aHR[delayH+5];
-	double aIR[delayI+5];
-	double aJR[delayJ+5];
-	double aKR[delayK+5];
-	double aLR[delayL+5];
-	double aMR[delayM+5];
-	double aNR[delayN+5];
-	double aOR[delayO+5];
-	double aPR[delayP+5];
-	double aQR[delayQ+5];
-	double aRR[delayR+5];
-	double aSR[delayS+5];
-	double aTR[delayT+5];
-	double aUR[delayU+5];
-	double aVR[delayV+5];
-	double aWR[delayW+5];
-	double aXR[delayX+5];
-	double aYR[delayY+5];
 	
-	double aZL[predelay+5];
-	double aZR[predelay+5];
 	
 	
 	double feedbackAL;
@@ -257,7 +187,77 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdR;
 
 	struct _dram {
-		double fixA[fix_total];
+		double eAL[earlyA+5];
+	double eBL[earlyB+5];
+	double eCL[earlyC+5];
+	double eDL[earlyD+5];
+	double eEL[earlyE+5];
+	double eFL[earlyF+5];
+	double eGL[earlyG+5];
+	double eHL[earlyH+5];
+	double eIL[earlyI+5];
+	double eAR[earlyA+5];
+	double eBR[earlyB+5];
+	double eCR[earlyC+5];
+	double eDR[earlyD+5];
+	double eER[earlyE+5];
+	double eFR[earlyF+5];
+	double eGR[earlyG+5];
+	double eHR[earlyH+5];
+	double eIR[earlyI+5];
+	double aAL[delayA+5];
+	double aBL[delayB+5];
+	double aCL[delayC+5];
+	double aDL[delayD+5];
+	double aEL[delayE+5];
+	double aFL[delayF+5];
+	double aGL[delayG+5];
+	double aHL[delayH+5];
+	double aIL[delayI+5];
+	double aJL[delayJ+5];
+	double aKL[delayK+5];
+	double aLL[delayL+5];
+	double aML[delayM+5];
+	double aNL[delayN+5];
+	double aOL[delayO+5];
+	double aPL[delayP+5];
+	double aQL[delayQ+5];
+	double aRL[delayR+5];
+	double aSL[delayS+5];
+	double aTL[delayT+5];
+	double aUL[delayU+5];
+	double aVL[delayV+5];
+	double aWL[delayW+5];
+	double aXL[delayX+5];
+	double aYL[delayY+5];
+	double aAR[delayA+5];
+	double aBR[delayB+5];
+	double aCR[delayC+5];
+	double aDR[delayD+5];
+	double aER[delayE+5];
+	double aFR[delayF+5];
+	double aGR[delayG+5];
+	double aHR[delayH+5];
+	double aIR[delayI+5];
+	double aJR[delayJ+5];
+	double aKR[delayK+5];
+	double aLR[delayL+5];
+	double aMR[delayM+5];
+	double aNR[delayN+5];
+	double aOR[delayO+5];
+	double aPR[delayP+5];
+	double aQR[delayQ+5];
+	double aRR[delayR+5];
+	double aSR[delayS+5];
+	double aTR[delayT+5];
+	double aUR[delayU+5];
+	double aVR[delayV+5];
+	double aWR[delayW+5];
+	double aXR[delayX+5];
+	double aYR[delayY+5];
+	double aZL[predelay+5];
+	double aZR[predelay+5];
+	double fixA[fix_total];
 	double fixB[fix_total];
 	double fixC[fix_total];
 	double fixD[fix_total];
@@ -411,19 +411,19 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//10k filter on input
 			
 			//begin allpasses
-			double oeAL = inputSampleL - (eAL[(earlyAL+1)-((earlyAL+1 > earlyA)?earlyA+1:0)]*0.5);
-			double oeBL = inputSampleL - (eBL[(earlyBL+1)-((earlyBL+1 > earlyB)?earlyB+1:0)]*0.5);
-			double oeCL = inputSampleL - (eCL[(earlyCL+1)-((earlyCL+1 > earlyC)?earlyC+1:0)]*0.5);
-			double oeCR = inputSampleR - (eCR[(earlyCR+1)-((earlyCR+1 > earlyC)?earlyC+1:0)]*0.5);
-			double oeFR = inputSampleR - (eFR[(earlyFR+1)-((earlyFR+1 > earlyF)?earlyF+1:0)]*0.5);
-			double oeIR = inputSampleR - (eIR[(earlyIR+1)-((earlyIR+1 > earlyI)?earlyI+1:0)]*0.5);
+			double oeAL = inputSampleL - (dram->eAL[(earlyAL+1)-((earlyAL+1 > earlyA)?earlyA+1:0)]*0.5);
+			double oeBL = inputSampleL - (dram->eBL[(earlyBL+1)-((earlyBL+1 > earlyB)?earlyB+1:0)]*0.5);
+			double oeCL = inputSampleL - (dram->eCL[(earlyCL+1)-((earlyCL+1 > earlyC)?earlyC+1:0)]*0.5);
+			double oeCR = inputSampleR - (dram->eCR[(earlyCR+1)-((earlyCR+1 > earlyC)?earlyC+1:0)]*0.5);
+			double oeFR = inputSampleR - (dram->eFR[(earlyFR+1)-((earlyFR+1 > earlyF)?earlyF+1:0)]*0.5);
+			double oeIR = inputSampleR - (dram->eIR[(earlyIR+1)-((earlyIR+1 > earlyI)?earlyI+1:0)]*0.5);
 			
-			eAL[earlyAL] = oeAL; oeAL *= 0.5;
-			eBL[earlyBL] = oeBL; oeBL *= 0.5;
-			eCL[earlyCL] = oeCL; oeCL *= 0.5;
-			eCR[earlyCR] = oeCR; oeCR *= 0.5;
-			eFR[earlyFR] = oeFR; oeFR *= 0.5;
-			eIR[earlyIR] = oeIR; oeIR *= 0.5;
+			dram->eAL[earlyAL] = oeAL; oeAL *= 0.5;
+			dram->eBL[earlyBL] = oeBL; oeBL *= 0.5;
+			dram->eCL[earlyCL] = oeCL; oeCL *= 0.5;
+			dram->eCR[earlyCR] = oeCR; oeCR *= 0.5;
+			dram->eFR[earlyFR] = oeFR; oeFR *= 0.5;
+			dram->eIR[earlyIR] = oeIR; oeIR *= 0.5;
 			
 			earlyAL++; if (earlyAL < 0 || earlyAL > earlyA) earlyAL = 0;
 			earlyBL++; if (earlyBL < 0 || earlyBL > earlyB) earlyBL = 0;
@@ -432,26 +432,26 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			earlyFR++; if (earlyFR < 0 || earlyFR > earlyF) earlyFR = 0;
 			earlyIR++; if (earlyIR < 0 || earlyIR > earlyI) earlyIR = 0;
 			
-			oeAL += eAL[earlyAL-((earlyAL > earlyA)?earlyA+1:0)];
-			oeBL += eBL[earlyBL-((earlyBL > earlyB)?earlyB+1:0)];
-			oeCL += eCL[earlyCL-((earlyCL > earlyC)?earlyC+1:0)];
-			oeCR += eCR[earlyCR-((earlyCR > earlyC)?earlyC+1:0)];
-			oeFR += eFR[earlyFR-((earlyFR > earlyF)?earlyF+1:0)];
-			oeIR += eIR[earlyIR-((earlyIR > earlyI)?earlyI+1:0)];
+			oeAL += dram->eAL[earlyAL-((earlyAL > earlyA)?earlyA+1:0)];
+			oeBL += dram->eBL[earlyBL-((earlyBL > earlyB)?earlyB+1:0)];
+			oeCL += dram->eCL[earlyCL-((earlyCL > earlyC)?earlyC+1:0)];
+			oeCR += dram->eCR[earlyCR-((earlyCR > earlyC)?earlyC+1:0)];
+			oeFR += dram->eFR[earlyFR-((earlyFR > earlyF)?earlyF+1:0)];
+			oeIR += dram->eIR[earlyIR-((earlyIR > earlyI)?earlyI+1:0)];
 			
-			double oeDL = ((oeBL+oeCL)-oeAL) - (eDL[(earlyDL+1)-((earlyDL+1 > earlyD)?earlyD+1:0)]*0.5);
-			double oeEL = ((oeAL+oeCL)-oeBL) - (eEL[(earlyEL+1)-((earlyEL+1 > earlyE)?earlyE+1:0)]*0.5);
-			double oeFL = ((oeAL+oeBL)-oeCL) - (eFL[(earlyFL+1)-((earlyFL+1 > earlyF)?earlyF+1:0)]*0.5);
-			double oeBR = ((oeFR+oeIR)-oeCR) - (eBR[(earlyBR+1)-((earlyBR+1 > earlyB)?earlyB+1:0)]*0.5);
-			double oeER = ((oeCR+oeIR)-oeFR) - (eER[(earlyER+1)-((earlyER+1 > earlyE)?earlyE+1:0)]*0.5);
-			double oeHR = ((oeCR+oeFR)-oeIR) - (eHR[(earlyHR+1)-((earlyHR+1 > earlyH)?earlyH+1:0)]*0.5);
+			double oeDL = ((oeBL+oeCL)-oeAL) - (dram->eDL[(earlyDL+1)-((earlyDL+1 > earlyD)?earlyD+1:0)]*0.5);
+			double oeEL = ((oeAL+oeCL)-oeBL) - (dram->eEL[(earlyEL+1)-((earlyEL+1 > earlyE)?earlyE+1:0)]*0.5);
+			double oeFL = ((oeAL+oeBL)-oeCL) - (dram->eFL[(earlyFL+1)-((earlyFL+1 > earlyF)?earlyF+1:0)]*0.5);
+			double oeBR = ((oeFR+oeIR)-oeCR) - (dram->eBR[(earlyBR+1)-((earlyBR+1 > earlyB)?earlyB+1:0)]*0.5);
+			double oeER = ((oeCR+oeIR)-oeFR) - (dram->eER[(earlyER+1)-((earlyER+1 > earlyE)?earlyE+1:0)]*0.5);
+			double oeHR = ((oeCR+oeFR)-oeIR) - (dram->eHR[(earlyHR+1)-((earlyHR+1 > earlyH)?earlyH+1:0)]*0.5);
 			
-			eDL[earlyDL] = oeDL; oeDL *= 0.5;
-			eEL[earlyEL] = oeEL; oeEL *= 0.5;
-			eFL[earlyFL] = oeFL; oeFL *= 0.5;
-			eBR[earlyBR] = oeBR; oeBR *= 0.5;
-			eER[earlyER] = oeER; oeER *= 0.5;
-			eHR[earlyHR] = oeHR; oeHR *= 0.5;
+			dram->eDL[earlyDL] = oeDL; oeDL *= 0.5;
+			dram->eEL[earlyEL] = oeEL; oeEL *= 0.5;
+			dram->eFL[earlyFL] = oeFL; oeFL *= 0.5;
+			dram->eBR[earlyBR] = oeBR; oeBR *= 0.5;
+			dram->eER[earlyER] = oeER; oeER *= 0.5;
+			dram->eHR[earlyHR] = oeHR; oeHR *= 0.5;
 			
 			earlyDL++; if (earlyDL < 0 || earlyDL > earlyD) earlyDL = 0;
 			earlyEL++; if (earlyEL < 0 || earlyEL > earlyE) earlyEL = 0;
@@ -460,26 +460,26 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			earlyER++; if (earlyER < 0 || earlyER > earlyE) earlyER = 0;
 			earlyHR++; if (earlyHR < 0 || earlyHR > earlyH) earlyHR = 0;
 			
-			oeDL += eDL[earlyDL-((earlyDL > earlyD)?earlyD+1:0)];
-			oeEL += eEL[earlyEL-((earlyEL > earlyE)?earlyE+1:0)];
-			oeFL += eFL[earlyFL-((earlyFL > earlyF)?earlyF+1:0)];
-			oeBR += eBR[earlyBR-((earlyBR > earlyB)?earlyB+1:0)];
-			oeER += eER[earlyER-((earlyER > earlyE)?earlyE+1:0)];
-			oeHR += eHR[earlyHR-((earlyHR > earlyH)?earlyH+1:0)];
+			oeDL += dram->eDL[earlyDL-((earlyDL > earlyD)?earlyD+1:0)];
+			oeEL += dram->eEL[earlyEL-((earlyEL > earlyE)?earlyE+1:0)];
+			oeFL += dram->eFL[earlyFL-((earlyFL > earlyF)?earlyF+1:0)];
+			oeBR += dram->eBR[earlyBR-((earlyBR > earlyB)?earlyB+1:0)];
+			oeER += dram->eER[earlyER-((earlyER > earlyE)?earlyE+1:0)];
+			oeHR += dram->eHR[earlyHR-((earlyHR > earlyH)?earlyH+1:0)];
 			
-			double oeGL = ((oeEL + oeFL) - oeDL) - (eGL[(earlyGL+1)-((earlyGL+1 > earlyG)?earlyG+1:0)]*0.5);
-			double oeHL = ((oeDL + oeFL) - oeEL) - (eHL[(earlyHL+1)-((earlyHL+1 > earlyH)?earlyH+1:0)]*0.5);
-			double oeIL = ((oeDL + oeEL) - oeFL) - (eIL[(earlyIL+1)-((earlyIL+1 > earlyI)?earlyI+1:0)]*0.5);
-			double oeAR = ((oeER + oeHR) - oeBR) - (eAR[(earlyAR+1)-((earlyAR+1 > earlyA)?earlyA+1:0)]*0.5);
-			double oeDR = ((oeBR + oeHR) - oeER) - (eDR[(earlyDR+1)-((earlyDR+1 > earlyD)?earlyD+1:0)]*0.5);
-			double oeGR = ((oeBR + oeER) - oeHR) - (eGR[(earlyGR+1)-((earlyGR+1 > earlyG)?earlyG+1:0)]*0.5);
+			double oeGL = ((oeEL + oeFL) - oeDL) - (dram->eGL[(earlyGL+1)-((earlyGL+1 > earlyG)?earlyG+1:0)]*0.5);
+			double oeHL = ((oeDL + oeFL) - oeEL) - (dram->eHL[(earlyHL+1)-((earlyHL+1 > earlyH)?earlyH+1:0)]*0.5);
+			double oeIL = ((oeDL + oeEL) - oeFL) - (dram->eIL[(earlyIL+1)-((earlyIL+1 > earlyI)?earlyI+1:0)]*0.5);
+			double oeAR = ((oeER + oeHR) - oeBR) - (dram->eAR[(earlyAR+1)-((earlyAR+1 > earlyA)?earlyA+1:0)]*0.5);
+			double oeDR = ((oeBR + oeHR) - oeER) - (dram->eDR[(earlyDR+1)-((earlyDR+1 > earlyD)?earlyD+1:0)]*0.5);
+			double oeGR = ((oeBR + oeER) - oeHR) - (dram->eGR[(earlyGR+1)-((earlyGR+1 > earlyG)?earlyG+1:0)]*0.5);
 			
-			eGL[earlyGL] = oeGL; oeGL *= 0.5;
-			eHL[earlyHL] = oeHL; oeHL *= 0.5;
-			eIL[earlyIL] = oeIL; oeIL *= 0.5;
-			eAR[earlyAR] = oeAR; oeAR *= 0.5;
-			eDR[earlyDR] = oeDR; oeDR *= 0.5;
-			eGR[earlyGR] = oeGR; oeGR *= 0.5;
+			dram->eGL[earlyGL] = oeGL; oeGL *= 0.5;
+			dram->eHL[earlyHL] = oeHL; oeHL *= 0.5;
+			dram->eIL[earlyIL] = oeIL; oeIL *= 0.5;
+			dram->eAR[earlyAR] = oeAR; oeAR *= 0.5;
+			dram->eDR[earlyDR] = oeDR; oeDR *= 0.5;
+			dram->eGR[earlyGR] = oeGR; oeGR *= 0.5;
 			
 			earlyGL++; if (earlyGL < 0 || earlyGL > earlyG) earlyGL = 0;
 			earlyHL++; if (earlyHL < 0 || earlyHL > earlyH) earlyHL = 0;
@@ -488,32 +488,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			earlyDR++; if (earlyDR < 0 || earlyDR > earlyD) earlyDR = 0;
 			earlyGR++; if (earlyGR < 0 || earlyGR > earlyG) earlyGR = 0;
 			
-			oeGL += eGL[earlyGL-((earlyGL > earlyG)?earlyG+1:0)];
-			oeHL += eHL[earlyHL-((earlyHL > earlyH)?earlyH+1:0)];
-			oeIL += eIL[earlyIL-((earlyIL > earlyI)?earlyI+1:0)];
-			oeAR += eAR[earlyAR-((earlyAR > earlyA)?earlyA+1:0)];
-			oeDR += eDR[earlyDR-((earlyDR > earlyD)?earlyD+1:0)];
-			oeGR += eGR[earlyGR-((earlyGR > earlyG)?earlyG+1:0)];
+			oeGL += dram->eGL[earlyGL-((earlyGL > earlyG)?earlyG+1:0)];
+			oeHL += dram->eHL[earlyHL-((earlyHL > earlyH)?earlyH+1:0)];
+			oeIL += dram->eIL[earlyIL-((earlyIL > earlyI)?earlyI+1:0)];
+			oeAR += dram->eAR[earlyAR-((earlyAR > earlyA)?earlyA+1:0)];
+			oeDR += dram->eDR[earlyDR-((earlyDR > earlyD)?earlyD+1:0)];
+			oeGR += dram->eGR[earlyGR-((earlyGR > earlyG)?earlyG+1:0)];
 			
 			//allpasses predelay
-			 aZL[countZ] = (oeGL + oeHL + oeIL)*0.25;
-			 aZR[countZ] = (oeAR + oeDR + oeGR)*0.25;
+			 dram->aZL[countZ] = (oeGL + oeHL + oeIL)*0.25;
+			 dram->aZR[countZ] = (oeAR + oeDR + oeGR)*0.25;
 			 countZ++; if (countZ < 0 || countZ > adjPredelay) countZ = 0;
-			 inputSampleL = aZL[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
-			 inputSampleR = aZR[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
+			 inputSampleL = dram->aZL[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
+			 inputSampleR = dram->aZR[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
 			 //end allpasses
 			
-			aAL[countAL] = inputSampleL + (feedbackAL * regen);
-			aBL[countBL] = inputSampleL + (feedbackBL * regen);
-			aCL[countCL] = inputSampleL + (feedbackCL * regen);
-			aDL[countDL] = inputSampleL + (feedbackDL * regen);
-			aEL[countEL] = inputSampleL + (feedbackEL * regen);
+			dram->aAL[countAL] = inputSampleL + (feedbackAL * regen);
+			dram->aBL[countBL] = inputSampleL + (feedbackBL * regen);
+			dram->aCL[countCL] = inputSampleL + (feedbackCL * regen);
+			dram->aDL[countDL] = inputSampleL + (feedbackDL * regen);
+			dram->aEL[countEL] = inputSampleL + (feedbackEL * regen);
 			
-			aER[countER] = inputSampleR + (feedbackER * regen);
-			aJR[countJR] = inputSampleR + (feedbackJR * regen);
-			aOR[countOR] = inputSampleR + (feedbackOR * regen);
-			aTR[countTR] = inputSampleR + (feedbackTR * regen);
-			aYR[countYR] = inputSampleR + (feedbackYR * regen);
+			dram->aER[countER] = inputSampleR + (feedbackER * regen);
+			dram->aJR[countJR] = inputSampleR + (feedbackJR * regen);
+			dram->aOR[countOR] = inputSampleR + (feedbackOR * regen);
+			dram->aTR[countTR] = inputSampleR + (feedbackTR * regen);
+			dram->aYR[countYR] = inputSampleR + (feedbackYR * regen);
 			
 			countAL++; if (countAL < 0 || countAL > delayA) countAL = 0;
 			countBL++; if (countBL < 0 || countBL > delayB) countBL = 0;
@@ -527,17 +527,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countTR++; if (countTR < 0 || countTR > delayT) countTR = 0;
 			countYR++; if (countYR < 0 || countYR > delayY) countYR = 0;
 			
-			double outAL = aAL[countAL-((countAL > delayA)?delayA+1:0)];
-			double outBL = aBL[countBL-((countBL > delayB)?delayB+1:0)];
-			double outCL = aCL[countCL-((countCL > delayC)?delayC+1:0)];
-			double outDL = aDL[countDL-((countDL > delayD)?delayD+1:0)];
-			double outEL = aEL[countEL-((countEL > delayE)?delayE+1:0)];
+			double outAL = dram->aAL[countAL-((countAL > delayA)?delayA+1:0)];
+			double outBL = dram->aBL[countBL-((countBL > delayB)?delayB+1:0)];
+			double outCL = dram->aCL[countCL-((countCL > delayC)?delayC+1:0)];
+			double outDL = dram->aDL[countDL-((countDL > delayD)?delayD+1:0)];
+			double outEL = dram->aEL[countEL-((countEL > delayE)?delayE+1:0)];
 			
-			double outER = aER[countER-((countER > delayE)?delayE+1:0)];
-			double outJR = aJR[countJR-((countJR > delayJ)?delayJ+1:0)];
-			double outOR = aOR[countOR-((countOR > delayO)?delayO+1:0)];
-			double outTR = aTR[countTR-((countTR > delayT)?delayT+1:0)];
-			double outYR = aYR[countYR-((countYR > delayY)?delayY+1:0)];
+			double outER = dram->aER[countER-((countER > delayE)?delayE+1:0)];
+			double outJR = dram->aJR[countJR-((countJR > delayJ)?delayJ+1:0)];
+			double outOR = dram->aOR[countOR-((countOR > delayO)?delayO+1:0)];
+			double outTR = dram->aTR[countTR-((countTR > delayT)?delayT+1:0)];
+			double outYR = dram->aYR[countYR-((countYR > delayY)?delayY+1:0)];
 			
 			//-------- one
 			
@@ -553,17 +553,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- filtered (one path in five, feeding the rest of the matrix
 			
-			aFL[countFL] = ((outAL*3.0) - ((outBL + outCL + outDL + outEL)*2.0));
-			aGL[countGL] = ((outBL*3.0) - ((outAL + outCL + outDL + outEL)*2.0));
-			aHL[countHL] = ((outCL*3.0) - ((outAL + outBL + outDL + outEL)*2.0));
-			aIL[countIL] = ((outDL*3.0) - ((outAL + outBL + outCL + outEL)*2.0));
-			aJL[countJL] = ((outEL*3.0) - ((outAL + outBL + outCL + outDL)*2.0));
+			dram->aFL[countFL] = ((outAL*3.0) - ((outBL + outCL + outDL + outEL)*2.0));
+			dram->aGL[countGL] = ((outBL*3.0) - ((outAL + outCL + outDL + outEL)*2.0));
+			dram->aHL[countHL] = ((outCL*3.0) - ((outAL + outBL + outDL + outEL)*2.0));
+			dram->aIL[countIL] = ((outDL*3.0) - ((outAL + outBL + outCL + outEL)*2.0));
+			dram->aJL[countJL] = ((outEL*3.0) - ((outAL + outBL + outCL + outDL)*2.0));
 			
-			aDR[countDR] = ((outER*3.0) - ((outJR + outOR + outTR + outYR)*2.0));
-			aIR[countIR] = ((outJR*3.0) - ((outER + outOR + outTR + outYR)*2.0));
-			aNR[countNR] = ((outOR*3.0) - ((outER + outJR + outTR + outYR)*2.0));
-			aSR[countSR] = ((outTR*3.0) - ((outER + outJR + outOR + outYR)*2.0));
-			aXR[countXR] = ((outYR*3.0) - ((outER + outJR + outOR + outTR)*2.0));
+			dram->aDR[countDR] = ((outER*3.0) - ((outJR + outOR + outTR + outYR)*2.0));
+			dram->aIR[countIR] = ((outJR*3.0) - ((outER + outOR + outTR + outYR)*2.0));
+			dram->aNR[countNR] = ((outOR*3.0) - ((outER + outJR + outTR + outYR)*2.0));
+			dram->aSR[countSR] = ((outTR*3.0) - ((outER + outJR + outOR + outYR)*2.0));
+			dram->aXR[countXR] = ((outYR*3.0) - ((outER + outJR + outOR + outTR)*2.0));
 			
 			countFL++; if (countFL < 0 || countFL > delayF) countFL = 0;
 			countGL++; if (countGL < 0 || countGL > delayG) countGL = 0;
@@ -577,17 +577,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countSR++; if (countSR < 0 || countSR > delayS) countSR = 0;
 			countXR++; if (countXR < 0 || countXR > delayX) countXR = 0;
 			
-			double outFL = aFL[countFL-((countFL > delayF)?delayF+1:0)];
-			double outGL = aGL[countGL-((countGL > delayG)?delayG+1:0)];
-			double outHL = aHL[countHL-((countHL > delayH)?delayH+1:0)];
-			double outIL = aIL[countIL-((countIL > delayI)?delayI+1:0)];
-			double outJL = aJL[countJL-((countJL > delayJ)?delayJ+1:0)];
+			double outFL = dram->aFL[countFL-((countFL > delayF)?delayF+1:0)];
+			double outGL = dram->aGL[countGL-((countGL > delayG)?delayG+1:0)];
+			double outHL = dram->aHL[countHL-((countHL > delayH)?delayH+1:0)];
+			double outIL = dram->aIL[countIL-((countIL > delayI)?delayI+1:0)];
+			double outJL = dram->aJL[countJL-((countJL > delayJ)?delayJ+1:0)];
 			
-			double outDR = aDR[countDR-((countDR > delayD)?delayD+1:0)];
-			double outIR = aIR[countIR-((countIR > delayI)?delayI+1:0)];
-			double outNR = aNR[countNR-((countNR > delayN)?delayN+1:0)];
-			double outSR = aSR[countSR-((countSR > delayS)?delayS+1:0)];
-			double outXR = aXR[countXR-((countXR > delayX)?delayX+1:0)];
+			double outDR = dram->aDR[countDR-((countDR > delayD)?delayD+1:0)];
+			double outIR = dram->aIR[countIR-((countIR > delayI)?delayI+1:0)];
+			double outNR = dram->aNR[countNR-((countNR > delayN)?delayN+1:0)];
+			double outSR = dram->aSR[countSR-((countSR > delayS)?delayS+1:0)];
+			double outXR = dram->aXR[countXR-((countXR > delayX)?delayX+1:0)];
 			
 			//-------- mulch
 			
@@ -608,17 +608,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- two
 			
-			aKL[countKL] = ((outFL*3.0) - ((outGL + outHL + outIL + outJL)*2.0));
-			aLL[countLL] = ((outGL*3.0) - ((outFL + outHL + outIL + outJL)*2.0));
-			aML[countML] = ((outHL*3.0) - ((outFL + outGL + outIL + outJL)*2.0));
-			aNL[countNL] = ((outIL*3.0) - ((outFL + outGL + outHL + outJL)*2.0));
-			aOL[countOL] = ((outJL*3.0) - ((outFL + outGL + outHL + outIL)*2.0));
+			dram->aKL[countKL] = ((outFL*3.0) - ((outGL + outHL + outIL + outJL)*2.0));
+			dram->aLL[countLL] = ((outGL*3.0) - ((outFL + outHL + outIL + outJL)*2.0));
+			dram->aML[countML] = ((outHL*3.0) - ((outFL + outGL + outIL + outJL)*2.0));
+			dram->aNL[countNL] = ((outIL*3.0) - ((outFL + outGL + outHL + outJL)*2.0));
+			dram->aOL[countOL] = ((outJL*3.0) - ((outFL + outGL + outHL + outIL)*2.0));
 			
-			aCR[countCR] = ((outDR*3.0) - ((outIR + outNR + outSR + outXR)*2.0));
-			aHR[countHR] = ((outIR*3.0) - ((outDR + outNR + outSR + outXR)*2.0));
-			aMR[countMR] = ((outNR*3.0) - ((outDR + outIR + outSR + outXR)*2.0));
-			aRR[countRR] = ((outSR*3.0) - ((outDR + outIR + outNR + outXR)*2.0));
-			aWR[countWR] = ((outXR*3.0) - ((outDR + outIR + outNR + outSR)*2.0));
+			dram->aCR[countCR] = ((outDR*3.0) - ((outIR + outNR + outSR + outXR)*2.0));
+			dram->aHR[countHR] = ((outIR*3.0) - ((outDR + outNR + outSR + outXR)*2.0));
+			dram->aMR[countMR] = ((outNR*3.0) - ((outDR + outIR + outSR + outXR)*2.0));
+			dram->aRR[countRR] = ((outSR*3.0) - ((outDR + outIR + outNR + outXR)*2.0));
+			dram->aWR[countWR] = ((outXR*3.0) - ((outDR + outIR + outNR + outSR)*2.0));
 			
 			countKL++; if (countKL < 0 || countKL > delayK) countKL = 0;
 			countLL++; if (countLL < 0 || countLL > delayL) countLL = 0;
@@ -632,17 +632,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countRR++; if (countRR < 0 || countRR > delayR) countRR = 0;
 			countWR++; if (countWR < 0 || countWR > delayW) countWR = 0;
 			
-			double outKL = aKL[countKL-((countKL > delayK)?delayK+1:0)];
-			double outLL = aLL[countLL-((countLL > delayL)?delayL+1:0)];
-			double outML = aML[countML-((countML > delayM)?delayM+1:0)];
-			double outNL = aNL[countNL-((countNL > delayN)?delayN+1:0)];
-			double outOL = aOL[countOL-((countOL > delayO)?delayO+1:0)];
+			double outKL = dram->aKL[countKL-((countKL > delayK)?delayK+1:0)];
+			double outLL = dram->aLL[countLL-((countLL > delayL)?delayL+1:0)];
+			double outML = dram->aML[countML-((countML > delayM)?delayM+1:0)];
+			double outNL = dram->aNL[countNL-((countNL > delayN)?delayN+1:0)];
+			double outOL = dram->aOL[countOL-((countOL > delayO)?delayO+1:0)];
 			
-			double outCR = aCR[countCR-((countCR > delayC)?delayC+1:0)];
-			double outHR = aHR[countHR-((countHR > delayH)?delayH+1:0)];
-			double outMR = aMR[countMR-((countMR > delayM)?delayM+1:0)];
-			double outRR = aRR[countRR-((countRR > delayR)?delayR+1:0)];
-			double outWR = aWR[countWR-((countWR > delayW)?delayW+1:0)];
+			double outCR = dram->aCR[countCR-((countCR > delayC)?delayC+1:0)];
+			double outHR = dram->aHR[countHR-((countHR > delayH)?delayH+1:0)];
+			double outMR = dram->aMR[countMR-((countMR > delayM)?delayM+1:0)];
+			double outRR = dram->aRR[countRR-((countRR > delayR)?delayR+1:0)];
+			double outWR = dram->aWR[countWR-((countWR > delayW)?delayW+1:0)];
 			
 			//-------- mulch
 			
@@ -663,17 +663,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- three
 			
-			aPL[countPL] = ((outKL*3.0) - ((outLL + outML + outNL + outOL)*2.0));
-			aQL[countQL] = ((outLL*3.0) - ((outKL + outML + outNL + outOL)*2.0));
-			aRL[countRL] = ((outML*3.0) - ((outKL + outLL + outNL + outOL)*2.0));
-			aSL[countSL] = ((outNL*3.0) - ((outKL + outLL + outML + outOL)*2.0));
-			aTL[countTL] = ((outOL*3.0) - ((outKL + outLL + outML + outNL)*2.0));
+			dram->aPL[countPL] = ((outKL*3.0) - ((outLL + outML + outNL + outOL)*2.0));
+			dram->aQL[countQL] = ((outLL*3.0) - ((outKL + outML + outNL + outOL)*2.0));
+			dram->aRL[countRL] = ((outML*3.0) - ((outKL + outLL + outNL + outOL)*2.0));
+			dram->aSL[countSL] = ((outNL*3.0) - ((outKL + outLL + outML + outOL)*2.0));
+			dram->aTL[countTL] = ((outOL*3.0) - ((outKL + outLL + outML + outNL)*2.0));
 			
-			aBR[countBR] = ((outCR*3.0) - ((outHR + outMR + outRR + outWR)*2.0));
-			aGR[countGR] = ((outHR*3.0) - ((outCR + outMR + outRR + outWR)*2.0));
-			aLR[countLR] = ((outMR*3.0) - ((outCR + outHR + outRR + outWR)*2.0));
-			aQR[countQR] = ((outRR*3.0) - ((outCR + outHR + outMR + outWR)*2.0));
-			aVR[countVR] = ((outWR*3.0) - ((outCR + outHR + outMR + outRR)*2.0));
+			dram->aBR[countBR] = ((outCR*3.0) - ((outHR + outMR + outRR + outWR)*2.0));
+			dram->aGR[countGR] = ((outHR*3.0) - ((outCR + outMR + outRR + outWR)*2.0));
+			dram->aLR[countLR] = ((outMR*3.0) - ((outCR + outHR + outRR + outWR)*2.0));
+			dram->aQR[countQR] = ((outRR*3.0) - ((outCR + outHR + outMR + outWR)*2.0));
+			dram->aVR[countVR] = ((outWR*3.0) - ((outCR + outHR + outMR + outRR)*2.0));
 			
 			countPL++; if (countPL < 0 || countPL > delayP) countPL = 0;
 			countQL++; if (countQL < 0 || countQL > delayQ) countQL = 0;
@@ -687,17 +687,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countQR++; if (countQR < 0 || countQR > delayQ) countQR = 0;
 			countVR++; if (countVR < 0 || countVR > delayV) countVR = 0;
 			
-			double outPL = aPL[countPL-((countPL > delayP)?delayP+1:0)];
-			double outQL = aQL[countQL-((countQL > delayQ)?delayQ+1:0)];
-			double outRL = aRL[countRL-((countRL > delayR)?delayR+1:0)];
-			double outSL = aSL[countSL-((countSL > delayS)?delayS+1:0)];
-			double outTL = aTL[countTL-((countTL > delayT)?delayT+1:0)];
+			double outPL = dram->aPL[countPL-((countPL > delayP)?delayP+1:0)];
+			double outQL = dram->aQL[countQL-((countQL > delayQ)?delayQ+1:0)];
+			double outRL = dram->aRL[countRL-((countRL > delayR)?delayR+1:0)];
+			double outSL = dram->aSL[countSL-((countSL > delayS)?delayS+1:0)];
+			double outTL = dram->aTL[countTL-((countTL > delayT)?delayT+1:0)];
 			
-			double outBR = aBR[countBR-((countBR > delayB)?delayB+1:0)];
-			double outGR = aGR[countGR-((countGR > delayG)?delayG+1:0)];
-			double outLR = aLR[countLR-((countLR > delayL)?delayL+1:0)];
-			double outQR = aQR[countQR-((countQR > delayQ)?delayQ+1:0)];
-			double outVR = aVR[countVR-((countVR > delayV)?delayV+1:0)];
+			double outBR = dram->aBR[countBR-((countBR > delayB)?delayB+1:0)];
+			double outGR = dram->aGR[countGR-((countGR > delayG)?delayG+1:0)];
+			double outLR = dram->aLR[countLR-((countLR > delayL)?delayL+1:0)];
+			double outQR = dram->aQR[countQR-((countQR > delayQ)?delayQ+1:0)];
+			double outVR = dram->aVR[countVR-((countVR > delayV)?delayV+1:0)];
 			
 			//-------- mulch
 			
@@ -718,17 +718,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- four
 			
-			aUL[countUL] = ((outPL*3.0) - ((outQL + outRL + outSL + outTL)*2.0));
-			aVL[countVL] = ((outQL*3.0) - ((outPL + outRL + outSL + outTL)*2.0));
-			aWL[countWL] = ((outRL*3.0) - ((outPL + outQL + outSL + outTL)*2.0));
-			aXL[countXL] = ((outSL*3.0) - ((outPL + outQL + outRL + outTL)*2.0));
-			aYL[countYL] = ((outTL*3.0) - ((outPL + outQL + outRL + outSL)*2.0));
+			dram->aUL[countUL] = ((outPL*3.0) - ((outQL + outRL + outSL + outTL)*2.0));
+			dram->aVL[countVL] = ((outQL*3.0) - ((outPL + outRL + outSL + outTL)*2.0));
+			dram->aWL[countWL] = ((outRL*3.0) - ((outPL + outQL + outSL + outTL)*2.0));
+			dram->aXL[countXL] = ((outSL*3.0) - ((outPL + outQL + outRL + outTL)*2.0));
+			dram->aYL[countYL] = ((outTL*3.0) - ((outPL + outQL + outRL + outSL)*2.0));
 			
-			aAR[countAR] = ((outBR*3.0) - ((outGR + outLR + outQR + outVR)*2.0));
-			aFR[countFR] = ((outGR*3.0) - ((outBR + outLR + outQR + outVR)*2.0));
-			aKR[countKR] = ((outLR*3.0) - ((outBR + outGR + outQR + outVR)*2.0));
-			aPR[countPR] = ((outQR*3.0) - ((outBR + outGR + outLR + outVR)*2.0));
-			aUR[countUR] = ((outVR*3.0) - ((outBR + outGR + outLR + outQR)*2.0));
+			dram->aAR[countAR] = ((outBR*3.0) - ((outGR + outLR + outQR + outVR)*2.0));
+			dram->aFR[countFR] = ((outGR*3.0) - ((outBR + outLR + outQR + outVR)*2.0));
+			dram->aKR[countKR] = ((outLR*3.0) - ((outBR + outGR + outQR + outVR)*2.0));
+			dram->aPR[countPR] = ((outQR*3.0) - ((outBR + outGR + outLR + outVR)*2.0));
+			dram->aUR[countUR] = ((outVR*3.0) - ((outBR + outGR + outLR + outQR)*2.0));
 			
 			countUL++; if (countUL < 0 || countUL > delayU) countUL = 0;
 			countVL++; if (countVL < 0 || countVL > delayV) countVL = 0;
@@ -742,17 +742,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countPR++; if (countPR < 0 || countPR > delayP) countPR = 0;
 			countUR++; if (countUR < 0 || countUR > delayU) countUR = 0;
 			
-			double outUL = aUL[countUL-((countUL > delayU)?delayU+1:0)];
-			double outVL = aVL[countVL-((countVL > delayV)?delayV+1:0)];
-			double outWL = aWL[countWL-((countWL > delayW)?delayW+1:0)];
-			double outXL = aXL[countXL-((countXL > delayX)?delayX+1:0)];
-			double outYL = aYL[countYL-((countYL > delayY)?delayY+1:0)];
+			double outUL = dram->aUL[countUL-((countUL > delayU)?delayU+1:0)];
+			double outVL = dram->aVL[countVL-((countVL > delayV)?delayV+1:0)];
+			double outWL = dram->aWL[countWL-((countWL > delayW)?delayW+1:0)];
+			double outXL = dram->aXL[countXL-((countXL > delayX)?delayX+1:0)];
+			double outYL = dram->aYL[countYL-((countYL > delayY)?delayY+1:0)];
 			
-			double outAR = aAR[countAR-((countAR > delayA)?delayA+1:0)];
-			double outFR = aFR[countFR-((countFR > delayF)?delayF+1:0)];
-			double outKR = aKR[countKR-((countKR > delayK)?delayK+1:0)];
-			double outPR = aPR[countPR-((countPR > delayP)?delayP+1:0)];
-			double outUR = aUR[countUR-((countUR > delayU)?delayU+1:0)];
+			double outAR = dram->aAR[countAR-((countAR > delayA)?delayA+1:0)];
+			double outFR = dram->aFR[countFR-((countFR > delayF)?delayF+1:0)];
+			double outKR = dram->aKR[countKR-((countKR > delayK)?delayK+1:0)];
+			double outPR = dram->aPR[countPR-((countPR > delayP)?delayP+1:0)];
+			double outUR = dram->aUR[countUR-((countUR > delayU)?delayU+1:0)];
 			
 			//-------- mulch
 			
@@ -895,43 +895,43 @@ int _airwindowsAlgorithm::reset(void) {
 	
 	gainIn = gainOutL = gainOutR = 1.0;
 	
-	for(int count = 0; count < delayA+2; count++) {aAL[count] = 0.0; aAR[count] = 0.0;}
-	for(int count = 0; count < delayB+2; count++) {aBL[count] = 0.0; aBR[count] = 0.0;}
-	for(int count = 0; count < delayC+2; count++) {aCL[count] = 0.0; aCR[count] = 0.0;}
-	for(int count = 0; count < delayD+2; count++) {aDL[count] = 0.0; aDR[count] = 0.0;}
-	for(int count = 0; count < delayE+2; count++) {aEL[count] = 0.0; aER[count] = 0.0;}
-	for(int count = 0; count < delayF+2; count++) {aFL[count] = 0.0; aFR[count] = 0.0;}
-	for(int count = 0; count < delayG+2; count++) {aGL[count] = 0.0; aGR[count] = 0.0;}
-	for(int count = 0; count < delayH+2; count++) {aHL[count] = 0.0; aHR[count] = 0.0;}
-	for(int count = 0; count < delayI+2; count++) {aIL[count] = 0.0; aIR[count] = 0.0;}
-	for(int count = 0; count < delayJ+2; count++) {aJL[count] = 0.0; aJR[count] = 0.0;}
-	for(int count = 0; count < delayK+2; count++) {aKL[count] = 0.0; aKR[count] = 0.0;}
-	for(int count = 0; count < delayL+2; count++) {aLL[count] = 0.0; aLR[count] = 0.0;}
-	for(int count = 0; count < delayM+2; count++) {aML[count] = 0.0; aMR[count] = 0.0;}
-	for(int count = 0; count < delayN+2; count++) {aNL[count] = 0.0; aNR[count] = 0.0;}
-	for(int count = 0; count < delayO+2; count++) {aOL[count] = 0.0; aOR[count] = 0.0;}
-	for(int count = 0; count < delayP+2; count++) {aPL[count] = 0.0; aPR[count] = 0.0;}
-	for(int count = 0; count < delayQ+2; count++) {aQL[count] = 0.0; aQR[count] = 0.0;}
-	for(int count = 0; count < delayR+2; count++) {aRL[count] = 0.0; aRR[count] = 0.0;}
-	for(int count = 0; count < delayS+2; count++) {aSL[count] = 0.0; aSR[count] = 0.0;}
-	for(int count = 0; count < delayT+2; count++) {aTL[count] = 0.0; aTR[count] = 0.0;}
-	for(int count = 0; count < delayU+2; count++) {aUL[count] = 0.0; aUR[count] = 0.0;}
-	for(int count = 0; count < delayV+2; count++) {aVL[count] = 0.0; aVR[count] = 0.0;}
-	for(int count = 0; count < delayW+2; count++) {aWL[count] = 0.0; aWR[count] = 0.0;}
-	for(int count = 0; count < delayX+2; count++) {aXL[count] = 0.0; aXR[count] = 0.0;}
-	for(int count = 0; count < delayY+2; count++) {aYL[count] = 0.0; aYR[count] = 0.0;}
+	for(int count = 0; count < delayA+2; count++) {dram->aAL[count] = 0.0; dram->aAR[count] = 0.0;}
+	for(int count = 0; count < delayB+2; count++) {dram->aBL[count] = 0.0; dram->aBR[count] = 0.0;}
+	for(int count = 0; count < delayC+2; count++) {dram->aCL[count] = 0.0; dram->aCR[count] = 0.0;}
+	for(int count = 0; count < delayD+2; count++) {dram->aDL[count] = 0.0; dram->aDR[count] = 0.0;}
+	for(int count = 0; count < delayE+2; count++) {dram->aEL[count] = 0.0; dram->aER[count] = 0.0;}
+	for(int count = 0; count < delayF+2; count++) {dram->aFL[count] = 0.0; dram->aFR[count] = 0.0;}
+	for(int count = 0; count < delayG+2; count++) {dram->aGL[count] = 0.0; dram->aGR[count] = 0.0;}
+	for(int count = 0; count < delayH+2; count++) {dram->aHL[count] = 0.0; dram->aHR[count] = 0.0;}
+	for(int count = 0; count < delayI+2; count++) {dram->aIL[count] = 0.0; dram->aIR[count] = 0.0;}
+	for(int count = 0; count < delayJ+2; count++) {dram->aJL[count] = 0.0; dram->aJR[count] = 0.0;}
+	for(int count = 0; count < delayK+2; count++) {dram->aKL[count] = 0.0; dram->aKR[count] = 0.0;}
+	for(int count = 0; count < delayL+2; count++) {dram->aLL[count] = 0.0; dram->aLR[count] = 0.0;}
+	for(int count = 0; count < delayM+2; count++) {dram->aML[count] = 0.0; dram->aMR[count] = 0.0;}
+	for(int count = 0; count < delayN+2; count++) {dram->aNL[count] = 0.0; dram->aNR[count] = 0.0;}
+	for(int count = 0; count < delayO+2; count++) {dram->aOL[count] = 0.0; dram->aOR[count] = 0.0;}
+	for(int count = 0; count < delayP+2; count++) {dram->aPL[count] = 0.0; dram->aPR[count] = 0.0;}
+	for(int count = 0; count < delayQ+2; count++) {dram->aQL[count] = 0.0; dram->aQR[count] = 0.0;}
+	for(int count = 0; count < delayR+2; count++) {dram->aRL[count] = 0.0; dram->aRR[count] = 0.0;}
+	for(int count = 0; count < delayS+2; count++) {dram->aSL[count] = 0.0; dram->aSR[count] = 0.0;}
+	for(int count = 0; count < delayT+2; count++) {dram->aTL[count] = 0.0; dram->aTR[count] = 0.0;}
+	for(int count = 0; count < delayU+2; count++) {dram->aUL[count] = 0.0; dram->aUR[count] = 0.0;}
+	for(int count = 0; count < delayV+2; count++) {dram->aVL[count] = 0.0; dram->aVR[count] = 0.0;}
+	for(int count = 0; count < delayW+2; count++) {dram->aWL[count] = 0.0; dram->aWR[count] = 0.0;}
+	for(int count = 0; count < delayX+2; count++) {dram->aXL[count] = 0.0; dram->aXR[count] = 0.0;}
+	for(int count = 0; count < delayY+2; count++) {dram->aYL[count] = 0.0; dram->aYR[count] = 0.0;}
 	
-	for(int count = 0; count < earlyA+2; count++) {eAL[count] = 0.0; eAR[count] = 0.0;}
-	for(int count = 0; count < earlyB+2; count++) {eBL[count] = 0.0; eBR[count] = 0.0;}
-	for(int count = 0; count < earlyC+2; count++) {eCL[count] = 0.0; eCR[count] = 0.0;}
-	for(int count = 0; count < earlyD+2; count++) {eDL[count] = 0.0; eDR[count] = 0.0;}
-	for(int count = 0; count < earlyE+2; count++) {eEL[count] = 0.0; eER[count] = 0.0;}
-	for(int count = 0; count < earlyF+2; count++) {eFL[count] = 0.0; eFR[count] = 0.0;}
-	for(int count = 0; count < earlyG+2; count++) {eGL[count] = 0.0; eGR[count] = 0.0;}
-	for(int count = 0; count < earlyH+2; count++) {eHL[count] = 0.0; eHR[count] = 0.0;}
-	for(int count = 0; count < earlyI+2; count++) {eIL[count] = 0.0; eIR[count] = 0.0;}
+	for(int count = 0; count < earlyA+2; count++) {dram->eAL[count] = 0.0; dram->eAR[count] = 0.0;}
+	for(int count = 0; count < earlyB+2; count++) {dram->eBL[count] = 0.0; dram->eBR[count] = 0.0;}
+	for(int count = 0; count < earlyC+2; count++) {dram->eCL[count] = 0.0; dram->eCR[count] = 0.0;}
+	for(int count = 0; count < earlyD+2; count++) {dram->eDL[count] = 0.0; dram->eDR[count] = 0.0;}
+	for(int count = 0; count < earlyE+2; count++) {dram->eEL[count] = 0.0; dram->eER[count] = 0.0;}
+	for(int count = 0; count < earlyF+2; count++) {dram->eFL[count] = 0.0; dram->eFR[count] = 0.0;}
+	for(int count = 0; count < earlyG+2; count++) {dram->eGL[count] = 0.0; dram->eGR[count] = 0.0;}
+	for(int count = 0; count < earlyH+2; count++) {dram->eHL[count] = 0.0; dram->eHR[count] = 0.0;}
+	for(int count = 0; count < earlyI+2; count++) {dram->eIL[count] = 0.0; dram->eIR[count] = 0.0;}
 	
-	for(int count = 0; count < predelay+2; count++) {aZL[count] = 0.0; aZR[count] = 0.0;}
+	for(int count = 0; count < predelay+2; count++) {dram->aZL[count] = 0.0; dram->aZR[count] = 0.0;}
 	
 	feedbackAL = 0.0;
 	feedbackBL = 0.0;
