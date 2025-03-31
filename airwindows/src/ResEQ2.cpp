@@ -32,15 +32,15 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		double prevfreqMPeak;
-		double prevamountMPeak;
+		float prevfreqMPeak;
+		float prevamountMPeak;
 		int mpc;
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			double mpk[2005];
-		double f[66];
+			float mpk[2005];
+		float f[66];
 	};
 	_dram* dram;
 };
@@ -54,34 +54,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	
 	//begin ResEQ2 Mid Boost
-	double freqMPeak = pow(GetParameter( kParam_One )+0.15,3);
-	double amountMPeak = pow(GetParameter( kParam_Two ),2);
-	int maxMPeak = (amountMPeak*63.0)+1;
+	float freqMPeak = pow(GetParameter( kParam_One )+0.15f,3);
+	float amountMPeak = pow(GetParameter( kParam_Two ),2);
+	int maxMPeak = (amountMPeak*63.0f)+1;
 	if ((freqMPeak != prevfreqMPeak)||(amountMPeak != prevamountMPeak)) {
 	for (int x = 0; x < maxMPeak; x++) {
-		if (((double)x*freqMPeak) < M_PI_4) dram->f[x] = sin(((double)x*freqMPeak)*4.0)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
-		else dram->f[x] = cos((double)x*freqMPeak)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
+		if (((float)x*freqMPeak) < M_PI_4) dram->f[x] = sin(((float)x*freqMPeak)*4.0f)*freqMPeak*sin(((float)(maxMPeak-x)/(float)maxMPeak)*M_PI_2);
+		else dram->f[x] = cos((float)x*freqMPeak)*freqMPeak*sin(((float)(maxMPeak-x)/(float)maxMPeak)*M_PI_2);
 	}
 	prevfreqMPeak = freqMPeak; prevamountMPeak = amountMPeak;
 	}//end ResEQ2 Mid Boost
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		//begin ResEQ2 Mid Boost
 		mpc++; if (mpc < 1 || mpc > 2001) mpc = 1;
 		dram->mpk[mpc] = inputSample;
-		double midMPeak = 0.0;
+		float midMPeak = 0.0f;
 		for (int x = 0; x < maxMPeak; x++) {
 			int y = x*cycleEnd;
 			switch (cycleEnd)
@@ -89,26 +89,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				case 1: 
 					midMPeak += (dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x]); break;
 				case 2: 
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5); y--;
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5); break;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5f); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5f); break;
 				case 3: 
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); y--;
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); y--;
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); break;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333f); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333f); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333f); break;
 				case 4: 
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
-					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); //break
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25f); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25f); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25f); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25f); //break
 			}
 		}
-		inputSample = (midMPeak*amountMPeak)+((1.5-amountMPeak>1.0)?inputSample:inputSample*(1.5-amountMPeak));
+		inputSample = (midMPeak*amountMPeak)+((1.5f-amountMPeak>1.0f)?inputSample:inputSample*(1.5f-amountMPeak));
 		//end ResEQ2 Mid Boost
 	
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

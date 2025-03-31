@@ -41,8 +41,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double iirEnc;
-		double iirDec;
+		float iirEnc;
+		float iirDec;
 
 		uint32_t fpd;
 	
@@ -60,58 +60,58 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	double dublyAmount = pow(GetParameter( kParam_A ),3)*0.25;
-	double iirEncFreq = GetParameter( kParam_B )/overallscale;
-	double tapeDrv = (GetParameter( kParam_C )*2.0)+1.0;
+	float dublyAmount = pow(GetParameter( kParam_A ),3)*0.25f;
+	float iirEncFreq = GetParameter( kParam_B )/overallscale;
+	float tapeDrv = (GetParameter( kParam_C )*2.0f)+1.0f;
 	
-	double outlyAmount = pow(GetParameter( kParam_D ),3)*0.25;
-	double iirDecFreq = GetParameter( kParam_E )/overallscale;
-	double outPad = (GetParameter( kParam_F )*2.0)+1.0;
-	if (tapeDrv > 1.0) outPad += 0.005;
+	float outlyAmount = pow(GetParameter( kParam_D ),3)*0.25f;
+	float iirDecFreq = GetParameter( kParam_E )/overallscale;
+	float outPad = (GetParameter( kParam_F )*2.0f)+1.0f;
+	if (tapeDrv > 1.0f) outPad += 0.005f;
 	
-	double wet = GetParameter( kParam_G );
+	float wet = GetParameter( kParam_G );
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		
-		iirEnc = (iirEnc * (1.0 - iirEncFreq)) + (inputSample * iirEncFreq);
-		double doubly = inputSample - iirEnc;
-		if (doubly > 1.0) doubly = 1.0; if (doubly < -1.0) doubly = -1.0;
-		if (doubly > 0) doubly = log(1.0+(255*fabs(doubly)))/2.40823996531;
-		if (doubly < 0) doubly = -log(1.0+(255*fabs(doubly)))/2.40823996531;
+		iirEnc = (iirEnc * (1.0f - iirEncFreq)) + (inputSample * iirEncFreq);
+		float doubly = inputSample - iirEnc;
+		if (doubly > 1.0f) doubly = 1.0f; if (doubly < -1.0f) doubly = -1.0f;
+		if (doubly > 0) doubly = log(1.0f+(255*fabs(doubly)))/2.40823996531f;
+		if (doubly < 0) doubly = -log(1.0f+(255*fabs(doubly)))/2.40823996531f;
 		inputSample += doubly*dublyAmount;
 		//end Dubly encode
 		
-		if (tapeDrv > 1.0) inputSample *= tapeDrv;
-		if (inputSample > 1.57079633) inputSample = 1.57079633;
-		if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (tapeDrv > 1.0f) inputSample *= tapeDrv;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+		if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		inputSample = sin(inputSample);
-		if (outPad > 1.0) inputSample /= outPad;
+		if (outPad > 1.0f) inputSample /= outPad;
 		
-		iirDec = (iirDec * (1.0 - iirDecFreq)) + (inputSample * iirDecFreq);
+		iirDec = (iirDec * (1.0f - iirDecFreq)) + (inputSample * iirDecFreq);
 		doubly = inputSample - iirDec;
-		if (doubly > 1.0) doubly = 1.0; if (doubly < -1.0) doubly = -1.0;
-		if (doubly > 0) doubly = log(1.0+(255*fabs(doubly)))/2.40823996531;
-		if (doubly < 0) doubly = -log(1.0+(255*fabs(doubly)))/2.40823996531;
+		if (doubly > 1.0f) doubly = 1.0f; if (doubly < -1.0f) doubly = -1.0f;
+		if (doubly > 0) doubly = log(1.0f+(255*fabs(doubly)))/2.40823996531f;
+		if (doubly < 0) doubly = -log(1.0f+(255*fabs(doubly)))/2.40823996531f;
 		inputSample -= doubly*outlyAmount;
 		//end Dubly decode
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

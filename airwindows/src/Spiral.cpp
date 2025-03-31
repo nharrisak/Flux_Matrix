@@ -45,13 +45,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
-		//clip to 1.2533141373155 to reach maximum output
-		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		//clip to 1.2533141373155f to reach maximum output
+		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		
 
 		//begin 32 bit floating point dither

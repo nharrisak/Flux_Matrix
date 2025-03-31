@@ -29,21 +29,21 @@ enum { kNumTemplateParameters = 6 };
  
 	int pL[65536];
 	int pR[65536];
-	double sweepL;
-	double sweepR;
+	float sweepL;
+	float sweepR;
 	int	gcount;
-	double airPrevL;
-	double airEvenL;
-	double airOddL;
-	double airFactorL;
-	double airPrevR;
-	double airEvenR;
-	double airOddR;
-	double airFactorR;
+	float airPrevL;
+	float airEvenL;
+	float airOddL;
+	float airFactorL;
+	float airPrevR;
+	float airEvenR;
+	float airOddR;
+	float airFactorR;
 	bool flip;
 	
-	double lastRefL[7];
-	double lastRefR[7];
+	float lastRefL[7];
+	float lastRefR[7];
 	int cycle;
 	
 	uint32_t fpdL;
@@ -58,25 +58,25 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	double speed = pow(0.32+(GetParameter( kParam_One )/6),10);
-	double depth = (GetParameter( kParam_Two )/60) / speed;
-	double tupi = 3.141592653589793238 * 2.0;
+	float speed = pow(0.32f+(GetParameter( kParam_One )/6),10);
+	float depth = (GetParameter( kParam_Two )/60) / speed;
+	float tupi = 3.141592653589793238f * 2.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		cycle++;
 		if (cycle == cycleEnd) { //hit the end point and we do a chorus sample
@@ -84,16 +84,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			airFactorL = airPrevL - inputSampleL;
 			if (flip) {airEvenL += airFactorL; airOddL -= airFactorL; airFactorL = airEvenL;}
 			else {airOddL += airFactorL; airEvenL -= airFactorL; airFactorL = airOddL;}
-			airOddL = (airOddL - ((airOddL - airEvenL)/256.0)) / 1.0001;
-			airEvenL = (airEvenL - ((airEvenL - airOddL)/256.0)) / 1.0001;
+			airOddL = (airOddL - ((airOddL - airEvenL)/256.0f)) / 1.0001f;
+			airEvenL = (airEvenL - ((airEvenL - airOddL)/256.0f)) / 1.0001f;
 			airPrevL = inputSampleL;
 			inputSampleL += airFactorL;
 			//left
 			airFactorR = airPrevR - inputSampleR;
 			if (flip) {airEvenR += airFactorR; airOddR -= airFactorR; airFactorR = airEvenR;}
 			else {airOddR += airFactorR; airEvenR -= airFactorR; airFactorR = airOddR;}
-			airOddR = (airOddR - ((airOddR - airEvenR)/256.0)) / 1.0001;
-			airEvenR = (airEvenR - ((airEvenR - airOddR)/256.0)) / 1.0001;
+			airOddR = (airOddR - ((airOddR - airEvenR)/256.0f)) / 1.0001f;
+			airEvenR = (airEvenR - ((airEvenR - airOddR)/256.0f)) / 1.0001f;
 			airPrevR = inputSampleR;
 			inputSampleR += airFactorR;
 			//right
@@ -104,9 +104,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			int tempR = 0;
 			if (gcount < 1 || gcount > 32760) {gcount = 32760;}
 			int count = gcount;
-			pL[count+32760] = pL[count] = (int)(inputSampleL*8388352.0);
-			//double buffer -8388352 to 8388352 is equal to 24 bit linear space
-			double offset = depth + (depth * sin(sweepL));
+			pL[count+32760] = pL[count] = (int)(inputSampleL*8388352.0f);
+			//float buffer -8388352 to 8388352 is equal to 24 bit linear space
+			float offset = depth + (depth * sin(sweepL));
 			count += (int)floor(offset);
 			tempL += (int)(pL[count] * (1-(offset-floor(offset)))); //less as value moves away from .0
 			tempL += pL[count+1]; //we can assume always using this in one way or another?
@@ -115,8 +115,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//left
 			
 			count = gcount;
-			pR[count+32760] = pR[count] = (int)(inputSampleR*8388352.0);
-			//double buffer -8388352 to 8388352 is equal to 24 bit linear space
+			pR[count+32760] = pR[count] = (int)(inputSampleR*8388352.0f);
+			//float buffer -8388352 to 8388352 is equal to 24 bit linear space
 			offset = depth + (depth * sin(sweepR));
 			count += (int)floor(offset);
 			tempR += (int)(pR[count] * (1-(offset-floor(offset)))); //less as value moves away from .0
@@ -132,8 +132,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			gcount--;
 			//still scrolling through the samples, remember
 			
-			inputSampleL = ((double)(tempL/16776704.0));
-			inputSampleR = ((double)(tempR/16776704.0));
+			inputSampleL = ((float)(tempL/16776704.0f));
+			inputSampleR = ((float)(tempR/16776704.0f));
 			if (cycleEnd == 4) {
 				lastRefL[0] = lastRefL[4]; //start from previous last
 				lastRefL[2] = (lastRefL[0] + inputSampleL)/2; //half
@@ -180,10 +180,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

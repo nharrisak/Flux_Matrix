@@ -42,8 +42,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample[8];
-		double intermediate[16][8];
+		float lastSample[8];
+		float intermediate[16][8];
 		bool wasPosClip[8];
 		bool wasNegClip[8];
 		uint32_t fpd;
@@ -62,57 +62,57 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
-	//double hardness = 0.618033988749894; // golden ratio
-	//double softness = 0.381966011250105; // 1.0 - hardness
-	//double refclip = 1.618033988749894; // -0.2dB we're making all this pure raw code
-	//refclip*hardness = 1.0  to use ClipOnly as a prefab code-chunk.
-	//refclip*softness = 0.618033988749894	Seven decimal places is plenty as it's
+	//float hardness = 0.618033988749894f; // golden ratio
+	//float softness = 0.381966011250105f; // 1.0f - hardness
+	//float refclip = 1.618033988749894f; // -0.2dB we're making all this pure raw code
+	//refclip*hardness = 1.0f  to use ClipOnly as a prefab code-chunk.
+	//refclip*softness = 0.618033988749894f	Seven decimal places is plenty as it's
 	//not related to the original sound much: it's an arbitrary position in softening.
-	double inputGain = pow(10.0,(GetParameter( kParam_One ))/20.0);
+	float inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
 
-	double ceiling = (1.0+(GetParameter( kParam_Two )*0.23594733))*0.5;
+	float ceiling = (1.0f+(GetParameter( kParam_Two )*0.23594733f))*0.5f;
 	int mode = (int) GetParameter( kParam_Three );
 	int stageSetting = mode-2;
 	if (stageSetting < 1) stageSetting = 1;
-	inputGain = ((inputGain-1.0)/stageSetting)+1.0;
+	inputGain = ((inputGain-1.0f)/stageSetting)+1.0f;
 
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double overshoot = 0.0;
-		inputSample *= 1.618033988749894;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float overshoot = 0.0f;
+		inputSample *= 1.618033988749894f;
 		
 		for (int stage = 0; stage < stageSetting; stage++) {
-			if (inputGain != 1.0) {
+			if (inputGain != 1.0f) {
 				inputSample *= inputGain;
 			}
 			if (stage == 0){
-				overshoot = fabs(inputSample) - 1.618033988749894;
-				if (overshoot < 0.0) overshoot = 0.0;
+				overshoot = fabs(inputSample) - 1.618033988749894f;
+				if (overshoot < 0.0f) overshoot = 0.0f;
 			}
-			if (inputSample > 4.0) inputSample = 4.0; if (inputSample < -4.0) inputSample = -4.0;
-			if (inputSample - lastSample[stage] > 0.618033988749894) inputSample = lastSample[stage] + 0.618033988749894;
-			if (inputSample - lastSample[stage] < -0.618033988749894) inputSample = lastSample[stage] - 0.618033988749894;
+			if (inputSample > 4.0f) inputSample = 4.0f; if (inputSample < -4.0f) inputSample = -4.0f;
+			if (inputSample - lastSample[stage] > 0.618033988749894f) inputSample = lastSample[stage] + 0.618033988749894f;
+			if (inputSample - lastSample[stage] < -0.618033988749894f) inputSample = lastSample[stage] - 0.618033988749894f;
 			//same as slew clippage
 			
 			//begin ClipOnly2 as a little, compressed chunk that can be dropped into code
 			if (wasPosClip[stage] == true) { //current will be over
-				if (inputSample<lastSample[stage]) lastSample[stage]=1.0+(inputSample*0.381966011250105);
-				else lastSample[stage] = 0.618033988749894+(lastSample[stage]*0.618033988749894);
+				if (inputSample<lastSample[stage]) lastSample[stage]=1.0f+(inputSample*0.381966011250105f);
+				else lastSample[stage] = 0.618033988749894f+(lastSample[stage]*0.618033988749894f);
 			} wasPosClip[stage] = false;
-			if (inputSample>1.618033988749894) {wasPosClip[stage]=true;inputSample=1.0+(lastSample[stage]*0.381966011250105);}
+			if (inputSample>1.618033988749894f) {wasPosClip[stage]=true;inputSample=1.0f+(lastSample[stage]*0.381966011250105f);}
 			if (wasNegClip[stage] == true) { //current will be -over
-				if (inputSample > lastSample[stage]) lastSample[stage]=-1.0+(inputSample*0.381966011250105);
-				else lastSample[stage]=-0.618033988749894+(lastSample[stage]*0.618033988749894);
+				if (inputSample > lastSample[stage]) lastSample[stage]=-1.0f+(inputSample*0.381966011250105f);
+				else lastSample[stage]=-0.618033988749894f+(lastSample[stage]*0.618033988749894f);
 			} wasNegClip[stage] = false;
-			if (inputSample<-1.618033988749894) {wasNegClip[stage]=true;inputSample=-1.0+(lastSample[stage]*0.381966011250105);}
+			if (inputSample<-1.618033988749894f) {wasNegClip[stage]=true;inputSample=-1.0f+(lastSample[stage]*0.381966011250105f);}
 			intermediate[spacing][stage] = inputSample;
 			inputSample = lastSample[stage]; //Latency is however many samples equals one 44.1k sample
 			for (int x = spacing; x > 0; x--) intermediate[x-1][stage] = intermediate[x][stage];
@@ -137,7 +137,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

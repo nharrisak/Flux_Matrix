@@ -31,10 +31,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 gainchase;
-		Float64 settingchase;
-		Float64 gainBchase;
-		Float64 chasespeed;
+		Float32 gainchase;
+		Float32 settingchase;
+		Float32 gainBchase;
+		Float32 chasespeed;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -52,63 +52,63 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 inputgain = GetParameter( kParam_One );
+	Float32 inputgain = GetParameter( kParam_One );
 	
 	if (settingchase != inputgain) {
-		chasespeed *= 2.0;
+		chasespeed *= 2.0f;
 		settingchase = inputgain;
 		//increment the slowness for each fader movement
 		//continuous alteration makes it react smoother
 		//sudden jump to setting, not so much
 	}
-	if (chasespeed > 2500.0) chasespeed = 2500.0;
+	if (chasespeed > 2500.0f) chasespeed = 2500.0f;
 	//bail out if it's too extreme
-	if (gainchase < -60.0) {
-		gainchase = pow(10.0,inputgain/20.0);
+	if (gainchase < -60.0f) {
+		gainchase = pow(10.0f,inputgain/20.0f);
 		//shouldn't even be a negative number
 		//this is about starting at whatever's set, when
 		//plugin is instantiated.
 		//Otherwise it's the target, in dB.
 	}
-	double targetgain;	
+	float targetgain;	
 	//done with top controller
 	
-	double targetBgain = GetParameter( kParam_Two );
-	if (gainBchase < 0.0) gainBchase = targetBgain;
+	float targetBgain = GetParameter( kParam_Two );
+	if (gainBchase < 0.0f) gainBchase = targetBgain;
 	//this one is not a dB value, but straight multiplication
 	//done with slow fade controller
 	
-	double fadeSpeed = targetBgain;
-	if (fadeSpeed < 0.0027) fadeSpeed = 0.0027; //minimum fade speed
-	fadeSpeed = ((GetSampleRate()*0.004) / fadeSpeed);
+	float fadeSpeed = targetBgain;
+	if (fadeSpeed < 0.0027f) fadeSpeed = 0.0027f; //minimum fade speed
+	fadeSpeed = ((GetSampleRate()*0.004f) / fadeSpeed);
 	//this will tend to be much slower than PurestGain, and also adapt to sample rates
 	
-	double outputgain;
+	float outputgain;
 	
-	double inputSample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		targetgain = pow(10.0,settingchase/20.0);
+		targetgain = pow(10.0f,settingchase/20.0f);
 		//now we have the target in our temp variable
 		
-		chasespeed *= 0.9999;
-		chasespeed -= 0.01;
-		if (chasespeed < 350.0) chasespeed = 350.0;
+		chasespeed *= 0.9999f;
+		chasespeed -= 0.01f;
+		if (chasespeed < 350.0f) chasespeed = 350.0f;
 		//we have our chase speed compensated for recent fader activity
 		
-		gainchase = (((gainchase*chasespeed)+targetgain)/(chasespeed+1.0));
+		gainchase = (((gainchase*chasespeed)+targetgain)/(chasespeed+1.0f));
 		//gainchase is chasing the target, as a simple multiply gain factor
 		
-		gainBchase = (((gainBchase*fadeSpeed)+targetBgain)/(fadeSpeed+1.0));
+		gainBchase = (((gainBchase*fadeSpeed)+targetBgain)/(fadeSpeed+1.0f));
 		//gainchase is chasing the target, as a simple multiply gain factor
 		
 		outputgain = gainchase * gainBchase;
 		//directly multiply the dB gain by the straight multiply gain
 		
-		if (1.0 == outputgain) *destP = *sourceP;
+		if (1.0f == outputgain) *destP = *sourceP;
 		else
 		{
 			inputSample *= outputgain;
@@ -116,7 +116,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//begin 32 bit floating point dither
 			int expon; frexpf((float)inputSample, &expon);
 			fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-			inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+			inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 			//end 32 bit floating point dither
 			*destP = inputSample;
 		}		

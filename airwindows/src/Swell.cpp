@@ -34,7 +34,7 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		
-		double swell;
+		float swell;
 		bool louder;
 		uint32_t fpd;
 	
@@ -52,41 +52,41 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 thresholdOn = pow(GetParameter( kParam_One ),2) * GetParameter( kParam_Two );
-	Float64 speedOn = (pow(GetParameter( kParam_Two ),2)*0.001)/overallscale;
-	Float64 thresholdOff = thresholdOn * GetParameter( kParam_Two );
-	Float64 speedOff = (sin(GetParameter( kParam_Two ))*0.01)/overallscale;
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 thresholdOn = pow(GetParameter( kParam_One ),2) * GetParameter( kParam_Two );
+	Float32 speedOn = (pow(GetParameter( kParam_Two ),2)*0.001f)/overallscale;
+	Float32 thresholdOff = thresholdOn * GetParameter( kParam_Two );
+	Float32 speedOff = (sin(GetParameter( kParam_Two ))*0.01f)/overallscale;
+	Float32 wet = GetParameter( kParam_Three );
 	//removed unnecessary dry variable
 
-	double drySample;
-	double inputSample;
+	float drySample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 
 		
 		if (fabs(inputSample) > thresholdOn && louder == false) louder = true;
 		if (fabs(inputSample) < thresholdOff && louder == true) louder = false;
-		if (louder == true)	swell = (swell * (1.0 - speedOn)) + speedOn;
-		else swell *= (1.0 - speedOff);
-		//both poles are a Zeno's arrow: approach but never get to either 1.0 or 0.0
+		if (louder == true)	swell = (swell * (1.0f - speedOn)) + speedOn;
+		else swell *= (1.0f - speedOff);
+		//both poles are a Zeno's arrow: approach but never get to either 1.0f or 0.0f
 		
 		inputSample *= swell;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

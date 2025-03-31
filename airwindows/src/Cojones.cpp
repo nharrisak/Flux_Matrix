@@ -37,8 +37,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double stored[2];
-		double diff[6];
+		float stored[2];
+		float diff[6];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -56,18 +56,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float64 breathy = GetParameter( kParam_One );
-	Float64 cojones = GetParameter( kParam_Two );
-	Float64 body = GetParameter( kParam_Three );
-	Float64 output = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
-	Float64 average[5];
+	Float32 breathy = GetParameter( kParam_One );
+	Float32 cojones = GetParameter( kParam_Two );
+	Float32 body = GetParameter( kParam_Three );
+	Float32 output = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
+	Float32 average[5];
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		stored[1] = stored[0];
 		stored[0] = inputSample;
@@ -84,23 +84,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		average[3] = average[2] + diff[4];
 		average[4] = average[3] + diff[5];
 		
-		average[0] /= 2.0;
-		average[1] /= 3.0;
-		average[2] /= 4.0;
-		average[3] /= 5.0;
-		average[4] /= 6.0;
+		average[0] /= 2.0f;
+		average[1] /= 3.0f;
+		average[2] /= 4.0f;
+		average[3] /= 5.0f;
+		average[4] /= 6.0f;
 		
-		double meanA = diff[0];
-		double meanB = diff[0];
+		float meanA = diff[0];
+		float meanB = diff[0];
 		if (fabs(average[4]) < fabs(meanB)) {meanA = meanB; meanB = average[4];}
 		if (fabs(average[3]) < fabs(meanB)) {meanA = meanB; meanB = average[3];}
 		if (fabs(average[2]) < fabs(meanB)) {meanA = meanB; meanB = average[2];}
 		if (fabs(average[1]) < fabs(meanB)) {meanA = meanB; meanB = average[1];}
 		if (fabs(average[0]) < fabs(meanB)) {meanA = meanB; meanB = average[0];}
-		double meanOut = ((meanA+meanB)/2.0);
+		float meanOut = ((meanA+meanB)/2.0f);
 		stored[0] = (stored[1] + meanOut);
 		
-		double outputSample = stored[0]*body;
+		float outputSample = stored[0]*body;
 		//presubtract cojones
 		outputSample += (((inputSample - stored[0])-average[1])*cojones);
 		
@@ -108,18 +108,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = outputSample;
 		
-		if (output < 1.0) {
+		if (output < 1.0f) {
 			inputSample *= output;
 		}
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

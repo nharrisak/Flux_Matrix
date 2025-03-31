@@ -40,7 +40,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double p[16386];
+			float p[16386];
 	};
 	_dram* dram;
 };
@@ -54,40 +54,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 coarse = GetParameter( kParam_One ) * (44.1*overallscale);
-	Float64 fine = GetParameter( kParam_Two );
-	Float64 subsample = GetParameter( kParam_Three );
+	Float32 coarse = GetParameter( kParam_One ) * (44.1f*overallscale);
+	Float32 fine = GetParameter( kParam_Two );
+	Float32 subsample = GetParameter( kParam_Three );
 	int offset = floor(coarse + fine);
 	if (offset > 16380) offset = 16380; //insanity check
 	int maxtime = 16384;
-	Float64 phase = GetParameter( kParam_Four );
-	Float64 dryLevel = 1.0-fabs(phase);
+	Float32 phase = GetParameter( kParam_Four );
+	Float32 dryLevel = 1.0f-fabs(phase);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		if (gcount < 0 || gcount > maxtime) {gcount = maxtime;}
 		int count = gcount;
 		dram->p[count] = inputSample;
 		count += offset;
-		inputSample = dram->p[count-((count > maxtime)?maxtime+1:0)]*(1.0 - subsample);
+		inputSample = dram->p[count-((count > maxtime)?maxtime+1:0)]*(1.0f - subsample);
 		inputSample += dram->p[count+1-((count+1 > maxtime)?maxtime+1:0)]*subsample;
 		gcount--;
 
-		if (phase < 1.0) inputSample *= phase;
+		if (phase < 1.0f) inputSample *= phase;
 		
-		if (dryLevel > 0.0) inputSample += (drySample * dryLevel);
+		if (dryLevel > 0.0f) inputSample += (drySample * dryLevel);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -29,8 +29,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastSample;
-		Float64 outSample;
+		Float32 lastSample;
+		Float32 outSample;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -48,51 +48,51 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float64 wet = pow(GetParameter( kParam_One ),5);
+	Float32 wet = pow(GetParameter( kParam_One ),5);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		double bridgerectifier = fabs(inputSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = 1.0-cos(bridgerectifier);
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		float bridgerectifier = fabs(inputSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = 1.0f-cos(bridgerectifier);
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;
 		
-		double silhouette = (double(fpd)/UINT32_MAX);
-		silhouette -= 0.5;
-		silhouette *= 2.0;
+		float silhouette = (float(fpd)/UINT32_MAX);
+		silhouette -= 0.5f;
+		silhouette *= 2.0f;
 		silhouette *= fabs(inputSample);
 		
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		double smoother = (double(fpd)/UINT32_MAX);
-		smoother -= 0.5;
-		smoother *= 2.0;
+		float smoother = (float(fpd)/UINT32_MAX);
+		smoother -= 0.5f;
+		smoother *= 2.0f;
 		smoother *= fabs(lastSample);
 		lastSample = inputSample;
 		
 		silhouette += smoother;
 		
-		bridgerectifier = fabs(silhouette)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bridgerectifier = fabs(silhouette)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
-		if (silhouette > 0.0) silhouette = bridgerectifier;
+		if (silhouette > 0.0f) silhouette = bridgerectifier;
 		else silhouette = -bridgerectifier;
 		
-		inputSample = (silhouette + outSample) / 2.0;
+		inputSample = (silhouette + outSample) / 2.0f;
 		outSample = silhouette;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

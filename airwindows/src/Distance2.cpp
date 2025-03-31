@@ -33,35 +33,35 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double lastSampleA;
-		double lastSampleB;
-		double lastSampleC;
-		double lastSampleD;
-		double lastSampleE;
-		double lastSampleF;
-		double lastSampleG;
-		double lastSampleH;
-		double lastSampleI;
-		double lastSampleJ;
-		double lastSampleK;
-		double lastSampleL;
-		double lastSampleM;
-		double thresholdA;
-		double thresholdB;
-		double thresholdC;
-		double thresholdD;
-		double thresholdE;
-		double thresholdF;
-		double thresholdG;
-		double thresholdH;
-		double thresholdI;
-		double thresholdJ;
-		double thresholdK;
-		double thresholdL;
-		double thresholdM;
+		float lastSampleA;
+		float lastSampleB;
+		float lastSampleC;
+		float lastSampleD;
+		float lastSampleE;
+		float lastSampleF;
+		float lastSampleG;
+		float lastSampleH;
+		float lastSampleI;
+		float lastSampleJ;
+		float lastSampleK;
+		float lastSampleL;
+		float lastSampleM;
+		float thresholdA;
+		float thresholdB;
+		float thresholdC;
+		float thresholdD;
+		float thresholdE;
+		float thresholdF;
+		float thresholdG;
+		float thresholdH;
+		float thresholdI;
+		float thresholdJ;
+		float thresholdK;
+		float thresholdL;
+		float thresholdM;
 		
-		Float64 thirdSample;
-		Float64 lastSample;
+		Float32 thirdSample;
+		Float32 lastSample;
 		
 		uint32_t fpd;
 	
@@ -79,45 +79,45 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	thresholdA = 0.618033988749894 / overallscale;
-	thresholdB = 0.679837387624884 / overallscale;
-	thresholdC = 0.747821126387373 / overallscale;
-	thresholdD = 0.82260323902611 / overallscale;
-	thresholdE = 0.904863562928721 / overallscale;
-	thresholdF = 0.995349919221593 / overallscale;
-	thresholdG = 1.094884911143752 / overallscale;
-	thresholdH = 1.204373402258128 / overallscale;
-	thresholdI = 1.32481074248394 / overallscale;
-	thresholdJ = 1.457291816732335 / overallscale;
-	thresholdK = 1.603020998405568 / overallscale;
-	thresholdL = 1.763323098246125 / overallscale;
-	thresholdM = 1.939655408070737 / overallscale;	
-	Float64 softslew = (pow(GetParameter( kParam_One ),3)*24)+.6;
+	thresholdA = 0.618033988749894f / overallscale;
+	thresholdB = 0.679837387624884f / overallscale;
+	thresholdC = 0.747821126387373f / overallscale;
+	thresholdD = 0.82260323902611f / overallscale;
+	thresholdE = 0.904863562928721f / overallscale;
+	thresholdF = 0.995349919221593f / overallscale;
+	thresholdG = 1.094884911143752f / overallscale;
+	thresholdH = 1.204373402258128f / overallscale;
+	thresholdI = 1.32481074248394f / overallscale;
+	thresholdJ = 1.457291816732335f / overallscale;
+	thresholdK = 1.603020998405568f / overallscale;
+	thresholdL = 1.763323098246125f / overallscale;
+	thresholdM = 1.939655408070737f / overallscale;	
+	Float32 softslew = (pow(GetParameter( kParam_One ),3)*24)+.6;
 	softslew *= overallscale;
-	Float64 filter = softslew * GetParameter( kParam_Two );
-	Float64 secondfilter = filter / 3.0;
-	Float64 thirdfilter = filter / 5.0;
-	Float64 offsetScale = GetParameter( kParam_One ) * 0.1618;
-	Float64 levelcorrect = 1.0 + ((filter / 12.0) * GetParameter( kParam_One ));
+	Float32 filter = softslew * GetParameter( kParam_Two );
+	Float32 secondfilter = filter / 3.0f;
+	Float32 thirdfilter = filter / 5.0f;
+	Float32 offsetScale = GetParameter( kParam_One ) * 0.1618f;
+	Float32 levelcorrect = 1.0f + ((filter / 12.0f) * GetParameter( kParam_One ));
 	//bring in top slider again to manage boost level for lower settings
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Three );
 	//this also functions as a pad for the intensely distorty deep distance mode
 
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
-		double offset = offsetScale - (lastSample - inputSample);		
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
+		float offset = offsetScale - (lastSample - inputSample);		
 		inputSample += (offset*offsetScale); //extra bit from Loud: offset air compression
 		inputSample *= wet; //clean up w. dry introduced
 		inputSample *= softslew; //scale into Atmosphere algorithm
 		
-		double clamp = inputSample - lastSampleA;
+		float clamp = inputSample - lastSampleA;
 		if (clamp > thresholdA) inputSample = lastSampleA + thresholdA;
 		if (-clamp > thresholdA) inputSample = lastSampleA - thresholdA;
 		
@@ -190,23 +190,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= (offset*offsetScale);
 		//begin IIR stage
 		inputSample += (thirdSample * thirdfilter);
-		inputSample /= (thirdfilter + 1.0);
+		inputSample /= (thirdfilter + 1.0f);
 		inputSample += (lastSample * secondfilter);
-		inputSample /= (secondfilter + 1.0);
+		inputSample /= (secondfilter + 1.0f);
 		//do an IIR like thing to further squish superdistant stuff
 		thirdSample = lastSample;
 		lastSample = inputSample;		
 		inputSample *= levelcorrect;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

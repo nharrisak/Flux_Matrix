@@ -29,7 +29,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double savg[9];
+		float savg[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -46,52 +46,52 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	
-	int sweetBits = 10-floor(GetParameter( kParam_One )*10.0);
-	double sweet = 1.0;
+	int sweetBits = 10-floor(GetParameter( kParam_One )*10.0f);
+	float sweet = 1.0f;
 	switch (sweetBits)
 	{
-		case 11: sweet = 0.00048828125; break;
-		case 10: sweet = 0.0009765625; break;
-		case 9: sweet = 0.001953125; break;
-		case 8: sweet = 0.00390625; break;
-		case 7: sweet = 0.0078125; break;
-		case 6: sweet = 0.015625; break;
-		case 5: sweet = 0.03125; break;
-		case 4: sweet = 0.0625; break;
-		case 3: sweet = 0.125; break;
-		case 2: sweet = 0.25; break;
-		case 1: sweet = 0.5; break;
-		case 0: sweet = 1.0; break;
-		case -1: sweet = 2.0; break;
+		case 11: sweet = 0.00048828125f; break;
+		case 10: sweet = 0.0009765625f; break;
+		case 9: sweet = 0.001953125f; break;
+		case 8: sweet = 0.00390625f; break;
+		case 7: sweet = 0.0078125f; break;
+		case 6: sweet = 0.015625f; break;
+		case 5: sweet = 0.03125f; break;
+		case 4: sweet = 0.0625f; break;
+		case 3: sweet = 0.125f; break;
+		case 2: sweet = 0.25f; break;
+		case 1: sweet = 0.5f; break;
+		case 0: sweet = 1.0f; break;
+		case -1: sweet = 2.0f; break;
 	} //now we have our input trim
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double sweetSample = inputSample;
+		float sweetSample = inputSample;
 		
-		double sv = sweetSample; sweetSample = (sweetSample + savg[0]) * 0.5; savg[0] = sv;
-		if (cycleEnd > 1) {sv = sweetSample; sweetSample = (sweetSample + savg[1]) * 0.5; savg[1] = sv;
-			if (cycleEnd > 2) {sv = sweetSample; sweetSample = (sweetSample + savg[2]) * 0.5; savg[2] = sv;
-				if (cycleEnd > 3) {sv = sweetSample; sweetSample = (sweetSample + savg[3]) * 0.5; savg[3] = sv;}
+		float sv = sweetSample; sweetSample = (sweetSample + savg[0]) * 0.5f; savg[0] = sv;
+		if (cycleEnd > 1) {sv = sweetSample; sweetSample = (sweetSample + savg[1]) * 0.5f; savg[1] = sv;
+			if (cycleEnd > 2) {sv = sweetSample; sweetSample = (sweetSample + savg[2]) * 0.5f; savg[2] = sv;
+				if (cycleEnd > 3) {sv = sweetSample; sweetSample = (sweetSample + savg[3]) * 0.5f; savg[3] = sv;}
 			} //if undersampling code is present, this gives a simple averaging that stacks up
 		} //when high sample rates are present, for a more intense aliasing reduction. PRE nonlinearity
 		
 		sweetSample = (sweetSample*sweetSample*sweet); //second harmonic (nonlinearity)
 		
-		sv = sweetSample; sweetSample = (sweetSample + savg[4]) * 0.5; savg[4] = sv;
-		if (cycleEnd > 1) {sv = sweetSample; sweetSample = (sweetSample + savg[5]) * 0.5; savg[5] = sv;
-			if (cycleEnd > 2) {sv = sweetSample; sweetSample = (sweetSample + savg[6]) * 0.5; savg[6] = sv;
-				if (cycleEnd > 3) {sv = sweetSample; sweetSample = (sweetSample + savg[7]) * 0.5; savg[7] = sv;}
+		sv = sweetSample; sweetSample = (sweetSample + savg[4]) * 0.5f; savg[4] = sv;
+		if (cycleEnd > 1) {sv = sweetSample; sweetSample = (sweetSample + savg[5]) * 0.5f; savg[5] = sv;
+			if (cycleEnd > 2) {sv = sweetSample; sweetSample = (sweetSample + savg[6]) * 0.5f; savg[6] = sv;
+				if (cycleEnd > 3) {sv = sweetSample; sweetSample = (sweetSample + savg[7]) * 0.5f; savg[7] = sv;}
 			} //if undersampling code is present, this gives a simple averaging that stacks up
 		} //when high sample rates are present, for a more intense aliasing reduction. POST nonlinearity
 		
@@ -100,7 +100,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

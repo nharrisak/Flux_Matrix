@@ -34,40 +34,40 @@ enum { kNumTemplateParameters = 6 };
 		int lastcountR;
 		int prevwidth;
 		
-		Float64 trackingL[9];
-		Float64 tempL[9];
-		Float64 positionL[9];
-		Float64 lastpositionL[9];
-		Float64 trackingR[9];
-		Float64 tempR[9];
-		Float64 positionR[9];
-		Float64 lastpositionR[9];
+		Float32 trackingL[9];
+		Float32 tempL[9];
+		Float32 positionL[9];
+		Float32 lastpositionL[9];
+		Float32 trackingR[9];
+		Float32 tempR[9];
+		Float32 positionR[9];
+		Float32 lastpositionR[9];
 		int activeL;
 		int bestspliceL;
 		int activeR;
 		int bestspliceR;
-		Float64 bestyetL;
-		Float64 bestyetR;
-		Float64 airPrevL;
-		Float64 airEvenL;
-		Float64 airOddL;
-		Float64 airFactorL;
-		Float64 airPrevR;
-		Float64 airEvenR;
-		Float64 airOddR;
-		Float64 airFactorR;
+		Float32 bestyetL;
+		Float32 bestyetR;
+		Float32 airPrevL;
+		Float32 airEvenL;
+		Float32 airOddL;
+		Float32 airFactorL;
+		Float32 airPrevR;
+		Float32 airEvenR;
+		Float32 airOddR;
+		Float32 airFactorR;
 		bool flip;
 	
-		double lastRefL[7];
-		double lastRefR[7];
+		float lastRefL[7];
+		float lastRefR[7];
 		int cycle;
 	
 		uint32_t fpdL;
 		uint32_t fpdR;
 
 	struct _dram {
-			Float64 pL[5001];
-		Float64 pR[5001];
+			Float32 pL[5001];
+		Float32 pR[5001];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -76,23 +76,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	Float64 trim = GetParameter( kParam_One );
+	Float32 trim = GetParameter( kParam_One );
 	trim *= fabs(trim);
 	trim /= 40;
-	Float64 speedL = trim+1.0;
-	Float64 speedR = (-trim)+1.0;
-	if (speedL < 0.0) speedL = 0.0;
-	if (speedR < 0.0) speedR = 0.0;
+	Float32 speedL = trim+1.0f;
+	Float32 speedR = (-trim)+1.0f;
+	if (speedL < 0.0f) speedL = 0.0f;
+	if (speedR < 0.0f) speedR = 0.0f;
 	
 	int width = 2300;
 	if (prevwidth != width)
@@ -115,48 +115,48 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		positionR[7] = (int)(width/2);
 		prevwidth = width;
 	}
-	Float64 adjust = 1100;
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 adjust = 1100;
+	Float32 wet = GetParameter( kParam_Two );
 	int gplusL;
 	int lastplusL;
 	int gplusR;
 	int lastplusR;
-	Float64 posplusL;
-	Float64 lastposplusL;
-	Float64 posplusR;
-	Float64 lastposplusR;
-	Float64 depth;
-	Float64 crossfade;
+	Float32 posplusL;
+	Float32 lastposplusL;
+	Float32 posplusR;
+	Float32 lastposplusR;
+	Float32 depth;
+	Float32 crossfade;
 	int count;
 	int bcountL;
 	int bcountR;
 	int base;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		cycle++;
-		if (cycle == cycleEnd) { //hit the end point and we do a doubler sample
-			double drySampleL = inputSampleL;
-			double drySampleR = inputSampleR;
+		if (cycle == cycleEnd) { //hit the end point and we do a floatr sample
+			float drySampleL = inputSampleL;
+			float drySampleR = inputSampleR;
 			
 			//assign working variables
 			airFactorL = airPrevL - inputSampleL;
 			if (flip) {airEvenL += airFactorL; airOddL -= airFactorL; airFactorL = airEvenL;}
 			else {airOddL += airFactorL; airEvenL -= airFactorL; airFactorL = airOddL;}
-			airOddL = (airOddL - ((airOddL - airEvenL)/256.0)) / 1.0001;
-			airEvenL = (airEvenL - ((airEvenL - airOddL)/256.0)) / 1.0001;
+			airOddL = (airOddL - ((airOddL - airEvenL)/256.0f)) / 1.0001f;
+			airEvenL = (airEvenL - ((airEvenL - airOddL)/256.0f)) / 1.0001f;
 			airPrevL = inputSampleL;
 			inputSampleL += airFactorL;
 			//left
 			airFactorR = airPrevR - inputSampleR;
 			if (flip) {airEvenR += airFactorR; airOddR -= airFactorR; airFactorR = airEvenR;}
 			else {airOddR += airFactorR; airEvenR -= airFactorR; airFactorR = airOddR;}
-			airOddR = (airOddR - ((airOddR - airEvenR)/256.0)) / 1.0001;
-			airEvenR = (airEvenR - ((airEvenR - airOddR)/256.0)) / 1.0001;
+			airOddR = (airOddR - ((airOddR - airEvenR)/256.0f)) / 1.0001f;
+			airEvenR = (airEvenR - ((airEvenR - airOddR)/256.0f)) / 1.0001f;
 			airPrevR = inputSampleR;
 			inputSampleR += airFactorR;
 			//right
@@ -177,25 +177,25 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			if (gplusR > width) {gplusR -= width;}
 			if (lastplusR > width) {lastplusR -= width;}
 			
-			if (trackingL[activeL] == 0.0)
+			if (trackingL[activeL] == 0.0f)
 			{
 				posplusL = positionL[activeL]+adjust;
 				lastposplusL = lastpositionL[activeL]+adjust;
 				if (posplusL > width) {posplusL -= width;}
 				if (lastposplusL > width) {lastposplusL -= width;}
-				if ((gplusL > positionL[activeL]) && (lastplusL < lastpositionL[activeL])) {trackingL[activeL] = 1.0;}
-				if ((posplusL > gcountL) && (lastposplusL < lastcountL)) {trackingL[activeL] = 1.0;}
+				if ((gplusL > positionL[activeL]) && (lastplusL < lastpositionL[activeL])) {trackingL[activeL] = 1.0f;}
+				if ((posplusL > gcountL) && (lastposplusL < lastcountL)) {trackingL[activeL] = 1.0f;}
 				//fire splice based on whether somebody moved past somebody else just now
 			}
 			
-			if (trackingR[activeR] == 0.0)
+			if (trackingR[activeR] == 0.0f)
 			{
 				posplusR = positionR[activeR]+adjust;
 				lastposplusR = lastpositionR[activeR]+adjust;
 				if (posplusR > width) {posplusR -= width;}
 				if (lastposplusR > width) {lastposplusR -= width;}
-				if ((gplusR > positionR[activeR]) && (lastplusR < lastpositionR[activeR])) {trackingR[activeR] = 1.0;}
-				if ((posplusR > gcountR) && (lastposplusR < lastcountR)) {trackingR[activeR] = 1.0;}
+				if ((gplusR > positionR[activeR]) && (lastplusR < lastpositionR[activeR])) {trackingR[activeR] = 1.0f;}
+				if ((posplusR > gcountR) && (lastposplusR < lastcountR)) {trackingR[activeR] = 1.0f;}
 				//fire splice based on whether somebody moved past somebody else just now
 			}
 			
@@ -233,70 +233,70 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			
 			
-			if (trackingL[activeL] > 0.0)
+			if (trackingL[activeL] > 0.0f)
 			{
-				crossfade = sin(trackingL[bestspliceL]*1.57);
-				inputSampleL = (tempL[activeL]*crossfade)+(tempL[bestspliceL]*(1.0-crossfade));
+				crossfade = sin(trackingL[bestspliceL]*1.57f);
+				inputSampleL = (tempL[activeL]*crossfade)+(tempL[bestspliceL]*(1.0f-crossfade));
 				
 				for(count = 0; count < 8; count++)
 				{
-					depth = (0.5-fabs(tempL[activeL]-tempL[count]));
+					depth = (0.5f-fabs(tempL[activeL]-tempL[count]));
 					if ((depth > 0) && (count != activeL))
 					{trackingL[count] -= (depth/adjust);
 						bestspliceL = count;}
 					//take down the splicings but skip the current one
 				}
-				bestyetL = 1.0;
+				bestyetL = 1.0f;
 				for(count = 0; count < 8; count++)
 				{
 					if ((trackingL[count] < bestyetL)&&(count != activeL))
 					{bestspliceL = count; bestyetL = trackingL[count];}
 				}
 				
-				if (trackingL[bestspliceL] < 0.0)
+				if (trackingL[bestspliceL] < 0.0f)
 				{
 					for(count = 0; count < 8; count++)
-					{trackingL[count] = 1.0;}
+					{trackingL[count] = 1.0f;}
 					activeL = bestspliceL;
-					trackingL[activeL] = 0.0;
+					trackingL[activeL] = 0.0f;
 				}
 			}
 			else
 			{inputSampleL = tempL[activeL];}
 			
-			if (trackingR[activeR] > 0.0)
+			if (trackingR[activeR] > 0.0f)
 			{
-				crossfade = sin(trackingR[bestspliceR]*1.57);
-				inputSampleR = (tempR[activeR]*crossfade)+(tempR[bestspliceR]*(1.0-crossfade));
+				crossfade = sin(trackingR[bestspliceR]*1.57f);
+				inputSampleR = (tempR[activeR]*crossfade)+(tempR[bestspliceR]*(1.0f-crossfade));
 				
 				for(count = 0; count < 8; count++)
 				{
-					depth = (0.5-fabs(tempR[activeR]-tempR[count]));
+					depth = (0.5f-fabs(tempR[activeR]-tempR[count]));
 					if ((depth > 0) && (count != activeR))
 					{trackingR[count] -= (depth/adjust);
 						bestspliceR = count;}
 					//take down the splicings but skip the current one
 				}
-				bestyetR = 1.0;
+				bestyetR = 1.0f;
 				for(count = 0; count < 8; count++)
 				{
 					if ((trackingR[count] < bestyetR)&&(count != activeR))
 					{bestspliceR = count; bestyetR = trackingR[count];}
 				}
 				
-				if (trackingR[bestspliceR] < 0.0)
+				if (trackingR[bestspliceR] < 0.0f)
 				{
 					for(count = 0; count < 8; count++)
-					{trackingR[count] = 1.0;}
+					{trackingR[count] = 1.0f;}
 					activeR = bestspliceR;
-					trackingR[activeR] = 0.0;
+					trackingR[activeR] = 0.0f;
 				}					
 			}
 			else
 			{inputSampleR = tempR[activeR];}
 			
-			inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-			inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+			inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+			inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 			
 			if (cycleEnd == 4) {
 				lastRefL[0] = lastRefL[4]; //start from previous last
@@ -346,10 +346,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

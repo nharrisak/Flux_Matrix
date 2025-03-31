@@ -29,14 +29,14 @@ kParam0, kParam1, kParam2, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double ovhGain;
+	float ovhGain;
 	int ovhCount;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
 	struct _dram {
-		double ovhL[130];
-	double ovhR[130];
+		float ovhL[130];
+	float ovhR[130];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -44,47 +44,47 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double ovhTrim = pow(GetParameter( kParam_One ),3);
-	ovhTrim += 1.0; ovhTrim *= ovhTrim;
-	int offset = (pow(GetParameter( kParam_Two ),7) * 16.0 * overallscale)+1;
-	double wet = GetParameter( kParam_Three );
+	float ovhTrim = pow(GetParameter( kParam_One ),3);
+	ovhTrim += 1.0f; ovhTrim *= ovhTrim;
+	int offset = (pow(GetParameter( kParam_Two ),7) * 16.0f * overallscale)+1;
+	float wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
 		//begin Overheads compressor
 		inputSampleL *= ovhTrim; inputSampleR *= ovhTrim;
 		ovhCount--; if (ovhCount < 0 || ovhCount > 128) ovhCount = 128; dram->ovhL[ovhCount] = inputSampleL; dram->ovhR[ovhCount] = inputSampleR;
-		double ovhClamp = sin(fabs(inputSampleL - dram->ovhL[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0)*64.0);
-		ovhGain *= (1.0 - ovhClamp); ovhGain += ((1.0-ovhClamp) * ovhClamp);
-		ovhClamp = sin(fabs(inputSampleR - dram->ovhR[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0)*64.0);
-		ovhGain *= (1.0 - ovhClamp); ovhGain += ((1.0-ovhClamp) * ovhClamp);
-		if (ovhGain > 1.0) ovhGain = 1.0; if (ovhGain < 0.0) ovhGain = 0.0;
+		float ovhClamp = sin(fabs(inputSampleL - dram->ovhL[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0f)*64.0f);
+		ovhGain *= (1.0f - ovhClamp); ovhGain += ((1.0f-ovhClamp) * ovhClamp);
+		ovhClamp = sin(fabs(inputSampleR - dram->ovhR[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0f)*64.0f);
+		ovhGain *= (1.0f - ovhClamp); ovhGain += ((1.0f-ovhClamp) * ovhClamp);
+		if (ovhGain > 1.0f) ovhGain = 1.0f; if (ovhGain < 0.0f) ovhGain = 0.0f;
 		inputSampleL *= ovhGain; inputSampleR *= ovhGain;
 		//end Overheads compressor
 		
-		if (wet != 1.0) {
-		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+		if (wet != 1.0f) {
+		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

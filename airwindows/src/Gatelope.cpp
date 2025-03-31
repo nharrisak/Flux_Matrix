@@ -37,12 +37,12 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirLowpassA;
-		Float64 iirLowpassB;
-		Float64 iirHighpassA;
-		Float64 iirHighpassB;
-		Float64 treblefreq;
-		Float64 bassfreq;
+		Float32 iirLowpassA;
+		Float32 iirLowpassB;
+		Float32 iirHighpassA;
+		Float32 iirHighpassB;
+		Float32 treblefreq;
+		Float32 bassfreq;
 		bool flip;
 		uint32_t fpd;
 	
@@ -60,32 +60,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	//speed settings around release
-	Float64 threshold = pow(GetParameter( kParam_One ),2);
+	Float32 threshold = pow(GetParameter( kParam_One ),2);
 	//gain settings around threshold
-	Float64 trebledecay = pow(1.0-GetParameter( kParam_Two ),2)/4196.0;
-	Float64 bassdecay =  pow(1.0-GetParameter( kParam_Three ),2)/8192.0;
-	Float64 slowAttack = (pow(GetParameter( kParam_Four ),3)*3)+0.003;
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 trebledecay = pow(1.0f-GetParameter( kParam_Two ),2)/4196.0f;
+	Float32 bassdecay =  pow(1.0f-GetParameter( kParam_Three ),2)/8192.0f;
+	Float32 slowAttack = (pow(GetParameter( kParam_Four ),3)*3)+0.003f;
+	Float32 wet = GetParameter( kParam_Five );
 	slowAttack /= overallscale;
 	trebledecay /= overallscale;
 	bassdecay /= overallscale;
-	trebledecay += 1.0;
-	bassdecay += 1.0;
-	Float64 attackSpeed;
+	trebledecay += 1.0f;
+	bassdecay += 1.0f;
+	Float32 attackSpeed;
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		attackSpeed = slowAttack - (fabs(inputSample)*slowAttack*0.5);
+		attackSpeed = slowAttack - (fabs(inputSample)*slowAttack*0.5f);
 		
-		if (attackSpeed < 0.0) attackSpeed = 0.0;
+		if (attackSpeed < 0.0f) attackSpeed = 0.0f;
 		//softening onset click depending on how hard we're getting it
 		
 		if (flip)
@@ -93,14 +93,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (fabs(inputSample) > threshold)
 			{
 				treblefreq += attackSpeed;
-				if (treblefreq > 2.0) treblefreq = 2.0;
+				if (treblefreq > 2.0f) treblefreq = 2.0f;
 				bassfreq -= attackSpeed;
 				bassfreq -= attackSpeed;
-				if (bassfreq < 0.0) bassfreq = 0.0;
+				if (bassfreq < 0.0f) bassfreq = 0.0f;
 				iirLowpassA = inputSample;
 				iirLowpassB = inputSample;
-				iirHighpassA = 0.0;
-				iirHighpassB = 0.0;
+				iirHighpassA = 0.0f;
+				iirHighpassB = 0.0f;
 			}
 			else
 			{
@@ -112,30 +112,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				bassfreq += treblefreq;
 			}
 			
-			if (treblefreq >= 1.0) iirLowpassA = inputSample;
-			else iirLowpassA = (iirLowpassA * (1.0 - treblefreq)) + (inputSample * treblefreq);
+			if (treblefreq >= 1.0f) iirLowpassA = inputSample;
+			else iirLowpassA = (iirLowpassA * (1.0f - treblefreq)) + (inputSample * treblefreq);
 			
-			if (bassfreq > 1.0) bassfreq = 1.0;
+			if (bassfreq > 1.0f) bassfreq = 1.0f;
 			
-			if (bassfreq > 0.0) iirHighpassA = (iirHighpassA * (1.0 - bassfreq)) + (inputSample * bassfreq);
-			else iirHighpassA = 0.0;
+			if (bassfreq > 0.0f) iirHighpassA = (iirHighpassA * (1.0f - bassfreq)) + (inputSample * bassfreq);
+			else iirHighpassA = 0.0f;
 			
 			if (treblefreq > bassfreq) inputSample = (iirLowpassA - iirHighpassA);
-			else inputSample = 0.0;
+			else inputSample = 0.0f;
 		}
 		else
 		{
 			if (fabs(inputSample) > threshold)
 			{
 				treblefreq += attackSpeed;
-				if (treblefreq > 2.0) treblefreq = 2.0;
+				if (treblefreq > 2.0f) treblefreq = 2.0f;
 				bassfreq -= attackSpeed;
 				bassfreq -= attackSpeed;
-				if (bassfreq < 0.0) bassfreq = 0.0;
+				if (bassfreq < 0.0f) bassfreq = 0.0f;
 				iirLowpassA = inputSample;
 				iirLowpassB = inputSample;
-				iirHighpassA = 0.0;
-				iirHighpassB = 0.0;
+				iirHighpassA = 0.0f;
+				iirHighpassB = 0.0f;
 			}
 			else
 			{
@@ -147,16 +147,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				bassfreq += treblefreq;
 			}
 			
-			if (treblefreq >= 1.0) iirLowpassB = inputSample;
-			else iirLowpassB = (iirLowpassB * (1.0 - treblefreq)) + (inputSample * treblefreq);
+			if (treblefreq >= 1.0f) iirLowpassB = inputSample;
+			else iirLowpassB = (iirLowpassB * (1.0f - treblefreq)) + (inputSample * treblefreq);
 			
-			if (bassfreq > 1.0) bassfreq = 1.0;
+			if (bassfreq > 1.0f) bassfreq = 1.0f;
 
-			if (bassfreq > 0.0) iirHighpassB = (iirHighpassB * (1.0 - bassfreq)) + (inputSample * bassfreq);
-			else iirHighpassB = 0.0;
+			if (bassfreq > 0.0f) iirHighpassB = (iirHighpassB * (1.0f - bassfreq)) + (inputSample * bassfreq);
+			else iirHighpassB = 0.0f;
 			
 			if (treblefreq > bassfreq) inputSample = (iirLowpassB - iirHighpassB);
-			else inputSample = 0.0;
+			else inputSample = 0.0f;
 		}
 		//done full gated envelope filtered effect
 		inputSample  = ((1-wet)*drySample)+(wet*inputSample);
@@ -167,7 +167,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

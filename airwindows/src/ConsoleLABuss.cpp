@@ -25,18 +25,18 @@ kParam0, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double lastSinewL;
-	double lastSinewR;
+	float lastSinewL;
+	float lastSinewR;
 	
-	double subAL;
-	double subAR;
-	double subBL;
-	double subBR;
-	double subCL;
-	double subCR;
+	float subAL;
+	float subAR;
+	float subBL;
+	float subBR;
+	float subCL;
+	float subCR;
 	
-	double gainA;
-	double gainB; //smoothed master fader for channel, from Z2 series filter code
+	float gainA;
+	float gainB; //smoothed master fader for channel, from Z2 series filter code
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -49,8 +49,8 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	gainA = gainB;
@@ -61,68 +61,68 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//but opens up the modified Sinew, because more of the attentuation happens before
 	//you even get to slew clipping :) and if the fader is not active, it bypasses completely.
 	
-	double threshSinew = 0.718/overallscale;
-	double subTrim = 0.0011 / overallscale;
+	float threshSinew = 0.718f/overallscale;
+	float subTrim = 0.0011f / overallscale;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double gain = (gainA*temp)+(gainB*(1.0-temp));
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float gain = (gainA*temp)+(gainB*(1.0f-temp));
 		//setting up smoothed master fader
 		
 		//begin SubTight section
-		double subSampleL = inputSampleL * subTrim;
-		double subSampleR = inputSampleR * subTrim;
+		float subSampleL = inputSampleL * subTrim;
+		float subSampleR = inputSampleR * subTrim;
 		
-		double scale = 0.5+fabs(subSampleL*0.5);
+		float scale = 0.5f+fabs(subSampleL*0.5f);
 		subSampleL = (subAL+(sin(subAL-subSampleL)*scale));
 		subAL = subSampleL*scale;
-		scale = 0.5+fabs(subSampleR*0.5);
+		scale = 0.5f+fabs(subSampleR*0.5f);
 		subSampleR = (subAR+(sin(subAR-subSampleR)*scale));
 		subAR = subSampleR*scale;
-		scale = 0.5+fabs(subSampleL*0.5);
+		scale = 0.5f+fabs(subSampleL*0.5f);
 		subSampleL = (subBL+(sin(subBL-subSampleL)*scale));
 		subBL = subSampleL*scale;
-		scale = 0.5+fabs(subSampleR*0.5);
+		scale = 0.5f+fabs(subSampleR*0.5f);
 		subSampleR = (subBR+(sin(subBR-subSampleR)*scale));
 		subBR = subSampleR*scale;
-		scale = 0.5+fabs(subSampleL*0.5);
+		scale = 0.5f+fabs(subSampleL*0.5f);
 		subSampleL = (subCL+(sin(subCL-subSampleL)*scale));
 		subCL = subSampleL*scale;
-		scale = 0.5+fabs(subSampleR*0.5);
+		scale = 0.5f+fabs(subSampleR*0.5f);
 		subSampleR = (subCR+(sin(subCR-subSampleR)*scale));
 		subCR = subSampleR*scale;
-		if (subSampleL > 0.25) subSampleL = 0.25;
-		if (subSampleL < -0.25) subSampleL = -0.25;
-		if (subSampleR > 0.25) subSampleR = 0.25;
-		if (subSampleR < -0.25) subSampleR = -0.25;
-		inputSampleL -= (subSampleL*16.0);
-		inputSampleR -= (subSampleR*16.0);
+		if (subSampleL > 0.25f) subSampleL = 0.25f;
+		if (subSampleL < -0.25f) subSampleL = -0.25f;
+		if (subSampleR > 0.25f) subSampleR = 0.25f;
+		if (subSampleR < -0.25f) subSampleR = -0.25f;
+		inputSampleL -= (subSampleL*16.0f);
+		inputSampleR -= (subSampleR*16.0f);
 		//end SubTight section
 		
-		if (gain < 1.0) {
+		if (gain < 1.0f) {
 			inputSampleL *= gain;
 			inputSampleR *= gain;
 		} //if using the master fader, we are going to attenuate three places.
 		//subtight is always fully engaged: tighten response when restraining full console
 		
 		//begin ConsoleZeroBuss which is the one we choose for ConsoleLA
-		if (inputSampleL > 2.8) inputSampleL = 2.8;
-		if (inputSampleL < -2.8) inputSampleL = -2.8;
-		if (inputSampleL > 0.0) inputSampleL = (inputSampleL*2.0)/(3.0-inputSampleL);
-		else inputSampleL = -(inputSampleL*-2.0)/(3.0+inputSampleL);
+		if (inputSampleL > 2.8f) inputSampleL = 2.8f;
+		if (inputSampleL < -2.8f) inputSampleL = -2.8f;
+		if (inputSampleL > 0.0f) inputSampleL = (inputSampleL*2.0f)/(3.0f-inputSampleL);
+		else inputSampleL = -(inputSampleL*-2.0f)/(3.0f+inputSampleL);
 		
-		if (inputSampleR > 2.8) inputSampleR = 2.8;
-		if (inputSampleR < -2.8) inputSampleR = -2.8;
-		if (inputSampleR > 0.0) inputSampleR = (inputSampleR*2.0)/(3.0-inputSampleR);
-		else inputSampleR = -(inputSampleR*-2.0)/(3.0+inputSampleR);
+		if (inputSampleR > 2.8f) inputSampleR = 2.8f;
+		if (inputSampleR < -2.8f) inputSampleR = -2.8f;
+		if (inputSampleR > 0.0f) inputSampleR = (inputSampleR*2.0f)/(3.0f-inputSampleR);
+		else inputSampleR = -(inputSampleR*-2.0f)/(3.0f+inputSampleR);
 		//ConsoleZero Buss
 		
-		if (gain < 1.0) {
+		if (gain < 1.0f) {
 			inputSampleL *= gain;
 			inputSampleR *= gain;
 		} //if using the master fader, we are going to attenuate three places.
@@ -130,23 +130,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//when pulling back master fader. Less drive equals more open
 		
 		temp = inputSampleL;
-		double clamp = inputSampleL - lastSinewL;
-		double sinew = threshSinew * cos(lastSinewL);
+		float clamp = inputSampleL - lastSinewL;
+		float sinew = threshSinew * cos(lastSinewL);
 		if (clamp > sinew) temp = lastSinewL + sinew;
 		if (-clamp > sinew) temp = lastSinewL - sinew;
 		inputSampleL = lastSinewL = temp;
-		if (lastSinewL > 1.0) lastSinewL = 1.0;
-		if (lastSinewL < -1.0) lastSinewL = -1.0;
+		if (lastSinewL > 1.0f) lastSinewL = 1.0f;
+		if (lastSinewL < -1.0f) lastSinewL = -1.0f;
 		temp = inputSampleR;
 		clamp = inputSampleR - lastSinewR;
 		sinew = threshSinew * cos(lastSinewR);
 		if (clamp > sinew) temp = lastSinewR + sinew;
 		if (-clamp > sinew) temp = lastSinewR - sinew;
 		inputSampleR = lastSinewR = temp;
-		if (lastSinewR > 1.0) lastSinewR = 1.0;
-		if (lastSinewR < -1.0) lastSinewR = -1.0;
+		if (lastSinewR > 1.0f) lastSinewR = 1.0f;
+		if (lastSinewR < -1.0f) lastSinewR = -1.0f;
 		
-		if (gain < 1.0) {
+		if (gain < 1.0f) {
 			inputSampleL *= gain;
 			inputSampleR *= gain;
 		} //if using the master fader, we are going to attenuate three places.
@@ -155,10 +155,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

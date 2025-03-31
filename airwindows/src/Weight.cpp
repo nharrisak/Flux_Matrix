@@ -31,8 +31,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double previousSample[9];
-		double previousTrend[9];
+		float previousSample[9];
+		float previousTrend[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -49,34 +49,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 targetFreq = (GetParameter( kParam_One )-20.0)/100.0;
+	Float32 targetFreq = (GetParameter( kParam_One )-20.0f)/100.0f;
 	//gives us a 0-1 value like the VST will be. For the VST, start with 0-1 and
 	//have the plugin display the number as 20-120.
 	
-	targetFreq = ((targetFreq+0.53)*0.2)/sqrt(overallscale);
+	targetFreq = ((targetFreq+0.53f)*0.2f)/sqrt(overallscale);
 	//must use square root of what the real scale would be, to get correct output
-	Float64 alpha = pow(targetFreq,4);
-	Float64 out = GetParameter( kParam_Two );
-	Float64 resControl = (out*0.05)+0.2;
-	Float64 beta = (alpha * pow(resControl,2));	
-	alpha += ((1.0-beta)*pow(targetFreq,3)); //correct for droop in frequency
+	Float32 alpha = pow(targetFreq,4);
+	Float32 out = GetParameter( kParam_Two );
+	Float32 resControl = (out*0.05f)+0.2f;
+	Float32 beta = (alpha * pow(resControl,2));	
+	alpha += ((1.0f-beta)*pow(targetFreq,3)); //correct for droop in frequency
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		//begin Weight
-		double trend;
-		double forecast;
+		float trend;
+		float forecast;
 		for (int i = 0; i < 8; i++) {
-			trend = (beta * (inputSample - previousSample[i]) + ((0.999-beta) * previousTrend[i]));
+			trend = (beta * (inputSample - previousSample[i]) + ((0.999f-beta) * previousTrend[i]));
 			forecast = previousSample[i] + previousTrend[i];
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSample[i] = inputSample; previousTrend[i] = trend;
 		}
 		//inputSample is now the bass boost to be added
@@ -87,7 +87,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

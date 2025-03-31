@@ -40,8 +40,8 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		int gcount;
-		Float64 offsetA;
-		Float64 offsetB;
+		Float32 offsetA;
+		Float32 offsetB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,52 +60,52 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 gain = GetParameter( kParam_One ) * 0.636;
-	Float64 targetA = pow(GetParameter( kParam_Two ),4) * 4790.0;
-	Float64 fractionA;
-	Float64 minusA;
-	Float64 intensityA = GetParameter( kParam_Three ) / 2.0;
+	Float32 gain = GetParameter( kParam_One ) * 0.636f;
+	Float32 targetA = pow(GetParameter( kParam_Two ),4) * 4790.0f;
+	Float32 fractionA;
+	Float32 minusA;
+	Float32 intensityA = GetParameter( kParam_Three ) / 2.0f;
 	//first delay
-	Float64 targetB = (pow(GetParameter( kParam_Four ),4) * 4790.0);
-	Float64 fractionB;
-	Float64 minusB;
-	Float64 intensityB = GetParameter( kParam_Five ) / 2.0;
+	Float32 targetB = (pow(GetParameter( kParam_Four ),4) * 4790.0f);
+	Float32 fractionB;
+	Float32 minusB;
+	Float32 intensityB = GetParameter( kParam_Five ) / 2.0f;
 	//second delay
-	Float64 output = GetParameter( kParam_Six );
-	Float64 total;
+	Float32 output = GetParameter( kParam_Six );
+	Float32 total;
 	int count;
-	Float64 temp;
+	Float32 temp;
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
 		if (fabs(offsetA - targetA) > 1000) offsetA = targetA;
-		offsetA = ((offsetA*999.0)+targetA)/1000.0;
+		offsetA = ((offsetA*999.0f)+targetA)/1000.0f;
 		fractionA = offsetA - floor(offsetA);
-		minusA = 1.0 - fractionA;
+		minusA = 1.0f - fractionA;
 		
 		if (fabs(offsetB - targetB) > 1000) offsetB = targetB;
-		offsetB = ((offsetB*999.0)+targetB)/1000.0;
+		offsetB = ((offsetB*999.0f)+targetB)/1000.0f;
 		fractionB = offsetB - floor(offsetB);
-		minusB = 1.0 - fractionB;
+		minusB = 1.0f - fractionB;
 		//chase delay taps for smooth action
 		
 		if (gain > 0) inputSample /= gain;
 		
-		if (inputSample > 1.2533141373155) inputSample = 1.2533141373155;
-		if (inputSample < -1.2533141373155) inputSample = -1.2533141373155;
-		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		if (inputSample > 1.2533141373155f) inputSample = 1.2533141373155f;
+		if (inputSample < -1.2533141373155f) inputSample = -1.2533141373155f;
+		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		//Spiral: lean out the sound a little when decoded by ConsoleBuss
 		
 		if (gcount < 1 || gcount > 4800) {gcount = 4800;}
 		count = gcount;
-		total = 0.0;
+		total = 0.0f;
 		dram->p[count+4800] = dram->p[count] = inputSample;
-		//double buffer
+		//float buffer
 		
-		if (intensityA != 0.0)
+		if (intensityA != 0.0f)
 		{
 			count = (int)(gcount+floor(offsetA));
 			temp = (dram->p[count] * minusA); //less as value moves away from .0
@@ -115,7 +115,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			total += (temp * intensityA);
 		}
 		
-		if (intensityB != 0.0)
+		if (intensityB != 0.0f)
 		{
 			count = (int)(gcount+floor(offsetB));
 			temp = (dram->p[count] * minusB); //less as value moves away from .0
@@ -130,8 +130,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample += total;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		
 		inputSample = asin(inputSample);
@@ -139,7 +139,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample *= gain;
 		
-		if (output < 1.0) inputSample *= output;
+		if (output < 1.0f) inputSample *= output;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);

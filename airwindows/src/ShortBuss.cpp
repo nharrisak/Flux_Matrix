@@ -31,7 +31,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double sbSample;		
+		float sbSample;		
 		uint32_t fpd;
 	
 	struct _dram {
@@ -48,30 +48,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double sbScale = (pow(GetParameter( kParam_One ),3)*0.001)/sqrt(overallscale);
-	double wet = GetParameter( kParam_Two );
+	float sbScale = (pow(GetParameter( kParam_One ),3)*0.001f)/sqrt(overallscale);
+	float wet = GetParameter( kParam_Two );
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		inputSample += (2.0 * inputSample * inputSample) * sbSample;
+		inputSample += (2.0f * inputSample * inputSample) * sbSample;
 		sbSample += ((inputSample - sin(inputSample))*sbScale);
-		sbSample = sin(sbSample*0.015625)*64.0;
+		sbSample = sin(sbSample*0.015625f)*64.0f;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

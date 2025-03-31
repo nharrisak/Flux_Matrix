@@ -45,30 +45,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 gain = GetParameter( kParam_One );
+	Float32 gain = GetParameter( kParam_One );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		if (gain != 1.0) {
+		if (gain != 1.0f) {
 			inputSample *= gain;
 		}
 		
 		//encode/decode courtesy of torridgristle under the MIT license
-		//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5
+		//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5f
 		//Reformulated using 'Herbie' for better accuracy near zero
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		else if (inputSample > 0.0) inputSample = inputSample / (1.0 + sqrt(1.0 - inputSample));
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		else if (inputSample > 0.0f) inputSample = inputSample / (1.0f + sqrt(1.0f - inputSample));
 		
-		if (inputSample < -1.0) inputSample = -1.0;
-		else if (inputSample < 0.0) inputSample = inputSample / (sqrt((inputSample + 1.0)) + 1.0);
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		else if (inputSample < 0.0f) inputSample = inputSample / (sqrt((inputSample + 1.0f)) + 1.0f);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

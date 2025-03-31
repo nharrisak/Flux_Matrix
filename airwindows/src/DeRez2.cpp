@@ -35,13 +35,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastSample;
-		Float64 heldSample;
-		Float64 lastDrySample;
-		Float64 lastOutputSample;
-		Float64 position;
-		Float64 incrementA;
-		Float64 incrementB;
+		Float32 lastSample;
+		Float32 heldSample;
+		Float32 lastDrySample;
+		Float32 lastOutputSample;
+		Float32 position;
+		Float32 incrementA;
+		Float32 incrementB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -58,43 +58,43 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 targetA = pow(GetParameter( kParam_One ),3)+0.0005;
-	if (targetA > 1.0) targetA = 1.0;
-	Float64 soften = (1.0 + targetA)/2;
-	Float64 targetB = pow(1.0-GetParameter( kParam_Two ),3) / 3;
-	Float64 hard = GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 targetA = pow(GetParameter( kParam_One ),3)+0.0005f;
+	if (targetA > 1.0f) targetA = 1.0f;
+	Float32 soften = (1.0f + targetA)/2;
+	Float32 targetB = pow(1.0f-GetParameter( kParam_Two ),3) / 3;
+	Float32 hard = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	targetA /= overallscale;	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		
-		incrementA = ((incrementA*999.0)+targetA)/1000.0;
-		incrementB = ((incrementB*999.0)+targetB)/1000.0;
+		incrementA = ((incrementA*999.0f)+targetA)/1000.0f;
+		incrementB = ((incrementB*999.0f)+targetB)/1000.0f;
 		//incrementA is the frequency derez
 		//incrementB is the bit depth derez
 		position += incrementA;
-		double outputSample = heldSample;
-		if (position > 1.0)
+		float outputSample = heldSample;
+		if (position > 1.0f)
 		{
-			position -= 1.0;
+			position -= 1.0f;
 			heldSample = (lastSample * position) + (inputSample * (1-position));
 			outputSample = (outputSample * (1-soften)) + (heldSample * soften);
 			//softens the edge of the derez
 		}
 		inputSample = outputSample;
 		
-		double temp = inputSample;
+		float temp = inputSample;
 
 		if (inputSample != lastOutputSample) {
 			temp = inputSample;
-			inputSample = (inputSample * hard) + (lastDrySample * (1.0-hard));
+			inputSample = (inputSample * hard) + (lastDrySample * (1.0f-hard));
 			//transitions get an intermediate dry sample
 			lastOutputSample = temp; //only one intermediate sample
 		} else {
@@ -104,14 +104,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//freq section of soft/hard interpolates dry samples
 
 		temp = inputSample;
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		if (inputSample > 0) inputSample = log(1.0+(255*fabs(inputSample))) / log(256);
-		if (inputSample < 0) inputSample = -log(1.0+(255*fabs(inputSample))) / log(256);
-		inputSample = (temp * hard) + (inputSample * (1.0-hard)); //uLaw encode as part of soft/hard
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		if (inputSample > 0) inputSample = log(1.0f+(255*fabs(inputSample))) / log(256);
+		if (inputSample < 0) inputSample = -log(1.0f+(255*fabs(inputSample))) / log(256);
+		inputSample = (temp * hard) + (inputSample * (1.0f-hard)); //uLaw encode as part of soft/hard
 		temp = inputSample;
 		
-		if (incrementB > 0.0005)
+		if (incrementB > 0.0005f)
 		{
 			if (inputSample > 0)
 			{
@@ -125,18 +125,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				inputSample -= temp;
 				//it's above 0 so subtracting subtracts the remainder
 			}
-			inputSample *= (1.0 - incrementB);
+			inputSample *= (1.0f - incrementB);
 		} //resolution section of derez
 		
 		temp = inputSample;		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0; //this may be superfluous?
-		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0) / 255;
-		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0) / 255;
-		inputSample = (temp * hard) + (inputSample * (1.0-hard)); //uLaw decode as part of soft/hard
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f; //this may be superfluous?
+		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0f) / 255;
+		inputSample = (temp * hard) + (inputSample * (1.0f-hard)); //uLaw decode as part of soft/hard
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
@@ -145,7 +145,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

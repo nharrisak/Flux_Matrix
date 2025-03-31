@@ -26,8 +26,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample;
-		double intermediate[16];
+		float lastSample;
+		float intermediate[16];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -44,22 +44,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double softSpeed = fabs(inputSample);
-		if (softSpeed < 1.0) softSpeed = 1.0; else softSpeed = 1.0/softSpeed;
-		if (inputSample > 1.57079633) inputSample = 1.57079633;
-		if (inputSample < -1.57079633) inputSample = -1.57079633;
-		inputSample = sin(inputSample)*0.9549925859; //scale to what cliponly uses
-		inputSample = (inputSample*softSpeed)+(lastSample*(1.0-softSpeed));
+		float softSpeed = fabs(inputSample);
+		if (softSpeed < 1.0f) softSpeed = 1.0f; else softSpeed = 1.0f/softSpeed;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+		if (inputSample < -1.57079633f) inputSample = -1.57079633f;
+		inputSample = sin(inputSample)*0.9549925859f; //scale to what cliponly uses
+		inputSample = (inputSample*softSpeed)+(lastSample*(1.0f-softSpeed));
 		
 		
 		intermediate[spacing] = inputSample;
@@ -70,7 +70,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

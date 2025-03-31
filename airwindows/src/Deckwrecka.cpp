@@ -31,36 +31,36 @@ struct _kernel {
  
 	
 		int bflip;
-		Float64 iirHeadBumpA;
-		Float64 iirHeadBumpB;
-		Float64 iirHeadBumpC;
+		Float32 iirHeadBumpA;
+		Float32 iirHeadBumpB;
+		Float32 iirHeadBumpC;
 				
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		Float64 iirSampleG;
-		Float64 iirSampleH;
-		Float64 iirSampleI;
-		Float64 iirSampleJ;
-		Float64 iirSampleK;
-		Float64 iirSampleL;
-		Float64 iirSampleM;
-		Float64 iirSampleN;
-		Float64 iirSampleO;
-		Float64 iirSampleP;
-		Float64 iirSampleQ;
-		Float64 iirSampleR;
-		Float64 iirSampleS;
-		Float64 iirSampleT;
-		Float64 iirSampleU;
-		Float64 iirSampleV;
-		Float64 iirSampleW;
-		Float64 iirSampleX;
-		Float64 iirSampleY;
-		Float64 iirSampleZ;		
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		Float32 iirSampleG;
+		Float32 iirSampleH;
+		Float32 iirSampleI;
+		Float32 iirSampleJ;
+		Float32 iirSampleK;
+		Float32 iirSampleL;
+		Float32 iirSampleM;
+		Float32 iirSampleN;
+		Float32 iirSampleO;
+		Float32 iirSampleP;
+		Float32 iirSampleQ;
+		Float32 iirSampleR;
+		Float32 iirSampleS;
+		Float32 iirSampleT;
+		Float32 iirSampleU;
+		Float32 iirSampleV;
+		Float32 iirSampleW;
+		Float32 iirSampleX;
+		Float32 iirSampleY;
+		Float32 iirSampleZ;		
 		
 		uint32_t fpd;
 	
@@ -78,38 +78,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP; 
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 wreck = pow(GetParameter( kParam_One ),2);
-	Float64 randy;
-	Float64 HeadBump = 0.0;
-	Float64 HeadBumpFreq = 0.01/overallscale;
-	Float64 iirHPAmount = 0.0000014/overallscale;
-	Float64 altHPAmount = 1.0 - iirHPAmount;
-	Float64 inputSample;
-	Float64 tempSample;
-	Float64 bridgerectifier;
-	Float64 correction;
+	Float32 wreck = pow(GetParameter( kParam_One ),2);
+	Float32 randy;
+	Float32 HeadBump = 0.0f;
+	Float32 HeadBumpFreq = 0.01f/overallscale;
+	Float32 iirHPAmount = 0.0000014f/overallscale;
+	Float32 altHPAmount = 1.0f - iirHPAmount;
+	Float32 inputSample;
+	Float32 tempSample;
+	Float32 bridgerectifier;
+	Float32 correction;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		randy = (double(fpd)/UINT32_MAX);
+		randy = (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		randy += (double(fpd)/UINT32_MAX);
+		randy += (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		randy += (double(fpd)/UINT32_MAX);
+		randy += (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		randy += (double(fpd)/UINT32_MAX);
+		randy += (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		randy += (double(fpd)/UINT32_MAX);
+		randy += (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		randy += (double(fpd)/UINT32_MAX);
-		randy /= 6.0;
+		randy += (float(fpd)/UINT32_MAX);
+		randy /= 6.0f;
 		randy *= wreck; //0 to 1 the noise, may not be needed
 		//set up the noise
 		
@@ -167,17 +167,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		HeadBump -= correction;
 		//apply stored up tiny corrections
 		
-		HeadBump *= (1.0 - (wreck/2));
+		HeadBump *= (1.0f - (wreck/2));
 		
 		bridgerectifier = fabs(HeadBump);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		bridgerectifier = sin(bridgerectifier);
-		if (HeadBump > 0.0) HeadBump = bridgerectifier;
+		if (HeadBump > 0.0f) HeadBump = bridgerectifier;
 		else HeadBump = -bridgerectifier;
 		//clamp HeadBump to -1 to 1 with distortion		
 
-		inputSample *= (1.0 - wreck);
+		inputSample *= (1.0f - wreck);
 		inputSample += (HeadBump * wreck);
 		
 		//begin 32 bit floating point dither

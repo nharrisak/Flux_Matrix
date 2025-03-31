@@ -25,8 +25,8 @@ kParam0, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 iirSampleA;
-	Float64 iirSampleB;
+	Float32 iirSampleA;
+	Float32 iirSampleB;
 	bool flip;
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -40,21 +40,21 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double inputSampleL;
-	double inputSampleR;
-	double mid;
-	Float64 side;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	float inputSampleL;
+	float inputSampleR;
+	float mid;
+	Float32 side;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
+	Float32 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
 		//assign working variables
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		mid = inputSampleL + inputSampleR;
 		side = inputSampleL - inputSampleR;
@@ -71,17 +71,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		}
 		//highpass section
 		
-		inputSampleL = (mid+side)/2.0;
-		inputSampleR = (mid-side)/2.0;
+		inputSampleL = (mid+side)/2.0f;
+		inputSampleR = (mid-side)/2.0f;
 		flip = !flip;
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

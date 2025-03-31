@@ -33,22 +33,22 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquadA[11];
-		double biquadB[11];
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 fastIIRA;
-		Float64 fastIIRB;
-		Float64 slowIIRA;
-		Float64 slowIIRB;
-		Float64 lastRef[7];
+		float biquadA[11];
+		float biquadB[11];
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 fastIIRA;
+		Float32 fastIIRB;
+		Float32 slowIIRA;
+		Float32 slowIIRB;
+		Float32 lastRef[7];
 		int cycle;
 		int gcount;
 		bool flip;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[264];
+			Float32 d[264];
 	};
 	_dram* dram;
 };
@@ -62,24 +62,24 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	Float64 inputgain = pow(10.0,GetParameter( kParam_One )/20.0);
-	Float64 outputgain = pow(10.0,GetParameter( kParam_Three )/20.0);
-	Float64 ips = GetParameter( kParam_Two ) * 1.1;
+	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 outputgain = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 ips = GetParameter( kParam_Two ) * 1.1f;
 	//slight correction to dial in convincing ips settings
-	if (ips < 1 || ips > 200) ips=33.0;
+	if (ips < 1 || ips > 200) ips=33.0f;
 	//sanity checks are always key
-	Float64 iirAmount = ips/430.0; //for low leaning
-	Float64 fastTaper = ips/15.0;
-	Float64 slowTaper = 2.0/(ips*ips);
+	Float32 iirAmount = ips/430.0f; //for low leaning
+	Float32 fastTaper = ips/15.0f;
+	Float32 slowTaper = 2.0f/(ips*ips);
 	
 	iirAmount /= overallscale;
 	fastTaper /= overallscale;
@@ -88,60 +88,60 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	fastTaper *= cycleEnd;
 	slowTaper *= cycleEnd;
 	//because we're only running that part one sample in two, or three, or four
-	fastTaper += 1.0;
-	slowTaper += 1.0;
+	fastTaper += 1.0f;
+	slowTaper += 1.0f;
 	
-	biquadA[0] = 24000.0 / GetSampleRate();
-    biquadA[1] = 1.618033988749894848204586;
-	biquadB[0] = 24000.0 / GetSampleRate();
-    biquadB[1] = 0.618033988749894848204586;
+	biquadA[0] = 24000.0f / GetSampleRate();
+    biquadA[1] = 1.618033988749894848204586f;
+	biquadB[0] = 24000.0f / GetSampleRate();
+    biquadB[1] = 0.618033988749894848204586f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadB[0]); //lowpass
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		if (flip)
 		{
-			if (fabs(iirSampleA)<1.18e-37) iirSampleA = 0.0;
+			if (fabs(iirSampleA)<1.18e-37f) iirSampleA = 0.0f;
 			iirSampleA = (iirSampleA * (1 - iirAmount)) + (inputSample * iirAmount);
 			inputSample -= iirSampleA;
 		}
 		else
 		{
-			if (fabs(iirSampleB)<1.18e-37) iirSampleB = 0.0;
+			if (fabs(iirSampleB)<1.18e-37f) iirSampleB = 0.0f;
 			iirSampleB = (iirSampleB * (1 - iirAmount)) + (inputSample * iirAmount);
 			inputSample -= iirSampleB;
 		}
 		//do IIR highpass for leaning out
 		
-		if (biquadA[0] < 0.49999) {
-			double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		if (biquadA[0] < 0.49999f) {
+			float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 			biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = tempSample; 
 			biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1
 		}		
 		
-		if (inputgain != 1.0) inputSample *= inputgain;
+		if (inputgain != 1.0f) inputSample *= inputgain;
 		
-		double bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		float bridgerectifier = fabs(inputSample);
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;		
 		
 		cycle++;
@@ -151,13 +151,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		int count = gcount;
 		//increment the counter
 		
-		double temp;
+		float temp;
 		dram->d[count+131] = dram->d[count] = inputSample;
 			
 		if (flip)
 		{
-			if (fabs(fastIIRA)<1.18e-37) fastIIRA = 0.0;
-			if (fabs(slowIIRA)<1.18e-37) slowIIRA = 0.0;
+			if (fabs(fastIIRA)<1.18e-37f) fastIIRA = 0.0f;
+			if (fabs(slowIIRA)<1.18e-37f) slowIIRA = 0.0f;
 			fastIIRA = fastIIRA/fastTaper;
 			slowIIRA = slowIIRA/slowTaper;
 			//scale stuff down
@@ -204,8 +204,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		else
 		{
-			if (fabs(fastIIRB)<1.18e-37) fastIIRB = 0.0;
-			if (fabs(slowIIRB)<1.18e-37) slowIIRB = 0.0;
+			if (fabs(fastIIRB)<1.18e-37f) fastIIRB = 0.0f;
+			if (fabs(slowIIRB)<1.18e-37f) slowIIRB = 0.0f;
 			fastIIRB = fastIIRB/fastTaper;
 			slowIIRB = slowIIRB/slowTaper;
 			//scale stuff down
@@ -279,26 +279,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
 		//can use as an output limiter
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;
 		//second stage of overdrive to prevent overs and allow bloody loud extremeness
 		
-		if (biquadB[0] < 0.49999) {
-			double tempSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
+		if (biquadB[0] < 0.49999f) {
+			float tempSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 			biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = tempSample; 
 			biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		}
 		
-		if (outputgain != 1.0) inputSample *= outputgain;
+		if (outputgain != 1.0f) inputSample *= outputgain;
 		flip = !flip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

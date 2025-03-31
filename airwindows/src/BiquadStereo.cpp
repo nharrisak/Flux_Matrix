@@ -31,7 +31,7 @@ kParam0, kParam1, kParam2, kParam3, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double biquad[11];
+	float biquad[11];
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -43,23 +43,23 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int type = GetParameter( kParam_One);
 	
-	biquad[0] = GetParameter( kParam_Two )*0.499;
-	if (biquad[0] < 0.0001) biquad[0] = 0.0001;
+	biquad[0] = GetParameter( kParam_Two )*0.499f;
+	if (biquad[0] < 0.0001f) biquad[0] = 0.0001f;
 	
     biquad[1] = GetParameter( kParam_Three );
-	if (biquad[1] < 0.0001) biquad[1] = 0.0001;
+	if (biquad[1] < 0.0001f) biquad[1] = 0.0001f;
 	
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Four );
 	
 	//biquad contains these values:
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
 	//[2] is a0 but you need distinct ones for additional biquad instances so it's here
 	//[3] is a1 but you need distinct ones for additional biquad instances so it's here
 	//[4] is a2 but you need distinct ones for additional biquad instances so it's here
@@ -76,52 +76,52 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//or in 'reset' if the freq and res are absolutely fixed (use GetSampleRate to define freq)
 	
 	if (type == 1) { //lowpass
-		double K = tan(M_PI * biquad[0]);
-		double norm = 1.0 / (1.0 + K / biquad[1] + K * K);
+		float K = tan(M_PI * biquad[0]);
+		float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
 		biquad[2] = K * K * norm;
-		biquad[3] = 2.0 * biquad[2];
+		biquad[3] = 2.0f * biquad[2];
 		biquad[4] = biquad[2];
-		biquad[5] = 2.0 * (K * K - 1.0) * norm;
-		biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+		biquad[5] = 2.0f * (K * K - 1.0f) * norm;
+		biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 	}
 	
 	if (type == 2) { //highpass
-		double K = tan(M_PI * biquad[0]);
-		double norm = 1.0 / (1.0 + K / biquad[1] + K * K);
+		float K = tan(M_PI * biquad[0]);
+		float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
 		biquad[2] = norm;
-		biquad[3] = -2.0 * biquad[2];
+		biquad[3] = -2.0f * biquad[2];
 		biquad[4] = biquad[2];
-		biquad[5] = 2.0 * (K * K - 1.0) * norm;
-		biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+		biquad[5] = 2.0f * (K * K - 1.0f) * norm;
+		biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 	}
 	
 	if (type == 3) { //bandpass
-		double K = tan(M_PI * biquad[0]);
-		double norm = 1.0 / (1.0 + K / biquad[1] + K * K);
+		float K = tan(M_PI * biquad[0]);
+		float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
 		biquad[2] = K / biquad[1] * norm;
-		biquad[3] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+		biquad[3] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 		biquad[4] = -biquad[2];
-		biquad[5] = 2.0 * (K * K - 1.0) * norm;
-		biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+		biquad[5] = 2.0f * (K * K - 1.0f) * norm;
+		biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 	}
 	
 	if (type == 4) { //notch
-		double K = tan(M_PI * biquad[0]);
-		double norm = 1.0 / (1.0 + K / biquad[1] + K * K);
-		biquad[2] = (1.0 + K * K) * norm;
-		biquad[3] = 2.0 * (K * K - 1) * norm;
+		float K = tan(M_PI * biquad[0]);
+		float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
+		biquad[2] = (1.0f + K * K) * norm;
+		biquad[3] = 2.0f * (K * K - 1) * norm;
 		biquad[4] = biquad[2];
 		biquad[5] = biquad[3];
-		biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+		biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 	}
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
 		
 		inputSampleL = sin(inputSampleL);
@@ -129,57 +129,57 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//encode Console5: good cleanness
 		
 		/*
-		double mid = inputSampleL + inputSampleR;
-		double side = inputSampleL - inputSampleR;
+		float mid = inputSampleL + inputSampleR;
+		float side = inputSampleL - inputSampleR;
 		//assign mid and side.Between these sections, you can do mid/side processing
 		
-		double tempSampleM = (mid * biquad[2]) + biquad[7];
+		float tempSampleM = (mid * biquad[2]) + biquad[7];
 		biquad[7] = (mid * biquad[3]) - (tempSampleM * biquad[5]) + biquad[8];
 		biquad[8] = (mid * biquad[4]) - (tempSampleM * biquad[6]);
 		mid = tempSampleM; //like mono AU, 7 and 8 store mid channel
 		
-		double tempSampleS = (side * biquad[2]) + biquad[9];
+		float tempSampleS = (side * biquad[2]) + biquad[9];
 		biquad[9] = (side * biquad[3]) - (tempSampleS * biquad[5]) + biquad[10];
 		biquad[10] = (side * biquad[4]) - (tempSampleS * biquad[6]);
 		inputSampleR = tempSampleS; //note: 9 and 10 store the side channel		
 		
-		inputSampleL = (mid+side)/2.0;
-		inputSampleR = (mid-side)/2.0;
+		inputSampleL = (mid+side)/2.0f;
+		inputSampleR = (mid-side)/2.0f;
 		//unassign mid and side
 		*/
 		
-		double tempSampleL = (inputSampleL * biquad[2]) + biquad[7];
+		float tempSampleL = (inputSampleL * biquad[2]) + biquad[7];
 		biquad[7] = (inputSampleL * biquad[3]) - (tempSampleL * biquad[5]) + biquad[8];
 		biquad[8] = (inputSampleL * biquad[4]) - (tempSampleL * biquad[6]);
 		inputSampleL = tempSampleL; //like mono AU, 7 and 8 store L channel
 
-		double tempSampleR = (inputSampleR * biquad[2]) + biquad[9];
+		float tempSampleR = (inputSampleR * biquad[2]) + biquad[9];
 		biquad[9] = (inputSampleR * biquad[3]) - (tempSampleR * biquad[5]) + biquad[10];
 		biquad[10] = (inputSampleR * biquad[4]) - (tempSampleR * biquad[6]);
 		inputSampleR = tempSampleR; //note: 9 and 10 store the R channel
 		
-		if (inputSampleL > 1.0) inputSampleL = 1.0;
-		if (inputSampleL < -1.0) inputSampleL = -1.0;
-		if (inputSampleR > 1.0) inputSampleR = 1.0;
-		if (inputSampleR < -1.0) inputSampleR = -1.0;
+		if (inputSampleL > 1.0f) inputSampleL = 1.0f;
+		if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+		if (inputSampleR > 1.0f) inputSampleR = 1.0f;
+		if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSampleL = asin(inputSampleL);
 		inputSampleR = asin(inputSampleR);
 		//amplitude aspect
 		
-		if (wet < 1.0) {
-			inputSampleL = (inputSampleL*wet) + (drySampleL*(1.0-fabs(wet)));
-			inputSampleR = (inputSampleR*wet) + (drySampleR*(1.0-fabs(wet)));
+		if (wet < 1.0f) {
+			inputSampleL = (inputSampleL*wet) + (drySampleL*(1.0f-fabs(wet)));
+			inputSampleR = (inputSampleR*wet) + (drySampleR*(1.0f-fabs(wet)));
 			//inv/dry/wet lets us turn LP into HP and band into notch
 		}
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

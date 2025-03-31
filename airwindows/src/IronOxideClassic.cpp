@@ -33,19 +33,19 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 fastIIRA;
-		Float64 fastIIRB;
-		Float64 slowIIRA;
-		Float64 slowIIRB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 fastIIRA;
+		Float32 fastIIRB;
+		Float32 slowIIRA;
+		Float32 slowIIRB;
 		SInt32 gcount;
 		
 		uint32_t fpd;
 		bool fpFlip;
 	
 	struct _dram {
-			Float64 d[264];
+			Float32 d[264];
 	};
 	_dram* dram;
 };
@@ -60,35 +60,35 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 inputgain = pow(10.0,GetParameter( kParam_One )/20.0);
-	Float64 outputgain = pow(10.0,GetParameter( kParam_Three )/20.0);
-	Float64 ips = GetParameter( kParam_Two ) * 1.1;
+	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 outputgain = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 ips = GetParameter( kParam_Two ) * 1.1f;
 	//slight correction to dial in convincing ips settings
-	if (ips < 1 || ips > 200){ips=33.0;}
+	if (ips < 1 || ips > 200){ips=33.0f;}
 	//sanity checks are always key
-	Float64 iirAmount = ips/430.0; //for low leaning
-	Float64 bridgerectifier;
-	Float64 fastTaper = ips/15.0;
-	Float64 slowTaper = 2.0/(ips*ips);
-	Float64 lowspeedscale = (5.0/ips);
-	double inputSample;
+	Float32 iirAmount = ips/430.0f; //for low leaning
+	Float32 bridgerectifier;
+	Float32 fastTaper = ips/15.0f;
+	Float32 slowTaper = 2.0f/(ips*ips);
+	Float32 lowspeedscale = (5.0f/ips);
+	float inputSample;
 	SInt32 count;
-	Float64 temp;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 temp;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	if (overallscale == 0) {fastTaper += 1.0; slowTaper += 1.0;}
+	if (overallscale == 0) {fastTaper += 1.0f; slowTaper += 1.0f;}
 	else
 	{
 		iirAmount /= overallscale;
 		lowspeedscale *= overallscale;
-		fastTaper = 1.0 + (fastTaper / overallscale);
-		slowTaper = 1.0 + (slowTaper / overallscale);
+		fastTaper = 1.0f + (fastTaper / overallscale);
+		slowTaper = 1.0f + (slowTaper / overallscale);
 	}
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 				
 		if (fpFlip)
 		{
@@ -102,12 +102,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		//do IIR highpass for leaning out
 		
-		if (inputgain != 1.0) inputSample *= inputgain;
+		if (inputgain != 1.0f) inputSample *= inputgain;
 		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;		
 		
 		if (gcount < 0 || gcount > 131) {gcount = 131;}
@@ -211,20 +211,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample /= lowspeedscale;
 		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
 		//can use as an output limiter
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;
 		//second stage of overdrive to prevent overs and allow bloody loud extremeness
 		
-		if (outputgain != 1.0) inputSample *= outputgain;
+		if (outputgain != 1.0f) inputSample *= outputgain;
 		fpFlip = !fpFlip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -35,7 +35,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[1503];
+			Float32 d[1503];
 	};
 	_dram* dram;
 };
@@ -51,23 +51,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	
 	int allpasstemp;
-	Float64 outallpass = 0.618033988749894848204586; //golden ratio!
-	//if you see 0.6180 it's not a wild stretch to wonder whether you are working with a constant
-	int maxdelayTarget = (int)(pow(GetParameter( kParam_One ),3)*1501.0);
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 outallpass = 0.618033988749894848204586f; //golden ratio!
+	//if you see 0.6180f it's not a wild stretch to wonder whether you are working with a constant
+	int maxdelayTarget = (int)(pow(GetParameter( kParam_One ),3)*1501.0f);
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
-	Float64 bridgerectifier;
+	Float32 bridgerectifier;
 	
-	double inputSample;
-	double drySample;
+	float inputSample;
+	float drySample;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
-		inputSample /= 4.0;
+		inputSample /= 4.0f;
 		bridgerectifier = fabs(inputSample);
 		bridgerectifier = sin(bridgerectifier);
 		if (inputSample > 0) inputSample = bridgerectifier;
@@ -75,10 +75,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		if (fabs(maxdelay - maxdelayTarget) > 1500) maxdelay = maxdelayTarget;
 		if (maxdelay < maxdelayTarget)
-		{maxdelay++; dram->d[maxdelay] = (dram->d[0]+dram->d[maxdelay-1]) / 2.0;}
+		{maxdelay++; dram->d[maxdelay] = (dram->d[0]+dram->d[maxdelay-1]) / 2.0f;}
 		
 		if (maxdelay > maxdelayTarget)
-		{maxdelay--; dram->d[maxdelay] = (dram->d[0]+dram->d[maxdelay]) / 2.0;}
+		{maxdelay--; dram->d[maxdelay] = (dram->d[0]+dram->d[maxdelay]) / 2.0f;}
 		
 		allpasstemp = one - 1;
 		if (allpasstemp < 0 || allpasstemp > maxdelay) {allpasstemp = maxdelay;}
@@ -89,16 +89,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += (dram->d[one]);
 		
 		bridgerectifier = fabs(inputSample);
-		bridgerectifier = 1.0-cos(bridgerectifier);
+		bridgerectifier = 1.0f-cos(bridgerectifier);
 		if (inputSample > 0) inputSample -= bridgerectifier;
 		else inputSample += bridgerectifier;
-		inputSample *= 4.0;
-		if (wet < 1.0) inputSample = (drySample * (1.0-wet))+(inputSample * wet);
+		inputSample *= 4.0f;
+		if (wet < 1.0f) inputSample = (drySample * (1.0f-wet))+(inputSample * wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

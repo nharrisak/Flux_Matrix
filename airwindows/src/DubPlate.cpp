@@ -22,15 +22,15 @@ static const uint8_t page1[] = {
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
 
-	double iirA;
-	double iirB; //first stage is the flipping one, for lowest slope. It is always engaged, and is the highest one
-	double iirC; //we introduce the second pole at the same frequency, to become a pseudo-Capacitor behavior
-	double iirD; //then there's a Mid highpass.
+	float iirA;
+	float iirB; //first stage is the flipping one, for lowest slope. It is always engaged, and is the highest one
+	float iirC; //we introduce the second pole at the same frequency, to become a pseudo-Capacitor behavior
+	float iirD; //then there's a Mid highpass.
 	bool fpFlip;
-	double lastSinewAL;
-	double lastSinewAR;
-	double lastSinewBL;
-	double lastSinewBR;
+	float lastSinewAL;
+	float lastSinewAR;
+	float lastSinewBL;
+	float lastSinewBR;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -42,88 +42,88 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double rangescale = 0.1 / overallscale;
-	double iirSide = 0.287496 * rangescale;
-	double iirMid = 0.20123 * rangescale;
-	double threshSinewA = 0.15 / overallscale;
-	double threshSinewB = 0.127 / overallscale;
+	float rangescale = 0.1f / overallscale;
+	float iirSide = 0.287496f * rangescale;
+	float iirMid = 0.20123f * rangescale;
+	float threshSinewA = 0.15f / overallscale;
+	float threshSinewB = 0.127f / overallscale;
 		
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		double mid = inputSampleL + inputSampleR;
-		double side = inputSampleL - inputSampleR;
+		float mid = inputSampleL + inputSampleR;
+		float side = inputSampleL - inputSampleR;
 		//assign mid and side.Between these sections, you can do mid/side processing
-		double temp = side;
-		double correction;
+		float temp = side;
+		float correction;
 		
 		if (fpFlip) {
-			iirA = (iirA * (1.0 - iirSide)) + (temp * iirSide); temp -= iirA; correction = iirA;
+			iirA = (iirA * (1.0f - iirSide)) + (temp * iirSide); temp -= iirA; correction = iirA;
 		} else {
-			iirB = (iirB * (1.0 - iirSide)) + (temp * iirSide); temp -= iirB; correction = iirB;
+			iirB = (iirB * (1.0f - iirSide)) + (temp * iirSide); temp -= iirB; correction = iirB;
 		}
-		iirC = (iirC * (1.0 - iirSide)) + (temp * iirSide); temp -= iirC; correction += (iirC * 0.162);
+		iirC = (iirC * (1.0f - iirSide)) + (temp * iirSide); temp -= iirC; correction += (iirC * 0.162f);
 
 		side -= sin(correction);
 		fpFlip = !fpFlip;
 		
-		iirD = (iirD * (1.0 - iirMid)) + (mid * iirMid);
+		iirD = (iirD * (1.0f - iirMid)) + (mid * iirMid);
 		mid -= sin(iirD);
 		//gonna cut those lows a hair
 				
-		inputSampleL = (mid+side)/2.0;
-		inputSampleR = (mid-side)/2.0;
+		inputSampleL = (mid+side)/2.0f;
+		inputSampleR = (mid-side)/2.0f;
 		//unassign mid and side
 		
 		temp = inputSampleL;
-		double sinew = threshSinewA * cos(lastSinewAL*lastSinewAL);
+		float sinew = threshSinewA * cos(lastSinewAL*lastSinewAL);
 		if (inputSampleL - lastSinewAL > sinew) temp = lastSinewAL + sinew;
 		if (-(inputSampleL - lastSinewAL) > sinew) temp = lastSinewAL - sinew;
 		lastSinewAL = temp;
-		if (lastSinewAL > 1.0) lastSinewAL = 1.0;
-		if (lastSinewAL < -1.0) lastSinewAL = -1.0;
-		inputSampleL = (inputSampleL * 0.5)+(lastSinewAL * 0.5);
+		if (lastSinewAL > 1.0f) lastSinewAL = 1.0f;
+		if (lastSinewAL < -1.0f) lastSinewAL = -1.0f;
+		inputSampleL = (inputSampleL * 0.5f)+(lastSinewAL * 0.5f);
 		
 		sinew = threshSinewB * cos(lastSinewBL*lastSinewBL);
 		if (inputSampleL - lastSinewBL > sinew) temp = lastSinewBL + sinew;
 		if (-(inputSampleL - lastSinewBL) > sinew) temp = lastSinewBL - sinew;
 		lastSinewBL = temp;
-		if (lastSinewBL > 1.0) lastSinewBL = 1.0;
-		if (lastSinewBL < -1.0) lastSinewBL = -1.0;
-		inputSampleL = (inputSampleL * 0.414)+(lastSinewBL * 0.586);
+		if (lastSinewBL > 1.0f) lastSinewBL = 1.0f;
+		if (lastSinewBL < -1.0f) lastSinewBL = -1.0f;
+		inputSampleL = (inputSampleL * 0.414f)+(lastSinewBL * 0.586f);
 				
 		temp = inputSampleR;
 		sinew = threshSinewA * cos(lastSinewAR*lastSinewAR);
 		if (inputSampleR - lastSinewAR > sinew) temp = lastSinewAR + sinew;
 		if (-(inputSampleR - lastSinewAR) > sinew) temp = lastSinewAR - sinew;
 		lastSinewAR = temp;
-		if (lastSinewAR > 1.0) lastSinewAR = 1.0;
-		if (lastSinewAR < -1.0) lastSinewAR = -1.0;
-		inputSampleR = (inputSampleR * 0.5)+(lastSinewAR * 0.5);
+		if (lastSinewAR > 1.0f) lastSinewAR = 1.0f;
+		if (lastSinewAR < -1.0f) lastSinewAR = -1.0f;
+		inputSampleR = (inputSampleR * 0.5f)+(lastSinewAR * 0.5f);
 				
 		sinew = threshSinewB * cos(lastSinewBR*lastSinewBR);
 		if (inputSampleR - lastSinewBR > sinew) temp = lastSinewBR + sinew;
 		if (-(inputSampleR - lastSinewBR) > sinew) temp = lastSinewBR - sinew;
 		lastSinewBR = temp;
-		if (lastSinewBR > 1.0) lastSinewBR = 1.0;
-		if (lastSinewBR < -1.0) lastSinewBR = -1.0;
-		inputSampleR = (inputSampleR * 0.414)+(lastSinewBR * 0.586);
+		if (lastSinewBR > 1.0f) lastSinewBR = 1.0f;
+		if (lastSinewBR < -1.0f) lastSinewBR = -1.0f;
+		inputSampleR = (inputSampleR * 0.414f)+(lastSinewBR * 0.586f);
 		//run Sinew to stop excess slews, two layers to make it more audible
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

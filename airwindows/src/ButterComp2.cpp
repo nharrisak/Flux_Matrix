@@ -33,13 +33,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double controlApos;
-		double controlAneg;
-		double controlBpos;
-		double controlBneg;
-		double targetpos;
-		double targetneg;
-		double lastOutput;
+		float controlApos;
+		float controlAneg;
+		float controlBpos;
+		float controlBneg;
+		float targetpos;
+		float targetneg;
+		float lastOutput;
 		bool flip;
 		uint32_t fpd;
 	
@@ -57,52 +57,52 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 2.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 2.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 inputgain = pow(10.0,(GetParameter( kParam_One )*14.0)/20.0);
-	Float64 compfactor = 0.012 * (GetParameter( kParam_One ) / 135.0);
-	Float64 output = GetParameter( kParam_Two );
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 inputgain = pow(10.0f,(GetParameter( kParam_One )*14.0f)/20.0f);
+	Float32 compfactor = 0.012f * (GetParameter( kParam_One ) / 135.0f);
+	Float32 output = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Three );
 	//removed unnecessary dry variable
-	Float64 outputgain = inputgain;
-	outputgain -= 1.0;
-	outputgain /= 1.5;
-	outputgain += 1.0;
+	Float32 outputgain = inputgain;
+	outputgain -= 1.0f;
+	outputgain /= 1.5f;
+	outputgain += 1.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		inputSample *= inputgain;
 		
-		double divisor = compfactor / (1.0+fabs(lastOutput));
+		float divisor = compfactor / (1.0f+fabs(lastOutput));
 		//this is slowing compressor recovery while output waveforms were high
 		divisor /= overallscale;
-		double remainder = divisor;
-		divisor = 1.0 - divisor;
+		float remainder = divisor;
+		divisor = 1.0f - divisor;
 		//recalculate divisor every sample
 		
-		double inputpos = inputSample + 1.0;
-		if (inputpos < 0.0) inputpos = 0.0;
-		double outputpos = inputpos / 2.0;
-		if (outputpos > 1.0) outputpos = 1.0;		
+		float inputpos = inputSample + 1.0f;
+		if (inputpos < 0.0f) inputpos = 0.0f;
+		float outputpos = inputpos / 2.0f;
+		if (outputpos > 1.0f) outputpos = 1.0f;		
 		inputpos *= inputpos;
 		targetpos *= divisor;
 		targetpos += (inputpos * remainder);
-		double calcpos = pow((1.0/targetpos),2);
+		float calcpos = pow((1.0f/targetpos),2);
 		
-		double inputneg = (-inputSample) + 1.0;
-		if (inputneg < 0.0) inputneg = 0.0;
-		double outputneg = inputneg / 2.0;
-		if (outputneg > 1.0) outputneg = 1.0;		
+		float inputneg = (-inputSample) + 1.0f;
+		if (inputneg < 0.0f) inputneg = 0.0f;
+		float outputneg = inputneg / 2.0f;
+		if (outputneg > 1.0f) outputneg = 1.0f;		
 		inputneg *= inputneg;
 		targetneg *= divisor;
 		targetneg += (inputneg * remainder);
-		double calcneg = pow((1.0/targetneg),2);
+		float calcneg = pow((1.0f/targetneg),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		
@@ -135,7 +135,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		//this causes each of the four to update only when active and in the correct 'flip'
 		
-		double totalmultiplier;
+		float totalmultiplier;
 		if (flip)
 		{totalmultiplier = (controlApos * outputpos) + (controlAneg * outputneg);}
 		else
@@ -145,12 +145,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample *= totalmultiplier;
 		inputSample /= outputgain;
 		
-		if (output != 1.0) {
+		if (output != 1.0f) {
 			inputSample *= output;
 		}
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
@@ -162,7 +162,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

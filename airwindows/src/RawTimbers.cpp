@@ -35,8 +35,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastSample;
-		Float64 lastSample2;
+		Float32 lastSample;
+		Float32 lastSample2;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -57,31 +57,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	
 	while (nSampleFrames-- > 0) {
 		
-		Float64 inputSample = *sourceP;
+		Float32 inputSample = *sourceP;
 
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		
-		Float64 outputSample;
+		Float32 outputSample;
 		
 		inputSample *= scaleFactor; //0-1 is now one bit
 		
-		inputSample += 0.381966011250105;
+		inputSample += 0.381966011250105f;
 		
 		if ((lastSample+lastSample) >= (inputSample+lastSample2)) outputSample = floor(lastSample);
-		else outputSample = floor(lastSample+1.0); //round down or up based on whether it softens treble angles
+		else outputSample = floor(lastSample+1.0f); //round down or up based on whether it softens treble angles
 		
 		lastSample2 = lastSample;
 		lastSample = inputSample; //we retain three samples in a row

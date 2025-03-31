@@ -46,8 +46,8 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double highpass[hilp_total];
-		double lowpass[hilp_total];
+			float highpass[hilp_total];
+		float lowpass[hilp_total];
 	};
 	_dram* dram;
 };
@@ -61,53 +61,53 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	dram->highpass[hilp_freq] = ((GetParameter( kParam_HIP )*330.0)+20.0)/GetSampleRate();
-	bool highpassEngage = true; if (GetParameter( kParam_HIP ) == 0.0) highpassEngage = false;
+	dram->highpass[hilp_freq] = ((GetParameter( kParam_HIP )*330.0f)+20.0f)/GetSampleRate();
+	bool highpassEngage = true; if (GetParameter( kParam_HIP ) == 0.0f) highpassEngage = false;
 	
-	dram->lowpass[hilp_freq] = ((pow(1.0-GetParameter( kParam_LOP ),2)*17000.0)+3000.0)/GetSampleRate();
-	bool lowpassEngage = true; if (GetParameter( kParam_LOP ) == 0.0) lowpassEngage = false;
+	dram->lowpass[hilp_freq] = ((pow(1.0f-GetParameter( kParam_LOP ),2)*17000.0f)+3000.0f)/GetSampleRate();
+	bool lowpassEngage = true; if (GetParameter( kParam_LOP ) == 0.0f) lowpassEngage = false;
 	
-	double K = tan(M_PI * dram->highpass[hilp_freq]); //highpass
-	double norm = 1.0 / (1.0 + K / 1.93185165 + K * K);
+	float K = tan(M_PI * dram->highpass[hilp_freq]); //highpass
+	float norm = 1.0f / (1.0f + K / 1.93185165f + K * K);
 	dram->highpass[hilp_a0] = norm;
-	dram->highpass[hilp_a1] = -2.0 * dram->highpass[hilp_a0];
-	dram->highpass[hilp_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->highpass[hilp_b2] = (1.0 - K / 1.93185165 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.70710678 + K * K);
+	dram->highpass[hilp_a1] = -2.0f * dram->highpass[hilp_a0];
+	dram->highpass[hilp_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->highpass[hilp_b2] = (1.0f - K / 1.93185165f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.70710678f + K * K);
 	dram->highpass[hilp_c0] = norm;
-	dram->highpass[hilp_c1] = -2.0 * dram->highpass[hilp_c0];
-	dram->highpass[hilp_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->highpass[hilp_d2] = (1.0 - K / 0.70710678 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.51763809 + K * K);
+	dram->highpass[hilp_c1] = -2.0f * dram->highpass[hilp_c0];
+	dram->highpass[hilp_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->highpass[hilp_d2] = (1.0f - K / 0.70710678f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.51763809f + K * K);
 	dram->highpass[hilp_e0] = norm;
-	dram->highpass[hilp_e1] = -2.0 * dram->highpass[hilp_e0];
-	dram->highpass[hilp_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->highpass[hilp_f2] = (1.0 - K / 0.51763809 + K * K) * norm;
+	dram->highpass[hilp_e1] = -2.0f * dram->highpass[hilp_e0];
+	dram->highpass[hilp_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->highpass[hilp_f2] = (1.0f - K / 0.51763809f + K * K) * norm;
 		
 	K = tan(M_PI * dram->lowpass[hilp_freq]); //lowpass
-	norm = 1.0 / (1.0 + K / 1.93185165 + K * K);
+	norm = 1.0f / (1.0f + K / 1.93185165f + K * K);
 	dram->lowpass[hilp_a0] = K * K * norm;
-	dram->lowpass[hilp_a1] = 2.0 * dram->lowpass[hilp_a0];
-	dram->lowpass[hilp_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lowpass[hilp_b2] = (1.0 - K / 1.93185165 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.70710678 + K * K);
+	dram->lowpass[hilp_a1] = 2.0f * dram->lowpass[hilp_a0];
+	dram->lowpass[hilp_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lowpass[hilp_b2] = (1.0f - K / 1.93185165f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.70710678f + K * K);
 	dram->lowpass[hilp_c0] = K * K * norm;
-	dram->lowpass[hilp_c1] = 2.0 * dram->lowpass[hilp_c0];
-	dram->lowpass[hilp_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lowpass[hilp_d2] = (1.0 - K / 0.70710678 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.51763809 + K * K);
+	dram->lowpass[hilp_c1] = 2.0f * dram->lowpass[hilp_c0];
+	dram->lowpass[hilp_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lowpass[hilp_d2] = (1.0f - K / 0.70710678f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.51763809f + K * K);
 	dram->lowpass[hilp_e0] = K * K * norm;
-	dram->lowpass[hilp_e1] = 2.0 * dram->lowpass[hilp_e0];
-	dram->lowpass[hilp_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lowpass[hilp_f2] = (1.0 - K / 0.51763809 + K * K) * norm;
+	dram->lowpass[hilp_e1] = 2.0f * dram->lowpass[hilp_e0];
+	dram->lowpass[hilp_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lowpass[hilp_f2] = (1.0f - K / 0.51763809f + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		if (highpassEngage) { //begin Stacked Highpass
 			dram->highpass[hilp_temp] = (inputSample*dram->highpass[hilp_a0])+dram->highpass[hilp_aL1];
@@ -120,7 +120,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			dram->highpass[hilp_eL1] = (inputSample*dram->highpass[hilp_e1])-(dram->highpass[hilp_temp]*dram->highpass[hilp_f1])+dram->highpass[hilp_eL2];
 			dram->highpass[hilp_eL2] = (inputSample*dram->highpass[hilp_e0])-(dram->highpass[hilp_temp]*dram->highpass[hilp_f2]); inputSample = dram->highpass[hilp_temp];
 		} else {
-			dram->highpass[hilp_aL1] = dram->highpass[hilp_aL2] = 0.0;
+			dram->highpass[hilp_aL1] = dram->highpass[hilp_aL2] = 0.0f;
 		} //end Stacked Highpass
 		
 		//rest of control strip goes here
@@ -140,7 +140,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

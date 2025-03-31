@@ -26,9 +26,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double noiseShaping;
-		Float64 lastSample;
-		Float64 lastSample2;
+		float noiseShaping;
+		Float32 lastSample;
+		Float32 lastSample2;
 	
 	struct _dram {
 		};
@@ -47,13 +47,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	while (nSampleFrames-- > 0) {
 		
-		Float64 inputSample = *sourceP * 32768.0; //0-1 is now one bit
-		Float64 outputSample;
+		Float32 inputSample = *sourceP * 32768.0f; //0-1 is now one bit
+		Float32 outputSample;
 		
-		lastSample -= (noiseShaping*0.125);
+		lastSample -= (noiseShaping*0.125f);
 		
 		if ((lastSample+lastSample) >= (inputSample+lastSample2)) outputSample = floor(lastSample);
-		else outputSample = floor(lastSample+1.0); //round down or up based on whether it softens treble angles
+		else outputSample = floor(lastSample+1.0f); //round down or up based on whether it softens treble angles
 		
 		lastSample2 = lastSample;
 		lastSample = inputSample; //we retain three samples in a row
@@ -61,16 +61,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		noiseShaping += outputSample;
 		noiseShaping -= lastSample;
 		
-		if (outputSample > 32760.0) {
-			outputSample = 32760.0;
-			noiseShaping *= 0.5;
+		if (outputSample > 32760.0f) {
+			outputSample = 32760.0f;
+			noiseShaping *= 0.5f;
 		}
-		if (outputSample < -32760.0) {
-			outputSample = -32760.0;
-			noiseShaping *= 0.5;
+		if (outputSample < -32760.0f) {
+			outputSample = -32760.0f;
+			noiseShaping *= 0.5f;
 		}
 
-		*destP = outputSample / 32768.0; //scale it back down to 16 bit resolution
+		*destP = outputSample / 32768.0f; //scale it back down to 16 bit resolution
 		
 		sourceP += inNumChannels;
 		destP += inNumChannels;

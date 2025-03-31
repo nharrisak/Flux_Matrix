@@ -31,10 +31,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double trebleA[9];
-		double trebleB[9];
-		double bassA[9];
-		double bassB[9];
+		float trebleA[9];
+		float trebleB[9];
+		float bassA[9];
+		float bassB[9];
 		bool flip;
 		uint32_t fpd;
 	
@@ -53,40 +53,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double trebleGain = pow(10.0,GetParameter( kParam_One )/20.0);
-	double trebleFreq = (4410.0*trebleGain)/GetSampleRate();
-	if (trebleFreq > 0.45) trebleFreq = 0.45;
+	float trebleGain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	float trebleFreq = (4410.0f*trebleGain)/GetSampleRate();
+	if (trebleFreq > 0.45f) trebleFreq = 0.45f;
 	trebleA[0] = trebleB[0] = trebleFreq;
-	double bassGain = pow(10.0,GetParameter( kParam_Two )/20.0);
-	double bassFreq = pow(10.0,-GetParameter( kParam_Two )/20.0);
-	bassFreq = (8820.0*bassFreq)/GetSampleRate();
-	if (bassFreq > 0.45) bassFreq = 0.45;
+	float bassGain = pow(10.0f,GetParameter( kParam_Two )/20.0f);
+	float bassFreq = pow(10.0f,-GetParameter( kParam_Two )/20.0f);
+	bassFreq = (8820.0f*bassFreq)/GetSampleRate();
+	if (bassFreq > 0.45f) bassFreq = 0.45f;
 	bassA[0] = bassB[0] = bassFreq;
-    trebleA[1] = trebleB[1] = 0.4;
-    bassA[1] = bassB[1] = 0.2;
+    trebleA[1] = trebleB[1] = 0.4f;
+    bassA[1] = bassB[1] = 0.2f;
 	
-	double K = tan(M_PI * trebleA[0]);
-	double norm = 1.0 / (1.0 + K / trebleA[1] + K * K);
+	float K = tan(M_PI * trebleA[0]);
+	float norm = 1.0f / (1.0f + K / trebleA[1] + K * K);
 	trebleB[2] = trebleA[2] = K * K * norm;
-	trebleB[3] = trebleA[3] = 2.0 * trebleA[2];
+	trebleB[3] = trebleA[3] = 2.0f * trebleA[2];
 	trebleB[4] = trebleA[4] = trebleA[2];
-	trebleB[5] = trebleA[5] = 2.0 * (K * K - 1.0) * norm;
-	trebleB[6] = trebleA[6] = (1.0 - K / trebleA[1] + K * K) * norm;
+	trebleB[5] = trebleA[5] = 2.0f * (K * K - 1.0f) * norm;
+	trebleB[6] = trebleA[6] = (1.0f - K / trebleA[1] + K * K) * norm;
 	
 	K = tan(M_PI * bassA[0]);
-	norm = 1.0 / (1.0 + K / bassA[1] + K * K);
+	norm = 1.0f / (1.0f + K / bassA[1] + K * K);
 	bassB[2] = bassA[2] = K * K * norm;
-	bassB[3] = bassA[3] = 2.0 * bassA[2];
+	bassB[3] = bassA[3] = 2.0f * bassA[2];
 	bassB[4] = bassA[4] = bassA[2];
-	bassB[5] = bassA[5] = 2.0 * (K * K - 1.0) * norm;
-	bassB[6] = bassA[6] = (1.0 - K / bassA[1] + K * K) * norm;
+	bassB[5] = bassA[5] = 2.0f * (K * K - 1.0f) * norm;
+	bassB[6] = bassA[6] = (1.0f - K / bassA[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 						
-		double trebleSample;
-		double bassSample;
+		float trebleSample;
+		float bassSample;
 		if (flip)
 		{
 			trebleSample = (inputSample * trebleA[2]) + trebleA[7];
@@ -118,7 +118,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

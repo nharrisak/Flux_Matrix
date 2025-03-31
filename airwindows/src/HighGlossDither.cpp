@@ -45,7 +45,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double inputSample;
+	float inputSample;
 	int hotbinA;
 
 	while (nSampleFrames-- > 0) {
@@ -53,7 +53,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		
-		inputSample *= 8388608.0;
+		inputSample *= 8388608.0f;
 		//0-1 is now one bit, now we dither
 		
 		Position += 1;
@@ -68,14 +68,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		hotbinA = hotbinA % 173; //% is C++ mod operator
 		hotbinA *= hotbinA;
 		hotbinA = hotbinA % 17;
-		hotbinA *= 0.0635;
+		hotbinA *= 0.0635f;
 		if (flip) hotbinA = -hotbinA;
 		inputSample += hotbinA;
 		inputSample = floor(inputSample);
 		//Quadratic dither
 		flip = !flip;
 		
-		inputSample /= 8388608.0;
+		inputSample /= 8388608.0f;
 		*destP = inputSample;
 		sourceP += inNumChannels; destP += inNumChannels;
 	}

@@ -29,40 +29,40 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 ataLast6Sample;
-		Float64 ataLast5Sample;
-		Float64 ataLast4Sample;
-		Float64 ataLast3Sample;
-		Float64 ataLast2Sample;
-		Float64 ataLast1Sample;
-		Float64 ataHalfwaySample;
-		Float64 ataHalfDrySample;
-		Float64 ataHalfDiffSample;
-		Float64 ataLastDiffSample;
-		Float64 ataDrySample;
-		Float64 ataDiffSample;
-		Float64 ataPrevDiffSample;
-		Float64 ataK1;
-		Float64 ataK2;
-		Float64 ataK3;
-		Float64 ataK4;
-		Float64 ataK5;
-		Float64 ataK6;
-		Float64 ataK7;
-		Float64 ataK8; //end antialiasing variables
-		Float64 lastSample;
-		Float64 lastOutSample;
-		Float64 lastOut2Sample;
-		Float64 lastOut3Sample;
-		Float64 lpDepth;
-		Float64 overshoot;
-		Float64 overall;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
+		Float32 ataLast6Sample;
+		Float32 ataLast5Sample;
+		Float32 ataLast4Sample;
+		Float32 ataLast3Sample;
+		Float32 ataLast2Sample;
+		Float32 ataLast1Sample;
+		Float32 ataHalfwaySample;
+		Float32 ataHalfDrySample;
+		Float32 ataHalfDiffSample;
+		Float32 ataLastDiffSample;
+		Float32 ataDrySample;
+		Float32 ataDiffSample;
+		Float32 ataPrevDiffSample;
+		Float32 ataK1;
+		Float32 ataK2;
+		Float32 ataK3;
+		Float32 ataK4;
+		Float32 ataK5;
+		Float32 ataK6;
+		Float32 ataK7;
+		Float32 ataK8; //end antialiasing variables
+		Float32 lastSample;
+		Float32 lastOutSample;
+		Float32 lastOut2Sample;
+		Float32 lastOut3Sample;
+		Float32 lpDepth;
+		Float32 overshoot;
+		Float32 overall;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
 		bool flip;
-		Float64 fpNShape;
+		Float32 fpNShape;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -79,42 +79,42 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 softness = 0.484416;
-	Float64 hardness = 1.0 - softness;
+	Float32 softness = 0.484416f;
+	Float32 hardness = 1.0f - softness;
 	
-	Float64 iirAmount = GetParameter( kParam_One )/8000.0;
+	Float32 iirAmount = GetParameter( kParam_One )/8000.0f;
 	
 	iirAmount /= overallscale;
-	Float64 altAmount = (1.0 - iirAmount);
+	Float32 altAmount = (1.0f - iirAmount);
 	
-	Float64 cancelnew = 0.0682276;
-	Float64 cancelold = 1.0 - cancelnew;
+	Float32 cancelnew = 0.0682276f;
+	Float32 cancelold = 1.0f - cancelnew;
 	
-	Float64 maxRecent;
+	Float32 maxRecent;
 	
-	Float64 lpSpeed = 0.0009;
+	Float32 lpSpeed = 0.0009f;
 
-	Float64 cliplevel = 0.98;
+	Float32 cliplevel = 0.98f;
 	
-	Float64 refclip = 0.5; //preset to cut out gain quite a lot. 91%? no touchy unless clip
+	Float32 refclip = 0.5f; //preset to cut out gain quite a lot. 91%? no touchy unless clip
 	
-	Float64 inputSample;
-	Float64 passThrough;
-	Float64 outputSample;
+	Float32 inputSample;
+	Float32 passThrough;
+	Float32 outputSample;
 	bool clipOnset;
-	Float64 drySample;
+	Float32 drySample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		passThrough = ataDrySample = inputSample;
 		
 		
-		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + (ataLast2Sample*ataK1) + (ataLast3Sample*ataK2) + (ataLast4Sample*ataK6) + (ataLast5Sample*ataK7) + (ataLast6Sample*ataK8)) / 2.0;
+		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + (ataLast2Sample*ataK1) + (ataLast3Sample*ataK2) + (ataLast4Sample*ataK6) + (ataLast5Sample*ataK7) + (ataLast6Sample*ataK8)) / 2.0f;
 		ataLast6Sample = ataLast5Sample; ataLast5Sample = ataLast4Sample; ataLast4Sample = ataLast3Sample; ataLast3Sample = ataLast2Sample; ataLast2Sample = ataLast1Sample; ataLast1Sample = inputSample;
 		//setting up oversampled special antialiasing
 		clipOnset = false;
@@ -129,9 +129,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs( inputSample ) > maxRecent ) maxRecent = fabs( inputSample );
 		//this gives us something that won't cut out in zero crossings, to interpolate with
 		
-		maxRecent *= 2.0;
-		//by refclip this is 1.0 and fully into the antialiasing
-		if (maxRecent > 1.0) maxRecent = 1.0;
+		maxRecent *= 2.0f;
+		//by refclip this is 1.0f and fully into the antialiasing
+		if (maxRecent > 1.0f) maxRecent = 1.0f;
 		//and it tops out at 1. Higher means more antialiasing, lower blends into passThrough without antialiasing
 		
 		ataHalfwaySample -= overall;
@@ -142,7 +142,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		if (lastSample >= refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (ataHalfwaySample < refclip)
 			{
 				lastSample = ((refclip*hardness) + (ataHalfwaySample * softness));
@@ -152,7 +152,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (lastSample <= -refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (ataHalfwaySample > -refclip)
 			{
 				lastSample = ((-refclip*hardness) + (ataHalfwaySample * softness));
@@ -162,7 +162,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (ataHalfwaySample > refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (lastSample < refclip)
 			{
 				ataHalfwaySample = ((refclip*hardness) + (lastSample * softness));
@@ -172,7 +172,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (ataHalfwaySample < -refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (lastSample > -refclip)
 			{
 				ataHalfwaySample = ((-refclip*hardness) + (lastSample * softness));
@@ -197,7 +197,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (lastSample >= refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (inputSample < refclip)
 			{
 				lastSample = ((refclip*hardness) + (inputSample * softness));
@@ -207,7 +207,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (lastSample <= -refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (inputSample > -refclip)
 			{
 				lastSample = ((-refclip*hardness) + (inputSample * softness));
@@ -217,7 +217,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (inputSample > refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (lastSample < refclip)
 			{
 				inputSample = ((refclip*hardness) + (lastSample * softness));
@@ -227,7 +227,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (inputSample < -refclip)
 		{
-			lpDepth += 0.1;
+			lpDepth += 0.1f;
 			if (lastSample > -refclip)
 			{
 				inputSample = ((-refclip*hardness) + (lastSample * softness));
@@ -242,9 +242,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//end raw sample
 		
 		ataHalfDrySample = (ataDrySample*ataK3)+(ataHalfDrySample*ataK4);
-		ataHalfDiffSample = (ataHalfwaySample - ataHalfDrySample)/2.0;
+		ataHalfDiffSample = (ataHalfwaySample - ataHalfDrySample)/2.0f;
 		ataLastDiffSample = ataDiffSample*ataK5;
-		ataDiffSample = (inputSample - ataDrySample)/2.0;
+		ataDiffSample = (inputSample - ataDrySample)/2.0f;
 		ataDiffSample += ataHalfDiffSample;
 		ataDiffSample -= ataLastDiffSample;
 		inputSample = ataDrySample;
@@ -277,15 +277,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		lastOutSample = inputSample;
 		
 		lpDepth -= lpSpeed;
-		if (lpDepth > 0.0)
+		if (lpDepth > 0.0f)
 		{
-			if (lpDepth > 1.0) lpDepth = 1.0;
-			inputSample *= (1.0-lpDepth);
-			inputSample += (((lastOutSample + lastOut2Sample + lastOut3Sample) / 3.6)*lpDepth);
+			if (lpDepth > 1.0f) lpDepth = 1.0f;
+			inputSample *= (1.0f-lpDepth);
+			inputSample += (((lastOutSample + lastOut2Sample + lastOut3Sample) / 3.6f)*lpDepth);
 		}
-		if (lpDepth < 0.0) lpDepth = 0.0;
+		if (lpDepth < 0.0f) lpDepth = 0.0f;
 				
-		inputSample *= (1.0-maxRecent);
+		inputSample *= (1.0f-maxRecent);
 		inputSample += (passThrough * maxRecent);
 		//there's our raw signal, without antialiasing. Brings up low level stuff and softens more when hot
 		
@@ -296,7 +296,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

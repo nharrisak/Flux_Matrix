@@ -33,13 +33,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double a[5];
-		double b[5];
-		double c[11];
-		double e[5];
-		double f[11];
-		double iirSampleA;
-		double iirSampleB;
+		float a[5];
+		float b[5];
+		float c[11];
+		float e[5];
+		float f[11];
+		float iirSampleA;
+		float iirSampleB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -56,25 +56,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 input = GetParameter( kParam_One );
-	Float64 unbox = GetParameter( kParam_Two )+1.0;
+	Float32 input = GetParameter( kParam_One );
+	Float32 unbox = GetParameter( kParam_Two )+1.0f;
 	unbox *= unbox; //let's get some more gain into this
-	Float64 iirAmount = (unbox*0.00052)/overallscale;
-	Float64 output = GetParameter( kParam_Three );
+	Float32 iirAmount = (unbox*0.00052f)/overallscale;
+	Float32 output = GetParameter( kParam_Three );
 	
-	Float64 treble = unbox; //averaging taps 1-4
-	Float64 gain = treble;
-	if (gain > 1.0) {e[0] = 1.0; gain -= 1.0;} else {e[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {e[1] = 1.0; gain -= 1.0;} else {e[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {e[2] = 1.0; gain -= 1.0;} else {e[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {e[3] = 1.0; gain -= 1.0;} else {e[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {e[4] = 1.0; gain -= 1.0;} else {e[4] = gain; gain = 0.0;}
+	Float32 treble = unbox; //averaging taps 1-4
+	Float32 gain = treble;
+	if (gain > 1.0f) {e[0] = 1.0f; gain -= 1.0f;} else {e[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {e[1] = 1.0f; gain -= 1.0f;} else {e[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {e[2] = 1.0f; gain -= 1.0f;} else {e[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {e[3] = 1.0f; gain -= 1.0f;} else {e[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {e[4] = 1.0f; gain -= 1.0f;} else {e[4] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
-	if (treble < 1.0) treble = 1.0;
+	if (treble < 1.0f) treble = 1.0f;
 	e[0] /= treble;
 	e[1] /= treble;
 	e[2] /= treble;
@@ -82,20 +82,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	e[4] /= treble;
 	//and now it's neatly scaled, too
 	
-	treble = unbox*2.0; //averaging taps 1-8
+	treble = unbox*2.0f; //averaging taps 1-8
 	gain = treble;
-	if (gain > 1.0) {f[0] = 1.0; gain -= 1.0;} else {f[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[1] = 1.0; gain -= 1.0;} else {f[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[2] = 1.0; gain -= 1.0;} else {f[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[3] = 1.0; gain -= 1.0;} else {f[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[4] = 1.0; gain -= 1.0;} else {f[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[5] = 1.0; gain -= 1.0;} else {f[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[6] = 1.0; gain -= 1.0;} else {f[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[7] = 1.0; gain -= 1.0;} else {f[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[8] = 1.0; gain -= 1.0;} else {f[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[9] = 1.0; gain -= 1.0;} else {f[9] = gain; gain = 0.0;}
+	if (gain > 1.0f) {f[0] = 1.0f; gain -= 1.0f;} else {f[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[1] = 1.0f; gain -= 1.0f;} else {f[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[2] = 1.0f; gain -= 1.0f;} else {f[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[3] = 1.0f; gain -= 1.0f;} else {f[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[4] = 1.0f; gain -= 1.0f;} else {f[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[5] = 1.0f; gain -= 1.0f;} else {f[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[6] = 1.0f; gain -= 1.0f;} else {f[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[7] = 1.0f; gain -= 1.0f;} else {f[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[8] = 1.0f; gain -= 1.0f;} else {f[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[9] = 1.0f; gain -= 1.0f;} else {f[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
-	if (treble < 1.0) treble = 1.0;
+	if (treble < 1.0f) treble = 1.0f;
 	f[0] /= treble;
 	f[1] /= treble;
 	f[2] /= treble;
@@ -110,12 +110,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (input != 1.0) inputSample *= input;
+		if (input != 1.0f) inputSample *= input;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		a[4] = a[3]; a[3] = a[2]; a[2] = a[1];
 		a[1] = a[0]; a[0] = inputSample;
@@ -136,14 +136,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//this is now an average of an average of inputSample. Two poles
 		
 		inputSample *= unbox;
-		//clip to 1.2533141373155 to reach maximum output
-		if (inputSample > 1.2533141373155) inputSample = 1.2533141373155;
-		if (inputSample < -1.2533141373155) inputSample = -1.2533141373155;
-		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		//clip to 1.2533141373155f to reach maximum output
+		if (inputSample > 1.2533141373155f) inputSample = 1.2533141373155f;
+		if (inputSample < -1.2533141373155f) inputSample = -1.2533141373155f;
+		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		inputSample /= unbox;	
 		//now we have a distorted inputSample at the correct volume relative to drySample
 		
-		double accumulatorSample = (drySample - inputSample);
+		float accumulatorSample = (drySample - inputSample);
 		c[9] = c[8]; c[8] = c[7]; c[7] = c[6]; c[6] = c[5];
 		c[5] = c[4]; c[4] = c[3]; c[3] = c[2]; c[2] = c[1];
 		c[1] = c[0]; c[0] = accumulatorSample;
@@ -170,7 +170,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = drySample - accumulatorSample;
 		//we apply it as one operation, to get the result.
 		
-		if (output != 1.0) inputSample *= output;
+		if (output != 1.0f) inputSample *= output;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);

@@ -52,11 +52,11 @@ struct _kernel {
 		int gcount;
 		int crosses;
 		int realzeroes;
-		Float64 airPrev;
-		Float64 airEven;
-		Float64 airOdd;
-		Float64 airFactor;
-		Float64 position;
+		Float32 airPrev;
+		Float32 airEven;
+		Float32 airOdd;
+		Float32 airFactor;
+		Float32 position;
 		bool flip;
 		bool splicing;
 		uint32_t fpd;
@@ -76,25 +76,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 note = GetParameter( kParam_One );
-	Float64 trim = GetParameter( kParam_Two );
-	Float64 speed = ((1.0/12.0)*note)+trim;	
-	if (speed < 0) speed *= 0.5;
+	Float32 note = GetParameter( kParam_One );
+	Float32 trim = GetParameter( kParam_Two );
+	Float32 speed = ((1.0f/12.0f)*note)+trim;	
+	if (speed < 0) speed *= 0.5f;
 	//include sanity check- maximum pitch lowering cannot be to 0 hz.
-	SInt32 width = (SInt32)(65536-((1-pow(1-GetParameter( kParam_Three ),2))*65530.0));
-	Float64 bias = pow(GetParameter( kParam_Three ),3);
-	Float64 feedback = GetParameter( kParam_Four )/1.5;
-	Float64 wet = GetParameter( kParam_Five );
+	SInt32 width = (SInt32)(65536-((1-pow(1-GetParameter( kParam_Three ),2))*65530.0f));
+	Float32 bias = pow(GetParameter( kParam_Three ),3);
+	Float32 feedback = GetParameter( kParam_Four )/1.5f;
+	Float32 wet = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
 		airFactor = airPrev - inputSample;
 		if (flip) {airEven += airFactor; airOdd -= airFactor; airFactor = airEven;}
 		else {airOdd += airFactor; airEven -= airFactor; airFactor = airOdd;}
-		airOdd = (airOdd - ((airOdd - airEven)/256.0)) / 1.0001;
-		airEven = (airEven - ((airEven - airOdd)/256.0)) / 1.0001;
+		airOdd = (airOdd - ((airOdd - airEven)/256.0f)) / 1.0001f;
+		airEven = (airEven - ((airEven - airOdd)/256.0f)) / 1.0001f;
 		airPrev = inputSample;
 		inputSample += airFactor;
 		flip = !flip;
@@ -117,8 +117,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//now we have counts zero, one, two, none of which have sanity checked values
 		//we are tracking most recent samples and must SUBTRACT.
 		
-		p[count+width] = p[count] = (SInt32)((inputSample*8388352.0)+(Float64)(lasttemp*feedback));
-		//double buffer -8388352 to 8388352 is equal to 24 bit linear space
+		p[count+width] = p[count] = (SInt32)((inputSample*8388352.0f)+(Float32)(lasttemp*feedback));
+		//float buffer -8388352 to 8388352 is equal to 24 bit linear space
 
 		if ((p[countone] > 0 && p[count] < 0)||(p[countone] < 0 && p[count] > 0)) //source crossed zero
 			{
@@ -140,16 +140,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (position > width) {
 			if (realzeroes > 0) { //we just caught up to the buffer end with zero crosses in the bin
 				position = 0;
-				Float64 diff = 99999999.0;
+				Float32 diff = 99999999.0f;
 				int best = 0;
 				int scan;
 				for(scan = (realzeroes-1); scan >= 0; scan--) {
 					int scanone = scan + crosses;
 					if (scanone > 256){scanone -= 256;}
 					//try to track the real most recent ones more closely
-					Float64 howdiff = (Float64)((temp - pastzero[scanone]) + (lasttemp - previous[scanone]) + (thirdtemp - third[scanone]) + (fourthtemp - fourth[scanone]));
+					Float32 howdiff = (Float32)((temp - pastzero[scanone]) + (lasttemp - previous[scanone]) + (thirdtemp - third[scanone]) + (fourthtemp - fourth[scanone]));
 					//got difference factor between things
-					howdiff -= (Float64)(scan*bias);
+					howdiff -= (Float32)(scan*bias);
 					//try to bias in favor of more recent crosses
 					if (howdiff < diff) {diff = howdiff; best = scanone;}
 				} //now we have 'best' as the closest match to the current rate of zero cross and positioning- a splice.
@@ -168,16 +168,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (position < 0) { //we just caught up to the dry tap
 			if (realzeroes > 0) { //we just caught up to the dry tap with zero crosses in the bin
 				position = 0;
-				Float64 diff = 99999999.0;
+				Float32 diff = 99999999.0f;
 				int best = 0;
 				int scan;
 				for(scan = (realzeroes-1); scan >= 0; scan--) {
 					int scanone = scan + crosses;
 					if (scanone > 256){scanone -= 256;}
 					//try to track the real most recent ones more closely
-					Float64 howdiff = (Float64)((temp - pastzero[scanone]) + (lasttemp - previous[scanone]) + (thirdtemp - third[scanone]) + (fourthtemp - fourth[scanone]));
+					Float32 howdiff = (Float32)((temp - pastzero[scanone]) + (lasttemp - previous[scanone]) + (thirdtemp - third[scanone]) + (fourthtemp - fourth[scanone]));
 					//got difference factor between things
-					howdiff -= (Float64)(scan*bias);
+					howdiff -= (Float32)(scan*bias);
 					//try to bias in favor of more recent crosses
 					if (howdiff < diff) {diff = howdiff; best = scanone;}
 				} //now we have 'best' as the closest match to the current rate of zero cross and positioning- a splice.
@@ -214,7 +214,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		temp /= 2; //gotta make temp be the same level scale as buffer
 		//now we have our delay tap, which is going to do our pitch shifting
 		
-		if (abs(temp) > 8388352.0){temp = (lasttemp + (lasttemp - thirdtemp));}
+		if (abs(temp) > 8388352.0f){temp = (lasttemp + (lasttemp - thirdtemp));}
 		//kill ticks of bad buffer mojo by sticking with the trajectory. Ugly hack *shrug*
 		
 		sincezerocross++;
@@ -231,16 +231,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		thirdtemp = lasttemp;
 		lasttemp = temp;
 		
-		inputSample = ( *sourceP * (1-wet))+((Float64)(temp/(8388352.0))*wet);
+		inputSample = ( *sourceP * (1-wet))+((Float32)(temp/(8388352.0f))*wet);
 		
-		if (inputSample > 4.0) inputSample = 4.0;
-		if (inputSample < -4.0) inputSample = -4.0;
+		if (inputSample > 4.0f) inputSample = 4.0f;
+		if (inputSample < -4.0f) inputSample = -4.0f;
 		//this plugin can throw insane outputs so we'll put in a hard clip
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

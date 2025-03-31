@@ -31,12 +31,12 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 control;
+		Float32 control;
 		int gcount;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[9000];
+			Float32 d[9000];
 	};
 	_dram* dram;
 };
@@ -50,38 +50,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 intensity = pow(GetParameter( kParam_One ),5)*80.0;
-	Float64 depthA = pow(GetParameter( kParam_Two ),2);
+	Float32 intensity = pow(GetParameter( kParam_One ),5)*80.0f;
+	Float32 depthA = pow(GetParameter( kParam_Two ),2);
 	int offsetA = (int)(depthA * 3900) + 1;	
-	Float64 clamp;
-	Float64 thickness;
-	Float64 out;
-	Float64 bridgerectifier;
-	double inputSample;
+	Float32 clamp;
+	Float32 thickness;
+	Float32 out;
+	Float32 bridgerectifier;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
 		if (gcount < 0 || gcount > 4000) {gcount = 4000;}
 		
 		dram->d[gcount+4000] = dram->d[gcount] = fabs(inputSample)*intensity;
 		control += (dram->d[gcount] / offsetA);
 		control -= (dram->d[gcount+offsetA] / offsetA);		
-		control -= 0.000001;
+		control -= 0.000001f;
 		
 		clamp = 1;
 		if (control < 0) {control = 0;}
 		if (control > 1) {clamp -= (control - 1); control = 1;}
-		if (clamp < 0.5) {clamp = 0.5;}
+		if (clamp < 0.5f) {clamp = 0.5f;}
 		
 		gcount--;
 		
-		thickness = ((1.0 - control) * 2.0) - 1.0;
+		thickness = ((1.0f - control) * 2.0f) - 1.0f;
 		out = fabs(thickness);		
 
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		if (thickness > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier);
@@ -95,7 +95,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

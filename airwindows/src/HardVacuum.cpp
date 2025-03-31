@@ -37,7 +37,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastSample;
+		Float32 lastSample;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -54,35 +54,35 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 multistage = GetParameter( kParam_One );
+	Float32 multistage = GetParameter( kParam_One );
 	if (multistage > 1) multistage *= multistage;
 	//WE MAKE LOUD NOISE! RAWWWK!
-	Float64 countdown;
-	Float64 warmth = GetParameter( kParam_Two );
-	Float64 invwarmth = 1.0-warmth;
-	warmth /= 1.57079633;
-	Float64 aura = GetParameter( kParam_Three )*3.1415926;
-	Float64 out = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
-	Float64 dry = 1.0-wet;
-	Float64 drive;
-	Float64 positive;
-	Float64 negative;
-	Float64 bridgerectifier;
-	Float64 skew;
-	double inputSample;
-	Float64 drySample;
+	Float32 countdown;
+	Float32 warmth = GetParameter( kParam_Two );
+	Float32 invwarmth = 1.0f-warmth;
+	warmth /= 1.57079633f;
+	Float32 aura = GetParameter( kParam_Three )*3.1415926f;
+	Float32 out = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
+	Float32 dry = 1.0f-wet;
+	Float32 drive;
+	Float32 positive;
+	Float32 negative;
+	Float32 bridgerectifier;
+	Float32 skew;
+	float inputSample;
+	Float32 drySample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;		
 		
 		skew = (inputSample - lastSample);
 		lastSample = inputSample;
 		//skew will be direction/angle
 		bridgerectifier = fabs(skew);
-		if (bridgerectifier > 3.1415926) bridgerectifier = 3.1415926;
+		if (bridgerectifier > 3.1415926f) bridgerectifier = 3.1415926f;
 		//for skew we want it to go to zero effect again, so we use full range of the sine
 		bridgerectifier = sin(bridgerectifier);
 		if (skew > 0) skew = bridgerectifier*aura;
@@ -90,7 +90,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//skew is now sined and clamped and then re-amplified again
 		skew *= inputSample;
 		//cools off sparkliness and crossover distortion
-		skew *= 1.557079633;
+		skew *= 1.557079633f;
 		//crank up the gain on this so we can make it sing
 		//We're doing all this here so skew isn't incremented by each stage
 
@@ -99,8 +99,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		while (countdown > 0)
 			{
-				if (countdown > 1.0) drive = 1.557079633;
-				else drive = countdown * (1.0+(0.557079633*invwarmth));
+				if (countdown > 1.0f) drive = 1.557079633f;
+				else drive = countdown * (1.0f+(0.557079633f*invwarmth));
 				//full crank stages followed by the proportional one
 				//whee. 1 at full warmth to 1.5570etc at no warmth
 				positive = drive - warmth;
@@ -110,13 +110,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				bridgerectifier = fabs(inputSample);
 				bridgerectifier += skew;
 				//apply it here so we don't overload
-				if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+				if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 				bridgerectifier = sin(bridgerectifier);
 				//the distortion section.
 				bridgerectifier *= drive;
 				bridgerectifier += skew;
 				//again
-				if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+				if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 				bridgerectifier = sin(bridgerectifier);
 				if (inputSample > 0)
 					{
@@ -127,22 +127,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					inputSample = (inputSample*(1-negative+skew))-(bridgerectifier*(negative+skew));
 					}
 				//blend according to positive and negative controls
-				countdown -= 1.0;
+				countdown -= 1.0f;
 				//step down a notch and repeat.
 			}
 		
-		if (out !=1.0) {
+		if (out !=1.0f) {
 			inputSample *= out;
 		}		
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

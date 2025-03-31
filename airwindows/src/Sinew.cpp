@@ -29,7 +29,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSinew;
+		float lastSinew;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -46,30 +46,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double threshSinew = pow((1.0-GetParameter( kParam_One )),4)/overallscale;
+	float threshSinew = pow((1.0f-GetParameter( kParam_One )),4)/overallscale;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		double temp = inputSample;
-		double clamp = inputSample - lastSinew;
-		double sinew = threshSinew * cos(lastSinew*lastSinew);
+		float temp = inputSample;
+		float clamp = inputSample - lastSinew;
+		float sinew = threshSinew * cos(lastSinew*lastSinew);
 		if (clamp > sinew) temp = lastSinew + sinew;
 		if (-clamp > sinew) temp = lastSinew - sinew;
 		inputSample = lastSinew = temp;
 		
-		if (lastSinew > 1.0) lastSinew = 1.0;
-		if (lastSinew < -1.0) lastSinew = -1.0;
+		if (lastSinew > 1.0f) lastSinew = 1.0f;
+		if (lastSinew < -1.0f) lastSinew = -1.0f;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

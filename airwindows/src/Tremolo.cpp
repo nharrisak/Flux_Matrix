@@ -31,13 +31,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 speedChase;
-		Float64 depthChase;
-		Float64 speedAmount;
-		Float64 depthAmount;
-		Float64 lastSpeed;
-		Float64 lastDepth;
-		Float64 sweep;
+		Float32 speedChase;
+		Float32 depthChase;
+		Float32 speedAmount;
+		Float32 depthAmount;
+		Float32 lastSpeed;
+		Float32 lastDepth;
+		Float32 sweep;
 		uint32_t fpd;		
 	
 	struct _dram {
@@ -55,44 +55,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	speedChase = pow(GetParameter( kParam_One ),4);
 	depthChase = GetParameter( kParam_Two );
-	Float64 speedSpeed = 300 / (fabs( lastSpeed - speedChase)+1.0);
-	Float64 depthSpeed = 300 / (fabs( lastDepth - depthChase)+1.0);
+	Float32 speedSpeed = 300 / (fabs( lastSpeed - speedChase)+1.0f);
+	Float32 depthSpeed = 300 / (fabs( lastDepth - depthChase)+1.0f);
 	lastSpeed = speedChase;
 	lastDepth = depthChase;
 
-	Float64 speed;
-	Float64 depth;
-	Float64 skew;
-	Float64 density;
+	Float32 speed;
+	Float32 depth;
+	Float32 skew;
+	Float32 density;
 	
-	Float64 tupi = 3.141592653589793238;
-	double inputSample;
-	double drySample;
-	Float64 control;
-	Float64 tempcontrol;
-	Float64 thickness;
-	Float64 out;
-	Float64 bridgerectifier;
-	Float64 offset;
+	Float32 tupi = 3.141592653589793238f;
+	float inputSample;
+	float drySample;
+	Float32 control;
+	Float32 tempcontrol;
+	Float32 thickness;
+	Float32 out;
+	Float32 bridgerectifier;
+	Float32 offset;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
-		speedAmount = (((speedAmount*speedSpeed)+speedChase)/(speedSpeed + 1.0));
-		depthAmount = (((depthAmount*depthSpeed)+depthChase)/(depthSpeed + 1.0));
-		speed = 0.0001+(speedAmount/1000.0);
+		speedAmount = (((speedAmount*speedSpeed)+speedChase)/(speedSpeed + 1.0f));
+		depthAmount = (((depthAmount*depthSpeed)+depthChase)/(depthSpeed + 1.0f));
+		speed = 0.0001f+(speedAmount/1000.0f);
 		speed /= overallscale;
-		depth = 1.0 - pow(1.0-depthAmount,5);
-		skew = 1.0+pow(depthAmount,9);
-		density = ((1.0-depthAmount)*2.0) - 1.0;		
+		depth = 1.0f - pow(1.0f-depthAmount,5);
+		skew = 1.0f+pow(depthAmount,9);
+		density = ((1.0f-depthAmount)*2.0f) - 1.0f;		
 		
 		offset = sin(sweep);
 		sweep += speed;
@@ -101,20 +101,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (density > 0)
 			{
 			tempcontrol = sin(control);
-			control = (control * (1.0-density))+(tempcontrol * density);
+			control = (control * (1.0f-density))+(tempcontrol * density);
 			}
 		else
 			{
 			tempcontrol = 1-cos(control);
-			control = (control * (1.0+density))+(tempcontrol * -density);
+			control = (control * (1.0f+density))+(tempcontrol * -density);
 			}
 		//produce either boosted or starved version of control signal
 		//will go from 0 to 1
 		
-		thickness = ((control * 2.0) - 1.0)*skew;
+		thickness = ((control * 2.0f) - 1.0f)*skew;
 		out = fabs(thickness);		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		if (thickness > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier);
@@ -122,15 +122,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (inputSample > 0) inputSample = (inputSample*(1-out))+(bridgerectifier*out);
 		else inputSample = (inputSample*(1-out))-(bridgerectifier*out);
 		//blend according to density control
-		inputSample *= (1.0 - control);
-		inputSample *= 2.0;
+		inputSample *= (1.0f - control);
+		inputSample *= 2.0f;
 		//apply tremolo, apply gain boost to compensate for volume loss
 		inputSample = (drySample * (1-depth)) + (inputSample*depth);
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

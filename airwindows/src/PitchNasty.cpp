@@ -40,14 +40,14 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		int inCount;
-		double outCount;
+		float outCount;
 		bool switchTransition;
-		double switchAmount;
-		double feedbackSample;
+		float switchAmount;
+		float feedbackSample;
 		uint32_t fpd;
 	
 	struct _dram {
-			double d[10002];
+			float d[10002];
 	};
 	_dram* dram;
 };
@@ -62,25 +62,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double note = GetParameter( kParam_One );// -12 to +12
-	double bend = GetParameter( kParam_Two );// -12.0 to +12.0
-	double speed = pow(2,note/12.0)*pow(2,bend/12.0);
+	float note = GetParameter( kParam_One );// -12 to +12
+	float bend = GetParameter( kParam_Two );// -12.0f to +12.0f
+	float speed = pow(2,note/12.0f)*pow(2,bend/12.0f);
 	
-	double grindRef = (1.0/261.6)*GetSampleRate(); //samples per Middle C cycle
-	double grindNote = pow(2,GetParameter( kParam_Three )/12.0); // -36 to 36
-	double width = grindRef / grindNote;
+	float grindRef = (1.0f/261.6f)*GetSampleRate(); //samples per Middle C cycle
+	float grindNote = pow(2,GetParameter( kParam_Three )/12.0f); // -36 to 36
+	float width = grindRef / grindNote;
 	if (width > 9990) width = 9990; //safety check
-	double feedback = GetParameter( kParam_Four );
-	double trim = GetParameter( kParam_Five );
-	double wet = GetParameter( kParam_Six );
+	float feedback = GetParameter( kParam_Four );
+	float trim = GetParameter( kParam_Five );
+	float wet = GetParameter( kParam_Six );
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		inputSample += (feedbackSample * feedback);
-		if (fabs(feedbackSample) > 1.0) inputSample /= fabs(feedbackSample);
+		if (fabs(feedbackSample) > 1.0f) inputSample /= fabs(feedbackSample);
 		
 		dram->d[inCount] = inputSample;
 		
@@ -88,7 +88,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		outCount += speed;
 		
 		if (outCount > inCount && switchTransition) {
-			switchAmount = 1.0;
+			switchAmount = 1.0f;
 			switchTransition = false;
 		}
 				
@@ -105,26 +105,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = (dram->d[count-((count > arrayWidth)?arrayWidth+1:0)] * (1-(outCount-floor(outCount))));
 		inputSample += (dram->d[count+1-((count+1 > arrayWidth)?arrayWidth+1:0)] * (outCount-floor(outCount)));
 		
-		if (switchAmount > fabs(inputSample-dram->d[inCount])*2.0) {
-			switchAmount = (switchAmount * 0.5) + (fabs(inputSample-dram->d[inCount]));
+		if (switchAmount > fabs(inputSample-dram->d[inCount])*2.0f) {
+			switchAmount = (switchAmount * 0.5f) + (fabs(inputSample-dram->d[inCount]));
 		}
-		inputSample = (dram->d[inCount] * switchAmount) + (inputSample * (1.0-switchAmount));
+		inputSample = (dram->d[inCount] * switchAmount) + (inputSample * (1.0f-switchAmount));
 		
 		feedbackSample = inputSample;
 		
-		if (trim != 1.0) {
+		if (trim != 1.0f) {
 			inputSample *= trim;
 		}
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

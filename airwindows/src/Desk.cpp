@@ -26,9 +26,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample;
-		double lastOutSample;
-		Float64 lastSlew;
+		float lastSample;
+		float lastOutSample;
+		Float32 lastSlew;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -45,26 +45,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 gain = 0.135;
-	Float64 slewgain = 0.208;	
-	Float64 prevslew = 0.333;
-	Float64 balanceB = 0.0001;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 gain = 0.135f;
+	Float32 slewgain = 0.208f;	
+	Float32 prevslew = 0.333f;
+	Float32 balanceB = 0.0001f;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	slewgain *= overallscale;
 	prevslew *= overallscale;
 	balanceB /= overallscale;
-	Float64 balanceA = 1.0 - balanceB;
-	Float64 slew;
-	Float64 bridgerectifier;
-	Float64 combSample;
-	double inputSample;
-	double drySample;	
+	Float32 balanceA = 1.0f - balanceB;
+	Float32 slew;
+	Float32 bridgerectifier;
+	Float32 combSample;
+	float inputSample;
+	float drySample;	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		slew = inputSample - lastSample;
@@ -73,7 +73,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		bridgerectifier = fabs(slew*slewgain);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		if (slew > 0) slew = bridgerectifier/slewgain;
 		else slew = -(bridgerectifier/slewgain);
@@ -84,7 +84,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//Set up slewed reference
 		
 		combSample = fabs(drySample*lastSample);
-		if (combSample > 1.0) combSample = 1.0;
+		if (combSample > 1.0f) combSample = 1.0f;
 		//bailout for very high input gains
 		inputSample -= (lastSlew * combSample * prevslew);
 		lastSlew = slew;
@@ -92,7 +92,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample *= gain;
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		
 		if (inputSample > 0) inputSample = bridgerectifier;
@@ -103,7 +103,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

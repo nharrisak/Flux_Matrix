@@ -32,14 +32,14 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		
-		Float64 iirA;
-		Float64 iirB; //first stage is the flipping one, for lowest slope. It is always engaged, and is the highest one
-		Float64 iirC; //we introduce the second pole at the same frequency, to become a pseudo-Capacitor behavior
-		Float64 iirD;
-		Float64 iirE;
-		Float64 iirF; //our slope control will have a pow() on it so that the high orders are way to the right side
-		Float64 iirG;
-		Float64 iirH; //seven poles max, and the final pole is always at 20hz directly.
+		Float32 iirA;
+		Float32 iirB; //first stage is the flipping one, for lowest slope. It is always engaged, and is the highest one
+		Float32 iirC; //we introduce the second pole at the same frequency, to become a pseudo-Capacitor behavior
+		Float32 iirD;
+		Float32 iirE;
+		Float32 iirF; //our slope control will have a pow() on it so that the high orders are way to the right side
+		Float32 iirG;
+		Float32 iirH; //seven poles max, and the final pole is always at 20hz directly.
 		
 		
 		uint32_t fpd;
@@ -59,64 +59,64 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double fpOld = 0.618033988749894848204586; //golden ratio!
-	double fpNew = 1.0 - fpOld;
+	float fpOld = 0.618033988749894848204586f; //golden ratio!
+	float fpNew = 1.0f - fpOld;
 
-	Float64 rangescale = 0.1 / overallscale;
+	Float32 rangescale = 0.1f / overallscale;
 	
-	Float64 cutoff = pow(GetParameter( kParam_One ),3);
-	Float64 slope = pow(GetParameter( kParam_Two ),3) * 6.0;
+	Float32 cutoff = pow(GetParameter( kParam_One ),3);
+	Float32 slope = pow(GetParameter( kParam_Two ),3) * 6.0f;
 	
-	Float64 newA = cutoff * rangescale;
-	Float64 newB = newA; //other part of interleaved IIR is the same
+	Float32 newA = cutoff * rangescale;
+	Float32 newB = newA; //other part of interleaved IIR is the same
 	
-	Float64 newC = cutoff * rangescale; //first extra pole is the same
-	cutoff = (cutoff * fpOld) + (0.00001 * fpNew);
-	Float64 newD = cutoff * rangescale;
-	cutoff = (cutoff * fpOld) + (0.00001 * fpNew);
-	Float64 newE = cutoff * rangescale;
-	cutoff = (cutoff * fpOld) + (0.00001 * fpNew);
-	Float64 newF = cutoff * rangescale;
-	cutoff = (cutoff * fpOld) + (0.00001 * fpNew);
-	Float64 newG = cutoff * rangescale;
-	cutoff = (cutoff * fpOld) + (0.00001 * fpNew);
-	Float64 newH = cutoff * rangescale;
+	Float32 newC = cutoff * rangescale; //first extra pole is the same
+	cutoff = (cutoff * fpOld) + (0.00001f * fpNew);
+	Float32 newD = cutoff * rangescale;
+	cutoff = (cutoff * fpOld) + (0.00001f * fpNew);
+	Float32 newE = cutoff * rangescale;
+	cutoff = (cutoff * fpOld) + (0.00001f * fpNew);
+	Float32 newF = cutoff * rangescale;
+	cutoff = (cutoff * fpOld) + (0.00001f * fpNew);
+	Float32 newG = cutoff * rangescale;
+	cutoff = (cutoff * fpOld) + (0.00001f * fpNew);
+	Float32 newH = cutoff * rangescale;
 	//converge toward the unvarying fixed cutoff value
 	
-	Float64 oldA = 1.0 - newA;
-	Float64 oldB = 1.0 - newB;
-	Float64 oldC = 1.0 - newC;
-	Float64 oldD = 1.0 - newD;
-	Float64 oldE = 1.0 - newE;
-	Float64 oldF = 1.0 - newF;
-	Float64 oldG = 1.0 - newG;
-	Float64 oldH = 1.0 - newH;
+	Float32 oldA = 1.0f - newA;
+	Float32 oldB = 1.0f - newB;
+	Float32 oldC = 1.0f - newC;
+	Float32 oldD = 1.0f - newD;
+	Float32 oldE = 1.0f - newE;
+	Float32 oldF = 1.0f - newF;
+	Float32 oldG = 1.0f - newG;
+	Float32 oldH = 1.0f - newH;
 	
-	Float64 polesC;
-	Float64 polesD;
-	Float64 polesE;
-	Float64 polesF;
-	Float64 polesG;
-	Float64 polesH;
+	Float32 polesC;
+	Float32 polesD;
+	Float32 polesE;
+	Float32 polesF;
+	Float32 polesG;
+	Float32 polesH;
 	
-	polesC = slope; if (slope > 1.0) polesC = 1.0; slope -= 1.0; if (slope < 0.0) slope = 0.0;
-	polesD = slope; if (slope > 1.0) polesD = 1.0; slope -= 1.0; if (slope < 0.0) slope = 0.0;
-	polesE = slope; if (slope > 1.0) polesE = 1.0; slope -= 1.0; if (slope < 0.0) slope = 0.0;
-	polesF = slope; if (slope > 1.0) polesF = 1.0; slope -= 1.0; if (slope < 0.0) slope = 0.0;
-	polesG = slope; if (slope > 1.0) polesG = 1.0; slope -= 1.0; if (slope < 0.0) slope = 0.0;
-	polesH = slope; if (slope > 1.0) polesH = 1.0; slope -= 1.0; if (slope < 0.0) slope = 0.0;
-	//each one will either be 0.0, the fractional slope value, or 1
+	polesC = slope; if (slope > 1.0f) polesC = 1.0f; slope -= 1.0f; if (slope < 0.0f) slope = 0.0f;
+	polesD = slope; if (slope > 1.0f) polesD = 1.0f; slope -= 1.0f; if (slope < 0.0f) slope = 0.0f;
+	polesE = slope; if (slope > 1.0f) polesE = 1.0f; slope -= 1.0f; if (slope < 0.0f) slope = 0.0f;
+	polesF = slope; if (slope > 1.0f) polesF = 1.0f; slope -= 1.0f; if (slope < 0.0f) slope = 0.0f;
+	polesG = slope; if (slope > 1.0f) polesG = 1.0f; slope -= 1.0f; if (slope < 0.0f) slope = 0.0f;
+	polesH = slope; if (slope > 1.0f) polesH = 1.0f; slope -= 1.0f; if (slope < 0.0f) slope = 0.0f;
+	//each one will either be 0.0f, the fractional slope value, or 1
 	
-	double inputSample;
-	Float64 tempSample;
-	Float64 correction;
+	float inputSample;
+	Float32 tempSample;
+	Float32 correction;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		tempSample = inputSample;
 
 		if (fpFlip) {
@@ -132,12 +132,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		iirH = (iirH * oldH) + (tempSample * newH); tempSample -= iirH;
 		//set up all the iir filters in case they are used
 		
-		if (polesC == 1.0) correction += iirC; if (polesC > 0.0 && polesC < 1.0) correction += (iirC * polesC);
-		if (polesD == 1.0) correction += iirD; if (polesD > 0.0 && polesD < 1.0) correction += (iirD * polesD);
-		if (polesE == 1.0) correction += iirE; if (polesE > 0.0 && polesE < 1.0) correction += (iirE * polesE);
-		if (polesF == 1.0) correction += iirF; if (polesF > 0.0 && polesF < 1.0) correction += (iirF * polesF);
-		if (polesG == 1.0) correction += iirG; if (polesG > 0.0 && polesG < 1.0) correction += (iirG * polesG);
-		if (polesH == 1.0) correction += iirH; if (polesH > 0.0 && polesH < 1.0) correction += (iirH * polesH);
+		if (polesC == 1.0f) correction += iirC; if (polesC > 0.0f && polesC < 1.0f) correction += (iirC * polesC);
+		if (polesD == 1.0f) correction += iirD; if (polesD > 0.0f && polesD < 1.0f) correction += (iirD * polesD);
+		if (polesE == 1.0f) correction += iirE; if (polesE > 0.0f && polesE < 1.0f) correction += (iirE * polesE);
+		if (polesF == 1.0f) correction += iirF; if (polesF > 0.0f && polesF < 1.0f) correction += (iirF * polesF);
+		if (polesG == 1.0f) correction += iirG; if (polesG > 0.0f && polesG < 1.0f) correction += (iirG * polesG);
+		if (polesH == 1.0f) correction += iirH; if (polesH > 0.0f && polesH < 1.0f) correction += (iirH * polesH);
 		//each of these are added directly if they're fully engaged,
 		//multiplied by 0-1 if they are the interpolated one, or skipped if they are beyond the interpolated one.
 		//the purpose is to do all the math at the floating point exponent nearest to the tiny value in use.
@@ -150,7 +150,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

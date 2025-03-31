@@ -35,13 +35,13 @@ kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 muVary;
-	Float64 muAttack;
-	Float64 muNewSpeed;
-	Float64 muSpeedA;
-	Float64 muSpeedB;
-	Float64 muCoefficientA;
-	Float64 muCoefficientB;
+	Float32 muVary;
+	Float32 muAttack;
+	Float32 muNewSpeed;
+	Float32 muSpeedA;
+	Float32 muSpeedB;
+	Float32 muCoefficientA;
+	Float32 muCoefficientB;
 	bool flip; //Pressure
 	
 	enum {
@@ -61,23 +61,23 @@ enum { kNumTemplateParameters = 6 };
 		fix_total
 	};
 	
-	double lastSampleL;
-	double intermediateL[16];
+	float lastSampleL;
+	float intermediateL[16];
 	bool wasPosClipL;
 	bool wasNegClipL;
-	double lastSampleR;
-	double intermediateR[16];
+	float lastSampleR;
+	float intermediateR[16];
 	bool wasPosClipR;
 	bool wasNegClipR; //Stereo ClipOnly2
 	
-	double slewMax; //to adust mewiness
+	float slewMax; //to adust mewiness
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
 
 	struct _dram {
-		double fixA[fix_total];
-	double fixB[fix_total]; //fixed frequency biquad filter for ultrasonics, stereo
+		float fixA[fix_total];
+	float fixB[fix_total]; //fixed frequency biquad filter for ultrasonics, stereo
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -85,52 +85,52 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
 		
-	double threshold = 1.0 - (GetParameter( kParam_One ) * 0.95);
-	double muMakeupGain = 1.0 / threshold;
+	float threshold = 1.0f - (GetParameter( kParam_One ) * 0.95f);
+	float muMakeupGain = 1.0f / threshold;
 	//gain settings around threshold
-	double release = pow((1.28-GetParameter( kParam_Two )),5)*32768.0;
-	double fastest = sqrt(release);
+	float release = pow((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
+	float fastest = sqrt(release);
 	release /= overallscale;
 	fastest /= overallscale;
 	//speed settings around release
-	double mewinessRef = GetParameter( kParam_Three );
-	double pawsClaws = -(GetParameter( kParam_Four )-0.5)*1.618033988749894848204586;
+	float mewinessRef = GetParameter( kParam_Three );
+	float pawsClaws = -(GetParameter( kParam_Four )-0.5f)*1.618033988749894848204586f;
 	// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
-	double outputGain = pow(GetParameter( kParam_Five )*2.0,2); //max 4.0 gain
-	double wet = GetParameter( kParam_Six );
+	float outputGain = pow(GetParameter( kParam_Five )*2.0f,2); //max 4.0f gain
+	float wet = GetParameter( kParam_Six );
 	
-	dram->fixA[fix_freq] = 24000.0 / GetSampleRate();
-    dram->fixA[fix_reso] = 0.7071; //butterworth Q
-	double K = tan(M_PI * dram->fixA[fix_freq]);
-	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_freq] = 24000.0f / GetSampleRate();
+    dram->fixA[fix_reso] = 0.7071f; //butterworth Q
+	float K = tan(M_PI * dram->fixA[fix_freq]);
+	float norm = 1.0f / (1.0f + K / dram->fixA[fix_reso] + K * K);
 	dram->fixA[fix_a0] = K * K * norm;
-	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a1] = 2.0f * dram->fixA[fix_a0];
 	dram->fixA[fix_a2] = dram->fixA[fix_a0];
-	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixA[fix_b2] = (1.0f - K / dram->fixA[fix_reso] + K * K) * norm;
 	//for the fixed-position biquad filter
 	for (int x = 0; x < fix_sL1; x++) dram->fixB[x] = dram->fixA[x];
 	//make the second filter same as the first, don't use sample slots
 
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
 		inputSampleL = inputSampleL * muMakeupGain;
 		inputSampleR = inputSampleR * muMakeupGain;
 		
-		if (dram->fixA[fix_freq] < 0.4999) {
-			double temp = (inputSampleL * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		if (dram->fixA[fix_freq] < 0.4999f) {
+			float temp = (inputSampleL * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
 			dram->fixA[fix_sL1] = (inputSampleL * dram->fixA[fix_a1]) - (temp * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
 			dram->fixA[fix_sL2] = (inputSampleL * dram->fixA[fix_a2]) - (temp * dram->fixA[fix_b2]);
 			inputSampleL = temp;
@@ -140,13 +140,13 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			inputSampleR = temp; //fixed biquad filtering ultrasonics before Pressure
 		}
 		
-		double inputSense = fabs(inputSampleL);
+		float inputSense = fabs(inputSampleL);
 		if (fabs(inputSampleR) > inputSense)
 			inputSense = fabs(inputSampleR);
 		//we will take the greater of either channel and just use that, then apply the result
 		//to both stereo channels.
 		
-		double mewiness = sin(mewinessRef + (slewMax * pawsClaws));
+		float mewiness = sin(mewinessRef + (slewMax * pawsClaws));
 		bool positivemu = true; if (mewiness < 0) {positivemu = false; mewiness = -mewiness;}
 		
 		if (flip)
@@ -155,7 +155,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			{
 				muVary = threshold / inputSense;
 				muAttack = sqrt(fabs(muSpeedA));
-				muCoefficientA = muCoefficientA * (muAttack-1.0);
+				muCoefficientA = muCoefficientA * (muAttack-1.0f);
 				if (muVary < threshold)
 				{
 					muCoefficientA = muCoefficientA + threshold;
@@ -168,8 +168,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			else
 			{
-				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-				muCoefficientA = muCoefficientA + 1.0;
+				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+				muCoefficientA = muCoefficientA + 1.0f;
 				muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 			}
 			muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -195,8 +195,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			else
 			{
-				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-				muCoefficientB = muCoefficientB + 1.0;
+				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+				muCoefficientB = muCoefficientB + 1.0f;
 				muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 			}
 			muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -205,32 +205,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		}
 		//got coefficients, adjusted speeds
 		
-		double coefficient;
+		float coefficient;
 		if (flip) {
 			if (positivemu) coefficient = pow(muCoefficientA,2);
 			else coefficient = sqrt(muCoefficientA);
-			coefficient = (coefficient*mewiness)+(muCoefficientA*(1.0-mewiness));
+			coefficient = (coefficient*mewiness)+(muCoefficientA*(1.0f-mewiness));
 			inputSampleL *= coefficient;
 			inputSampleR *= coefficient;
 		} else {
 			if (positivemu) coefficient = pow(muCoefficientB,2);
 			else coefficient = sqrt(muCoefficientB);
-			coefficient = (coefficient*mewiness)+(muCoefficientB*(1.0-mewiness));
+			coefficient = (coefficient*mewiness)+(muCoefficientB*(1.0f-mewiness));
 			inputSampleL *= coefficient;
 			inputSampleR *= coefficient;
 		}
 		//applied compression with vari-vari-µ-µ-µ-µ-µ-µ-is-the-kitten-song o/~
 		//applied gain correction to control output level- tends to constrain sound rather than inflate it
 		
-		if (outputGain != 1.0) {
+		if (outputGain != 1.0f) {
 			inputSampleL *= outputGain;
 			inputSampleR *= outputGain;
 		}		
 		
 		flip = !flip;
 				
-		if (dram->fixB[fix_freq] < 0.49999) {
-			double temp = (inputSampleL * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
+		if (dram->fixB[fix_freq] < 0.49999f) {
+			float temp = (inputSampleL * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
 			dram->fixB[fix_sL1] = (inputSampleL * dram->fixB[fix_a1]) - (temp * dram->fixB[fix_b1]) + dram->fixB[fix_sL2];
 			dram->fixB[fix_sL2] = (inputSampleL * dram->fixB[fix_a2]) - (temp * dram->fixB[fix_b2]);
 			inputSampleL = temp;
@@ -240,9 +240,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			inputSampleR = temp; //fixed biquad filtering ultrasonics between Pressure and ClipOnly
 		}
 		
-		if (wet != 1.0) {
-		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+		if (wet != 1.0f) {
+		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 		}
 		//Dry/Wet control, BEFORE ClipOnly
 		
@@ -251,33 +251,33 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//set up for fiddling with mewiness. Largest amount of slew in any direction
 		
 		//begin ClipOnly2 stereo as a little, compressed chunk that can be dropped into code
-		if (inputSampleL > 4.0) inputSampleL = 4.0; if (inputSampleL < -4.0) inputSampleL = -4.0;
+		if (inputSampleL > 4.0f) inputSampleL = 4.0f; if (inputSampleL < -4.0f) inputSampleL = -4.0f;
 		if (wasPosClipL == true) { //current will be over
-			if (inputSampleL<lastSampleL) lastSampleL=0.7058208+(inputSampleL*0.2609148);
-			else lastSampleL = 0.2491717+(lastSampleL*0.7390851);
+			if (inputSampleL<lastSampleL) lastSampleL=0.7058208f+(inputSampleL*0.2609148f);
+			else lastSampleL = 0.2491717f+(lastSampleL*0.7390851f);
 		} wasPosClipL = false;
-		if (inputSampleL>0.9549925859) {wasPosClipL=true;inputSampleL=0.7058208+(lastSampleL*0.2609148);}
+		if (inputSampleL>0.9549925859f) {wasPosClipL=true;inputSampleL=0.7058208f+(lastSampleL*0.2609148f);}
 		if (wasNegClipL == true) { //current will be -over
-			if (inputSampleL > lastSampleL) lastSampleL=-0.7058208+(inputSampleL*0.2609148);
-			else lastSampleL=-0.2491717+(lastSampleL*0.7390851);
+			if (inputSampleL > lastSampleL) lastSampleL=-0.7058208f+(inputSampleL*0.2609148f);
+			else lastSampleL=-0.2491717f+(lastSampleL*0.7390851f);
 		} wasNegClipL = false;
-		if (inputSampleL<-0.9549925859) {wasNegClipL=true;inputSampleL=-0.7058208+(lastSampleL*0.2609148);}
+		if (inputSampleL<-0.9549925859f) {wasNegClipL=true;inputSampleL=-0.7058208f+(lastSampleL*0.2609148f);}
 		intermediateL[spacing] = inputSampleL;
         inputSampleL = lastSampleL; //Latency is however many samples equals one 44.1k sample
 		for (int x = spacing; x > 0; x--) intermediateL[x-1] = intermediateL[x];
 		lastSampleL = intermediateL[0]; //run a little buffer to handle this
 		
-		if (inputSampleR > 4.0) inputSampleR = 4.0; if (inputSampleR < -4.0) inputSampleR = -4.0;
+		if (inputSampleR > 4.0f) inputSampleR = 4.0f; if (inputSampleR < -4.0f) inputSampleR = -4.0f;
 		if (wasPosClipR == true) { //current will be over
-			if (inputSampleR<lastSampleR) lastSampleR=0.7058208+(inputSampleR*0.2609148);
-			else lastSampleR = 0.2491717+(lastSampleR*0.7390851);
+			if (inputSampleR<lastSampleR) lastSampleR=0.7058208f+(inputSampleR*0.2609148f);
+			else lastSampleR = 0.2491717f+(lastSampleR*0.7390851f);
 		} wasPosClipR = false;
-		if (inputSampleR>0.9549925859) {wasPosClipR=true;inputSampleR=0.7058208+(lastSampleR*0.2609148);}
+		if (inputSampleR>0.9549925859f) {wasPosClipR=true;inputSampleR=0.7058208f+(lastSampleR*0.2609148f);}
 		if (wasNegClipR == true) { //current will be -over
-			if (inputSampleR > lastSampleR) lastSampleR=-0.7058208+(inputSampleR*0.2609148);
-			else lastSampleR=-0.2491717+(lastSampleR*0.7390851);
+			if (inputSampleR > lastSampleR) lastSampleR=-0.7058208f+(inputSampleR*0.2609148f);
+			else lastSampleR=-0.2491717f+(lastSampleR*0.7390851f);
 		} wasNegClipR = false;
-		if (inputSampleR<-0.9549925859) {wasNegClipR=true;inputSampleR=-0.7058208+(lastSampleR*0.2609148);}
+		if (inputSampleR<-0.9549925859f) {wasNegClipR=true;inputSampleR=-0.7058208f+(lastSampleR*0.2609148f);}
 		intermediateR[spacing] = inputSampleR;
         inputSampleR = lastSampleR; //Latency is however many samples equals one 44.1k sample
 		for (int x = spacing; x > 0; x--) intermediateR[x-1] = intermediateR[x];
@@ -288,10 +288,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

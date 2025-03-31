@@ -37,14 +37,14 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquad[11];
-		double biquadA[11];
-		double biquadB[11];
-		double biquadC[11];
-		double biquadD[11];
-		double biquadE[11];
-		double biquadF[11];
-		double iirSampleA;
+		float biquad[11];
+		float biquadA[11];
+		float biquadB[11];
+		float biquadC[11];
+		float biquadD[11];
+		float biquadE[11];
+		float biquadF[11];
+		float iirSampleA;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -61,196 +61,196 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 		
 	//begin from XRegion
-	Float64 high = GetParameter( kParam_Two );
-	Float64 low = GetParameter( kParam_Three );
-	Float64 mid = (high+low)*0.5;
-	Float64 spread = 1.001-fabs(high-low);
+	Float32 high = GetParameter( kParam_Two );
+	Float32 low = GetParameter( kParam_Three );
+	Float32 mid = (high+low)*0.5f;
+	Float32 spread = 1.001f-fabs(high-low);
 	
-	biquad[0] = (pow(high,3)*20000.0)/GetSampleRate();
-	if (biquad[0] < 0.00009) biquad[0] = 0.00009;
-	Float64 compensation = sqrt(biquad[0])*6.4*spread;
-	Float64 clipFactor = 0.75+(biquad[0]*GetParameter( kParam_Four )*37.0);
+	biquad[0] = (pow(high,3)*20000.0f)/GetSampleRate();
+	if (biquad[0] < 0.00009f) biquad[0] = 0.00009f;
+	Float32 compensation = sqrt(biquad[0])*6.4f*spread;
+	Float32 clipFactor = 0.75f+(biquad[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadA[0] = (pow((high+mid)*0.5,3)*20000.0)/GetSampleRate();
-	if (biquadA[0] < 0.00009) biquadA[0] = 0.00009;
-	Float64 compensationA = sqrt(biquadA[0])*6.4*spread;
-	Float64 clipFactorA = 0.75+(biquadA[0]*GetParameter( kParam_Four )*37.0);
+	biquadA[0] = (pow((high+mid)*0.5f,3)*20000.0f)/GetSampleRate();
+	if (biquadA[0] < 0.00009f) biquadA[0] = 0.00009f;
+	Float32 compensationA = sqrt(biquadA[0])*6.4f*spread;
+	Float32 clipFactorA = 0.75f+(biquadA[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadB[0] = (pow(mid,3)*20000.0)/GetSampleRate();
-	if (biquadB[0] < 0.00009) biquadB[0] = 0.00009;
-	Float64 compensationB = sqrt(biquadB[0])*6.4*spread;
-	Float64 clipFactorB = 0.75+(biquadB[0]*GetParameter( kParam_Four )*37.0);
+	biquadB[0] = (pow(mid,3)*20000.0f)/GetSampleRate();
+	if (biquadB[0] < 0.00009f) biquadB[0] = 0.00009f;
+	Float32 compensationB = sqrt(biquadB[0])*6.4f*spread;
+	Float32 clipFactorB = 0.75f+(biquadB[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadC[0] = (pow((mid+low)*0.5,3)*20000.0)/GetSampleRate();
-	if (biquadC[0] < 0.00009) biquadC[0] = 0.00009;
-	Float64 compensationC = sqrt(biquadC[0])*6.4*spread;
-	Float64 clipFactorC = 0.75+(biquadC[0]*GetParameter( kParam_Four )*37.0);
+	biquadC[0] = (pow((mid+low)*0.5f,3)*20000.0f)/GetSampleRate();
+	if (biquadC[0] < 0.00009f) biquadC[0] = 0.00009f;
+	Float32 compensationC = sqrt(biquadC[0])*6.4f*spread;
+	Float32 clipFactorC = 0.75f+(biquadC[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadD[0] = (pow(low,3)*20000.0)/GetSampleRate();
-	if (biquadD[0] < 0.00009) biquadD[0] = 0.00009;
-	Float64 compensationD = sqrt(biquadD[0])*6.4*spread;
-	Float64 clipFactorD = 0.75+(biquadD[0]*GetParameter( kParam_Four )*37.0);
+	biquadD[0] = (pow(low,3)*20000.0f)/GetSampleRate();
+	if (biquadD[0] < 0.00009f) biquadD[0] = 0.00009f;
+	Float32 compensationD = sqrt(biquadD[0])*6.4f*spread;
+	Float32 clipFactorD = 0.75f+(biquadD[0]*GetParameter( kParam_Four )*37.0f);
 	
-	double K = tan(M_PI * biquad[0]);
-	double norm = 1.0 / (1.0 + K / 0.7071 + K * K);
-	biquad[2] = K / 0.7071 * norm;
+	float K = tan(M_PI * biquad[0]);
+	float norm = 1.0f / (1.0f + K / 0.7071f + K * K);
+	biquad[2] = K / 0.7071f * norm;
 	biquad[4] = -biquad[2];
-	biquad[5] = 2.0 * (K * K - 1.0) * norm;
-	biquad[6] = (1.0 - K / 0.7071 + K * K) * norm;
+	biquad[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquad[6] = (1.0f - K / 0.7071f + K * K) * norm;
 	
 	K = tan(M_PI * biquadA[0]);
-	norm = 1.0 / (1.0 + K / 0.7071 + K * K);
-	biquadA[2] = K / 0.7071 * norm;
+	norm = 1.0f / (1.0f + K / 0.7071f + K * K);
+	biquadA[2] = K / 0.7071f * norm;
 	biquadA[4] = -biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / 0.7071 + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / 0.7071f + K * K) * norm;
 	
 	K = tan(M_PI * biquadB[0]);
-	norm = 1.0 / (1.0 + K / 0.7071 + K * K);
-	biquadB[2] = K / 0.7071 * norm;
+	norm = 1.0f / (1.0f + K / 0.7071f + K * K);
+	biquadB[2] = K / 0.7071f * norm;
 	biquadB[4] = -biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / 0.7071 + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / 0.7071f + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / 0.7071 + K * K);
-	biquadC[2] = K / 0.7071 * norm;
+	norm = 1.0f / (1.0f + K / 0.7071f + K * K);
+	biquadC[2] = K / 0.7071f * norm;
 	biquadC[4] = -biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / 0.7071 + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / 0.7071f + K * K) * norm;
 	
 	K = tan(M_PI * biquadD[0]);
-	norm = 1.0 / (1.0 + K / 0.7071 + K * K);
-	biquadD[2] = K / 0.7071 * norm;
+	norm = 1.0f / (1.0f + K / 0.7071f + K * K);
+	biquadD[2] = K / 0.7071f * norm;
 	biquadD[4] = -biquadD[2];
-	biquadD[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadD[6] = (1.0 - K / 0.7071 + K * K) * norm;	
+	biquadD[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadD[6] = (1.0f - K / 0.7071f + K * K) * norm;	
 	
 	//opamp stuff
-	double inTrim = GetParameter( kParam_One )*10.0;
+	float inTrim = GetParameter( kParam_One )*10.0f;
 	inTrim *= inTrim; inTrim *= inTrim;
-	double iirAmountA = 0.00069/overallscale;
-	biquadF[0] = biquadE[0] = 15500.0 / GetSampleRate();
-    biquadF[1] = biquadE[1] = 0.935;
+	float iirAmountA = 0.00069f/overallscale;
+	biquadF[0] = biquadE[0] = 15500.0f / GetSampleRate();
+    biquadF[1] = biquadE[1] = 0.935f;
 	K = tan(M_PI * biquadE[0]); //lowpass
-	norm = 1.0 / (1.0 + K / biquadE[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadE[1] + K * K);
 	biquadE[2] = K * K * norm;
-	biquadE[3] = 2.0 * biquadE[2];
+	biquadE[3] = 2.0f * biquadE[2];
 	biquadE[4] = biquadE[2];
-	biquadE[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadE[6] = (1.0 - K / biquadE[1] + K * K) * norm;
+	biquadE[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadE[6] = (1.0f - K / biquadE[1] + K * K) * norm;
 	for (int x = 0; x < 7; x++) biquadF[x] = biquadE[x];
 	//end opamp stuff	
 	
-	double aWet = 1.0;
-	double bWet = 1.0;
-	double cWet = 1.0;
-	double dWet = GetParameter( kParam_Four )*4.0;
+	float aWet = 1.0f;
+	float bWet = 1.0f;
+	float cWet = 1.0f;
+	float dWet = GetParameter( kParam_Four )*4.0f;
 	//four-stage wet/dry control using progressive stages that bypass when not engaged
-	if (dWet < 1.0) {aWet = dWet; bWet = 0.0; cWet = 0.0; dWet = 0.0;}
-	else if (dWet < 2.0) {bWet = dWet - 1.0; cWet = 0.0; dWet = 0.0;}
-	else if (dWet < 3.0) {cWet = dWet - 2.0; dWet = 0.0;}
-	else {dWet -= 3.0;}
+	if (dWet < 1.0f) {aWet = dWet; bWet = 0.0f; cWet = 0.0f; dWet = 0.0f;}
+	else if (dWet < 2.0f) {bWet = dWet - 1.0f; cWet = 0.0f; dWet = 0.0f;}
+	else if (dWet < 3.0f) {cWet = dWet - 2.0f; dWet = 0.0f;}
+	else {dWet -= 3.0f;}
 	//this is one way to make a little set of dry/wet stages that are successively added to the
 	//output as the control is turned up. Each one independently goes from 0-1 and stays at 1
 	//beyond that point: this is a way to progressively add a 'black box' sound processing
 	//which lets you fall through to simpler processing at lower settings.
-	double wet = GetParameter( kParam_Five );
-	double outSample = 0.0;
+	float wet = GetParameter( kParam_Five );
+	float outSample = 0.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
-		double overallDrySample = drySample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
+		float overallDrySample = drySample;
 		
-		if (inTrim != 1.0) inputSample *= inTrim;
+		if (inTrim != 1.0f) inputSample *= inTrim;
 		
-		double nukeLevel = inputSample;
+		float nukeLevel = inputSample;
 
 		//begin XRegion
 		inputSample *= clipFactor;
-		if (inputSample > 1.57079633) inputSample = 1.57079633;
-		if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+		if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		inputSample = sin(inputSample);
 		outSample = biquad[2]*inputSample+biquad[4]*biquad[8]-biquad[5]*biquad[9]-biquad[6]*biquad[10];
 		biquad[8] = biquad[7]; biquad[7] = inputSample; biquad[10] = biquad[9];
 		biquad[9] = outSample; //DF1
 		inputSample = outSample / compensation; nukeLevel = inputSample;
 		
-		if (aWet > 0.0) {
+		if (aWet > 0.0f) {
 			inputSample *= clipFactorA;
-			if (inputSample > 1.57079633) inputSample = 1.57079633;
-			if (inputSample < -1.57079633) inputSample = -1.57079633;
+			if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+			if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 			inputSample = sin(inputSample);
 			outSample = biquadA[2]*inputSample+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 			biquadA[8] = biquadA[7]; biquadA[7] = inputSample; biquadA[10] = biquadA[9];
 			biquadA[9] = outSample; //DF1
-			inputSample = outSample / compensationA; inputSample = (inputSample * aWet) + (nukeLevel * (1.0-aWet));
+			inputSample = outSample / compensationA; inputSample = (inputSample * aWet) + (nukeLevel * (1.0f-aWet));
 			nukeLevel = inputSample;
 		}
-		if (bWet > 0.0) {
+		if (bWet > 0.0f) {
 			inputSample *= clipFactorB;
-			if (inputSample > 1.57079633) inputSample = 1.57079633;
-			if (inputSample < -1.57079633) inputSample = -1.57079633;
+			if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+			if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 			inputSample = sin(inputSample);
 			outSample = biquadB[2]*inputSample+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 			biquadB[8] = biquadB[7]; biquadB[7] = inputSample; biquadB[10] = biquadB[9]; 
 			biquadB[9] = outSample; //DF1
-			inputSample = outSample / compensationB; inputSample = (inputSample * bWet) + (nukeLevel * (1.0-bWet));
+			inputSample = outSample / compensationB; inputSample = (inputSample * bWet) + (nukeLevel * (1.0f-bWet));
 			nukeLevel = inputSample;
 		}
-		if (cWet > 0.0) {
+		if (cWet > 0.0f) {
 			inputSample *= clipFactorC;
-			if (inputSample > 1.57079633) inputSample = 1.57079633;
-			if (inputSample < -1.57079633) inputSample = -1.57079633;
+			if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+			if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 			inputSample = sin(inputSample);
 			outSample = biquadC[2]*inputSample+biquadC[4]*biquadC[8]-biquadC[5]*biquadC[9]-biquadC[6]*biquadC[10];
 			biquadC[8] = biquadC[7]; biquadC[7] = inputSample; biquadC[10] = biquadC[9]; 
 			biquadC[9] = outSample; //DF1
-			inputSample = outSample / compensationC; inputSample = (inputSample * cWet) + (nukeLevel * (1.0-cWet));
+			inputSample = outSample / compensationC; inputSample = (inputSample * cWet) + (nukeLevel * (1.0f-cWet));
 			nukeLevel = inputSample;
 		}
-		if (dWet > 0.0) {
+		if (dWet > 0.0f) {
 			inputSample *= clipFactorD;
-			if (inputSample > 1.57079633) inputSample = 1.57079633;
-			if (inputSample < -1.57079633) inputSample = -1.57079633;
+			if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+			if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 			inputSample = sin(inputSample);
 			outSample = biquadD[2]*inputSample+biquadD[4]*biquadD[8]-biquadD[5]*biquadD[9]-biquadD[6]*biquadD[10];
 			biquadD[8] = biquadD[7]; biquadD[7] = inputSample; biquadD[10] = biquadD[9]; 
 			biquadD[9] = outSample; //DF1
-			inputSample = outSample / compensationD; inputSample = (inputSample * dWet) + (nukeLevel * (1.0-dWet));
+			inputSample = outSample / compensationD; inputSample = (inputSample * dWet) + (nukeLevel * (1.0f-dWet));
 		}
 		//end XRegion
 		
 		//opamp stage
-		if (fabs(iirSampleA)<1.18e-37) iirSampleA = 0.0;
-		iirSampleA = (iirSampleA * (1.0 - iirAmountA)) + (inputSample * iirAmountA);
+		if (fabs(iirSampleA)<1.18e-37f) iirSampleA = 0.0f;
+		iirSampleA = (iirSampleA * (1.0f - iirAmountA)) + (inputSample * iirAmountA);
 		inputSample -= iirSampleA;
 		
 		outSample = biquadE[2]*inputSample+biquadE[3]*biquadE[7]+biquadE[4]*biquadE[8]-biquadE[5]*biquadE[9]-biquadE[6]*biquadE[10];
 		biquadE[8] = biquadE[7]; biquadE[7] = inputSample; inputSample = outSample; biquadE[10] = biquadE[9]; biquadE[9] = inputSample; //DF1		
 		
-		if (inputSample > 1.0) inputSample = 1.0; if (inputSample < -1.0) inputSample = -1.0;
-		inputSample -= (inputSample*inputSample*inputSample*inputSample*inputSample*0.1768);
+		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample -= (inputSample*inputSample*inputSample*inputSample*inputSample*0.1768f);
 		
 		outSample = biquadF[2]*inputSample+biquadF[3]*biquadF[7]+biquadF[4]*biquadF[8]-biquadF[5]*biquadF[9]-biquadF[6]*biquadF[10];
 		biquadF[8] = biquadF[7]; biquadF[7] = inputSample; inputSample = outSample; biquadF[10] = biquadF[9]; biquadF[9] = inputSample; //DF1		
 		//end opamp stage
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (overallDrySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (overallDrySample * (1.0f-wet));
 		}	
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

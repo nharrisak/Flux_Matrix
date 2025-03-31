@@ -34,7 +34,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double sub[22]; //probably worth just using a number here
+			float sub[22]; //probably worth just using a number here
 	};
 	_dram* dram;
 };
@@ -48,34 +48,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	int subStages = pow(GetParameter( kParam_Two ),2)*16.0;
+	int subStages = pow(GetParameter( kParam_Two ),2)*16.0f;
 	if (subStages < 1) subStages = 1;
-	double subTrim = pow((GetParameter( kParam_One )*0.3)+(pow(GetParameter( kParam_Two ),2)*0.2),subStages)/overallscale;
+	float subTrim = pow((GetParameter( kParam_One )*0.3f)+(pow(GetParameter( kParam_Two ),2)*0.2f),subStages)/overallscale;
 	//to use this as an analog modeler for restricting digital lows, find set values that still show bass
 	//Note that this is best used sparingly, on the 'not enough subtraction' side of the node.
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		//you want subStages and subTrim to be hardcoded values when embedding this into something else
-		//then it only needs the dram->sub[] array, and to have it initialized to 0.0
+		//then it only needs the dram->sub[] array, and to have it initialized to 0.0f
 		
 		//begin SubTight section
-		double subSample = inputSample * subTrim;
+		float subSample = inputSample * subTrim;
 		for (int x = 0; x < subStages; x++) {
-			double scale = 0.5+fabs(subSample*0.5);
+			float scale = 0.5f+fabs(subSample*0.5f);
 			subSample = (dram->sub[x]+(sin(dram->sub[x]-subSample)*scale));
 			dram->sub[x] = subSample*scale;
 		}
 		if (subStages % 2 > 0) subSample = -subSample;
-		if (subSample > 0.25) subSample = 0.25;
-		if (subSample < -0.25) subSample = -0.25;
-		inputSample -= (subSample*16.0);
+		if (subSample > 0.25f) subSample = 0.25f;
+		if (subSample < -0.25f) subSample = -0.25f;
+		inputSample -= (subSample*16.0f);
 		//end SubTight section
 		
 		//cut the level WAY down, then the modified Creature code blows up subs.
@@ -85,7 +85,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

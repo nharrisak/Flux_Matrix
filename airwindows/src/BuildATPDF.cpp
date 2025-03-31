@@ -47,8 +47,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 b[11];
-		Float64 f[11];		
+		Float32 b[11];
+		Float32 f[11];		
 		uint32_t fpd;
 	
 	struct _dram {
@@ -66,7 +66,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 inputSample;
+	Float32 inputSample;
 	f[0] = GetParameter( kParam_One );
 	f[1] = GetParameter( kParam_Two );
 	f[2] = GetParameter( kParam_Three );
@@ -77,19 +77,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	f[7] = GetParameter( kParam_Eight );
 	f[8] = GetParameter( kParam_Nine );
 	f[9] = GetParameter( kParam_Ten );
-	Float64 currentDither;
+	Float32 currentDither;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
-		inputSample *= 8388608.0;
+		inputSample *= 8388608.0f;
 		//0-1 is now one bit, now we dither
 		
 		b[9] = b[8]; b[8] = b[7]; b[7] = b[6]; b[6] = b[5];
 		b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1];
-		b[1] = b[0]; b[0] = (double(fpd)/UINT32_MAX);
+		b[1] = b[0]; b[0] = (float(fpd)/UINT32_MAX);
 		
 		currentDither  = (b[0] * f[0]);
 		currentDither += (b[1] * f[1]);
@@ -105,7 +105,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = floor(inputSample);
 		
-		inputSample /= 8388608.0;
+		inputSample /= 8388608.0f;
 
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		//pseudorandom number updater

@@ -27,11 +27,11 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquadA[11];
-		double biquadB[11];
-		double biquadC[11];
-		double biquadD[11];
-		double biquadE[11];
+		float biquadA[11];
+		float biquadB[11];
+		float biquadC[11];
+		float biquadD[11];
+		float biquadE[11];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -49,58 +49,58 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	biquadE[0] = biquadD[0] = biquadC[0] = biquadB[0] = biquadA[0] = 20.0 / GetSampleRate();
-    biquadA[1] = 0.50623256;
-	biquadB[1] = 0.56116312;
-	biquadC[1] = 0.70710678;
-	biquadD[1] = 1.10134463;
-	biquadE[1] = 3.19622661; //tenth order Butterworth out of five biquads
+	biquadE[0] = biquadD[0] = biquadC[0] = biquadB[0] = biquadA[0] = 20.0f / GetSampleRate();
+    biquadA[1] = 0.50623256f;
+	biquadB[1] = 0.56116312f;
+	biquadC[1] = 0.70710678f;
+	biquadD[1] = 1.10134463f;
+	biquadE[1] = 3.19622661f; //tenth order Butterworth out of five biquads
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = norm;
-	biquadA[3] = -2.0 * biquadA[2];
+	biquadA[3] = -2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 		
 	K = tan(M_PI * biquadA[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = norm;
-	biquadB[3] = -2.0 * biquadB[2];
+	biquadB[3] = -2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / biquadC[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadC[1] + K * K);
 	biquadC[2] = norm;
-	biquadC[3] = -2.0 * biquadC[2];
+	biquadC[3] = -2.0f * biquadC[2];
 	biquadC[4] = biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / biquadC[1] + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadD[0]);
-	norm = 1.0 / (1.0 + K / biquadD[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadD[1] + K * K);
 	biquadD[2] = norm;
-	biquadD[3] = -2.0 * biquadD[2];
+	biquadD[3] = -2.0f * biquadD[2];
 	biquadD[4] = biquadD[2];
-	biquadD[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadD[6] = (1.0 - K / biquadD[1] + K * K) * norm;
+	biquadD[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadD[6] = (1.0f - K / biquadD[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadE[0]);
-	norm = 1.0 / (1.0 + K / biquadE[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadE[1] + K * K);
 	biquadE[2] = norm;
-	biquadE[3] = -2.0 * biquadE[2];
+	biquadE[3] = -2.0f * biquadE[2];
 	biquadE[4] = biquadE[2];
-	biquadE[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadE[6] = (1.0 - K / biquadE[1] + K * K) * norm;
+	biquadE[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadE[6] = (1.0f - K / biquadE[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1
 		
@@ -124,7 +124,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

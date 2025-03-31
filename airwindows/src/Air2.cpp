@@ -37,31 +37,31 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 airPrevA;
-		Float64 airEvenA;
-		Float64 airOddA;
-		Float64 airFactorA;
+		Float32 airPrevA;
+		Float32 airEvenA;
+		Float32 airOddA;
+		Float32 airFactorA;
 		bool flipA;
-		Float64 airPrevB;
-		Float64 airEvenB;
-		Float64 airOddB;
-		Float64 airFactorB;
+		Float32 airPrevB;
+		Float32 airEvenB;
+		Float32 airOddB;
+		Float32 airFactorB;
 		bool flipB;
-		Float64 airPrevC;
-		Float64 airEvenC;
-		Float64 airOddC;
-		Float64 airFactorC;
+		Float32 airPrevC;
+		Float32 airEvenC;
+		Float32 airOddC;
+		Float32 airFactorC;
 		bool flop;
-		Float64 tripletPrev;
-		Float64 tripletMid;
-		Float64 tripletA;
-		Float64 tripletB;
-		Float64 tripletC;
-		Float64 tripletFactor;
+		Float32 tripletPrev;
+		Float32 tripletMid;
+		Float32 tripletA;
+		Float32 tripletB;
+		Float32 tripletC;
+		Float32 tripletFactor;
 		int count;
-		double postsine;
+		float postsine;
 		
-		double lastRef[10];
+		float lastRef[10];
 		int cycle;
 		
 		uint32_t fpd;
@@ -80,43 +80,43 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check	
 	
-	Float64 hiIntensity = GetParameter( kParam_One );
-	Float64 tripletIntensity = GetParameter( kParam_Two );
-	Float64 airIntensity = GetParameter( kParam_Three );
-	if (hiIntensity < 0.0) hiIntensity *= 0.57525;
-	if (tripletIntensity < 0.0) tripletIntensity *= 0.71325;
-	if (airIntensity < 0.0) airIntensity *= 0.5712;
+	Float32 hiIntensity = GetParameter( kParam_One );
+	Float32 tripletIntensity = GetParameter( kParam_Two );
+	Float32 airIntensity = GetParameter( kParam_Three );
+	if (hiIntensity < 0.0f) hiIntensity *= 0.57525f;
+	if (tripletIntensity < 0.0f) tripletIntensity *= 0.71325f;
+	if (airIntensity < 0.0f) airIntensity *= 0.5712f;
 	hiIntensity = -pow(hiIntensity,3);
 	tripletIntensity = -pow(tripletIntensity,3);
 	airIntensity = -pow(airIntensity,3);
-	Float64 hiQ = 1.5+fabs(hiIntensity*0.5);
-	Float64 tripletQ = 1.5+fabs(tripletIntensity*0.5);
-	Float64 airQ = 1.5+fabs(airIntensity*0.5);
-	Float64 intensity = (pow(GetParameter( kParam_Four ),3)*4.0) + 0.0001;
-	Float64 mix = GetParameter( kParam_Five );
-	Float64 drymix = (1.0-mix)*4.0;
-	if (drymix > 1.0) drymix = 1.0;
+	Float32 hiQ = 1.5f+fabs(hiIntensity*0.5f);
+	Float32 tripletQ = 1.5f+fabs(tripletIntensity*0.5f);
+	Float32 airQ = 1.5f+fabs(airIntensity*0.5f);
+	Float32 intensity = (pow(GetParameter( kParam_Four ),3)*4.0f) + 0.0001f;
+	Float32 mix = GetParameter( kParam_Five );
+	Float32 drymix = (1.0f-mix)*4.0f;
+	if (drymix > 1.0f) drymix = 1.0f;
 	
 	//all types of air band are running in parallel, not series
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		cycle++;
 		if (cycle == cycleEnd) { //hit the end point and we do an Air sample
-			double correction = 0.0;
-			if (fabs(hiIntensity) > 0.0001) {
+			float correction = 0.0f;
+			if (fabs(hiIntensity) > 0.0001f) {
 				airFactorC = airPrevC - inputSample;
 				if (flop)
 				{
@@ -128,14 +128,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					airOddC += airFactorC; airEvenC -= airFactorC;
 					airFactorC = airOddC * hiIntensity;
 				}
-				airOddC = (airOddC - ((airOddC - airEvenC)/256.0)) / hiQ;
-				airEvenC = (airEvenC - ((airEvenC - airOddC)/256.0)) / hiQ;
+				airOddC = (airOddC - ((airOddC - airEvenC)/256.0f)) / hiQ;
+				airEvenC = (airEvenC - ((airEvenC - airOddC)/256.0f)) / hiQ;
 				airPrevC = inputSample;
 				correction = correction + airFactorC;
 				flop = !flop;
 			}//22k
 			
-			if (fabs(tripletIntensity) > 0.0001) {
+			if (fabs(tripletIntensity) > 0.0001f) {
 				tripletFactor = tripletPrev - inputSample;
 				if (count < 1 || count > 3) count = 1;
 				switch (count)
@@ -161,7 +161,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				count++;
 			}//15K
 			
-			if (fabs(airIntensity) > 0.0001) {
+			if (fabs(airIntensity) > 0.0001f) {
 				if (flop)
 				{
 					airFactorA = airPrevA - inputSample;
@@ -175,8 +175,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 						airOddA += airFactorA; airEvenA -= airFactorA;
 						airFactorA = airOddA * airIntensity;
 					}
-					airOddA = (airOddA - ((airOddA - airEvenA)/256.0)) / airQ;
-					airEvenA = (airEvenA - ((airEvenA - airOddA)/256.0)) / airQ;
+					airOddA = (airOddA - ((airOddA - airEvenA)/256.0f)) / airQ;
+					airEvenA = (airEvenA - ((airEvenA - airOddA)/256.0f)) / airQ;
 					airPrevA = inputSample;
 					correction = correction + airFactorA;
 					flipA = !flipA;
@@ -194,8 +194,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 						airOddB += airFactorB; airEvenB -= airFactorB;
 						airFactorB = airOddB * airIntensity;
 					}
-					airOddB = (airOddB - ((airOddB - airEvenB)/256.0)) / airQ;
-					airEvenB = (airEvenB - ((airEvenB - airOddB)/256.0)) / airQ;
+					airOddB = (airOddB - ((airOddB - airEvenB)/256.0f)) / airQ;
+					airEvenB = (airEvenB - ((airEvenB - airOddB)/256.0f)) / airQ;
 					airPrevB = inputSample;
 					correction = correction + airFactorB;
 					flipB = !flipB;
@@ -203,15 +203,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}//11k
 			
 			correction *= intensity;
-			correction -= 1.0;
-			double bridgerectifier = fabs(correction);
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			correction -= 1.0f;
+			float bridgerectifier = fabs(correction);
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
 			if (correction > 0) correction = bridgerectifier;
 			else correction = -bridgerectifier;
 			correction += postsine;
 			correction /= intensity;
-			inputSample = correction * 4.0 * mix;
+			inputSample = correction * 4.0f * mix;
 			
 			if (cycleEnd == 4) {
 				lastRef[0] = lastRef[4]; //start from previous last
@@ -241,25 +241,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		switch (cycleEnd) //multi-pole average using lastRef[] variables
 		{
 			case 4:
-				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[7])*0.5;
+				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[7])*0.5f;
 				lastRef[7] = lastRef[8]; //continue, do not break
 			case 3:
-				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[6])*0.5;
+				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[6])*0.5f;
 				lastRef[6] = lastRef[8]; //continue, do not break
 			case 2:
-				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[5])*0.5;
+				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[5])*0.5f;
 				lastRef[5] = lastRef[8]; //continue, do not break
 			case 1:
 				break; //no further averaging
 		}
 		
-		if (drymix < 1.0) drySample *= drymix;
+		if (drymix < 1.0f) drySample *= drymix;
 		inputSample += drySample;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

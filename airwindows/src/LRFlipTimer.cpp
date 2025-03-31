@@ -36,8 +36,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	uint32_t time = (uint32_t)(GetParameter( kParam_One ) * 60.0 * GetSampleRate());
-	uint32_t transition = (uint32_t)(GetSampleRate()*0.1);
+	uint32_t time = (uint32_t)(GetParameter( kParam_One ) * 60.0f * GetSampleRate());
+	uint32_t transition = (uint32_t)(GetSampleRate()*0.1f);
 	//number of minutes * 60 seconds * samples per second
 	//transition: tenth of a second crossfade
 
@@ -52,17 +52,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		if (tick < time) {
 			if (tick < transition) {
-				Float64 crossfade;
+				Float32 crossfade;
 				crossfade = tick;
 				crossfade /= transition;
 				//0 to 1 from beginning swapped to end as direct stereo out
-				if (crossfade < 0.5) {
-					outputSampleL = (inputSampleL*crossfade)+(inputSampleR*(1.0-crossfade));
-					outputSampleR = (inputSampleR*crossfade)+(inputSampleL*(1.0-crossfade));
+				if (crossfade < 0.5f) {
+					outputSampleL = (inputSampleL*crossfade)+(inputSampleR*(1.0f-crossfade));
+					outputSampleR = (inputSampleR*crossfade)+(inputSampleL*(1.0f-crossfade));
 				} else {
-					crossfade = fabs(crossfade-1.0);
-					outputSampleL = (inputSampleR*crossfade)+(inputSampleL*(1.0-crossfade));
-					outputSampleR = (inputSampleL*crossfade)+(inputSampleR*(1.0-crossfade));
+					crossfade = fabs(crossfade-1.0f);
+					outputSampleL = (inputSampleR*crossfade)+(inputSampleL*(1.0f-crossfade));
+					outputSampleR = (inputSampleL*crossfade)+(inputSampleR*(1.0f-crossfade));
 				}
 			} else {
 				outputSampleL = inputSampleL;
@@ -71,17 +71,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 		} else {
 			if ((tick - time) < transition) {
-				Float64 crossfade;
+				Float32 crossfade;
 				crossfade = tick-time;
 				crossfade /= transition;
 				//0 to 1 from beginning direct to end as swapped stereo
-				if (crossfade < 0.5) {
-					outputSampleL = (inputSampleR*crossfade)+(inputSampleL*(1.0-crossfade));
-					outputSampleR = (inputSampleL*crossfade)+(inputSampleR*(1.0-crossfade));
+				if (crossfade < 0.5f) {
+					outputSampleL = (inputSampleR*crossfade)+(inputSampleL*(1.0f-crossfade));
+					outputSampleR = (inputSampleL*crossfade)+(inputSampleR*(1.0f-crossfade));
 				} else {
-					crossfade = fabs(crossfade-1.0);
-					outputSampleL = (inputSampleL*crossfade)+(inputSampleR*(1.0-crossfade));
-					outputSampleR = (inputSampleR*crossfade)+(inputSampleL*(1.0-crossfade));
+					crossfade = fabs(crossfade-1.0f);
+					outputSampleL = (inputSampleL*crossfade)+(inputSampleR*(1.0f-crossfade));
+					outputSampleR = (inputSampleR*crossfade)+(inputSampleL*(1.0f-crossfade));
 				}
 			} else {
 				outputSampleL = inputSampleR;

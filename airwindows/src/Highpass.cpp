@@ -33,8 +33,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -57,29 +57,29 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
-	Float64 tight = GetParameter( kParam_Two );
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
+	Float32 tight = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Three );
 	//removed unnecessary dry variable
-	Float64 offset;
-	Float64 inputSample;
-	Float64 outputSample;
+	Float32 offset;
+	Float32 inputSample;
+	Float32 outputSample;
 
 	iirAmount += (iirAmount * tight * tight);
-	if (tight > 0) tight /= 1.5;
-	else tight /=  3.0;
+	if (tight > 0) tight /= 1.5f;
+	else tight /=  3.0f;
 	//we are setting it up so that to either extreme we can get an audible sound,
 	//but sort of scaled so small adjustments don't shift the cutoff frequency yet.
-	if (iirAmount <= 0.0) iirAmount = 0.0;
-	if (iirAmount > 1.0) iirAmount = 1.0;
+	if (iirAmount <= 0.0f) iirAmount = 0.0f;
+	if (iirAmount > 1.0f) iirAmount = 1.0f;
 	//handle the change in cutoff frequency
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		outputSample = inputSample;
 
 		if (tight > 0) offset = (1 - tight) + (fabs(inputSample)*tight);
@@ -97,13 +97,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			outputSample = outputSample - iirSampleB;
 			}
 		
-		if (wet < 1.0) outputSample = (outputSample * wet) + (inputSample * (1.0-wet));
+		if (wet < 1.0f) outputSample = (outputSample * wet) + (inputSample * (1.0f-wet));
 		fpFlip = !fpFlip;
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = outputSample;

@@ -41,31 +41,31 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirSamplehA;
-		Float64 iirSamplehB;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 fastIIRA;
-		Float64 fastIIRB;
-		Float64 slowIIRA;
-		Float64 slowIIRB;
-		Float64 fastIIHA;
-		Float64 fastIIHB;
-		Float64 slowIIHA;
-		Float64 slowIIHB;
+		Float32 iirSamplehA;
+		Float32 iirSamplehB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 fastIIRA;
+		Float32 fastIIRB;
+		Float32 slowIIRA;
+		Float32 slowIIRB;
+		Float32 fastIIHA;
+		Float32 fastIIHB;
+		Float32 slowIIHA;
+		Float32 slowIIHB;
 		SInt32 gcount;
-		Float64 prevInputSample;
+		Float32 prevInputSample;
 		
 		SInt32 fstoredcount;
-		Float64 rateof;
-		Float64 sweep;
-		Float64 nextmax;
+		Float32 rateof;
+		Float32 sweep;
+		Float32 nextmax;
 		uint32_t fpd;
 		bool flip;
 	
 	struct _dram {
-			Float64 d[264];
-		Float64 fl[100];
+			Float32 d[264];
+		Float32 fl[100];
 	};
 	_dram* dram;
 };
@@ -80,71 +80,71 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 inputgain = pow(10.0,GetParameter( kParam_One )/20.0);
-	Float64 outputgain = pow(10.0,GetParameter( kParam_Six )/20.0);
-	Float64 ips = GetParameter( kParam_Two ) * 1.1;
+	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 outputgain = pow(10.0f,GetParameter( kParam_Six )/20.0f);
+	Float32 ips = GetParameter( kParam_Two ) * 1.1f;
 	//slight correction to dial in convincing ips settings
-	if (ips < 1 || ips > 200){ips=33.0;}
+	if (ips < 1 || ips > 200){ips=33.0f;}
 	//sanity checks are always key
-	Float64 tempRandy = 0.04+(0.11/sqrt(ips));
-	Float64 randy;
-	Float64 lps = GetParameter( kParam_Three ) * 1.1;
+	Float32 tempRandy = 0.04f+(0.11f/sqrt(ips));
+	Float32 randy;
+	Float32 lps = GetParameter( kParam_Three ) * 1.1f;
 	//slight correction to dial in convincing ips settings
-	if (lps < 1 || lps > 200){lps=33.0;}
+	if (lps < 1 || lps > 200){lps=33.0f;}
 	//sanity checks are always key
-	Float64 iirAmount = lps/430.0; //for low leaning
-	Float64 bridgerectifier;
-	Float64 fastTaper = ips/15.0;
-	Float64 slowTaper = 2.0/(lps*lps);
-	Float64 lowspeedscale = (5.0/ips);
-	double inputSample;
-	Float64 drySample;
+	Float32 iirAmount = lps/430.0f; //for low leaning
+	Float32 bridgerectifier;
+	Float32 fastTaper = ips/15.0f;
+	Float32 slowTaper = 2.0f/(lps*lps);
+	Float32 lowspeedscale = (5.0f/ips);
+	float inputSample;
+	Float32 drySample;
 	SInt32 count;
 	SInt32 flutcount;
-	Float64 flutterrandy;
-	Float64 temp;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 flutterrandy;
+	Float32 temp;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 depth = pow(GetParameter( kParam_Four ),2)*overallscale;
-	Float64 fluttertrim = 0.00581/overallscale;
-	Float64 sweeptrim = (0.0005*depth)/overallscale;
-	Float64 offset;	
-	Float64 tupi = 3.141592653589793238 * 2.0;
-	Float64 newrate = 0.006/overallscale;
-	Float64 oldrate = 1.0-newrate;	
-	if (overallscale == 0) {fastTaper += 1.0; slowTaper += 1.0;}
+	Float32 depth = pow(GetParameter( kParam_Four ),2)*overallscale;
+	Float32 fluttertrim = 0.00581f/overallscale;
+	Float32 sweeptrim = (0.0005f*depth)/overallscale;
+	Float32 offset;	
+	Float32 tupi = 3.141592653589793238f * 2.0f;
+	Float32 newrate = 0.006f/overallscale;
+	Float32 oldrate = 1.0f-newrate;	
+	if (overallscale == 0) {fastTaper += 1.0f; slowTaper += 1.0f;}
 	else
 	{
 		iirAmount /= overallscale;
 		lowspeedscale *= overallscale;
-		fastTaper = 1.0 + (fastTaper / overallscale);
-		slowTaper = 1.0 + (slowTaper / overallscale);
+		fastTaper = 1.0f + (fastTaper / overallscale);
+		slowTaper = 1.0f + (slowTaper / overallscale);
 	}
-	Float64 noise = GetParameter( kParam_Five ) * 0.5;
-	Float64 invdrywet = GetParameter( kParam_Seven );
-	Float64 dry = 1.0;
-	if (invdrywet > 0.0) dry -= invdrywet;
+	Float32 noise = GetParameter( kParam_Five ) * 0.5f;
+	Float32 invdrywet = GetParameter( kParam_Seven );
+	Float32 dry = 1.0f;
+	if (invdrywet > 0.0f) dry -= invdrywet;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
-		flutterrandy = (double(fpd)/UINT32_MAX);
+		flutterrandy = (float(fpd)/UINT32_MAX);
 		//part of flutter section
 		//now we've got a random flutter, so we're messing with the pitch before tape effects go on
 		if (fstoredcount < 0 || fstoredcount > 30) {fstoredcount = 30;}
 		flutcount = fstoredcount;
 		dram->fl[flutcount+31] = dram->fl[flutcount] = inputSample;
-		offset = (1.0 + sin(sweep)) * depth;
+		offset = (1.0f + sin(sweep)) * depth;
 		flutcount += (int)floor(offset);
 		bridgerectifier = (dram->fl[flutcount] * (1-(offset-floor(offset))));
 		bridgerectifier += (dram->fl[flutcount+1] * (offset-floor(offset)));
 		rateof = (nextmax * newrate) + (rateof * oldrate);
 		sweep += rateof * fluttertrim;
 		sweep += sweep * sweeptrim;
-		if (sweep >= tupi){sweep = 0.0; nextmax = 0.02 + (flutterrandy*0.98);}
+		if (sweep >= tupi){sweep = 0.0f; nextmax = 0.02f + (flutterrandy*0.98f);}
 		fstoredcount--;
 		inputSample = bridgerectifier;
 		//apply to input signal, interpolate samples
@@ -163,9 +163,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//do IIR highpass for leaning out
 		inputSample *= inputgain;
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;
 		//preliminary gain stage using antialiasing
 		
@@ -273,31 +273,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//post-center code on inputSample and halfwaySample in parallel
 		//begin raw sample- inputSample and ataDrySample handled separately here
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
 		//can use as an output limiter
-		if (inputSample > 0.0) inputSample = bridgerectifier;
+		if (inputSample > 0.0f) inputSample = bridgerectifier;
 		else inputSample = -bridgerectifier;
 		//second stage of overdrive to prevent overs and allow bloody loud extremeness		
 		
-		randy = (0.55 + tempRandy + ((double(fpd)/UINT32_MAX)*tempRandy))*noise; //0 to 2
-		inputSample *= (1.0 - randy);
+		randy = (0.55f + tempRandy + ((float(fpd)/UINT32_MAX)*tempRandy))*noise; //0 to 2
+		inputSample *= (1.0f - randy);
 		inputSample += (prevInputSample*randy);
 		prevInputSample = drySample;
 		
 		flip = !flip;
 		
 		//begin invdrywet block with outputgain
-		if (outputgain != 1.0) inputSample *= outputgain;
-		if (invdrywet != 1.0) inputSample *= invdrywet;
-		if (dry != 1.0) drySample *= dry;
-		if (fabs(drySample) > 0.0) inputSample += drySample;
+		if (outputgain != 1.0f) inputSample *= outputgain;
+		if (invdrywet != 1.0f) inputSample *= invdrywet;
+		if (dry != 1.0f) drySample *= dry;
+		if (fabs(drySample) > 0.0f) inputSample += drySample;
 		//end invdrywet block with outputgain
 				
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

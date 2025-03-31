@@ -44,7 +44,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double figure[9];
+		float figure[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -62,92 +62,92 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
-	Float64 boost = pow(10.0,GetParameter( kParam_One )/20.0);
-	figure[0] = 3515.775/GetSampleRate(); //fixed frequency, 3.515775k
-	figure[1] = pow(pow(GetParameter( kParam_Two ),3)*2,2)+0.0001; //resonance
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
+	Float32 boost = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	figure[0] = 3515.775f/GetSampleRate(); //fixed frequency, 3.515775k
+	figure[1] = pow(pow(GetParameter( kParam_Two ),3)*2,2)+0.0001f; //resonance
 	int mode = (int) GetParameter( kParam_Three );
-	Float64 output = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 output = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
 	
 	
-	double K = tan(M_PI * figure[0]);
-	double norm = 1.0 / (1.0 + K / figure[1] + K * K);
+	float K = tan(M_PI * figure[0]);
+	float norm = 1.0f / (1.0f + K / figure[1] + K * K);
 	figure[2] = K / figure[1] * norm;
 	figure[4] = -figure[2];
-	figure[5] = 2.0 * (K * K - 1.0) * norm;
-	figure[6] = (1.0 - K / figure[1] + K * K) * norm;
+	figure[5] = 2.0f * (K * K - 1.0f) * norm;
+	figure[6] = (1.0f - K / figure[1] + K * K) * norm;
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		
 		inputSample = sin(inputSample);
 		//encode Console5: good cleanness
 		
-		double tempSample = (inputSample * figure[2]) + figure[7];
+		float tempSample = (inputSample * figure[2]) + figure[7];
 		figure[7] = -(tempSample * figure[5]) + figure[8];
 		figure[8] = (inputSample * figure[4]) - (tempSample * figure[6]);
 		inputSample = tempSample;
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//decode Console5
 		
-		double groundSample = drySample - inputSample; //set up UnBox
+		float groundSample = drySample - inputSample; //set up UnBox
 		inputSample *= boost; //now, focussed area gets cranked before distort
 		
 		switch (mode)
 		{
 			case 0: //Density
-				if (inputSample > 1.570796326794897) inputSample = 1.570796326794897;
-				if (inputSample < -1.570796326794897) inputSample = -1.570796326794897;
-				//clip to 1.570796326794897 to reach maximum output
+				if (inputSample > 1.570796326794897f) inputSample = 1.570796326794897f;
+				if (inputSample < -1.570796326794897f) inputSample = -1.570796326794897f;
+				//clip to 1.570796326794897f to reach maximum output
 				inputSample = sin(inputSample);
 				break;
 			case 1: //Drive				
-				if (inputSample > 1.0) inputSample = 1.0;
-				if (inputSample < -1.0) inputSample = -1.0;
-				inputSample -= (inputSample * (fabs(inputSample) * 0.6) * (fabs(inputSample) * 0.6));
-				inputSample *= 1.6;
+				if (inputSample > 1.0f) inputSample = 1.0f;
+				if (inputSample < -1.0f) inputSample = -1.0f;
+				inputSample -= (inputSample * (fabs(inputSample) * 0.6f) * (fabs(inputSample) * 0.6f));
+				inputSample *= 1.6f;
 				break;
 			case 2: //Spiral
-				if (inputSample > 1.2533141373155) inputSample = 1.2533141373155;
-				if (inputSample < -1.2533141373155) inputSample = -1.2533141373155;
-				//clip to 1.2533141373155 to reach maximum output
-				inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+				if (inputSample > 1.2533141373155f) inputSample = 1.2533141373155f;
+				if (inputSample < -1.2533141373155f) inputSample = -1.2533141373155f;
+				//clip to 1.2533141373155f to reach maximum output
+				inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 				break;
 			case 3: //Mojo
-				double mojo; mojo = pow(fabs(inputSample),0.25);
-				if (mojo > 0.0) inputSample = (sin(inputSample * mojo * M_PI * 0.5) / mojo) * 0.987654321;
+				float mojo; mojo = pow(fabs(inputSample),0.25f);
+				if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 				//mojo is the one that flattens WAAAAY out very softly before wavefolding				
 				break;
 			case 4: //Dyno
-				double dyno; dyno = pow(fabs(inputSample),4);
-				if (dyno > 0.0) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321;
+				float dyno; dyno = pow(fabs(inputSample),4);
+				if (dyno > 0.0f) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321f;
 				//dyno is the one that tries to raise peak energy				
 				break;
 		}				
 		
-		if (output != 1.0) {
+		if (output != 1.0f) {
 			inputSample *= output;
 		}
 		
 		inputSample += groundSample; //effectively UnBox
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -35,29 +35,29 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 muVary;
-		Float64 muAttack;
-		Float64 muNewSpeed;
-		Float64 muSpeedA;
-		Float64 muSpeedB;
-		Float64 muSpeedC;
-		Float64 muSpeedD;
-		Float64 muSpeedE;
-		Float64 muCoefficientA;
-		Float64 muCoefficientB;
-		Float64 muCoefficientC;
-		Float64 muCoefficientD;
-		Float64 muCoefficientE;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 lastCoefficientA;
-		Float64 lastCoefficientB;
-		Float64 lastCoefficientC;
-		Float64 lastCoefficientD;
-		Float64 mergedCoefficients;
+		Float32 muVary;
+		Float32 muAttack;
+		Float32 muNewSpeed;
+		Float32 muSpeedA;
+		Float32 muSpeedB;
+		Float32 muSpeedC;
+		Float32 muSpeedD;
+		Float32 muSpeedE;
+		Float32 muCoefficientA;
+		Float32 muCoefficientB;
+		Float32 muCoefficientC;
+		Float32 muCoefficientD;
+		Float32 muCoefficientE;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 lastCoefficientA;
+		Float32 lastCoefficientB;
+		Float32 lastCoefficientC;
+		Float32 lastCoefficientD;
+		Float32 mergedCoefficients;
 		int count;
 		bool fpFlip;
 		uint32_t fpd;
@@ -76,37 +76,37 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double highpassSample;
-	double highpassSampleB;
-	Float64 threshold = 1.01 - (1.0-pow(1.0-(GetParameter( kParam_One )*0.5),4));
-	Float64 iirAmount = pow(GetParameter( kParam_Two ),4)/overallscale;
-	Float64 output = GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
+	float highpassSample;
+	float highpassSampleB;
+	Float32 threshold = 1.01f - (1.0f-pow(1.0f-(GetParameter( kParam_One )*0.5f),4));
+	Float32 iirAmount = pow(GetParameter( kParam_Two ),4)/overallscale;
+	Float32 output = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		Float64 muMakeupGain = 1.0 / threshold;
-		Float64 outMakeupGain = sqrt(muMakeupGain);
+		Float32 muMakeupGain = 1.0f / threshold;
+		Float32 outMakeupGain = sqrt(muMakeupGain);
 		muMakeupGain += outMakeupGain;
-		muMakeupGain *= 0.5;
-		outMakeupGain *= 0.5;
+		muMakeupGain *= 0.5f;
+		outMakeupGain *= 0.5f;
 		//gain settings around threshold
-		Float64 release = mergedCoefficients * 32768.0;
+		Float32 release = mergedCoefficients * 32768.0f;
 		release /= overallscale;
-		Float64 fastest = sqrt(release);
+		Float32 fastest = sqrt(release);
 		//speed settings around release
-		Float64 lastCorrection = mergedCoefficients;
+		Float32 lastCorrection = mergedCoefficients;
 		// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
 		
-		if (muMakeupGain != 1.0) inputSample = inputSample * muMakeupGain;
+		if (muMakeupGain != 1.0f) inputSample = inputSample * muMakeupGain;
 		
 		highpassSampleB = highpassSample = inputSample;
 		
@@ -120,7 +120,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				{
 					muVary = threshold / fabs(highpassSample);
 					muAttack = sqrt(fabs(muSpeedA));
-					muCoefficientA = muCoefficientA * (muAttack-1.0);
+					muCoefficientA = muCoefficientA * (muAttack-1.0f);
 					if (muVary < threshold)
 					{
 						muCoefficientA = muCoefficientA + threshold;
@@ -133,8 +133,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				}
 				else
 				{
-					muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-					muCoefficientA = muCoefficientA + 1.0;
+					muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+					muCoefficientA = muCoefficientA + 1.0f;
 					muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 				}
 				muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -143,7 +143,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				lastCoefficientA = pow(muCoefficientA,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
-				lastCoefficientA *= (1.0 - lastCorrection);
+				lastCoefficientA *= (1.0f - lastCorrection);
 				lastCoefficientA += (muCoefficientA * lastCorrection);
 				lastCoefficientB = lastCoefficientA;
 				break;
@@ -167,8 +167,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				}
 				else
 				{
-					muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-					muCoefficientB = muCoefficientB + 1.0;
+					muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+					muCoefficientB = muCoefficientB + 1.0f;
 					muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 				}
 				muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -177,7 +177,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				lastCoefficientA = pow(muCoefficientB,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
-				lastCoefficientA *= (1.0 - lastCorrection);
+				lastCoefficientA *= (1.0f - lastCorrection);
 				lastCoefficientA += (muCoefficientB * lastCorrection);
 				lastCoefficientB = lastCoefficientA;
 				break;
@@ -201,8 +201,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				}
 				else
 				{
-					muCoefficientC = muCoefficientC * ((muSpeedC * muSpeedC)-1.0);
-					muCoefficientC = muCoefficientC + 1.0;
+					muCoefficientC = muCoefficientC * ((muSpeedC * muSpeedC)-1.0f);
+					muCoefficientC = muCoefficientC + 1.0f;
 					muCoefficientC = muCoefficientC / (muSpeedC * muSpeedC);
 				}
 				muNewSpeed = muSpeedC * (muSpeedC-1);
@@ -211,7 +211,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				lastCoefficientA = pow(muCoefficientC,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
-				lastCoefficientA *= (1.0 - lastCorrection);
+				lastCoefficientA *= (1.0f - lastCorrection);
 				lastCoefficientA += (muCoefficientC * lastCorrection);
 				lastCoefficientB = lastCoefficientA;
 				break;
@@ -228,7 +228,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			{
 				muVary = threshold / fabs(highpassSampleB);
 				muAttack = sqrt(fabs(muSpeedD));
-				muCoefficientD = muCoefficientD * (muAttack-1.0);
+				muCoefficientD = muCoefficientD * (muAttack-1.0f);
 				if (muVary < threshold)
 				{
 					muCoefficientD = muCoefficientD + threshold;
@@ -241,8 +241,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}
 			else
 			{
-				muCoefficientD = muCoefficientD * ((muSpeedD * muSpeedD)-1.0);
-				muCoefficientD = muCoefficientD + 1.0;
+				muCoefficientD = muCoefficientD * ((muSpeedD * muSpeedD)-1.0f);
+				muCoefficientD = muCoefficientD + 1.0f;
 				muCoefficientD = muCoefficientD / (muSpeedD * muSpeedD);
 			}
 			muNewSpeed = muSpeedD * (muSpeedD-1);
@@ -251,7 +251,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			lastCoefficientC = pow(muCoefficientE,2);
 			mergedCoefficients += lastCoefficientD;
 			mergedCoefficients += lastCoefficientC;
-			lastCoefficientC *= (1.0 - lastCorrection);
+			lastCoefficientC *= (1.0f - lastCorrection);
 			lastCoefficientC += (muCoefficientD * lastCorrection);
 			lastCoefficientD = lastCoefficientC;
 		} else {
@@ -261,7 +261,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			{
 				muVary = threshold / fabs(highpassSampleB);
 				muAttack = sqrt(fabs(muSpeedE));
-				muCoefficientE = muCoefficientE * (muAttack-1.0);
+				muCoefficientE = muCoefficientE * (muAttack-1.0f);
 				if (muVary < threshold)
 				{
 					muCoefficientE = muCoefficientE + threshold;
@@ -274,8 +274,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}
 			else
 			{
-				muCoefficientE = muCoefficientE * ((muSpeedE * muSpeedE)-1.0);
-				muCoefficientE = muCoefficientE + 1.0;
+				muCoefficientE = muCoefficientE * ((muSpeedE * muSpeedE)-1.0f);
+				muCoefficientE = muCoefficientE + 1.0f;
 				muCoefficientE = muCoefficientE / (muSpeedE * muSpeedE);
 			}
 			muNewSpeed = muSpeedE * (muSpeedE-1);
@@ -284,23 +284,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			lastCoefficientC = pow(muCoefficientE,2);
 			mergedCoefficients += lastCoefficientD;
 			mergedCoefficients += lastCoefficientC;
-			lastCoefficientC *= (1.0 - lastCorrection);
+			lastCoefficientC *= (1.0f - lastCorrection);
 			lastCoefficientC += (muCoefficientE * lastCorrection);
 			lastCoefficientD = lastCoefficientC;
 		}
-		mergedCoefficients *= 0.25;
+		mergedCoefficients *= 0.25f;
 		inputSample *= mergedCoefficients;
 		
-		if (outMakeupGain != 1.0) inputSample = inputSample * outMakeupGain;
+		if (outMakeupGain != 1.0f) inputSample = inputSample * outMakeupGain;
 		
 		fpFlip = !fpFlip;
 		
-		if (output < 1.0) {
+		if (output < 1.0f) {
 			inputSample *= output;
 		}
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither

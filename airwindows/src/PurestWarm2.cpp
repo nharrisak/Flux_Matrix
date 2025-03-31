@@ -48,7 +48,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double fixA[fix_total];
+			float fixA[fix_total];
 	};
 	_dram* dram;
 };
@@ -62,41 +62,41 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 pos = GetParameter( kParam_One );
-	Float64 neg = GetParameter( kParam_Two );
-	double cutoff = 25000.0 / GetSampleRate();
-	if (cutoff > 0.49) cutoff = 0.49; //don't crash if run at 44.1k
+	Float32 pos = GetParameter( kParam_One );
+	Float32 neg = GetParameter( kParam_Two );
+	float cutoff = 25000.0f / GetSampleRate();
+	if (cutoff > 0.49f) cutoff = 0.49f; //don't crash if run at 44.1k
 	dram->fixA[fix_freq] = cutoff;
-	dram->fixA[fix_reso] = 0.70710678; //butterworth Q
-	double K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_reso] = 0.70710678f; //butterworth Q
+	float K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
+	float norm = 1.0f / (1.0f + K / dram->fixA[fix_reso] + K * K);
 	dram->fixA[fix_a0] = K * K * norm;
-	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a1] = 2.0f * dram->fixA[fix_a0];
 	dram->fixA[fix_a2] = dram->fixA[fix_a0];
-	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
-	dram->fixA[fix_sL1] = 0.0;
-	dram->fixA[fix_sL2] = 0.0;
-	dram->fixA[fix_sR1] = 0.0;
-	dram->fixA[fix_sR2] = 0.0;
+	dram->fixA[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixA[fix_b2] = (1.0f - K / dram->fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_sL1] = 0.0f;
+	dram->fixA[fix_sL2] = 0.0f;
+	dram->fixA[fix_sR1] = 0.0f;
+	dram->fixA[fix_sR2] = 0.0f;
 	//define filters here: on VST you can't define them in reset 'cos getSampleRate isn't returning good information yet
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		float outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
 		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
 		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		if (inputSample > 0) inputSample = (sin(inputSample*1.57079634*pos)/1.57079634)+(inputSample*(1.0-pos));
-		if (inputSample < 0) inputSample = (sin(inputSample*1.57079634*neg)/1.57079634)+(inputSample*(1.0-neg));
+		if (inputSample > 0) inputSample = (sin(inputSample*1.57079634f*pos)/1.57079634f)+(inputSample*(1.0f-pos));
+		if (inputSample < 0) inputSample = (sin(inputSample*1.57079634f*neg)/1.57079634f)+(inputSample*(1.0f-neg));
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

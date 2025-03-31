@@ -31,15 +31,15 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 noiseA;
-		Float64 noiseB;
-		Float64 noiseC;
+		Float32 noiseA;
+		Float32 noiseB;
+		Float32 noiseC;
 		int position;
 		int quadratic;
 		bool flip;
 		bool filterflip;
-		Float64 b[11];
-		Float64 f[11];
+		Float32 b[11];
+		Float32 f[11];
 		int lastAlgorithm;
 		uint32_t fpd;
 	
@@ -61,25 +61,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 cutoff = pow((GetParameter( kParam_One )*0.89)+0.1,3);
-	if (cutoff > 1.0) cutoff = 1.0;
-	Float64 invcutoff = 1.0 - cutoff;
+	Float32 cutoff = pow((GetParameter( kParam_One )*0.89f)+0.1f,3);
+	if (cutoff > 1.0f) cutoff = 1.0f;
+	Float32 invcutoff = 1.0f - cutoff;
 	//this is the lowpass
 	
-	Float64 overallscale = ((1.0-GetParameter( kParam_One ))*9.0)+1.0;
-	Float64 gain = overallscale;
-	if (gain > 1.0) {f[0] = 1.0; gain -= 1.0;} else {f[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[1] = 1.0; gain -= 1.0;} else {f[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[2] = 1.0; gain -= 1.0;} else {f[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[3] = 1.0; gain -= 1.0;} else {f[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[4] = 1.0; gain -= 1.0;} else {f[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[5] = 1.0; gain -= 1.0;} else {f[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[6] = 1.0; gain -= 1.0;} else {f[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[7] = 1.0; gain -= 1.0;} else {f[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[8] = 1.0; gain -= 1.0;} else {f[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[9] = 1.0; gain -= 1.0;} else {f[9] = gain; gain = 0.0;}
+	Float32 overallscale = ((1.0f-GetParameter( kParam_One ))*9.0f)+1.0f;
+	Float32 gain = overallscale;
+	if (gain > 1.0f) {f[0] = 1.0f; gain -= 1.0f;} else {f[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[1] = 1.0f; gain -= 1.0f;} else {f[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[2] = 1.0f; gain -= 1.0f;} else {f[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[3] = 1.0f; gain -= 1.0f;} else {f[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[4] = 1.0f; gain -= 1.0f;} else {f[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[5] = 1.0f; gain -= 1.0f;} else {f[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[6] = 1.0f; gain -= 1.0f;} else {f[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[7] = 1.0f; gain -= 1.0f;} else {f[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[8] = 1.0f; gain -= 1.0f;} else {f[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[9] = 1.0f; gain -= 1.0f;} else {f[9] = gain; gain = 0.0f;}
 	//this is the moving average with remainders
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	f[0] /= overallscale;
 	f[1] /= overallscale;
 	f[2] /= overallscale;
@@ -94,8 +94,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 	int lowcut = GetParameter( kParam_Two );
 	if (lastAlgorithm != lowcut) {
-		noiseA = 0.0; noiseB = 0.0; noiseC = 0.0;
-		for(int count = 0; count < 11; count++) {b[count] = 0.0;}
+		noiseA = 0.0f; noiseB = 0.0f; noiseC = 0.0f;
+		for(int count = 0; count < 11; count++) {b[count] = 0.0f;}
 		lastAlgorithm = lowcut;
 	}
 	//cuts the noise back to 0 if we are changing algorithms,
@@ -121,9 +121,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (lowcut < 1) {lowcut = 1; dcut= 11;}
 	//this is the mechanism for cutting back subs without filtering
 	
-	Float64 rumbletrim = sqrt(lowcut);
+	Float32 rumbletrim = sqrt(lowcut);
 	//this among other things is just to give volume compensation
-	Float64 inputSample;
+	Float32 inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
@@ -151,8 +151,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//it's a pure random walk that will generate DC.
 		}
 		
-		if (flip) noiseA += (double(fpd)/UINT32_MAX);
-		else noiseA -= (double(fpd)/UINT32_MAX);
+		if (flip) noiseA += (float(fpd)/UINT32_MAX);
+		else noiseA -= (float(fpd)/UINT32_MAX);
 		//here's the guts of the random walk
 	
 		if (filterflip)
@@ -178,7 +178,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += (b[8] * f[8]);
 		inputSample += (b[9] * f[9]);
 		
-		inputSample *= 0.1;
+		inputSample *= 0.1f;
 		inputSample *= invcutoff;
 		inputSample /= rumbletrim;
 		
@@ -188,7 +188,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 
 		*destP = inputSample;

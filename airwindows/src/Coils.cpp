@@ -33,7 +33,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double figure[9];
+		float figure[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -51,57 +51,57 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
-	Float64 boost = 1.0-pow(GetParameter( kParam_One ),2);
-	if (boost < 0.001) boost = 0.001; //there's a divide, we can't have this be zero
-	figure[0] = 600.0/GetSampleRate(); //fixed frequency, 600hz
-	figure[1] = 0.023; //resonance
-	Float64 offset = GetParameter( kParam_Two );
-	Float64 sinOffset = sin(offset); //we can cache this, it's expensive
-	Float64 wet = GetParameter( kParam_Three );
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
+	Float32 boost = 1.0f-pow(GetParameter( kParam_One ),2);
+	if (boost < 0.001f) boost = 0.001f; //there's a divide, we can't have this be zero
+	figure[0] = 600.0f/GetSampleRate(); //fixed frequency, 600hz
+	figure[1] = 0.023f; //resonance
+	Float32 offset = GetParameter( kParam_Two );
+	Float32 sinOffset = sin(offset); //we can cache this, it's expensive
+	Float32 wet = GetParameter( kParam_Three );
 	
 	
-	double K = tan(M_PI * figure[0]);
-	double norm = 1.0 / (1.0 + K / figure[1] + K * K);
+	float K = tan(M_PI * figure[0]);
+	float norm = 1.0f / (1.0f + K / figure[1] + K * K);
 	figure[2] = K / figure[1] * norm;
 	figure[4] = -figure[2];
-	figure[5] = 2.0 * (K * K - 1.0) * norm;
-	figure[6] = (1.0 - K / figure[1] + K * K) * norm;
+	figure[5] = 2.0f * (K * K - 1.0f) * norm;
+	figure[6] = (1.0f - K / figure[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		//double tempSample = (inputSample * figure[2]) + figure[7];
+		//float tempSample = (inputSample * figure[2]) + figure[7];
 		//figure[7] = -(tempSample * figure[5]) + figure[8];
 		//figure[8] = (inputSample * figure[4]) - (tempSample * figure[6]);
 		//inputSample = tempSample + sin(drySample-tempSample);
 		//or
 		//inputSample = tempSample + ((sin(((drySample-tempSample)/boost)+offset)-sinOffset)*boost);
 		//
-		//given a bandlimited inputSample, freq 600hz and Q of 0.023, this restores a lot of
+		//given a bandlimited inputSample, freq 600hz and Q of 0.023f, this restores a lot of
 		//the full frequencies but distorts like a real transformer. Purest case, and since
 		//we are not using a high Q we can remove the extra sin/asin on the biquad.
 		
-		double tempSample = (inputSample * figure[2]) + figure[7];
+		float tempSample = (inputSample * figure[2]) + figure[7];
 		figure[7] = -(tempSample * figure[5]) + figure[8];
 		figure[8] = (inputSample * figure[4]) - (tempSample * figure[6]);
 		inputSample = tempSample + ((sin(((drySample-tempSample)/boost)+offset)-sinOffset)*boost);
-		//given a bandlimited inputSample, freq 600hz and Q of 0.023, this restores a lot of
+		//given a bandlimited inputSample, freq 600hz and Q of 0.023f, this restores a lot of
 		//the full frequencies but distorts like a real transformer. Since
 		//we are not using a high Q we can remove the extra sin/asin on the biquad.
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

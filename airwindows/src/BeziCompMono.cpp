@@ -44,15 +44,15 @@ struct _kernel {
 			bez_total
 		}; //the new undersampling. bez signifies the bezier curve reconstruction
 		
-		double lastSampleL;
-		double intermediateL[16];
+		float lastSampleL;
+		float intermediateL[16];
 		bool wasPosClipL;
 		bool wasNegClipL;
 
 		uint32_t fpd;
 	
 	struct _dram {
-			double bezComp[bez_total];
+			float bezComp[bez_total];
 	};
 	_dram* dram;
 };
@@ -66,52 +66,52 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
 
-	double bezCThresh = pow(GetParameter( kParam_A ),2.0) * 64.0;
-	double bezMakeUp = sqrt(bezCThresh+1.0);
-	double bezRez = (pow(GetParameter( kParam_B ),6.0)+0.0001)/overallscale; if (bezRez > 1.0) bezRez = 1.0;
-	double wet = GetParameter( kParam_C );
+	float bezCThresh = pow(GetParameter( kParam_A ),2.0f) * 64.0f;
+	float bezMakeUp = sqrt(bezCThresh+1.0f);
+	float bezRez = (pow(GetParameter( kParam_B ),6.0f)+0.0001f)/overallscale; if (bezRez > 1.0f) bezRez = 1.0f;
+	float wet = GetParameter( kParam_C );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *sourceP;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpd * 1.18e-17;
-		double drySampleL = inputSampleL;
+		float inputSampleL = *sourceP;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpd * 1.18e-17f;
+		float drySampleL = inputSampleL;
 		
 		dram->bezComp[bez_cycle] += bezRez;
 		dram->bezComp[bez_SampL] += (fabs(inputSampleL) * bezRez);
 		
-		if (dram->bezComp[bez_cycle] > 1.0) {
-			dram->bezComp[bez_cycle] -= 1.0;
+		if (dram->bezComp[bez_cycle] > 1.0f) {
+			dram->bezComp[bez_cycle] -= 1.0f;
 			dram->bezComp[bez_CL] = dram->bezComp[bez_BL];
 			dram->bezComp[bez_BL] = dram->bezComp[bez_AL];
 			dram->bezComp[bez_AL] = dram->bezComp[bez_SampL];
-			dram->bezComp[bez_SampL] = 0.0;
+			dram->bezComp[bez_SampL] = 0.0f;
 		}
-		double CBL = (dram->bezComp[bez_CL]*(1.0-dram->bezComp[bez_cycle]))+(dram->bezComp[bez_BL]*dram->bezComp[bez_cycle]);
-		double BAL = (dram->bezComp[bez_BL]*(1.0-dram->bezComp[bez_cycle]))+(dram->bezComp[bez_AL]*dram->bezComp[bez_cycle]);
-		double CBAL = (dram->bezComp[bez_BL]+(CBL*(1.0-dram->bezComp[bez_cycle]))+(BAL*dram->bezComp[bez_cycle]))*0.5;
-		inputSampleL *= 1.0-(fmin(CBAL*bezCThresh,1.0));
+		float CBL = (dram->bezComp[bez_CL]*(1.0f-dram->bezComp[bez_cycle]))+(dram->bezComp[bez_BL]*dram->bezComp[bez_cycle]);
+		float BAL = (dram->bezComp[bez_BL]*(1.0f-dram->bezComp[bez_cycle]))+(dram->bezComp[bez_AL]*dram->bezComp[bez_cycle]);
+		float CBAL = (dram->bezComp[bez_BL]+(CBL*(1.0f-dram->bezComp[bez_cycle]))+(BAL*dram->bezComp[bez_cycle]))*0.5f;
+		inputSampleL *= 1.0f-(fmin(CBAL*bezCThresh,1.0f));
 		inputSampleL *= bezMakeUp;
 		
-		if (wet < 1.0) inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
+		if (wet < 1.0f) inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
 		
 		//begin ClipOnly2 stereo as a little, compressed chunk that can be dropped into code
-		if (inputSampleL > 4.0) inputSampleL = 4.0; if (inputSampleL < -4.0) inputSampleL = -4.0;
+		if (inputSampleL > 4.0f) inputSampleL = 4.0f; if (inputSampleL < -4.0f) inputSampleL = -4.0f;
 		if (wasPosClipL == true) { //current will be over
-			if (inputSampleL<lastSampleL) lastSampleL=0.7058208+(inputSampleL*0.2609148);
-			else lastSampleL = 0.2491717+(lastSampleL*0.7390851);
+			if (inputSampleL<lastSampleL) lastSampleL=0.7058208f+(inputSampleL*0.2609148f);
+			else lastSampleL = 0.2491717f+(lastSampleL*0.7390851f);
 		} wasPosClipL = false;
-		if (inputSampleL>0.9549925859) {wasPosClipL=true;inputSampleL=0.7058208+(lastSampleL*0.2609148);}
+		if (inputSampleL>0.9549925859f) {wasPosClipL=true;inputSampleL=0.7058208f+(lastSampleL*0.2609148f);}
 		if (wasNegClipL == true) { //current will be -over
-			if (inputSampleL > lastSampleL) lastSampleL=-0.7058208+(inputSampleL*0.2609148);
-			else lastSampleL=-0.2491717+(lastSampleL*0.7390851);
+			if (inputSampleL > lastSampleL) lastSampleL=-0.7058208f+(inputSampleL*0.2609148f);
+			else lastSampleL=-0.2491717f+(lastSampleL*0.7390851f);
 		} wasNegClipL = false;
-		if (inputSampleL<-0.9549925859) {wasNegClipL=true;inputSampleL=-0.7058208+(lastSampleL*0.2609148);}
+		if (inputSampleL<-0.9549925859f) {wasNegClipL=true;inputSampleL=-0.7058208f+(lastSampleL*0.2609148f);}
 		intermediateL[spacing] = inputSampleL;
         inputSampleL = lastSampleL; //Latency is however many samples equals one 44.1k sample
 		for (int x = spacing; x > 0; x--) intermediateL[x-1] = intermediateL[x];
@@ -121,7 +121,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSampleL += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSampleL;

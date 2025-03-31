@@ -37,36 +37,36 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirMidRollerA;
-		Float64 iirMidRollerB;
-		Float64 iirMidRollerC;
+		Float32 iirMidRollerA;
+		Float32 iirMidRollerB;
+		Float32 iirMidRollerC;
 		
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		Float64 iirSampleG;
-		Float64 iirSampleH;
-		Float64 iirSampleI;
-		Float64 iirSampleJ;
-		Float64 iirSampleK;
-		Float64 iirSampleL;
-		Float64 iirSampleM;
-		Float64 iirSampleN;
-		Float64 iirSampleO;
-		Float64 iirSampleP;
-		Float64 iirSampleQ;
-		Float64 iirSampleR;
-		Float64 iirSampleS;
-		Float64 iirSampleT;
-		Float64 iirSampleU;
-		Float64 iirSampleV;
-		Float64 iirSampleW;
-		Float64 iirSampleX;
-		Float64 iirSampleY;
-		Float64 iirSampleZ;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		Float32 iirSampleG;
+		Float32 iirSampleH;
+		Float32 iirSampleI;
+		Float32 iirSampleJ;
+		Float32 iirSampleK;
+		Float32 iirSampleL;
+		Float32 iirSampleM;
+		Float32 iirSampleN;
+		Float32 iirSampleO;
+		Float32 iirSampleP;
+		Float32 iirSampleQ;
+		Float32 iirSampleR;
+		Float32 iirSampleS;
+		Float32 iirSampleT;
+		Float32 iirSampleU;
+		Float32 iirSampleV;
+		Float32 iirSampleW;
+		Float32 iirSampleX;
+		Float32 iirSampleY;
+		Float32 iirSampleZ;
 		int flip;
 		
 		uint32_t fpd;
@@ -85,44 +85,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 inputgain = GetParameter( kParam_One );
-	Float64 SoftenControl = GetParameter( kParam_Two );
-	Float64 RollAmount = (1.0-SoftenControl)/overallscale;
-	Float64 iirAmount = (0.004*(1.0-GetParameter( kParam_Three )))/overallscale;
-	Float64 altAmount = 1.0 - iirAmount;
-	Float64 outputgain = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 inputgain = GetParameter( kParam_One );
+	Float32 SoftenControl = GetParameter( kParam_Two );
+	Float32 RollAmount = (1.0f-SoftenControl)/overallscale;
+	Float32 iirAmount = (0.004f*(1.0f-GetParameter( kParam_Three )))/overallscale;
+	Float32 altAmount = 1.0f - iirAmount;
+	Float32 outputgain = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
 	//removed unnecessary dry variable
-	Float64 HighsSample = 0.0;
-	Float64 Subtract;
-	Float64 bridgerectifier;
-	Float64 randy;
-	Float64 invrandy;
-	Float64 tempSample;
-	Float64 drySample;
+	Float32 HighsSample = 0.0f;
+	Float32 Subtract;
+	Float32 bridgerectifier;
+	Float32 randy;
+	Float32 invrandy;
+	Float32 tempSample;
+	Float32 drySample;
 	
 	
-	double inputSample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		
-		if (inputgain != 1.0) {
+		if (inputgain != 1.0f) {
 			inputSample *= inputgain;
 		}		
 		
-		randy = (double(fpd)/UINT32_MAX) * SoftenControl; //for soften
-		invrandy = (1.0-randy);
-		randy /= 2.0;
+		randy = (float(fpd)/UINT32_MAX) * SoftenControl; //for soften
+		invrandy = (1.0f-randy);
+		randy /= 2.0f;
 		//we've set up so that we dial in the amount of the alt sections (in pairs) with invrandy being the source section
 		
-		Subtract = 0.0;
+		Subtract = 0.0f;
 		tempSample = inputSample;		
 		iirSampleA = (iirSampleA * altAmount) + (tempSample * iirAmount); tempSample -= iirSampleA; Subtract += iirSampleA;
 		iirSampleB = (iirSampleB * altAmount) + (tempSample * iirAmount); tempSample -= iirSampleB; Subtract += iirSampleB;
@@ -161,17 +161,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		switch (flip)
 		{
 			case 1:				
-				iirMidRollerA = (iirMidRollerA * (1.0 - RollAmount)) + (inputSample * RollAmount);
+				iirMidRollerA = (iirMidRollerA * (1.0f - RollAmount)) + (inputSample * RollAmount);
 				iirMidRollerA = (invrandy * iirMidRollerA) + (randy * iirMidRollerB) + (randy * iirMidRollerC);
 				HighsSample = inputSample - iirMidRollerA;
 				break;
 			case 2:
-				iirMidRollerB = (iirMidRollerB * (1.0 - RollAmount)) + (inputSample * RollAmount);
+				iirMidRollerB = (iirMidRollerB * (1.0f - RollAmount)) + (inputSample * RollAmount);
 				iirMidRollerB = (randy * iirMidRollerA) + (invrandy * iirMidRollerB) + (randy * iirMidRollerC);
 				HighsSample = inputSample - iirMidRollerB;
 				break;
 			case 3:
-				iirMidRollerC = (iirMidRollerC * (1.0 - RollAmount)) + (inputSample * RollAmount);
+				iirMidRollerC = (iirMidRollerC * (1.0f - RollAmount)) + (inputSample * RollAmount);
 				iirMidRollerC = (randy * iirMidRollerA) + (randy * iirMidRollerB) + (invrandy * iirMidRollerC);
 				HighsSample = inputSample - iirMidRollerC;
 				break;
@@ -179,8 +179,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		flip++; //increment the triplet counter
 		
 		Subtract = HighsSample;		
-		bridgerectifier = fabs(Subtract)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bridgerectifier = fabs(Subtract)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = 1-cos(bridgerectifier);
 		if (Subtract > 0) Subtract = bridgerectifier;
 		if (Subtract < 0) Subtract = -bridgerectifier;
@@ -191,18 +191,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//transients, plus we are subtracting any artifacts we got from the negative Density.
 		
 		
-		if (outputgain != 1.0) {
+		if (outputgain != 1.0f) {
 			inputSample *= outputgain;
 		}
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

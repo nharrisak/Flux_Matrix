@@ -37,9 +37,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 lastSample;
-		Float64 limitPos;
-		Float64 limitNeg;
+		Float32 lastSample;
+		Float32 limitPos;
+		Float32 limitNeg;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -56,34 +56,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 inputGain = pow(10.0,(GetParameter( kParam_One ))/20.0);
-	Float64 posThreshold = pow(10.0,(GetParameter( kParam_Two ))/20.0);
-	Float64 posTarget = posThreshold;
-	Float64 negThreshold = -pow(10.0,(GetParameter( kParam_Three ))/20.0);
-	Float64 negTarget = negThreshold;
-	Float64 voicing = GetParameter( kParam_Four );
-	if (voicing == 0.618) voicing = 0.618033988749894848204586;
-	//special case: we will do a perfect golden ratio as the default 0.618
+	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 posThreshold = pow(10.0f,(GetParameter( kParam_Two ))/20.0f);
+	Float32 posTarget = posThreshold;
+	Float32 negThreshold = -pow(10.0f,(GetParameter( kParam_Three ))/20.0f);
+	Float32 negTarget = negThreshold;
+	Float32 voicing = GetParameter( kParam_Four );
+	if (voicing == 0.618f) voicing = 0.618033988749894848204586f;
+	//special case: we will do a perfect golden ratio as the default 0.618f
 	//just 'cos magic universality sauce (seriously, it seems a sweetspot)
-	if (overallscale > 0.0) voicing /= overallscale;
+	if (overallscale > 0.0f) voicing /= overallscale;
 	//translate to desired sample rate, 44.1K is the base
-	if (voicing < 0.0) voicing = 0.0;
-	if (voicing > 1.0) voicing = 1.0;
+	if (voicing < 0.0f) voicing = 0.0f;
+	if (voicing > 1.0f) voicing = 1.0f;
 	//some insanity checking
-	Float64 inverseHardness = 1.0 - voicing;
+	Float32 inverseHardness = 1.0f - voicing;
 	bool clipEngage = false;
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 wet = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;		
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;		
 
-		if (inputGain != 1.0)
+		if (inputGain != 1.0f)
 			{
 				inputSample *= inputGain;
 				clipEngage = true;
@@ -122,14 +122,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		lastSample = inputSample;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		if (clipEngage == false)

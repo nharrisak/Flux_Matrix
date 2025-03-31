@@ -28,13 +28,13 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		double lastSample;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		float lastSample;
 		uint32_t fpd;
 		bool flip;
 	
@@ -52,20 +52,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 firstStage = 0.381966011250105 / overallscale;
-	Float64 iirAmount = 0.00295 / overallscale;
-	Float64 threshold = 0.381966011250105;
+	Float32 firstStage = 0.381966011250105f / overallscale;
+	Float32 iirAmount = 0.00295f / overallscale;
+	Float32 threshold = 0.381966011250105f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = *sourceP;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = *sourceP;
 		
-		inputSample = (inputSample+lastSample)*0.5; //start the lowpassing with an average
+		inputSample = (inputSample+lastSample)*0.5f; //start the lowpassing with an average
 		
 		if (flip) {
 			iirSampleA = (iirSampleA * (1 - firstStage)) + (inputSample * firstStage); inputSample = iirSampleA;
@@ -92,7 +92,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

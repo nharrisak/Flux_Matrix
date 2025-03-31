@@ -37,66 +37,66 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 
-	double gainControl = (GetParameter( kParam_One )*0.5)+0.05; //0.0 to 1.0
+	float gainControl = (GetParameter( kParam_One )*0.5f)+0.05f; //0.0f to 1.0f
 	int gainBits = 20; //start beyond maximum attenuation
-	if (gainControl > 0.0) gainBits = floor(1.0 / gainControl);
+	if (gainControl > 0.0f) gainBits = floor(1.0f / gainControl);
 	int bitshiftL = gainBits - 3;
 	int bitshiftR = gainBits - 3;
-	double panControl = (GetParameter( kParam_Two )*2.0)-1.0; //-1.0 to 1.0
-	double panAttenuation = (1.0-fabs(panControl));
+	float panControl = (GetParameter( kParam_Two )*2.0f)-1.0f; //-1.0f to 1.0f
+	float panAttenuation = (1.0f-fabs(panControl));
 	int panBits = 20; //start centered
-	if (panAttenuation > 0.0) panBits = floor(1.0 / panAttenuation);
-	if (panControl > 0.25) bitshiftL += panBits;
-	if (panControl < -0.25) bitshiftR += panBits;
+	if (panAttenuation > 0.0f) panBits = floor(1.0f / panAttenuation);
+	if (panControl > 0.25f) bitshiftL += panBits;
+	if (panControl < -0.25f) bitshiftR += panBits;
 	if (bitshiftL < -2) bitshiftL = -2; if (bitshiftL > 17) bitshiftL = 17;
 	if (bitshiftR < -2) bitshiftR = -2; if (bitshiftR > 17) bitshiftR = 17;
-	double gainL = 1.0;
-	double gainR = 1.0;
+	float gainL = 1.0f;
+	float gainR = 1.0f;
 	switch (bitshiftL)
 	{
-		case 17: gainL = 0.0; break;
-		case 16: gainL = 0.0000152587890625; break;
-		case 15: gainL = 0.000030517578125; break;
-		case 14: gainL = 0.00006103515625; break;
-		case 13: gainL = 0.0001220703125; break;
-		case 12: gainL = 0.000244140625; break;
-		case 11: gainL = 0.00048828125; break;
-		case 10: gainL = 0.0009765625; break;
-		case 9: gainL = 0.001953125; break;
-		case 8: gainL = 0.00390625; break;
-		case 7: gainL = 0.0078125; break;
-		case 6: gainL = 0.015625; break;
-		case 5: gainL = 0.03125; break;
-		case 4: gainL = 0.0625; break;
-		case 3: gainL = 0.125; break;
-		case 2: gainL = 0.25; break;
-		case 1: gainL = 0.5; break;
-		case 0: gainL = 1.0; break;
-		case -1: gainL = 2.0; break;
-		case -2: gainL = 4.0; break;
+		case 17: gainL = 0.0f; break;
+		case 16: gainL = 0.0000152587890625f; break;
+		case 15: gainL = 0.000030517578125f; break;
+		case 14: gainL = 0.00006103515625f; break;
+		case 13: gainL = 0.0001220703125f; break;
+		case 12: gainL = 0.000244140625f; break;
+		case 11: gainL = 0.00048828125f; break;
+		case 10: gainL = 0.0009765625f; break;
+		case 9: gainL = 0.001953125f; break;
+		case 8: gainL = 0.00390625f; break;
+		case 7: gainL = 0.0078125f; break;
+		case 6: gainL = 0.015625f; break;
+		case 5: gainL = 0.03125f; break;
+		case 4: gainL = 0.0625f; break;
+		case 3: gainL = 0.125f; break;
+		case 2: gainL = 0.25f; break;
+		case 1: gainL = 0.5f; break;
+		case 0: gainL = 1.0f; break;
+		case -1: gainL = 2.0f; break;
+		case -2: gainL = 4.0f; break;
 	}
 	switch (bitshiftR)
 	{
-		case 17: gainR = 0.0; break;
-		case 16: gainR = 0.0000152587890625; break;
-		case 15: gainR = 0.000030517578125; break;
-		case 14: gainR = 0.00006103515625; break;
-		case 13: gainR = 0.0001220703125; break;
-		case 12: gainR = 0.000244140625; break;
-		case 11: gainR = 0.00048828125; break;
-		case 10: gainR = 0.0009765625; break;
-		case 9: gainR = 0.001953125; break;
-		case 8: gainR = 0.00390625; break;
-		case 7: gainR = 0.0078125; break;
-		case 6: gainR = 0.015625; break;
-		case 5: gainR = 0.03125; break;
-		case 4: gainR = 0.0625; break;
-		case 3: gainR = 0.125; break;
-		case 2: gainR = 0.25; break;
-		case 1: gainR = 0.5; break;
-		case 0: gainR = 1.0; break;
-		case -1: gainR = 2.0; break;
-		case -2: gainR = 4.0; break;
+		case 17: gainR = 0.0f; break;
+		case 16: gainR = 0.0000152587890625f; break;
+		case 15: gainR = 0.000030517578125f; break;
+		case 14: gainR = 0.00006103515625f; break;
+		case 13: gainR = 0.0001220703125f; break;
+		case 12: gainR = 0.000244140625f; break;
+		case 11: gainR = 0.00048828125f; break;
+		case 10: gainR = 0.0009765625f; break;
+		case 9: gainR = 0.001953125f; break;
+		case 8: gainR = 0.00390625f; break;
+		case 7: gainR = 0.0078125f; break;
+		case 6: gainR = 0.015625f; break;
+		case 5: gainR = 0.03125f; break;
+		case 4: gainR = 0.0625f; break;
+		case 3: gainR = 0.125f; break;
+		case 2: gainR = 0.25f; break;
+		case 1: gainR = 0.5f; break;
+		case 0: gainR = 1.0f; break;
+		case -1: gainR = 2.0f; break;
+		case -2: gainR = 4.0f; break;
 	}
 	
 	while (nSampleFrames-- > 0) {

@@ -45,8 +45,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 storedSample;
-		Float64 lastSample;
+		Float32 storedSample;
+		Float32 lastSample;
 		int tik;
 		int lok;
 		bool flip;
@@ -66,37 +66,37 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	bool highSample = false;
 	if (GetSampleRate() > 64000) highSample = true;
 	//we will go to another dither for 88 and 96K
-	Float64 inputSample;
-	Float64 tempSample;
-	Float64 drySample;
+	Float32 inputSample;
+	Float32 tempSample;
+	Float32 drySample;
 	int deSyn = GetParameter( kParam_One );
-	Float64 increment = GetParameter( kParam_Two );
-	Float64 brighten = GetParameter( kParam_Three );
-	Float64 outputlevel = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 increment = GetParameter( kParam_Two );
+	Float32 brighten = GetParameter( kParam_Three );
+	Float32 outputlevel = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
 	
-	if (deSyn == 4) {deSyn = 1; increment = 0.411; brighten = 0.87;}
+	if (deSyn == 4) {deSyn = 1; increment = 0.411f; brighten = 0.87f;}
 	//606 preset
-	if (deSyn == 5) {deSyn = 2; increment = 0.111; brighten = 1.0;}
+	if (deSyn == 5) {deSyn = 2; increment = 0.111f; brighten = 1.0f;}
 	//808 preset
-	if (deSyn == 6) {deSyn = 2; increment = 0.299; brighten = 0.359;}
+	if (deSyn == 6) {deSyn = 2; increment = 0.299f; brighten = 0.359f;}
 	//909 preset
 	int tok = deSyn + 1;
-	increment *= 0.98;
-	increment += 0.01;
-	increment += (Float64)tok;
-	Float64 fosA = increment;
-	Float64 fosB = fosA * increment;
-	Float64 fosC = fosB * increment;
-	Float64 fosD = fosC * increment;
-	Float64 fosE = fosD * increment;
-	Float64 fosF = fosE * increment;
+	increment *= 0.98f;
+	increment += 0.01f;
+	increment += (Float32)tok;
+	Float32 fosA = increment;
+	Float32 fosB = fosA * increment;
+	Float32 fosC = fosB * increment;
+	Float32 fosD = fosC * increment;
+	Float32 fosE = fosD * increment;
+	Float32 fosF = fosE * increment;
 	int posA = fosA;
 	int posB = fosB;
 	int posC = fosC;
@@ -144,14 +144,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += storedSample;
 		storedSample = tempSample;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

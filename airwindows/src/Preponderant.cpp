@@ -37,16 +37,16 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquadA[9];
-		double biquadB[9];
-		double biquadC[9];
-		double bassBalance;
-		double midBalance;
-		double highBalance;
-		double bassTrack;
-		double midTrack;
-		double highTrack;
-		double quickness;
+		float biquadA[9];
+		float biquadB[9];
+		float biquadC[9];
+		float bassBalance;
+		float midBalance;
+		float highBalance;
+		float bassTrack;
+		float midTrack;
+		float highTrack;
+		float quickness;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -63,80 +63,80 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 chase = 0.00005 / overallscale;
+	Float32 chase = 0.00005f / overallscale;
 			
-	biquadA[0] = pow(GetParameter( kParam_One ),(3.0*cbrt(overallscale)))*0.42;
-	if (biquadA[0] < 0.0001) biquadA[0] = 0.0001;
+	biquadA[0] = pow(GetParameter( kParam_One ),(3.0f*cbrt(overallscale)))*0.42f;
+	if (biquadA[0] < 0.0001f) biquadA[0] = 0.0001f;
 	
-	biquadB[0] = pow(GetParameter( kParam_Two ),(3.0*cbrt(overallscale)))*0.42;
-	if (biquadB[0] < 0.0001) biquadB[0] = 0.0001;
+	biquadB[0] = pow(GetParameter( kParam_Two ),(3.0f*cbrt(overallscale)))*0.42f;
+	if (biquadB[0] < 0.0001f) biquadB[0] = 0.0001f;
 	
-	biquadC[0] = pow(GetParameter( kParam_Three ),(3.0*cbrt(overallscale)))*0.42;
-	if (biquadC[0] < 0.0001) biquadC[0] = 0.0001;
+	biquadC[0] = pow(GetParameter( kParam_Three ),(3.0f*cbrt(overallscale)))*0.42f;
+	if (biquadC[0] < 0.0001f) biquadC[0] = 0.0001f;
 	
-    biquadA[1] = biquadB[1] = biquadC[1] = (pow(GetParameter( kParam_Four ),3)*8.0)+0.33;
-	biquadB[1] /= 2.0; biquadC[1] /= 4.0;
+    biquadA[1] = biquadB[1] = biquadC[1] = (pow(GetParameter( kParam_Four ),3)*8.0f)+0.33f;
+	biquadB[1] /= 2.0f; biquadC[1] /= 4.0f;
 	
-	Float64 volumeCompensation = sqrt(biquadA[1]);
+	Float32 volumeCompensation = sqrt(biquadA[1]);
 
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 wet = GetParameter( kParam_Five );
 		
-	double K = tan(M_PI * biquadA[0]);
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]);
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K / biquadA[1] * norm;
-	biquadA[3] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+	biquadA[3] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 	biquadA[4] = -biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadB[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K / biquadB[1] * norm;
-	biquadB[3] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+	biquadB[3] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 	biquadB[4] = -biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / biquadC[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadC[1] + K * K);
 	biquadC[2] = K / biquadC[1] * norm;
-	biquadC[3] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+	biquadC[3] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 	biquadC[4] = -biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / biquadC[1] + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = *sourceP;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = *sourceP;
 				
-		double tempSample = (inputSample * biquadA[2]) + biquadA[7];
+		float tempSample = (inputSample * biquadA[2]) + biquadA[7];
 		biquadA[7] = -(tempSample * biquadA[5]) + biquadA[8];
 		biquadA[8] = (inputSample * biquadA[4]) - (tempSample * biquadA[6]);
-		double bassSample = tempSample; //BANDPASS form
+		float bassSample = tempSample; //BANDPASS form
 		
 		tempSample = (inputSample * biquadB[2]) + biquadB[7];
 		biquadB[7] = -(tempSample * biquadB[5]) + biquadB[8];
 		biquadB[8] = (inputSample * biquadB[4]) - (tempSample * biquadB[6]);
-		double midSample = tempSample; //BANDPASS form
+		float midSample = tempSample; //BANDPASS form
 		
 		tempSample = (inputSample * biquadC[2]) + biquadC[7];
 		biquadC[7] = -(tempSample * biquadC[5]) + biquadC[8];
 		biquadC[8] = (inputSample * biquadC[4]) - (tempSample * biquadC[6]);
-		double highSample = tempSample; //BANDPASS form
+		float highSample = tempSample; //BANDPASS form
 		
-		if (bassBalance < 0.00125) bassBalance = 0.00125;
-		if (bassBalance > 1.0) bassBalance = 1.0;
+		if (bassBalance < 0.00125f) bassBalance = 0.00125f;
+		if (bassBalance > 1.0f) bassBalance = 1.0f;
 		
-		if (midBalance < 0.00125) midBalance = 0.00125;
-		if (midBalance > 1.0) midBalance = 1.0;
+		if (midBalance < 0.00125f) midBalance = 0.00125f;
+		if (midBalance > 1.0f) midBalance = 1.0f;
 		
-		if (highBalance < 0.00125) highBalance = 0.00125;
-		if (highBalance > 1.0) highBalance = 1.0;
+		if (highBalance < 0.00125f) highBalance = 0.00125f;
+		if (highBalance > 1.0f) highBalance = 1.0f;
 				
 		bassSample *= bassBalance;
 		midSample *= midBalance;
@@ -150,13 +150,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (highTrack > quickness) highTrack -= quickness;
 		
 		
-		Float64 disparity = 0.0;
+		Float32 disparity = 0.0f;
 		if (disparity < fabs(bassTrack - midTrack)) disparity = fabs(bassTrack - midTrack);
 		if (disparity < fabs(bassTrack - highTrack)) disparity = fabs(bassTrack - highTrack);
 		if (disparity < fabs(midTrack - highTrack)) disparity = fabs(midTrack - highTrack);
 		
-		quickness *= (1.0-chase);
-		quickness += ((1.0+disparity) * 0.0001 * chase);
+		quickness *= (1.0f-chase);
+		quickness += ((1.0f+disparity) * 0.0001f * chase);
 		
 		
 		if (bassTrack > midTrack) {bassBalance -= quickness; midBalance += quickness;}
@@ -166,21 +166,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (highTrack > bassTrack) {highBalance -= quickness; bassBalance += quickness;}
 		else {highBalance += quickness; bassBalance -= quickness;}
 		
-		if (highBalance > 0.618033988749894848204586) highBalance -= (quickness*0.001); else highBalance += (quickness*0.001);
-		if (midBalance > 0.618033988749894848204586) midBalance -= (quickness*0.001); else midBalance += (quickness*0.001);
-		if (bassBalance > 0.618033988749894848204586) bassBalance -= (quickness*0.001); else bassBalance += (quickness*0.001);
+		if (highBalance > 0.618033988749894848204586f) highBalance -= (quickness*0.001f); else highBalance += (quickness*0.001f);
+		if (midBalance > 0.618033988749894848204586f) midBalance -= (quickness*0.001f); else midBalance += (quickness*0.001f);
+		if (bassBalance > 0.618033988749894848204586f) bassBalance -= (quickness*0.001f); else bassBalance += (quickness*0.001f);
 		
 		inputSample = (bassSample + midSample + highSample) * volumeCompensation;
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample*wet) + (drySample*(1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample*wet) + (drySample*(1.0f-wet));
 			//inv/dry/wet lets us turn LP into HP and band into notch
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

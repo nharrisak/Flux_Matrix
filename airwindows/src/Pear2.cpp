@@ -99,18 +99,18 @@ enum { kNumTemplateParameters = 6 };
 		pear_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
 	
-	double freqA;
-	double freqB;
-	double nonLinA;
-	double nonLinB;
-	double wetA;
-	double wetB;
+	float freqA;
+	float freqB;
+	float nonLinA;
+	float nonLinB;
+	float wetA;
+	float wetB;
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
 
 	struct _dram {
-		double pear[pear_total]; //probably worth just using a number here
+		float pear[pear_total]; //probably worth just using a number here
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -118,43 +118,43 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
 	freqA = freqB;
 	freqB = pow(GetParameter( kParam_One ),2);
-	if (freqB < 0.0001) freqB = 0.0001;
+	if (freqB < 0.0001f) freqB = 0.0001f;
 	nonLinA = nonLinB;
 	nonLinB = pow(GetParameter( kParam_Two ),2);
-	double maxPoles = pow(GetParameter( kParam_Three ),3)*pear_total;
+	float maxPoles = pow(GetParameter( kParam_Three ),3)*pear_total;
 	wetA = wetB;
 	wetB = GetParameter( kParam_Four ); //inv-dry-wet for highpass
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double freq = (freqA*temp)+(freqB*(1.0-temp));
-		double nonLin = (nonLinA*temp)+(nonLinB*(1.0-temp));
-		double wet = (wetA*temp)+(wetB*(1.0-temp));
-		double dry = 2.0-(wet*2.0);
-		if (dry > 1.0) dry = 1.0; //full dry for use with inv, to 0.0 at full wet
-		wet = (wet*2.0)-1.0; //inv-dry-wet for highpass
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float freq = (freqA*temp)+(freqB*(1.0f-temp));
+		float nonLin = (nonLinA*temp)+(nonLinB*(1.0f-temp));
+		float wet = (wetA*temp)+(wetB*(1.0f-temp));
+		float dry = 2.0f-(wet*2.0f);
+		if (dry > 1.0f) dry = 1.0f; //full dry for use with inv, to 0.0f at full wet
+		wet = (wet*2.0f)-1.0f; //inv-dry-wet for highpass
 						
 		for (int x = 0; x < maxPoles; x += 4) {
-			double di = fabs(freq*(1.0+(inputSampleL*nonLin))); if (di > 1.0) di = 1.0;
-			double slew = ((inputSampleL - dram->pear[x]) + dram->pear[x+1])*di*0.5;
-			dram->pear[x] = inputSampleL = (di * inputSampleL) + ((1.0-di) * (dram->pear[x] + dram->pear[x+1]));
+			float di = fabs(freq*(1.0f+(inputSampleL*nonLin))); if (di > 1.0f) di = 1.0f;
+			float slew = ((inputSampleL - dram->pear[x]) + dram->pear[x+1])*di*0.5f;
+			dram->pear[x] = inputSampleL = (di * inputSampleL) + ((1.0f-di) * (dram->pear[x] + dram->pear[x+1]));
 			dram->pear[x+1] = slew;
-			di = fabs(freq*(1.0+(inputSampleR*nonLin))); if (di > 1.0) di = 1.0;
-			slew = ((inputSampleR - dram->pear[x+2]) + dram->pear[x+3])*di*0.5;
-			dram->pear[x+2] = inputSampleR = (di * inputSampleR) + ((1.0-di) * (dram->pear[x+2] + dram->pear[x+3]));
+			di = fabs(freq*(1.0f+(inputSampleR*nonLin))); if (di > 1.0f) di = 1.0f;
+			slew = ((inputSampleR - dram->pear[x+2]) + dram->pear[x+3])*di*0.5f;
+			dram->pear[x+2] = inputSampleR = (di * inputSampleR) + ((1.0f-di) * (dram->pear[x+2] + dram->pear[x+3]));
 			dram->pear[x+3] = slew;
 		}
 		
@@ -168,10 +168,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

@@ -63,9 +63,9 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double high[biqs_total];
-		double hmid[biqs_total];
-		double lmid[biqs_total];
+			float high[biqs_total];
+		float hmid[biqs_total];
+		float lmid[biqs_total];
 	};
 	_dram* dram;
 };
@@ -79,156 +79,156 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	dram->high[biqs_freq] = (((pow(GetParameter( kParam_TRF ),3)*14500.0)+1500.0)/GetSampleRate());
-	if (dram->high[biqs_freq] < 0.0001) dram->high[biqs_freq] = 0.0001;
+	dram->high[biqs_freq] = (((pow(GetParameter( kParam_TRF ),3)*14500.0f)+1500.0f)/GetSampleRate());
+	if (dram->high[biqs_freq] < 0.0001f) dram->high[biqs_freq] = 0.0001f;
 	dram->high[biqs_nonlin] = GetParameter( kParam_TRG );
-	dram->high[biqs_level] = (dram->high[biqs_nonlin]*2.0)-1.0;
-	if (dram->high[biqs_level] > 0.0) dram->high[biqs_level] *= 2.0;
-	dram->high[biqs_reso] = ((0.5+(dram->high[biqs_nonlin]*0.5)+sqrt(dram->high[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_TRR ),2.0)))+0.5+(dram->high[biqs_nonlin]*0.5);
-	double K = tan(M_PI * dram->high[biqs_freq]);
-	double norm = 1.0 / (1.0 + K / (dram->high[biqs_reso]*1.93185165) + K * K);
-	dram->high[biqs_a0] = K / (dram->high[biqs_reso]*1.93185165) * norm;
-	dram->high[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->high[biqs_b2] = (1.0 - K / (dram->high[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->high[biqs_reso]*0.70710678) + K * K);
-	dram->high[biqs_c0] = K / (dram->high[biqs_reso]*0.70710678) * norm;
-	dram->high[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->high[biqs_d2] = (1.0 - K / (dram->high[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->high[biqs_reso]*0.51763809) + K * K);
-	dram->high[biqs_e0] = K / (dram->high[biqs_reso]*0.51763809) * norm;
-	dram->high[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->high[biqs_f2] = (1.0 - K / (dram->high[biqs_reso]*0.51763809) + K * K) * norm;
+	dram->high[biqs_level] = (dram->high[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->high[biqs_level] > 0.0f) dram->high[biqs_level] *= 2.0f;
+	dram->high[biqs_reso] = ((0.5f+(dram->high[biqs_nonlin]*0.5f)+sqrt(dram->high[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_TRR ),2.0f)))+0.5f+(dram->high[biqs_nonlin]*0.5f);
+	float K = tan(M_PI * dram->high[biqs_freq]);
+	float norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*1.93185165f) + K * K);
+	dram->high[biqs_a0] = K / (dram->high[biqs_reso]*1.93185165f) * norm;
+	dram->high[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->high[biqs_b2] = (1.0f - K / (dram->high[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*0.70710678f) + K * K);
+	dram->high[biqs_c0] = K / (dram->high[biqs_reso]*0.70710678f) * norm;
+	dram->high[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->high[biqs_d2] = (1.0f - K / (dram->high[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*0.51763809f) + K * K);
+	dram->high[biqs_e0] = K / (dram->high[biqs_reso]*0.51763809f) * norm;
+	dram->high[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->high[biqs_f2] = (1.0f - K / (dram->high[biqs_reso]*0.51763809f) + K * K) * norm;
 	//high
 	
-	dram->hmid[biqs_freq] = (((pow(GetParameter( kParam_HMF ),3)*6400.0)+600.0)/GetSampleRate());
-	if (dram->hmid[biqs_freq] < 0.0001) dram->hmid[biqs_freq] = 0.0001;
+	dram->hmid[biqs_freq] = (((pow(GetParameter( kParam_HMF ),3)*6400.0f)+600.0f)/GetSampleRate());
+	if (dram->hmid[biqs_freq] < 0.0001f) dram->hmid[biqs_freq] = 0.0001f;
 	dram->hmid[biqs_nonlin] = GetParameter( kParam_HMG );
-	dram->hmid[biqs_level] = (dram->hmid[biqs_nonlin]*2.0)-1.0;
-	if (dram->hmid[biqs_level] > 0.0) dram->hmid[biqs_level] *= 2.0;
-	dram->hmid[biqs_reso] = ((0.5+(dram->hmid[biqs_nonlin]*0.5)+sqrt(dram->hmid[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_HMR ),2.0)))+0.5+(dram->hmid[biqs_nonlin]*0.5);
+	dram->hmid[biqs_level] = (dram->hmid[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->hmid[biqs_level] > 0.0f) dram->hmid[biqs_level] *= 2.0f;
+	dram->hmid[biqs_reso] = ((0.5f+(dram->hmid[biqs_nonlin]*0.5f)+sqrt(dram->hmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_HMR ),2.0f)))+0.5f+(dram->hmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->hmid[biqs_freq]);
-	norm = 1.0 / (1.0 + K / (dram->hmid[biqs_reso]*1.93185165) + K * K);
-	dram->hmid[biqs_a0] = K / (dram->hmid[biqs_reso]*1.93185165) * norm;
-	dram->hmid[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hmid[biqs_b2] = (1.0 - K / (dram->hmid[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->hmid[biqs_reso]*0.70710678) + K * K);
-	dram->hmid[biqs_c0] = K / (dram->hmid[biqs_reso]*0.70710678) * norm;
-	dram->hmid[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hmid[biqs_d2] = (1.0 - K / (dram->hmid[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->hmid[biqs_reso]*0.51763809) + K * K);
-	dram->hmid[biqs_e0] = K / (dram->hmid[biqs_reso]*0.51763809) * norm;
-	dram->hmid[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hmid[biqs_f2] = (1.0 - K / (dram->hmid[biqs_reso]*0.51763809) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*1.93185165f) + K * K);
+	dram->hmid[biqs_a0] = K / (dram->hmid[biqs_reso]*1.93185165f) * norm;
+	dram->hmid[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hmid[biqs_b2] = (1.0f - K / (dram->hmid[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*0.70710678f) + K * K);
+	dram->hmid[biqs_c0] = K / (dram->hmid[biqs_reso]*0.70710678f) * norm;
+	dram->hmid[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hmid[biqs_d2] = (1.0f - K / (dram->hmid[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*0.51763809f) + K * K);
+	dram->hmid[biqs_e0] = K / (dram->hmid[biqs_reso]*0.51763809f) * norm;
+	dram->hmid[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hmid[biqs_f2] = (1.0f - K / (dram->hmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//hmid
 	
-	dram->lmid[biqs_freq] = (((pow(GetParameter( kParam_LMF ),3)*2200.0)+20.0)/GetSampleRate());
-	if (dram->lmid[biqs_freq] < 0.00001) dram->lmid[biqs_freq] = 0.00001;
+	dram->lmid[biqs_freq] = (((pow(GetParameter( kParam_LMF ),3)*2200.0f)+20.0f)/GetSampleRate());
+	if (dram->lmid[biqs_freq] < 0.00001f) dram->lmid[biqs_freq] = 0.00001f;
 	dram->lmid[biqs_nonlin] = GetParameter( kParam_LMG );
-	dram->lmid[biqs_level] = (dram->lmid[biqs_nonlin]*2.0)-1.0;
-	if (dram->lmid[biqs_level] > 0.0) dram->lmid[biqs_level] *= 2.0;
-	dram->lmid[biqs_reso] = ((0.5+(dram->lmid[biqs_nonlin]*0.5)+sqrt(dram->lmid[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_LMR ),2.0)))+0.5+(dram->lmid[biqs_nonlin]*0.5);
+	dram->lmid[biqs_level] = (dram->lmid[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->lmid[biqs_level] > 0.0f) dram->lmid[biqs_level] *= 2.0f;
+	dram->lmid[biqs_reso] = ((0.5f+(dram->lmid[biqs_nonlin]*0.5f)+sqrt(dram->lmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_LMR ),2.0f)))+0.5f+(dram->lmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->lmid[biqs_freq]);
-	norm = 1.0 / (1.0 + K / (dram->lmid[biqs_reso]*1.93185165) + K * K);
-	dram->lmid[biqs_a0] = K / (dram->lmid[biqs_reso]*1.93185165) * norm;
-	dram->lmid[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lmid[biqs_b2] = (1.0 - K / (dram->lmid[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->lmid[biqs_reso]*0.70710678) + K * K);
-	dram->lmid[biqs_c0] = K / (dram->lmid[biqs_reso]*0.70710678) * norm;
-	dram->lmid[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lmid[biqs_d2] = (1.0 - K / (dram->lmid[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->lmid[biqs_reso]*0.51763809) + K * K);
-	dram->lmid[biqs_e0] = K / (dram->lmid[biqs_reso]*0.51763809) * norm;
-	dram->lmid[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lmid[biqs_f2] = (1.0 - K / (dram->lmid[biqs_reso]*0.51763809) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*1.93185165f) + K * K);
+	dram->lmid[biqs_a0] = K / (dram->lmid[biqs_reso]*1.93185165f) * norm;
+	dram->lmid[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lmid[biqs_b2] = (1.0f - K / (dram->lmid[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*0.70710678f) + K * K);
+	dram->lmid[biqs_c0] = K / (dram->lmid[biqs_reso]*0.70710678f) * norm;
+	dram->lmid[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lmid[biqs_d2] = (1.0f - K / (dram->lmid[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*0.51763809f) + K * K);
+	dram->lmid[biqs_e0] = K / (dram->lmid[biqs_reso]*0.51763809f) * norm;
+	dram->lmid[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lmid[biqs_f2] = (1.0f - K / (dram->lmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//lmid
 		
-	double wet = GetParameter( kParam_DW );
+	float wet = GetParameter( kParam_DW );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->high[biqs_outL] = inputSample * fabs(dram->high[biqs_level]);
-		dram->high[biqs_dis] = fabs(dram->high[biqs_a0] * (1.0+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_a0] * (1.0f+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outL] * dram->high[biqs_dis]) + dram->high[biqs_aL1];
 		dram->high[biqs_aL1] = dram->high[biqs_aL2] - (dram->high[biqs_temp]*dram->high[biqs_b1]);
 		dram->high[biqs_aL2] = (dram->high[biqs_outL] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_b2]);
 		dram->high[biqs_outL] = dram->high[biqs_temp];
-		dram->high[biqs_dis] = fabs(dram->high[biqs_c0] * (1.0+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_c0] * (1.0f+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outL] * dram->high[biqs_dis]) + dram->high[biqs_cL1];
 		dram->high[biqs_cL1] = dram->high[biqs_cL2] - (dram->high[biqs_temp]*dram->high[biqs_d1]);
 		dram->high[biqs_cL2] = (dram->high[biqs_outL] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_d2]);
 		dram->high[biqs_outL] = dram->high[biqs_temp];
-		dram->high[biqs_dis] = fabs(dram->high[biqs_e0] * (1.0+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_e0] * (1.0f+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outL] * dram->high[biqs_dis]) + dram->high[biqs_eL1];
 		dram->high[biqs_eL1] = dram->high[biqs_eL2] - (dram->high[biqs_temp]*dram->high[biqs_f1]);
 		dram->high[biqs_eL2] = (dram->high[biqs_outL] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_f2]);
 		dram->high[biqs_outL] = dram->high[biqs_temp]; dram->high[biqs_outL] *= dram->high[biqs_level];
-		if (dram->high[biqs_level] > 1.0) dram->high[biqs_outL] *= dram->high[biqs_level];
+		if (dram->high[biqs_level] > 1.0f) dram->high[biqs_outL] *= dram->high[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->hmid[biqs_outL] = inputSample * fabs(dram->hmid[biqs_level]);
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_a0] * (1.0+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_a0] * (1.0f+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outL] * dram->hmid[biqs_dis]) + dram->hmid[biqs_aL1];
 		dram->hmid[biqs_aL1] = dram->hmid[biqs_aL2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_b1]);
 		dram->hmid[biqs_aL2] = (dram->hmid[biqs_outL] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_b2]);
 		dram->hmid[biqs_outL] = dram->hmid[biqs_temp];
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_c0] * (1.0+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_c0] * (1.0f+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outL] * dram->hmid[biqs_dis]) + dram->hmid[biqs_cL1];
 		dram->hmid[biqs_cL1] = dram->hmid[biqs_cL2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_d1]);
 		dram->hmid[biqs_cL2] = (dram->hmid[biqs_outL] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_d2]);
 		dram->hmid[biqs_outL] = dram->hmid[biqs_temp];
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_e0] * (1.0+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_e0] * (1.0f+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outL] * dram->hmid[biqs_dis]) + dram->hmid[biqs_eL1];
 		dram->hmid[biqs_eL1] = dram->hmid[biqs_eL2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_f1]);
 		dram->hmid[biqs_eL2] = (dram->hmid[biqs_outL] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_f2]);
 		dram->hmid[biqs_outL] = dram->hmid[biqs_temp]; dram->hmid[biqs_outL] *= dram->hmid[biqs_level];
-		if (dram->hmid[biqs_level] > 1.0) dram->hmid[biqs_outL] *= dram->hmid[biqs_level];
+		if (dram->hmid[biqs_level] > 1.0f) dram->hmid[biqs_outL] *= dram->hmid[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->lmid[biqs_outL] = inputSample * fabs(dram->lmid[biqs_level]);
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_a0] * (1.0+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_a0] * (1.0f+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outL] * dram->lmid[biqs_dis]) + dram->lmid[biqs_aL1];
 		dram->lmid[biqs_aL1] = dram->lmid[biqs_aL2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_b1]);
 		dram->lmid[biqs_aL2] = (dram->lmid[biqs_outL] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_b2]);
 		dram->lmid[biqs_outL] = dram->lmid[biqs_temp];
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_c0] * (1.0+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_c0] * (1.0f+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outL] * dram->lmid[biqs_dis]) + dram->lmid[biqs_cL1];
 		dram->lmid[biqs_cL1] = dram->lmid[biqs_cL2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_d1]);
 		dram->lmid[biqs_cL2] = (dram->lmid[biqs_outL] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_d2]);
 		dram->lmid[biqs_outL] = dram->lmid[biqs_temp];
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_e0] * (1.0+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_e0] * (1.0f+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outL] * dram->lmid[biqs_dis]) + dram->lmid[biqs_eL1];
 		dram->lmid[biqs_eL1] = dram->lmid[biqs_eL2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_f1]);
 		dram->lmid[biqs_eL2] = (dram->lmid[biqs_outL] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_f2]);
 		dram->lmid[biqs_outL] = dram->lmid[biqs_temp]; dram->lmid[biqs_outL] *= dram->lmid[biqs_level];
-		if (dram->lmid[biqs_level] > 1.0) dram->lmid[biqs_outL] *= dram->lmid[biqs_level];
+		if (dram->lmid[biqs_level] > 1.0f) dram->lmid[biqs_outL] *= dram->lmid[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 				
-		double parametric = dram->high[biqs_outL] + dram->hmid[biqs_outL] + dram->lmid[biqs_outL];
+		float parametric = dram->high[biqs_outL] + dram->hmid[biqs_outL] + dram->lmid[biqs_outL];
 		inputSample += (parametric * wet); //purely a parallel filter stage here
 		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

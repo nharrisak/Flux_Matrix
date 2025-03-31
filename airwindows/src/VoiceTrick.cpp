@@ -25,16 +25,16 @@ kParam0, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		Float64 iirLowpassA;
-		Float64 iirLowpassB;
-		Float64 iirLowpassC;
-		Float64 iirLowpassD;
-		Float64 iirLowpassE;
-		Float64 iirLowpassF;
+		Float32 iirLowpassA;
+		Float32 iirLowpassB;
+		Float32 iirLowpassC;
+		Float32 iirLowpassD;
+		Float32 iirLowpassE;
+		Float32 iirLowpassF;
 		int count;
-		Float64 lowpassChase;
-		Float64 lowpassAmount;
-		Float64 lastLowpass;
+		Float32 lowpassChase;
+		Float32 lowpassAmount;
+		Float32 lastLowpass;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -50,21 +50,21 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	lowpassChase = pow(GetParameter( kParam_One ),2);
 	//should not scale with sample rate, because values reaching 1 are important
 	//to its ability to bypass when set to max
-	Float64 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0);
+	Float32 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0f);
 	lastLowpass = lowpassChase;	
-	Float64 invLowpass;
+	Float32 invLowpass;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		lowpassAmount = (((lowpassAmount*lowpassSpeed)+lowpassChase)/(lowpassSpeed + 1.0)); invLowpass = 1.0 - lowpassAmount;
+		lowpassAmount = (((lowpassAmount*lowpassSpeed)+lowpassChase)/(lowpassSpeed + 1.0f)); invLowpass = 1.0f - lowpassAmount;
 		//setting chase functionality of Capacitor Lowpass. I could just use this value directly from the control,
 		//but if I say it's the lowpass out of Capacitor it should literally be that in every behavior.
 				
-		double inputSample = (inputSampleL + inputSampleR) * 0.5;
+		float inputSample = (inputSampleL + inputSampleR) * 0.5f;
 		//this is now our mono audio
 		
 		count++; if (count > 5) count = 0; switch (count)
@@ -126,10 +126,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

@@ -33,15 +33,15 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		Float64 iirSampleG;
-		Float64 iirSampleH;
-		Float64 lastSample;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		Float32 iirSampleG;
+		Float32 iirSampleH;
+		Float32 lastSample;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -64,25 +64,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 iirAmountL = 0.0819;
+	Float32 iirAmountL = 0.0819f;
 	iirAmountL /= overallscale;
-	Float64 iirAmountH = 0.377933067;
+	Float32 iirAmountH = 0.377933067f;
 	iirAmountH /= overallscale;
-	Float64 drive = GetParameter( kParam_One );
-	Float64 out = GetParameter( kParam_Two );
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 drive = GetParameter( kParam_One );
+	Float32 out = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Three );
 	//removed unnecessary dry variable
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
-		double lowSample;
-		double midSample;
-		double highSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
+		float lowSample;
+		float midSample;
+		float highSample;
 		
 		inputSample *= drive;
 		if (fpFlip)
@@ -106,60 +106,60 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			highSample = inputSample - iirSampleH;
 			}
 		//generate the tone bands we're using
-		if (lowSample > 1.0) {lowSample = 1.0;}
-		if (lowSample < -1.0) {lowSample = -1.0;}
-		lowSample -= (lowSample * (fabs(lowSample) * 0.448) * (fabs(lowSample) * 0.448) );
+		if (lowSample > 1.0f) {lowSample = 1.0f;}
+		if (lowSample < -1.0f) {lowSample = -1.0f;}
+		lowSample -= (lowSample * (fabs(lowSample) * 0.448f) * (fabs(lowSample) * 0.448f) );
 		lowSample *= drive;
 
-		if (highSample > 1.0) {highSample = 1.0;}
-		if (highSample < -1.0) {highSample = -1.0;}
-		highSample -= (highSample * (fabs(highSample) * 0.599) * (fabs(highSample) * 0.599) );
+		if (highSample > 1.0f) {highSample = 1.0f;}
+		if (highSample < -1.0f) {highSample = -1.0f;}
+		highSample -= (highSample * (fabs(highSample) * 0.599f) * (fabs(highSample) * 0.599f) );
 		highSample *= drive;
 
 		midSample = midSample * drive;
-		double skew = (midSample - lastSample);
+		float skew = (midSample - lastSample);
 		lastSample = midSample;
 		//skew will be direction/angle
-		double bridgerectifier = fabs(skew);
-		if (bridgerectifier > 3.1415926) bridgerectifier = 3.1415926;
+		float bridgerectifier = fabs(skew);
+		if (bridgerectifier > 3.1415926f) bridgerectifier = 3.1415926f;
 		//for skew we want it to go to zero effect again, so we use full range of the sine
 		bridgerectifier = sin(bridgerectifier);
-		if (skew > 0) skew = bridgerectifier*3.1415926;
-		else skew = -bridgerectifier*3.1415926;
+		if (skew > 0) skew = bridgerectifier*3.1415926f;
+		else skew = -bridgerectifier*3.1415926f;
 		//skew is now sined and clamped and then re-amplified again
 		skew *= midSample;
 		//cools off sparkliness and crossover distortion
-		skew *= 1.557079633;
+		skew *= 1.557079633f;
 		//crank up the gain on this so we can make it sing
 		bridgerectifier = fabs(midSample);
 		bridgerectifier += skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
 		bridgerectifier *= drive;
 		bridgerectifier += skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
 		if (midSample > 0)
 				{
-				midSample = bridgerectifier; //(midSample*(1-1.557079633+skew))+((bridgerectifier)*(1.557079633+skew));
+				midSample = bridgerectifier; //(midSample*(1-1.557079633f+skew))+((bridgerectifier)*(1.557079633f+skew));
 				}
 			else
 				{
-				midSample = -bridgerectifier; //(midSample*(1-1.557079633+skew))-((bridgerectifier)*(1.557079633+skew));
+				midSample = -bridgerectifier; //(midSample*(1-1.557079633f+skew))-((bridgerectifier)*(1.557079633f+skew));
 				}
 		//blend according to positive and negative controls
 		
 		inputSample = ((lowSample + midSample + highSample)/drive)*out;
 		
-		if (wet < 1.0) {
-			inputSample = (drySample * (1.0-wet))+(inputSample*wet);
+		if (wet < 1.0f) {
+			inputSample = (drySample * (1.0f-wet))+(inputSample*wet);
 		}
 		fpFlip = !fpFlip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

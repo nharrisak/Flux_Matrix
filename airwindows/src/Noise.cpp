@@ -39,18 +39,18 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 noiseA;
-		Float64 noiseB;
-		Float64 noiseC;
-		Float64 rumbleA;
-		Float64 rumbleB;
-		Float64 surge;
+		Float32 noiseA;
+		Float32 noiseB;
+		Float32 noiseC;
+		Float32 rumbleA;
+		Float32 rumbleB;
+		Float32 surge;
 		int position;
 		int quadratic;
 		bool flip;
 		bool filterflip;
-		Float64 b[11];
-		Float64 f[11];		
+		Float32 b[11];
+		Float32 f[11];		
 		uint32_t fpd;
 	
 	struct _dram {
@@ -67,13 +67,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 cutoff;
-	Float64 cutofftarget = (GetParameter( kParam_One )*3.5);
-	Float64 rumblecutoff = cutofftarget * 0.005;
-	Float64 invcutoff;
-	double inputSample;
-	Float64 drySample;
-	Float64 highpass = GetParameter( kParam_Three )*38.0;
+	Float32 cutoff;
+	Float32 cutofftarget = (GetParameter( kParam_One )*3.5f);
+	Float32 rumblecutoff = cutofftarget * 0.005f;
+	Float32 invcutoff;
+	float inputSample;
+	Float32 drySample;
+	Float32 highpass = GetParameter( kParam_Three )*38.0f;
 	int lowcut = floor(highpass);
 	int dcut;
 	if (lowcut > 37) {dcut= 1151;}
@@ -114,32 +114,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (lowcut == 3) {dcut= 7;}
 	if (lowcut == 2) {dcut= 5;}
 	if (lowcut < 2) {dcut= 3;}
-	highpass = GetParameter( kParam_Two ) * 22.0;
+	highpass = GetParameter( kParam_Two ) * 22.0f;
 	lowcut = floor(highpass)+1;
 		
-	Float64 decay = 0.001 - ((1.0-pow(1.0-GetParameter( kParam_Four ),3))*0.001);
-	if (decay == 0.001) decay = 0.1;
-	Float64 wet = GetParameter( kParam_Six );
+	Float32 decay = 0.001f - ((1.0f-pow(1.0f-GetParameter( kParam_Four ),3))*0.001f);
+	if (decay == 0.001f) decay = 0.1f;
+	Float32 wet = GetParameter( kParam_Six );
 	//removed unnecessary dry variable
-	wet *= 0.01; //correct large gain issue
-	Float64 correctionSample;
-	Float64 accumulatorSample;
-	Float64 overallscale = (GetParameter( kParam_Five )*9.0)+1.0;
-	Float64 gain = overallscale;
+	wet *= 0.01f; //correct large gain issue
+	Float32 correctionSample;
+	Float32 accumulatorSample;
+	Float32 overallscale = (GetParameter( kParam_Five )*9.0f)+1.0f;
+	Float32 gain = overallscale;
 	
-	if (gain > 1.0) {f[0] = 1.0; gain -= 1.0;} else {f[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[1] = 1.0; gain -= 1.0;} else {f[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[2] = 1.0; gain -= 1.0;} else {f[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[3] = 1.0; gain -= 1.0;} else {f[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[4] = 1.0; gain -= 1.0;} else {f[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[5] = 1.0; gain -= 1.0;} else {f[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[6] = 1.0; gain -= 1.0;} else {f[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[7] = 1.0; gain -= 1.0;} else {f[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[8] = 1.0; gain -= 1.0;} else {f[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[9] = 1.0; gain -= 1.0;} else {f[9] = gain; gain = 0.0;}
+	if (gain > 1.0f) {f[0] = 1.0f; gain -= 1.0f;} else {f[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[1] = 1.0f; gain -= 1.0f;} else {f[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[2] = 1.0f; gain -= 1.0f;} else {f[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[3] = 1.0f; gain -= 1.0f;} else {f[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[4] = 1.0f; gain -= 1.0f;} else {f[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[5] = 1.0f; gain -= 1.0f;} else {f[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[6] = 1.0f; gain -= 1.0f;} else {f[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[7] = 1.0f; gain -= 1.0f;} else {f[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[8] = 1.0f; gain -= 1.0f;} else {f[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[9] = 1.0f; gain -= 1.0f;} else {f[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
 	
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	f[0] /= overallscale;
 	f[1] /= overallscale;
 	f[2] /= overallscale;
@@ -154,23 +154,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		if (surge<fabs(inputSample))
 		{
-			surge += (double(fpd)/UINT32_MAX)*(fabs(inputSample)-surge);
-			if (surge > 1.0) surge = 1.0;
+			surge += (float(fpd)/UINT32_MAX)*(fabs(inputSample)-surge);
+			if (surge > 1.0f) surge = 1.0f;
 		}
 		else
 		{
-			surge -= ((double(fpd)/UINT32_MAX)*(surge-fabs(inputSample))*decay);
-			if (surge < 0.0) surge = 0.0;
+			surge -= ((float(fpd)/UINT32_MAX)*(surge-fabs(inputSample))*decay);
+			if (surge < 0.0f) surge = 0.0f;
 		}
 		
 		cutoff = pow((cutofftarget*surge),5);
-		if (cutoff > 1.0) cutoff = 1.0;
-		invcutoff = 1.0 - cutoff;
+		if (cutoff > 1.0f) cutoff = 1.0f;
+		invcutoff = 1.0f - cutoff;
 		//set up modified cutoff
 		
 		flip = !flip;
@@ -195,29 +195,29 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		
-		if (flip) noiseA += (double(fpd)/UINT32_MAX);
-		else noiseA -= (double(fpd)/UINT32_MAX);
+		if (flip) noiseA += (float(fpd)/UINT32_MAX);
+		else noiseA -= (float(fpd)/UINT32_MAX);
 		
 		if (filterflip)
 		{
 			noiseB *= invcutoff; noiseB += (noiseA*cutoff);
 			inputSample = noiseB+noiseC;
-			rumbleA *= (1.0-rumblecutoff);
+			rumbleA *= (1.0f-rumblecutoff);
 			rumbleA += (inputSample*rumblecutoff);
 		}
 		else 
 		{
 			noiseC *= invcutoff; noiseC += (noiseA*cutoff);
 			inputSample = noiseB+noiseC;
-			rumbleB *= (1.0-rumblecutoff);
+			rumbleB *= (1.0f-rumblecutoff);
 			rumbleB += (inputSample*rumblecutoff);
 		}
 		
 		inputSample -= (rumbleA+rumbleB);
-		inputSample *= (1.0-rumblecutoff);
+		inputSample *= (1.0f-rumblecutoff);
 		
 		inputSample *= wet;
-		inputSample += (drySample * (1.0-wet));
+		inputSample += (drySample * (1.0f-wet));
 		//apply the dry to the noise
 		
 		b[9] = b[8]; b[8] = b[7]; b[7] = b[6]; b[6] = b[5];
@@ -245,7 +245,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -33,9 +33,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double sinePos;
-		double incA;
-		double incB;
+		float sinePos;
+		float incA;
+		float incB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -52,48 +52,48 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
 	incA = incB; incB = pow(GetParameter( kParam_A ),5)/overallscale;
-	double soar = 0.3-(GetParameter( kParam_B )*0.3);
-	double wet = pow(GetParameter( kParam_C ),2);
+	float soar = 0.3f-(GetParameter( kParam_B )*0.3f);
+	float wet = pow(GetParameter( kParam_C ),2);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double inc = (incA*temp)+(incB*(1.0-temp));
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float inc = (incA*temp)+(incB*(1.0f-temp));
 
 		sinePos += inc;
-		if (sinePos > 6.283185307179586) sinePos -= 6.283185307179586;
-		double sinResult = sin(sinePos);
-		double out = 0.0;
-		double snM = fabs(sinResult)+(soar*soar);
-		double inM = fabs(inputSample);
+		if (sinePos > 6.283185307179586f) sinePos -= 6.283185307179586f;
+		float sinResult = sin(sinePos);
+		float out = 0.0f;
+		float snM = fabs(sinResult)+(soar*soar);
+		float inM = fabs(inputSample);
 		if (inM < snM) {
 			inM = fabs(sinResult);
 			snM = fabs(inputSample)+(soar*soar);
 		}
 		
-		if (inputSample > 0.0 && sinResult > 0.0) out = fmax((sqrt((fabs(inM)/snM))*snM)-soar,0.0);
-		if (inputSample < 0.0 && sinResult > 0.0) out = fmin((-sqrt((fabs(inM)/snM))*snM)+soar,0.0);
-		if (inputSample > 0.0 && sinResult < 0.0) out = fmin((-sqrt((fabs(inM)/snM))*snM)+soar,0.0);
-		if (inputSample < 0.0 && sinResult < 0.0) out = fmax((sqrt((fabs(inM)/snM))*snM)-soar,0.0);
+		if (inputSample > 0.0f && sinResult > 0.0f) out = fmax((sqrt((fabs(inM)/snM))*snM)-soar,0.0f);
+		if (inputSample < 0.0f && sinResult > 0.0f) out = fmin((-sqrt((fabs(inM)/snM))*snM)+soar,0.0f);
+		if (inputSample > 0.0f && sinResult < 0.0f) out = fmin((-sqrt((fabs(inM)/snM))*snM)+soar,0.0f);
+		if (inputSample < 0.0f && sinResult < 0.0f) out = fmax((sqrt((fabs(inM)/snM))*snM)-soar,0.0f);
 		inputSample = out;
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

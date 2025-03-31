@@ -73,9 +73,9 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double biquad[biq_total];
-		double fixA[fix_total];
-		double fixB[fix_total];
+			float biquad[biq_total];
+		float fixA[fix_total];
+		float fixB[fix_total];
 	};
 	_dram* dram;
 };
@@ -89,62 +89,62 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double inTrim = GetParameter( kParam_One )*10.0;
+	float inTrim = GetParameter( kParam_One )*10.0f;
 	
-	dram->biquad[biq_freq] = pow(GetParameter( kParam_Two ),3)*20000.0;
-	if (dram->biquad[biq_freq] < 15.0) dram->biquad[biq_freq] = 15.0;
+	dram->biquad[biq_freq] = pow(GetParameter( kParam_Two ),3)*20000.0f;
+	if (dram->biquad[biq_freq] < 15.0f) dram->biquad[biq_freq] = 15.0f;
 	dram->biquad[biq_freq] /= GetSampleRate();
-    dram->biquad[biq_reso] = (pow(GetParameter( kParam_Three ),2)*15.0)+0.0001;
-	double K = tan(M_PI * dram->biquad[biq_freq]);
-	double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
-	dram->biquad[biq_a0] = (1.0 + K * K) * norm;
-	dram->biquad[biq_a1] = 2.0 * (K * K - 1) * norm;
+    dram->biquad[biq_reso] = (pow(GetParameter( kParam_Three ),2)*15.0f)+0.0001f;
+	float K = tan(M_PI * dram->biquad[biq_freq]);
+	float norm = 1.0f / (1.0f + K / dram->biquad[biq_reso] + K * K);
+	dram->biquad[biq_a0] = (1.0f + K * K) * norm;
+	dram->biquad[biq_a1] = 2.0f * (K * K - 1) * norm;
 	dram->biquad[biq_a2] = dram->biquad[biq_a0];
 	dram->biquad[biq_b1] = dram->biquad[biq_a1];
-	dram->biquad[biq_b2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
+	dram->biquad[biq_b2] = (1.0f - K / dram->biquad[biq_reso] + K * K) * norm;
 	//for the coefficient-interpolated biquad filter
 	
-	double powFactor = pow(GetParameter( kParam_Four )+0.9,4);
+	float powFactor = pow(GetParameter( kParam_Four )+0.9f,4);
 	
-	//1.0 == target neutral
+	//1.0f == target neutral
 	
-	double outTrim = GetParameter( kParam_Five );
+	float outTrim = GetParameter( kParam_Five );
 	
-	double wet = GetParameter( kParam_Six );
+	float wet = GetParameter( kParam_Six );
 	
-	dram->fixA[fix_freq] = dram->fixB[fix_freq] = 20000.0 / GetSampleRate();
-    dram->fixA[fix_reso] = dram->fixB[fix_reso] = 0.7071; //butterworth Q
+	dram->fixA[fix_freq] = dram->fixB[fix_freq] = 20000.0f / GetSampleRate();
+    dram->fixA[fix_reso] = dram->fixB[fix_reso] = 0.7071f; //butterworth Q
 	
 	K = tan(M_PI * dram->fixA[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixA[fix_reso] + K * K);
 	dram->fixA[fix_a0] = dram->fixB[fix_a0] = K * K * norm;
-	dram->fixA[fix_a1] = dram->fixB[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a1] = dram->fixB[fix_a1] = 2.0f * dram->fixA[fix_a0];
 	dram->fixA[fix_a2] = dram->fixB[fix_a2] = dram->fixA[fix_a0];
-	dram->fixA[fix_b1] = dram->fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixA[fix_b2] = dram->fixB[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_b1] = dram->fixB[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixA[fix_b2] = dram->fixB[fix_b2] = (1.0f - K / dram->fixA[fix_reso] + K * K) * norm;
 	//for the fixed-position biquad filter
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = *sourceP;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = *sourceP;
 		
 		inputSample *= inTrim;
 		
-		double temp = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		float temp = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
 		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (temp * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
 		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (temp * dram->fixA[fix_b2]);
 		inputSample = temp; //fixed biquad filtering ultrasonics
 		
 		//encode/decode courtesy of torridgristle under the MIT license
-		if (inputSample > 1.0) inputSample = 1.0;
-		else if (inputSample > 0.0) inputSample = 1.0 - pow(1.0-inputSample,powFactor);
-		if (inputSample < -1.0) inputSample = -1.0;
-		else if (inputSample < 0.0) inputSample = -1.0 + pow(1.0+inputSample,powFactor);
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,powFactor);
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,powFactor);
 		
 		temp = (inputSample * dram->biquad[biq_a0]) + dram->biquad[biq_sL1];
 		dram->biquad[biq_sL1] =  (inputSample * dram->biquad[biq_a1]) - (temp * dram->biquad[biq_b1]) + dram->biquad[biq_sL2];
@@ -152,10 +152,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = temp; //coefficient interpolating biquad filter
 		
 		//encode/decode courtesy of torridgristle under the MIT license
-		if (inputSample > 1.0) inputSample = 1.0;
-		else if (inputSample > 0.0) inputSample = 1.0 - pow(1.0-inputSample,(1.0/powFactor));
-		if (inputSample < -1.0) inputSample = -1.0;
-		else if (inputSample < 0.0) inputSample = -1.0 + pow(1.0+inputSample,(1.0/powFactor));
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,(1.0f/powFactor));
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,(1.0f/powFactor));
 		
 		inputSample *= outTrim;
 		
@@ -164,14 +164,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		dram->fixB[fix_sL2] = (inputSample * dram->fixB[fix_a2]) - (temp * dram->fixB[fix_b2]);
 		inputSample = temp; //fixed biquad filtering ultrasonics
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample*wet) + (drySample*(1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample*wet) + (drySample*(1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

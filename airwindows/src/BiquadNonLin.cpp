@@ -66,7 +66,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double biquad[biq_total];
+			float biquad[biq_total];
 	};
 	_dram* dram;
 };
@@ -80,27 +80,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int type = 0;
-	if (GetParameter( kParam_One ) > 0.5) type = 1;
+	if (GetParameter( kParam_One ) > 0.5f) type = 1;
 	
-	dram->biquad[biq_freq] = ((pow(GetParameter( kParam_Two ),3)*20000.0)/GetSampleRate());
-	if (dram->biquad[biq_freq] < 0.0001) dram->biquad[biq_freq] = 0.0001;
+	dram->biquad[biq_freq] = ((pow(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate());
+	if (dram->biquad[biq_freq] < 0.0001f) dram->biquad[biq_freq] = 0.0001f;
 	
     dram->biquad[biq_reso] = GetParameter( kParam_Three );
-	if (dram->biquad[biq_reso] < 0.0001) dram->biquad[biq_reso] = 0.0001;
+	if (dram->biquad[biq_reso] < 0.0001f) dram->biquad[biq_reso] = 0.0001f;
 	
-	double nonLin = pow(GetParameter( kParam_Four ),2);
-	//if you're using a 0.5 for a lowpass fixed frequency, value is 0.25
+	float nonLin = pow(GetParameter( kParam_Four ),2);
+	//if you're using a 0.5f for a lowpass fixed frequency, value is 0.25f
 	
-	double wet = GetParameter( kParam_Five );
+	float wet = GetParameter( kParam_Five );
 	
 	//biquad contains these values:
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
 	//[2] is a0 but you need distinct ones for additional biquad instances so it's here
 	//[3] is a1 but you need distinct ones for additional biquad instances so it's here
 	//[4] is a2 but you need distinct ones for additional biquad instances so it's here
@@ -125,26 +125,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//to the A section and now it's the new starting point.
 	
 	if (type == 0) { //lowpass
-		double K = tan(M_PI * dram->biquad[biq_freq]);
-		double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+		float K = tan(M_PI * dram->biquad[biq_freq]);
+		float norm = 1.0f / (1.0f + K / dram->biquad[biq_reso] + K * K);
 		dram->biquad[biq_aB0] = K * K * norm;
-		dram->biquad[biq_aB1] = 2.0 * dram->biquad[biq_aB0];
+		dram->biquad[biq_aB1] = 2.0f * dram->biquad[biq_aB0];
 		dram->biquad[biq_aB2] = dram->biquad[biq_aB0];
-		dram->biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-		dram->biquad[biq_bB2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
+		dram->biquad[biq_bB1] = 2.0f * (K * K - 1.0f) * norm;
+		dram->biquad[biq_bB2] = (1.0f - K / dram->biquad[biq_reso] + K * K) * norm;
 	}
 		
 	if (type == 1) { //bandpass
-		double K = tan(M_PI * dram->biquad[biq_freq]);
-		double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+		float K = tan(M_PI * dram->biquad[biq_freq]);
+		float norm = 1.0f / (1.0f + K / dram->biquad[biq_reso] + K * K);
 		dram->biquad[biq_aB0] = K / dram->biquad[biq_reso] * norm;
-		dram->biquad[biq_aB1] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+		dram->biquad[biq_aB1] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 		dram->biquad[biq_aB2] = -dram->biquad[biq_aB0];
-		dram->biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-		dram->biquad[biq_bB2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
+		dram->biquad[biq_bB1] = 2.0f * (K * K - 1.0f) * norm;
+		dram->biquad[biq_bB2] = (1.0f - K / dram->biquad[biq_reso] + K * K) * norm;
 	}
 		
-	if (dram->biquad[biq_aA0] == 0.0) { // if we have just started, start directly with raw info
+	if (dram->biquad[biq_aA0] == 0.0f) { // if we have just started, start directly with raw info
 		dram->biquad[biq_aA0] = dram->biquad[biq_aB0];
 		dram->biquad[biq_aA1] = dram->biquad[biq_aB1];
 		dram->biquad[biq_aA2] = dram->biquad[biq_aB2];
@@ -153,32 +153,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	}
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = *sourceP;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = *sourceP;
 		
-		double buf = (double)nSampleFrames/inFramesToProcess;
-		dram->biquad[biq_a0] = (dram->biquad[biq_aA0]*buf)+(dram->biquad[biq_aB0]*(1.0-buf));
-		dram->biquad[biq_a1] = (dram->biquad[biq_aA1]*buf)+(dram->biquad[biq_aB1]*(1.0-buf));
-		dram->biquad[biq_a2] = (dram->biquad[biq_aA2]*buf)+(dram->biquad[biq_aB2]*(1.0-buf));
-		dram->biquad[biq_b1] = (dram->biquad[biq_bA1]*buf)+(dram->biquad[biq_bB1]*(1.0-buf));
-		dram->biquad[biq_b2] = (dram->biquad[biq_bA2]*buf)+(dram->biquad[biq_bB2]*(1.0-buf));
+		float buf = (float)nSampleFrames/inFramesToProcess;
+		dram->biquad[biq_a0] = (dram->biquad[biq_aA0]*buf)+(dram->biquad[biq_aB0]*(1.0f-buf));
+		dram->biquad[biq_a1] = (dram->biquad[biq_aA1]*buf)+(dram->biquad[biq_aB1]*(1.0f-buf));
+		dram->biquad[biq_a2] = (dram->biquad[biq_aA2]*buf)+(dram->biquad[biq_aB2]*(1.0f-buf));
+		dram->biquad[biq_b1] = (dram->biquad[biq_bA1]*buf)+(dram->biquad[biq_bB1]*(1.0f-buf));
+		dram->biquad[biq_b2] = (dram->biquad[biq_bA2]*buf)+(dram->biquad[biq_bB2]*(1.0f-buf));
 		
 		
-		double dia0 = fabs(dram->biquad[biq_a0]*(1.0+(inputSample*nonLin))); if (dia0 > 1.0) dia0 = 1.0;
-		double dia2 = dia0; //if lowpass, use this in both places
+		float dia0 = fabs(dram->biquad[biq_a0]*(1.0f+(inputSample*nonLin))); if (dia0 > 1.0f) dia0 = 1.0f;
+		float dia2 = dia0; //if lowpass, use this in both places
 		if (type == 1) dia2 = -dia2;
 		//if bandpass, you must reverse polarity
 		
-		double tempSample = (inputSample * dia0) + dram->biquad[biq_sL1];
+		float tempSample = (inputSample * dia0) + dram->biquad[biq_sL1];
 		dram->biquad[biq_sL1] = (inputSample * dram->biquad[biq_a1]) - (tempSample * dram->biquad[biq_b1]) + dram->biquad[biq_sL2];
 		dram->biquad[biq_sL2] = (inputSample * dia2) - (tempSample * dram->biquad[biq_b2]);
 		inputSample = tempSample;
 		
 		
 		inputSample *= wet;
-		if (wet > 0.0) {
-			inputSample += (drySample*(1.0-wet));
+		if (wet > 0.0f) {
+			inputSample += (drySample*(1.0f-wet));
 		} else {
 			inputSample += drySample;
 		} //inv/dry/wet lets us turn LP into HP and band into notch
@@ -186,7 +186,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

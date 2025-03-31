@@ -29,22 +29,22 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 ataLast3Sample;
-		Float64 ataLast2Sample;
-		Float64 ataLast1Sample;
-		Float64 ataHalfwaySample;
-		Float64 ataHalfDrySample;
-		Float64 ataHalfDiffSample;
-		Float64 ataA;
-		Float64 ataB;
-		Float64 ataC;
-		Float64 ataDecay;
-		Float64 ataUpsampleHighTweak;
-		Float64 ataDrySample;
-		Float64 ataDiffSample;
-		Float64 ataPrevDiffSample;
+		Float32 ataLast3Sample;
+		Float32 ataLast2Sample;
+		Float32 ataLast1Sample;
+		Float32 ataHalfwaySample;
+		Float32 ataHalfDrySample;
+		Float32 ataHalfDiffSample;
+		Float32 ataA;
+		Float32 ataB;
+		Float32 ataC;
+		Float32 ataDecay;
+		Float32 ataUpsampleHighTweak;
+		Float32 ataDrySample;
+		Float32 ataDiffSample;
+		Float32 ataPrevDiffSample;
 		bool ataFlip; //end defining of antialiasing variables
-		Float64 lastSample;
+		Float32 lastSample;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -61,19 +61,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 2.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 2.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 inputSample;
-	Float64 clamp;
-	Float64 threshold = pow((1-GetParameter( kParam_One )),4)/overallscale;
+	Float32 inputSample;
+	Float32 clamp;
+	Float32 threshold = pow((1-GetParameter( kParam_One )),4)/overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		ataDrySample = inputSample;
 		
-		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + ((-ataLast2Sample + ataLast3Sample) * ataUpsampleHighTweak)) / 2.0;
+		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + ((-ataLast2Sample + ataLast3Sample) * ataUpsampleHighTweak)) / 2.0f;
 		ataLast3Sample = ataLast2Sample; ataLast2Sample = ataLast1Sample; ataLast1Sample = inputSample;
 		//setting up oversampled special antialiasing
 	//begin first half- change inputSample -> ataHalfwaySample, ataDrySample -> ataHalfDrySample
@@ -109,14 +109,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else {ataB *= ataDecay; ataA *= ataDecay; ataB += ataC; ataA -= ataC; ataC = ataB;}
 		ataDiffSample = (ataC * ataDecay); ataFlip = !ataFlip;
 		//end antialiasing section for input sample
-		inputSample = ataDrySample; inputSample += ((ataDiffSample + ataHalfDiffSample + ataPrevDiffSample) / 0.734);
-		ataPrevDiffSample = ataDiffSample / 2.0;
+		inputSample = ataDrySample; inputSample += ((ataDiffSample + ataHalfDiffSample + ataPrevDiffSample) / 0.734f);
+		ataPrevDiffSample = ataDiffSample / 2.0f;
 		//apply processing as difference to non-oversampled raw input
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

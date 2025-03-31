@@ -29,10 +29,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 gainchase;
-		Float64 chasespeed;		
-		double biquadA[11];
-		double biquadB[11];
+		Float32 gainchase;
+		Float32 chasespeed;		
+		float biquadA[11];
+		float biquadB[11];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -49,50 +49,50 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double inputgain = GetParameter( kParam_One ) * 1.03;
+	float inputgain = GetParameter( kParam_One ) * 1.03f;
 	
-	if (gainchase != inputgain) chasespeed *= 2.0;
+	if (gainchase != inputgain) chasespeed *= 2.0f;
 	if (chasespeed > inFramesToProcess) chasespeed = inFramesToProcess;
-	if (gainchase < 0.0) gainchase = inputgain;
+	if (gainchase < 0.0f) gainchase = inputgain;
 	
-	biquadB[0] = biquadA[0] = 20000.0 / GetSampleRate();
-    biquadA[1] = 0.618033988749894848204586;
-	biquadB[1] = 0.5;
+	biquadB[0] = biquadA[0] = 20000.0f / GetSampleRate();
+    biquadA[1] = 0.618033988749894848204586f;
+	biquadB[1] = 0.5f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadA[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1
 		
-		chasespeed *= 0.9999; chasespeed -= 0.01; if (chasespeed < 64.0) chasespeed = 64.0;
+		chasespeed *= 0.9999f; chasespeed -= 0.01f; if (chasespeed < 64.0f) chasespeed = 64.0f;
 		//we have our chase speed compensated for recent fader activity
-		gainchase = (((gainchase*chasespeed)+inputgain)/(chasespeed+1.0));
+		gainchase = (((gainchase*chasespeed)+inputgain)/(chasespeed+1.0f));
 		//gainchase is chasing the target, as a simple multiply gain factor
-		if (1.0 != gainchase) inputSample *= sqrt(gainchase);
+		if (1.0f != gainchase) inputSample *= sqrt(gainchase);
 		//done with trim control
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		inputSample = ((asin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.618033988749894848204586)+(asin(inputSample)*0.381966011250105);
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample = ((asin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.618033988749894848204586f)+(asin(inputSample)*0.381966011250105f);
 		//this is an asin version of Spiral blended with regular asin ConsoleBuss.
 		//It's blending between two different harmonics in the overtones of the algorithm
 		
@@ -100,13 +100,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = tempSample; 
 		biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (1.0 != gainchase) inputSample *= sqrt(gainchase);
+		if (1.0f != gainchase) inputSample *= sqrt(gainchase);
 		//we re-amplify after the distortion relative to how much we cut back previously.
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -34,12 +34,12 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		int hullp;
-		double hullb[5];
+		float hullb[5];
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			double hull[225];	
+			float hull[225];	
 	};
 	_dram* dram;
 };
@@ -53,8 +53,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
 	int cycleEnd = floor(overallscale);
@@ -62,64 +62,64 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (cycleEnd > 4) cycleEnd = 4;
 	//max out at 4x, 192k
 	
-	double treble = GetParameter( kParam_One )*2.0;
-	double mid = GetParameter( kParam_Two )*2.0;
-	double bass = GetParameter( kParam_Three )*2.0;
-	double iirAmount = 0.125/cycleEnd;
+	float treble = GetParameter( kParam_One )*2.0f;
+	float mid = GetParameter( kParam_Two )*2.0f;
+	float bass = GetParameter( kParam_Three )*2.0f;
+	float iirAmount = 0.125f/cycleEnd;
 	int limit = 4*cycleEnd;
-	double divisor = 2.0/limit;
+	float divisor = 2.0f/limit;
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		//begin Hull2 treble crossover
 		hullp--; if (hullp < 0) hullp += 60;
 		dram->hull[hullp] = dram->hull[hullp+60] = inputSample;
 		int x = hullp;
-		double midSample = 0.0;
+		float midSample = 0.0f;
 		while (x < hullp+(limit/2)) {
 			midSample += dram->hull[x] * divisor;
 			x++;
 		}
-		midSample += midSample * 0.125;
+		midSample += midSample * 0.125f;
 		while (x < hullp+limit) {
-			midSample -= dram->hull[x] * 0.125 * divisor;
+			midSample -= dram->hull[x] * 0.125f * divisor;
 			x++;
 		}
 		dram->hull[hullp+20] = dram->hull[hullp+80] = midSample;
 		x = hullp+20;
-		midSample = 0.0;
+		midSample = 0.0f;
 		while (x < hullp+20+(limit/2)) {
 			midSample += dram->hull[x] * divisor;
 			x++;
 		}
-		midSample += midSample * 0.125;
+		midSample += midSample * 0.125f;
 		while (x < hullp+20+limit) {
-			midSample -= dram->hull[x] * 0.125 * divisor;
+			midSample -= dram->hull[x] * 0.125f * divisor;
 			x++;
 		}
 		dram->hull[hullp+40] = dram->hull[hullp+100] = midSample;
 		x = hullp+40;
-		midSample = 0.0;
+		midSample = 0.0f;
 		while (x < hullp+40+(limit/2)) {
 			midSample += dram->hull[x] * divisor;
 			x++;
 		}
-		midSample += midSample * 0.125;
+		midSample += midSample * 0.125f;
 		while (x < hullp+40+limit) {
-			midSample -= dram->hull[x] * 0.125 * divisor;
+			midSample -= dram->hull[x] * 0.125f * divisor;
 			x++;
 		}
-		double trebleSample = drySample - midSample;
+		float trebleSample = drySample - midSample;
 		//end Hull2 treble crossover
 		
 		//begin Hull2 midbass crossover
-		double bassSample = midSample; x = 0;
+		float bassSample = midSample; x = 0;
 		while (x < 3) {
-			hullb[x] = (hullb[x] * (1.0 - iirAmount)) + (bassSample * iirAmount);
-			if (fabs(hullb[x])<1.18e-37) hullb[x] = 0.0;
+			hullb[x] = (hullb[x] * (1.0f - iirAmount)) + (bassSample * iirAmount);
+			if (fabs(hullb[x])<1.18e-37f) hullb[x] = 0.0f;
 			bassSample = hullb[x];
 			x++;
 		}
@@ -131,7 +131,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

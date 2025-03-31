@@ -27,22 +27,22 @@ kParam0, kParam1, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 muVary;
-	Float64 muAttack;
-	Float64 muNewSpeed;
-	Float64 muSpeedA;
-	Float64 muSpeedB;
-	Float64 muCoefficientA;
-	Float64 muCoefficientB;
-	Float64 gateL;
-	Float64 gateR;
-	Float64 iirSampleAL;
-	Float64 iirSampleBL;
-	Float64 iirSampleAR;
-	Float64 iirSampleBR;
-	Float64 iirSampleAM;
-	Float64 iirSampleBM;
-	Float64 iirSampleCM;
+	Float32 muVary;
+	Float32 muAttack;
+	Float32 muNewSpeed;
+	Float32 muSpeedA;
+	Float32 muSpeedB;
+	Float32 muCoefficientA;
+	Float32 muCoefficientB;
+	Float32 gateL;
+	Float32 gateR;
+	Float32 iirSampleAL;
+	Float32 iirSampleBL;
+	Float32 iirSampleAR;
+	Float32 iirSampleBR;
+	Float32 iirSampleAM;
+	Float32 iirSampleBM;
+	Float32 iirSampleCM;
 	uint32_t fpdL;
 	uint32_t fpdR;
 	bool flip;
@@ -56,40 +56,40 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 thunder = GetParameter( kParam_One ) * 0.4;
-	Float64 threshold = 1.0 - (thunder * 2.0);
-	if (threshold < 0.01) threshold = 0.01;
-	Float64 muMakeupGain = 1.0 / threshold;
-	Float64 release = pow((1.28-thunder),5)*32768.0;
+	Float32 thunder = GetParameter( kParam_One ) * 0.4f;
+	Float32 threshold = 1.0f - (thunder * 2.0f);
+	if (threshold < 0.01f) threshold = 0.01f;
+	Float32 muMakeupGain = 1.0f / threshold;
+	Float32 release = pow((1.28f-thunder),5)*32768.0f;
 	release /= overallscale;
-	Float64 fastest = sqrt(release);
-	Float64 EQ = ((0.0275 / GetSampleRate())*32000.0);
-	Float64 dcblock = EQ / 300.0;
-	Float64 basstrim = (0.01/EQ)+1.0;
+	Float32 fastest = sqrt(release);
+	Float32 EQ = ((0.0275f / GetSampleRate())*32000.0f);
+	Float32 dcblock = EQ / 300.0f;
+	Float32 basstrim = (0.01f/EQ)+1.0f;
 	//FF parameters also ride off Speed
-	Float64 outputGain = GetParameter( kParam_Two );
+	Float32 outputGain = GetParameter( kParam_Two );
 	
-	Float64 coefficient;
-	Float64 inputSense;
+	Float32 coefficient;
+	Float32 inputSense;
 	
-	Float64 resultL;
-	Float64 resultR;
-	Float64 resultM;
-	Float64 resultML;
-	Float64 resultMR;
+	Float32 resultL;
+	Float32 resultR;
+	Float32 resultM;
+	Float32 resultML;
+	Float32 resultMR;
 	
-	double inputSampleL;
-	double inputSampleR;
+	float inputSampleL;
+	float inputSampleR;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		inputSampleL = inputSampleL * muMakeupGain;
 		inputSampleR = inputSampleR * muMakeupGain;
@@ -132,8 +132,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (resultM > resultMR) resultMR = resultM;
 		//trying to restrict the buzziness
 		
-		if (resultML > 1.0) resultML = 1.0;
-		if (resultMR > 1.0) resultMR = 1.0;
+		if (resultML > 1.0f) resultML = 1.0f;
+		if (resultMR > 1.0f) resultMR = 1.0f;
 		//now we have result L, R and M the trigger modulator which must be 0-1
 		
 		//begin compressor section
@@ -153,7 +153,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			{
 				muVary = threshold / inputSense;
 				muAttack = sqrt(fabs(muSpeedA));
-				muCoefficientA = muCoefficientA * (muAttack-1.0);
+				muCoefficientA = muCoefficientA * (muAttack-1.0f);
 				if (muVary < threshold)
 				{
 					muCoefficientA = muCoefficientA + threshold;
@@ -166,8 +166,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			else
 			{
-				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-				muCoefficientA = muCoefficientA + 1.0;
+				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+				muCoefficientA = muCoefficientA + 1.0f;
 				muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 			}
 			muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -193,8 +193,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			else
 			{
-				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-				muCoefficientB = muCoefficientB + 1.0;
+				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+				muCoefficientB = muCoefficientB + 1.0f;
 				muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 			}
 			muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -222,7 +222,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		inputSampleR += (resultR * resultM);
 		//combine the two by adding the summed channnel of lows
 		
-		if (outputGain != 1.0) {
+		if (outputGain != 1.0f) {
 			inputSampleL *= outputGain;
 			inputSampleR *= outputGain;
 		}
@@ -231,10 +231,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

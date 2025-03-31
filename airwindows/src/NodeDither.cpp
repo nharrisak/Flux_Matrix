@@ -39,7 +39,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[5000];
+			Float32 d[5000];
 	};
 	_dram* dram;
 };
@@ -54,9 +54,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 depthA = GetParameter( kParam_One );
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 depthA = GetParameter( kParam_One );
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int offsetA = (int)(depthA * overallscale);
@@ -66,25 +66,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int phase = GetParameter( kParam_Two );
 	//0 default is out of phase, 1 is in phase
 	
-	double inputSample;
-	Float64 currentDither;
+	float inputSample;
+	Float32 currentDither;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
 		
-		inputSample *= 8388608.0;
+		inputSample *= 8388608.0f;
 		//0-1 is now one bit, now we dither
 		
 		if (gcount < 0 || gcount > 2450) {gcount = 2450;}
 				
-		currentDither = (double(fpd)/UINT32_MAX);
+		currentDither = (float(fpd)/UINT32_MAX);
 		inputSample += currentDither;
 		
 		if (phase == 1) {
-			inputSample -= 1.0;
+			inputSample -= 1.0f;
 			inputSample += dram->d[gcount+offsetA];
 		} else {
 			inputSample -= dram->d[gcount+offsetA];
@@ -97,7 +97,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		gcount--;
 		
-		inputSample /= 8388608.0;
+		inputSample /= 8388608.0f;
 
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		//pseudorandom number updater

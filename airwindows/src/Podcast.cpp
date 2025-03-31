@@ -31,11 +31,11 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 c1;
-		Float64 c2;
-		Float64 c3;
-		Float64 c4;
-		Float64 c5;
+		Float32 c1;
+		Float32 c2;
+		Float32 c3;
+		Float32 c4;
+		Float32 c5;
 		//the compressor
 		
 		uint32_t fpd;
@@ -54,89 +54,89 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 compress = 1.0 + pow(GetParameter( kParam_One ),2);
-	Float64 wet = GetParameter( kParam_Two );
-	Float64 speed1 = 64.0 / pow(compress,2);
+	Float32 compress = 1.0f + pow(GetParameter( kParam_One ),2);
+	Float32 wet = GetParameter( kParam_Two );
+	Float32 speed1 = 64.0f / pow(compress,2);
 	speed1 *= overallscale;
-	Float64 speed2 = speed1 * 1.4;
-	Float64 speed3 = speed2 * 1.5;
-	Float64 speed4 = speed3 * 1.6;
-	Float64 speed5 = speed4 * 1.7;
-	Float64 trigger;
+	Float32 speed2 = speed1 * 1.4f;
+	Float32 speed3 = speed2 * 1.5f;
+	Float32 speed4 = speed3 * 1.6f;
+	Float32 speed5 = speed4 * 1.7f;
+	Float32 trigger;
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 				
 		inputSample *= c1;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c1 += trigger/speed5;
 		if (c1 > compress) c1 = compress;
 		//compress stage
 		
 		inputSample *= c2;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c2 += trigger/speed4;
 		if (c2 > compress) c2 = compress;
 		//compress stage
 				
 		inputSample *= c3;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c3 += trigger/speed3;
 		if (c3 > compress) c3 = compress;
 		//compress stage
 		
 		inputSample *= c4;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c4 += trigger/speed2;
 		if (c4 > compress) c4 = compress;
 		//compress stage
 				
 		inputSample *= c5;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c5 += trigger/speed1;
 		if (c5 > compress) c5 = compress;
 		//compress stage
 		
-		if (compress > 1.0) inputSample /= compress;
+		if (compress > 1.0f) inputSample /= compress;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
-		if (inputSample > 0.999) inputSample = 0.999;
-		if (inputSample < -0.999) inputSample = -0.999;
+		if (inputSample > 0.999f) inputSample = 0.999f;
+		if (inputSample < -0.999f) inputSample = -0.999f;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

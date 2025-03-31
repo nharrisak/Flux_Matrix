@@ -37,10 +37,10 @@ struct _kernel {
  
 		bool WasNegative;
 		bool SubOctave;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -57,22 +57,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 inputSample;
-	Float64 rootnote = GetParameter( kParam_One );
-	Float64 suboctave = GetParameter( kParam_Two );
-	Float64 EQ = 0.01+((pow(GetParameter( kParam_Three ),4) / GetSampleRate())*32000.0);
-	Float64 dcblock = EQ / 320.0;
-	Float64 wet = GetParameter( kParam_Four )*2.0;
-	Float64 dry = 2.0 - wet;
-	Float64 bridgerectifier;
-	Float64 result;
-	Float64 basstrim = (0.01/EQ)+1.0;
-	if (wet > 1.0) wet = 1.0;
-	if (dry > 1.0) dry = 1.0;
+	Float32 inputSample;
+	Float32 rootnote = GetParameter( kParam_One );
+	Float32 suboctave = GetParameter( kParam_Two );
+	Float32 EQ = 0.01f+((pow(GetParameter( kParam_Three ),4) / GetSampleRate())*32000.0f);
+	Float32 dcblock = EQ / 320.0f;
+	Float32 wet = GetParameter( kParam_Four )*2.0f;
+	Float32 dry = 2.0f - wet;
+	Float32 bridgerectifier;
+	Float32 result;
+	Float32 basstrim = (0.01f/EQ)+1.0f;
+	if (wet > 1.0f) wet = 1.0f;
+	if (dry > 1.0f) dry = 1.0f;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
 		if (inputSample > 0)
@@ -101,7 +101,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		iirSampleC = (iirSampleC * (1 - EQ)) + (result *  EQ);
 		result = iirSampleC;
 		
-        Float64 outputSample = (inputSample*dry) + (result*wet);
+        Float32 outputSample = (inputSample*dry) + (result*wet);
 		//this plugin produces DC offset very easily: it's presented in this primitive form
 		//to make it easier to understand for when these are open sourced.
 		//FathomFive is the original Airwindows deep bass booster algorithm:
@@ -110,7 +110,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)outputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		outputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		outputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		sourceP += inNumChannels;

@@ -47,38 +47,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
-	//double hardness = 0.618033988749894; // golden ratio
-	//double softness = 0.381966011250105; // 1.0 - hardness
-	//double refclip = 1.618033988749894; // -0.2dB we're making all this pure raw code
-	//refclip*hardness = 1.0  to use ClipOnly as a prefab code-chunk.
-	//refclip*softness = 0.618033988749894	Seven decimal places is plenty as it's
+	//float hardness = 0.618033988749894f; // golden ratio
+	//float softness = 0.381966011250105f; // 1.0f - hardness
+	//float refclip = 1.618033988749894f; // -0.2dB we're making all this pure raw code
+	//refclip*hardness = 1.0f  to use ClipOnly as a prefab code-chunk.
+	//refclip*softness = 0.618033988749894f	Seven decimal places is plenty as it's
 	//not related to the original sound much: it's an arbitrary position in softening.
 
 	while (nSampleFrames-- > 0) {
 		Float32 inputSample = *sourceP;
 		
-		if (inputSample > 4.0) inputSample = 4.0; if (inputSample < -4.0) inputSample = -4.0;
-		if (inputSample - lastSample > 0.618033988749894) inputSample = lastSample + 0.618033988749894;
-		if (inputSample - lastSample < -0.618033988749894) inputSample = lastSample - 0.618033988749894;
+		if (inputSample > 4.0f) inputSample = 4.0f; if (inputSample < -4.0f) inputSample = -4.0f;
+		if (inputSample - lastSample > 0.618033988749894f) inputSample = lastSample + 0.618033988749894f;
+		if (inputSample - lastSample < -0.618033988749894f) inputSample = lastSample - 0.618033988749894f;
 		//same as slew clippage
 		
 		//begin ClipOnly2 as a little, compressed chunk that can be dropped into code
 		if (wasPosClip == true) { //current will be over
-			if (inputSample<lastSample) lastSample=1.0+(inputSample*0.381966011250105);
-			else lastSample = 0.618033988749894+(lastSample*0.618033988749894);
+			if (inputSample<lastSample) lastSample=1.0f+(inputSample*0.381966011250105f);
+			else lastSample = 0.618033988749894f+(lastSample*0.618033988749894f);
 		} wasPosClip = false;
-		if (inputSample>1.618033988749894) {wasPosClip=true;inputSample=1.0+(lastSample*0.381966011250105);}
+		if (inputSample>1.618033988749894f) {wasPosClip=true;inputSample=1.0f+(lastSample*0.381966011250105f);}
 		if (wasNegClip == true) { //current will be -over
-			if (inputSample > lastSample) lastSample=-1.0+(inputSample*0.381966011250105);
-			else lastSample=-0.618033988749894+(lastSample*0.618033988749894);
+			if (inputSample > lastSample) lastSample=-1.0f+(inputSample*0.381966011250105f);
+			else lastSample=-0.618033988749894f+(lastSample*0.618033988749894f);
 		} wasNegClip = false;
-		if (inputSample<-1.618033988749894) {wasNegClip=true;inputSample=-1.0+(lastSample*0.381966011250105);}
+		if (inputSample<-1.618033988749894f) {wasNegClip=true;inputSample=-1.0f+(lastSample*0.381966011250105f);}
 		intermediate[spacing] = inputSample;
         inputSample = lastSample; //Latency is however many samples equals one 44.1k sample
 		for (int x = spacing; x > 0; x--) intermediate[x-1] = intermediate[x];

@@ -37,18 +37,18 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 sweep;
-		Float64 sweepB;
+		Float32 sweep;
+		Float32 sweepB;
 		int gcount;
-		Float64 airPrev;
-		Float64 airEven;
-		Float64 airOdd;
-		Float64 airFactor;
+		Float32 airPrev;
+		Float32 airEven;
+		Float32 airOdd;
+		Float32 airFactor;
 		bool flip;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 p[16386]; //this is processed, not raw incoming samples
+			Float32 p[16386]; //this is processed, not raw incoming samples
 	};
 	_dram* dram;
 };
@@ -62,23 +62,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 speed = pow(0.1+GetParameter( kParam_One ),6);
-	Float64 depth = (pow(GetParameter( kParam_Two ),3) / sqrt(speed))*4.0;
-	Float64 speedB = pow(0.1+GetParameter( kParam_Three ),6);
-	Float64 depthB = pow(GetParameter( kParam_Four ),3) / sqrt(speedB);
-	Float64 tupi = 3.141592653589793238 * 2.0;
-	Float64 wet = GetParameter( kParam_Five ); //note: inv/dry/wet
+	Float32 speed = pow(0.1f+GetParameter( kParam_One ),6);
+	Float32 depth = (pow(GetParameter( kParam_Two ),3) / sqrt(speed))*4.0f;
+	Float32 speedB = pow(0.1f+GetParameter( kParam_Three ),6);
+	Float32 depthB = pow(GetParameter( kParam_Four ),3) / sqrt(speedB);
+	Float32 tupi = 3.141592653589793238f * 2.0f;
+	Float32 wet = GetParameter( kParam_Five ); //note: inv/dry/wet
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		airFactor = airPrev - inputSample;
 		if (flip) {airEven += airFactor; airOdd -= airFactor; airFactor = airEven;}
 		else {airOdd += airFactor; airEven -= airFactor; airFactor = airOdd;}
-		airOdd = (airOdd - ((airOdd - airEven)/256.0)) / 1.0001;
-		airEven = (airEven - ((airEven - airOdd)/256.0)) / 1.0001;
+		airOdd = (airOdd - ((airOdd - airEven)/256.0f)) / 1.0001f;
+		airEven = (airEven - ((airEven - airOdd)/256.0f)) / 1.0001f;
 		airPrev = inputSample;
 		inputSample += airFactor;
 		flip = !flip;
@@ -88,32 +88,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		int count = gcount;
 		dram->p[count+8192] = dram->p[count] = inputSample;
 		
-		Float64 offset = depth + (depth * sin(sweep));
+		Float32 offset = depth + (depth * sin(sweep));
 		count += (int)floor(offset);
 		
 		inputSample = dram->p[count] * (1-(offset-floor(offset))); //less as value moves away from .0
 		inputSample += dram->p[count+1]; //we can assume always using this in one way or another?
 		inputSample += dram->p[count+2] * (offset-floor(offset)); //greater as value moves away from .0
 		inputSample -= ((dram->p[count]-dram->p[count+1])-(dram->p[count+1]-dram->p[count+2]))/50; //interpolation hacks 'r us
-		inputSample *= 0.5; // gain trim
+		inputSample *= 0.5f; // gain trim
 		
 		sweep += (speed + (speedB * sin(sweepB) * depthB));
 		sweepB += speedB;
 		if (sweep > tupi){sweep -= tupi;}
-		if (sweep < 0.0){sweep += tupi;} //through zero FM
+		if (sweep < 0.0f){sweep += tupi;} //through zero FM
 		if (sweepB > tupi){sweepB -= tupi;}
 		gcount--;
 		//still scrolling through the samples, remember
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-fabs(wet)));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-fabs(wet)));
 		}
 		//Inv/Dry/Wet control
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

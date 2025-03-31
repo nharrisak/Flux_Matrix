@@ -33,25 +33,25 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double muVary;
-		double muAttack;
-		double muNewSpeed;
-		double muSpeedA;
-		double muSpeedB;
-		double muCoefficientA;
-		double muCoefficientB;
-		double thicken;
-		double previous;
-		double previous2;
-		double previous3;
-		double previous4;
-		double previous5;
+		float muVary;
+		float muAttack;
+		float muNewSpeed;
+		float muSpeedA;
+		float muSpeedB;
+		float muCoefficientA;
+		float muCoefficientB;
+		float thicken;
+		float previous;
+		float previous2;
+		float previous3;
+		float previous4;
+		float previous5;
 		int delay;
 		bool flip;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[10001];
+			Float32 d[10001];
 	};
 	_dram* dram;
 };
@@ -65,50 +65,50 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 highGainOffset = pow(GetParameter( kParam_One ),2)*0.023;
-	Float64 threshold = 1.001 - (1.0-pow(1.0-GetParameter( kParam_One ),5));
-	Float64 muMakeupGain = sqrt(1.0 / threshold);
+	Float32 highGainOffset = pow(GetParameter( kParam_One ),2)*0.023f;
+	Float32 threshold = 1.001f - (1.0f-pow(1.0f-GetParameter( kParam_One ),5));
+	Float32 muMakeupGain = sqrt(1.0f / threshold);
 	//gain settings around threshold
-	Float64 release = (GetParameter( kParam_One )*100000.0) + 300000.0;
-	int maxdelay = (int)(1450.0 * overallscale);
+	Float32 release = (GetParameter( kParam_One )*100000.0f) + 300000.0f;
+	int maxdelay = (int)(1450.0f * overallscale);
 	if (maxdelay > 9999) maxdelay = 9999;
 	release /= overallscale;
-	Float64 fastest = sqrt(release);
+	Float32 fastest = sqrt(release);
 	//speed settings around release
-	Float64 output = GetParameter( kParam_Two );
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 output = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Three );
 	// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
 	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		dram->d[delay] = inputSample;
 		delay--;
 		if (delay < 0 || delay > maxdelay) {delay = maxdelay;}
 		//yes this is a second bounds check. it's cheap, check EVERY time
-		inputSample = (inputSample * thicken) + (dram->d[delay] * (1.0-thicken));
+		inputSample = (inputSample * thicken) + (dram->d[delay] * (1.0f-thicken));
 		
-		double lowestSample = inputSample;
+		float lowestSample = inputSample;
 		if (fabs(inputSample) > fabs(previous)) lowestSample = previous;
-		if (fabs(lowestSample) > fabs(previous2)) lowestSample = (lowestSample + previous2) / 1.99;
-		if (fabs(lowestSample) > fabs(previous3)) lowestSample = (lowestSample + previous3) / 1.98;
-		if (fabs(lowestSample) > fabs(previous4)) lowestSample = (lowestSample + previous4) / 1.97;
-		if (fabs(lowestSample) > fabs(previous5)) lowestSample = (lowestSample + previous5) / 1.96;
+		if (fabs(lowestSample) > fabs(previous2)) lowestSample = (lowestSample + previous2) / 1.99f;
+		if (fabs(lowestSample) > fabs(previous3)) lowestSample = (lowestSample + previous3) / 1.98f;
+		if (fabs(lowestSample) > fabs(previous4)) lowestSample = (lowestSample + previous4) / 1.97f;
+		if (fabs(lowestSample) > fabs(previous5)) lowestSample = (lowestSample + previous5) / 1.96f;
 		previous5 = previous4;
 		previous4 = previous3;
 		previous3 = previous2;
 		previous2 = previous;
 		previous = inputSample;
 		inputSample *= muMakeupGain;
-		Float64 punchiness = 0.95-fabs(inputSample*0.08);
-		if (punchiness < 0.65) punchiness = 0.65;
+		Float32 punchiness = 0.95f-fabs(inputSample*0.08f);
+		if (punchiness < 0.65f) punchiness = 0.65f;
 
 		
 		if (flip)
@@ -117,7 +117,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					{
 						muVary = threshold / fabs(lowestSample);
 						muAttack = sqrt(fabs(muSpeedA));
-						muCoefficientA = muCoefficientA * (muAttack-1.0);
+						muCoefficientA = muCoefficientA * (muAttack-1.0f);
 						if (muVary < threshold)
 							{
 								muCoefficientA = muCoefficientA + threshold;
@@ -130,8 +130,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					}
 				else
 					{
-						muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-						muCoefficientA = muCoefficientA + 1.0;
+						muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+						muCoefficientA = muCoefficientA + 1.0f;
 						muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 					}
 				muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -157,8 +157,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					}
 				else
 					{
-						muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-						muCoefficientB = muCoefficientB + 1.0;
+						muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+						muCoefficientB = muCoefficientB + 1.0f;
 						muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 					}
 				muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -166,26 +166,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				muSpeedB = muNewSpeed / muSpeedB;
 			}
 		//got coefficients, adjusted speeds
-		double coefficient = highGainOffset;
+		float coefficient = highGainOffset;
 		if (flip) coefficient += pow(muCoefficientA,2);
 		else coefficient += pow(muCoefficientB,2);
 		inputSample *= coefficient;
-		thicken = (coefficient/5)+punchiness;//0.80;
-		thicken = (1.0-wet)+(wet*thicken);
+		thicken = (coefficient/5)+punchiness;//0.80f;
+		thicken = (1.0f-wet)+(wet*thicken);
 		//applied compression with vari-vari-µ-µ-µ-µ-µ-µ-is-the-kitten-song o/~
 		//applied gain correction to control output level- tends to constrain sound rather than inflate it
 		
-		double bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.2533141373155) bridgerectifier = 1.2533141373155;
-		bridgerectifier = sin(bridgerectifier * fabs(bridgerectifier)) / ((fabs(bridgerectifier) == 0.0) ?1:fabs(bridgerectifier));
+		float bridgerectifier = fabs(inputSample);
+		if (bridgerectifier > 1.2533141373155f) bridgerectifier = 1.2533141373155f;
+		bridgerectifier = sin(bridgerectifier * fabs(bridgerectifier)) / ((fabs(bridgerectifier) == 0.0f) ?1:fabs(bridgerectifier));
 		//using Spiral instead of Density algorithm
 		if (inputSample > 0) inputSample = (inputSample*coefficient)+(bridgerectifier*(1-coefficient));
 		else inputSample = (inputSample*coefficient)-(bridgerectifier*(1-coefficient));
 		//second stage of overdrive to prevent overs and allow bloody loud extremeness
 		flip = !flip;
 		
-		if (output < 1.0) inputSample *= output;
-		if (wet < 1.0) inputSample = (drySample*(1.0-wet))+(inputSample*wet);
+		if (output < 1.0f) inputSample *= output;
+		if (wet < 1.0f) inputSample = (drySample*(1.0f-wet))+(inputSample*wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);

@@ -33,10 +33,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 nibA;
-		Float64 nobA;
-		Float64 nibB;
-		Float64 nobB;
+		Float32 nibA;
+		Float32 nobA;
+		Float32 nibB;
+		Float32 nobB;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -62,23 +62,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 gaintrim = pow(10.0,GetParameter( kParam_One )/20);
-	Float64 nibDiv = 1 / pow(GetParameter( kParam_Three )+0.2,7);
+	Float32 gaintrim = pow(10.0f,GetParameter( kParam_One )/20);
+	Float32 nibDiv = 1 / pow(GetParameter( kParam_Three )+0.2f,7);
 	nibDiv /= overallscale;
-	Float64 nobDiv;
-	if (GetParameter( kParam_Two ) > 0) nobDiv = nibDiv / (1.001-GetParameter( kParam_Two ));
-	else nobDiv = nibDiv * (1.001-pow(GetParameter( kParam_Two )*0.75,2));
-	Float64 nibnobFactor = 0.0; //start with the fallthrough value, why not
-	double inputSample;
-	Float64 absolute;
+	Float32 nobDiv;
+	if (GetParameter( kParam_Two ) > 0) nobDiv = nibDiv / (1.001f-GetParameter( kParam_Two ));
+	else nobDiv = nibDiv * (1.001f-pow(GetParameter( kParam_Two )*0.75f,2));
+	Float32 nibnobFactor = 0.0f; //start with the fallthrough value, why not
+	float inputSample;
+	Float32 absolute;
 
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
 		sourceP += inNumChannels;
@@ -114,7 +114,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

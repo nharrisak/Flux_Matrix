@@ -37,10 +37,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double byn[13];
-		double noiseShaping;
-		double lastSample;
-		double lastSample2;
+		float byn[13];
+		float noiseShaping;
+		float lastSample;
+		float lastSample2;
 	
 	struct _dram {
 		};
@@ -72,12 +72,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	}
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample;
-		double outputSample;
-		double drySample;
+		float inputSample;
+		float outputSample;
+		float drySample;
 		
-		if (highres) inputSample = *sourceP * 8388608.0;
-		else inputSample = *sourceP * 32768.0;
+		if (highres) inputSample = *sourceP * 8388608.0f;
+		else inputSample = *sourceP * 32768.0f;
 		//shared input stage
 		
 		if (benford) {
@@ -85,16 +85,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			cutbins = false;
 			drySample = inputSample;
 			inputSample -= noiseShaping;
-			double benfordize = floor(inputSample);
-			while (benfordize >= 1.0) {benfordize /= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
+			float benfordize = floor(inputSample);
+			while (benfordize >= 1.0f) {benfordize /= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
 			int hotbinA = floor(benfordize);
 			//hotbin becomes the Benford bin value for this number floored
-			double totalA = 0;
+			float totalA = 0;
 			if ((hotbinA > 0) && (hotbinA < 10))
 			{
 				byn[hotbinA] += 1;
@@ -113,15 +113,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//produce total number- smaller is closer to Benford real
 			
 			benfordize = ceil(inputSample);
-			while (benfordize >= 1.0) {benfordize /= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
+			while (benfordize >= 1.0f) {benfordize /= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
 			int hotbinB = floor(benfordize);
 			//hotbin becomes the Benford bin value for this number ceiled
-			double totalB = 0;
+			float totalB = 0;
 			if ((hotbinB > 0) && (hotbinB < 10))
 			{
 				byn[hotbinB] += 1;
@@ -152,16 +152,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//assign the relevant one to the delay line
 			//and floor/ceil signal accordingly
 			if (cutbins) {
-				byn[1] *= 0.99;
-				byn[2] *= 0.99;
-				byn[3] *= 0.99;
-				byn[4] *= 0.99;
-				byn[5] *= 0.99;
-				byn[6] *= 0.99;
-				byn[7] *= 0.99;
-				byn[8] *= 0.99;
-				byn[9] *= 0.99;
-				byn[10] *= 0.99; //catchall for garbage data
+				byn[1] *= 0.99f;
+				byn[2] *= 0.99f;
+				byn[3] *= 0.99f;
+				byn[4] *= 0.99f;
+				byn[5] *= 0.99f;
+				byn[6] *= 0.99f;
+				byn[7] *= 0.99f;
+				byn[8] *= 0.99f;
+				byn[9] *= 0.99f;
+				byn[10] *= 0.99f; //catchall for garbage data
 			}
 			noiseShaping += outputSample - drySample;
 			
@@ -169,13 +169,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		} else {		
 			//begin StudioTan or Dither Me Timbers
 			if (brightfloor) {
-				lastSample -= (noiseShaping*0.8);
+				lastSample -= (noiseShaping*0.8f);
 				if ((lastSample+lastSample) <= (inputSample+lastSample2)) outputSample = floor(lastSample); //StudioTan
-				else outputSample = floor(lastSample+1.0); //round down or up based on whether it softens treble angles
+				else outputSample = floor(lastSample+1.0f); //round down or up based on whether it softens treble angles
 			} else {
-				lastSample -= (noiseShaping*0.11);
+				lastSample -= (noiseShaping*0.11f);
 				if ((lastSample+lastSample) >= (inputSample+lastSample2)) outputSample = floor(lastSample); //DitherMeTimbers
-				else outputSample = floor(lastSample+1.0); //round down or up based on whether it softens treble angles
+				else outputSample = floor(lastSample+1.0f); //round down or up based on whether it softens treble angles
 			}
 			noiseShaping += outputSample;
 			noiseShaping -= lastSample; //apply noise shaping
@@ -185,16 +185,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		//shared output stage
-		double noiseSuppress = fabs(inputSample);
+		float noiseSuppress = fabs(inputSample);
 		if (noiseShaping > noiseSuppress) noiseShaping = noiseSuppress;
 		if (noiseShaping < -noiseSuppress) noiseShaping = -noiseSuppress;
 		
 		Float32 ironBar;
-		if (highres) ironBar = outputSample / 8388608.0;
-		else ironBar = outputSample / 32768.0;
+		if (highres) ironBar = outputSample / 8388608.0f;
+		else ironBar = outputSample / 32768.0f;
 		
-		if (ironBar > 1.0) ironBar = 1.0;
-		if (ironBar < -1.0) ironBar = -1.0;
+		if (ironBar > 1.0f) ironBar = 1.0f;
+		if (ironBar < -1.0f) ironBar = -1.0f;
 		*destP = ironBar;
 		
 		sourceP += inNumChannels;

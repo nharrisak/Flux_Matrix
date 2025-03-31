@@ -30,10 +30,10 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 a[1503];
-		Float64 b[1503];
-		Float64 c[1503];
-		Float64 d[1503];
+			Float32 a[1503];
+		Float32 b[1503];
+		Float32 c[1503];
+		Float32 d[1503];
 	};
 	_dram* dram;
 };
@@ -47,88 +47,88 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	int am = (int)149.0 * overallscale;
-	int bm = (int)179.0 * overallscale;
-	int cm = (int)191.0 * overallscale;
-	int dm = (int)223.0 * overallscale; //these are 'good' primes, spacing out the allpasses
+	int am = (int)149.0f * overallscale;
+	int bm = (int)179.0f * overallscale;
+	int cm = (int)191.0f * overallscale;
+	int dm = (int)223.0f * overallscale; //these are 'good' primes, spacing out the allpasses
 	int allpasstemp = 0;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 				
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
 
 		allpasstemp = ax - 1; if (allpasstemp < 0 || allpasstemp > am) allpasstemp = am;
-		inputSample -= dram->a[allpasstemp]*0.5;
+		inputSample -= dram->a[allpasstemp]*0.5f;
 		dram->a[ax] = inputSample;
-		inputSample *= 0.5;
+		inputSample *= 0.5f;
 		ax--; if (ax < 0 || ax > am) {ax = am;}
 		inputSample += (dram->a[ax]);
 		//a single Midiverb-style allpass
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
 		
 		allpasstemp = bx - 1; if (allpasstemp < 0 || allpasstemp > bm) allpasstemp = bm;
-		inputSample -= dram->b[allpasstemp]*0.5;
+		inputSample -= dram->b[allpasstemp]*0.5f;
 		dram->b[bx] = inputSample;
-		inputSample *= 0.5;
+		inputSample *= 0.5f;
 		bx--; if (bx < 0 || bx > bm) {bx = bm;}
 		inputSample += (dram->b[bx]);
 		//a single Midiverb-style allpass
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
 		
 		allpasstemp = cx - 1; if (allpasstemp < 0 || allpasstemp > cm) allpasstemp = cm;
-		inputSample -= dram->c[allpasstemp]*0.5;
+		inputSample -= dram->c[allpasstemp]*0.5f;
 		dram->c[cx] = inputSample;
-		inputSample *= 0.5;
+		inputSample *= 0.5f;
 		cx--; if (cx < 0 || cx > cm) {cx = cm;}
 		inputSample += (dram->c[cx]);
 		//a single Midiverb-style allpass
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
 		
 		allpasstemp = dx - 1; if (allpasstemp < 0 || allpasstemp > dm) allpasstemp = dm;
-		inputSample -= dram->d[allpasstemp]*0.5;
+		inputSample -= dram->d[allpasstemp]*0.5f;
 		dram->d[dx] = inputSample;
-		inputSample *= 0.5;
+		inputSample *= 0.5f;
 		dx--; if (dx < 0 || dx > dm) {dx = dm;}
 		inputSample += (dram->d[dx]);
 		//a single Midiverb-style allpass
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
 		
-		inputSample *= 0.63679; //scale it to 0dB output at full blast
+		inputSample *= 0.63679f; //scale it to 0dB output at full blast
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -29,11 +29,11 @@ kParam0, kParam1, kParam2, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 storedL[2];
-	Float64 diffL;
-	Float64 storedR[2];
-	Float64 diffR;
-	Float64 gate;
+	Float32 storedL[2];
+	Float32 diffL;
+	Float32 storedR[2];
+	Float32 diffR;
+	Float32 gate;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -45,21 +45,21 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 threshold = pow(GetParameter( kParam_One ),6);
-	Float64 recovery = pow((GetParameter( kParam_Two )*0.5),6);
+	Float32 threshold = pow(GetParameter( kParam_One ),6);
+	Float32 recovery = pow((GetParameter( kParam_Two )*0.5f),6);
 	recovery /= overallscale;
-	Float64 baseline = pow(GetParameter( kParam_Three ),6);
-	Float64 invrec = 1.0 - recovery;
+	Float32 baseline = pow(GetParameter( kParam_Three ),6);
+	Float32 invrec = 1.0f - recovery;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		storedL[1] = storedL[0];
 		storedL[0] = inputSampleL;
 		diffL = storedL[0] - storedL[1];
@@ -70,30 +70,30 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		if (gate > 0) {gate = ((gate-baseline) * invrec) + baseline;}
 		
-		if ((fabs(diffR) > threshold) || (fabs(diffL) > threshold)) {gate = 1.1;}
+		if ((fabs(diffR) > threshold) || (fabs(diffL) > threshold)) {gate = 1.1f;}
 		else {gate = (gate * invrec); if (threshold > 0) {gate += ((fabs(inputSampleL)/threshold) * recovery);gate += ((fabs(inputSampleR)/threshold) * recovery);}}
 		
 		if (gate < 0) gate = 0;
 		
-		if (gate < 1.0)
+		if (gate < 1.0f)
 		{
 			storedL[0] = storedL[1] + (diffL * gate);		
 			storedR[0] = storedR[1] + (diffR * gate);
 		}
 		
 		if (gate < 1) {
-			inputSampleL = (inputSampleL * gate) + (storedL[0] * (1.0-gate));
-			inputSampleR = (inputSampleR * gate) + (storedR[0] * (1.0-gate));
+			inputSampleL = (inputSampleL * gate) + (storedL[0] * (1.0f-gate));
+			inputSampleR = (inputSampleR * gate) + (storedR[0] * (1.0f-gate));
 		}
 		
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

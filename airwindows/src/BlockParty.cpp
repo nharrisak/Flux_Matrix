@@ -31,26 +31,26 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 muVary;
-		Float64 muAttack;
-		Float64 muNewSpeed;
-		Float64 muSpeedA;
-		Float64 muSpeedB;
-		Float64 muSpeedC;
-		Float64 muSpeedD;
-		Float64 muSpeedE;
-		Float64 muCoefficientA;
-		Float64 muCoefficientB;
-		Float64 muCoefficientC;
-		Float64 muCoefficientD;
-		Float64 muCoefficientE;
-		Float64 lastCoefficientA;
-		Float64 lastCoefficientB;
-		Float64 lastCoefficientC;
-		Float64 lastCoefficientD;
-		Float64 mergedCoefficients;
-		Float64 threshold;
-		Float64 thresholdB;
+		Float32 muVary;
+		Float32 muAttack;
+		Float32 muNewSpeed;
+		Float32 muSpeedA;
+		Float32 muSpeedB;
+		Float32 muSpeedC;
+		Float32 muSpeedD;
+		Float32 muSpeedE;
+		Float32 muCoefficientA;
+		Float32 muCoefficientB;
+		Float32 muCoefficientC;
+		Float32 muCoefficientD;
+		Float32 muCoefficientE;
+		Float32 lastCoefficientA;
+		Float32 lastCoefficientB;
+		Float32 lastCoefficientC;
+		Float32 lastCoefficientD;
+		Float32 mergedCoefficients;
+		Float32 threshold;
+		Float32 thresholdB;
 		int count;
 		bool fpFlip;
 		uint32_t fpd;
@@ -69,38 +69,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 targetthreshold = 1.01 - (1.0-pow(1.0-(GetParameter( kParam_One )*0.5),4));
-	Float64 wet = GetParameter( kParam_Two );
-	Float64 voicing = 0.618033988749894848204586;
-	if (overallscale > 0.0) voicing /= overallscale;
+	Float32 targetthreshold = 1.01f - (1.0f-pow(1.0f-(GetParameter( kParam_One )*0.5f),4));
+	Float32 wet = GetParameter( kParam_Two );
+	Float32 voicing = 0.618033988749894848204586f;
+	if (overallscale > 0.0f) voicing /= overallscale;
 	//translate to desired sample rate, 44.1K is the base
-	if (voicing < 0.0) voicing = 0.0;
-	if (voicing > 1.0) voicing = 1.0;
+	if (voicing < 0.0f) voicing = 0.0f;
+	if (voicing > 1.0f) voicing = 1.0f;
 	//some insanity checking
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		Float64 muMakeupGain = 1.0 / threshold;
-		Float64 outMakeupGain = sqrt(muMakeupGain);
+		Float32 muMakeupGain = 1.0f / threshold;
+		Float32 outMakeupGain = sqrt(muMakeupGain);
 		muMakeupGain += outMakeupGain;
-		muMakeupGain *= 0.5;
+		muMakeupGain *= 0.5f;
 		//gain settings around threshold
-		Float64 release = mergedCoefficients * 32768.0;
+		Float32 release = mergedCoefficients * 32768.0f;
 		release /= overallscale;
-		Float64 fastest = sqrt(release);
+		Float32 fastest = sqrt(release);
 		//speed settings around release
-		Float64 lastCorrection = mergedCoefficients;
+		Float32 lastCorrection = mergedCoefficients;
 		// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
 		
-		if (muMakeupGain != 1.0) inputSample = inputSample * muMakeupGain;
+		if (muMakeupGain != 1.0f) inputSample = inputSample * muMakeupGain;
 				
 		if (count < 1 || count > 3) count = 1;
 		switch (count)
@@ -108,16 +108,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 1:
 				if (fabs(inputSample) > threshold)
 				{
-					if (inputSample > 0.0) {
-						inputSample = (inputSample * voicing) + (targetthreshold * (1.0-voicing));
+					if (inputSample > 0.0f) {
+						inputSample = (inputSample * voicing) + (targetthreshold * (1.0f-voicing));
 						threshold = fabs(inputSample);
 					} else {
-						inputSample = (inputSample * voicing) - (targetthreshold * (1.0-voicing));
+						inputSample = (inputSample * voicing) - (targetthreshold * (1.0f-voicing));
 						threshold = fabs(inputSample);
 					}
 					muVary = targetthreshold / fabs(inputSample);
 					muAttack = sqrt(fabs(muSpeedA));
-					muCoefficientA = muCoefficientA * (muAttack-1.0);
+					muCoefficientA = muCoefficientA * (muAttack-1.0f);
 					if (muVary < threshold)
 					{
 						muCoefficientA = muCoefficientA + targetthreshold;
@@ -131,8 +131,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				else
 				{
 					threshold = targetthreshold;
-					muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-					muCoefficientA = muCoefficientA + 1.0;
+					muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+					muCoefficientA = muCoefficientA + 1.0f;
 					muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 				}
 				muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -141,18 +141,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				lastCoefficientA = pow(muCoefficientA,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
-				lastCoefficientA *= (1.0-lastCorrection);
+				lastCoefficientA *= (1.0f-lastCorrection);
 				lastCoefficientA += (muCoefficientA * lastCorrection);
 				lastCoefficientB = lastCoefficientA;
 				break;
 			case 2:
 				if (fabs(inputSample) > threshold)
 				{
-					if (inputSample > 0.0) {
-						inputSample = (inputSample * voicing) + (targetthreshold * (1.0-voicing));
+					if (inputSample > 0.0f) {
+						inputSample = (inputSample * voicing) + (targetthreshold * (1.0f-voicing));
 						threshold = fabs(inputSample);
 					} else {
-						inputSample = (inputSample * voicing) - (targetthreshold * (1.0-voicing));
+						inputSample = (inputSample * voicing) - (targetthreshold * (1.0f-voicing));
 						threshold = fabs(inputSample);
 					}
 					muVary = targetthreshold / fabs(inputSample);
@@ -171,8 +171,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				else
 				{
 					threshold = targetthreshold;
-					muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-					muCoefficientB = muCoefficientB + 1.0;
+					muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+					muCoefficientB = muCoefficientB + 1.0f;
 					muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 				}
 				muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -181,18 +181,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				lastCoefficientA = pow(muCoefficientB,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
-				lastCoefficientA *= (1.0-lastCorrection);
+				lastCoefficientA *= (1.0f-lastCorrection);
 				lastCoefficientA += (muCoefficientB * lastCorrection);
 				lastCoefficientB = lastCoefficientA;
 				break;
 			case 3:
 				if (fabs(inputSample) > threshold)
 				{
-					if (inputSample > 0.0) {
-						inputSample = (inputSample * voicing) + (targetthreshold * (1.0-voicing));
+					if (inputSample > 0.0f) {
+						inputSample = (inputSample * voicing) + (targetthreshold * (1.0f-voicing));
 						threshold = fabs(inputSample);
 					} else {
-						inputSample = (inputSample * voicing) - (targetthreshold * (1.0-voicing));
+						inputSample = (inputSample * voicing) - (targetthreshold * (1.0f-voicing));
 						threshold = fabs(inputSample);
 					}
 					muVary = targetthreshold / fabs(inputSample);
@@ -211,8 +211,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				else
 				{
 					threshold = targetthreshold;
-					muCoefficientC = muCoefficientC * ((muSpeedC * muSpeedC)-1.0);
-					muCoefficientC = muCoefficientC + 1.0;
+					muCoefficientC = muCoefficientC * ((muSpeedC * muSpeedC)-1.0f);
+					muCoefficientC = muCoefficientC + 1.0f;
 					muCoefficientC = muCoefficientC / (muSpeedC * muSpeedC);
 				}
 				muNewSpeed = muSpeedC * (muSpeedC-1);
@@ -221,7 +221,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				lastCoefficientA = pow(muCoefficientC,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
-				lastCoefficientA *= (1.0-lastCorrection);
+				lastCoefficientA *= (1.0f-lastCorrection);
 				lastCoefficientA += (muCoefficientC * lastCorrection);
 				lastCoefficientB = lastCoefficientA;
 				break;
@@ -234,16 +234,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fpFlip) {
 			if (fabs(inputSample) > thresholdB)
 			{
-				if (inputSample > 0.0) {
-					inputSample = (inputSample * voicing) + (targetthreshold * (1.0-voicing));
+				if (inputSample > 0.0f) {
+					inputSample = (inputSample * voicing) + (targetthreshold * (1.0f-voicing));
 					thresholdB = fabs(inputSample);
 				} else {
-					inputSample = (inputSample * voicing) - (targetthreshold * (1.0-voicing));
+					inputSample = (inputSample * voicing) - (targetthreshold * (1.0f-voicing));
 					thresholdB = fabs(inputSample);
 				}
 				muVary = targetthreshold / fabs(inputSample);
 				muAttack = sqrt(fabs(muSpeedD));
-				muCoefficientD = muCoefficientD * (muAttack-1.0);
+				muCoefficientD = muCoefficientD * (muAttack-1.0f);
 				if (muVary < thresholdB)
 				{
 					muCoefficientD = muCoefficientD + targetthreshold;
@@ -257,8 +257,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			else
 			{
 				thresholdB = targetthreshold;
-				muCoefficientD = muCoefficientD * ((muSpeedD * muSpeedD)-1.0);
-				muCoefficientD = muCoefficientD + 1.0;
+				muCoefficientD = muCoefficientD * ((muSpeedD * muSpeedD)-1.0f);
+				muCoefficientD = muCoefficientD + 1.0f;
 				muCoefficientD = muCoefficientD / (muSpeedD * muSpeedD);
 			}
 			muNewSpeed = muSpeedD * (muSpeedD-1);
@@ -267,22 +267,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			lastCoefficientC = pow(muCoefficientE,2);
 			mergedCoefficients += lastCoefficientD;
 			mergedCoefficients += lastCoefficientC;
-			lastCoefficientC *= (1.0-lastCorrection);
+			lastCoefficientC *= (1.0f-lastCorrection);
 			lastCoefficientC += (muCoefficientD * lastCorrection);
 			lastCoefficientD = lastCoefficientC;
 		} else {
 			if (fabs(inputSample) > thresholdB)
 			{
-				if (inputSample > 0.0) {
-					inputSample = (inputSample * voicing) + (targetthreshold * (1.0-voicing));
+				if (inputSample > 0.0f) {
+					inputSample = (inputSample * voicing) + (targetthreshold * (1.0f-voicing));
 					thresholdB = fabs(inputSample);
 				} else {
-					inputSample = (inputSample * voicing) - (targetthreshold * (1.0-voicing));
+					inputSample = (inputSample * voicing) - (targetthreshold * (1.0f-voicing));
 					thresholdB = fabs(inputSample);
 				}
 				muVary = targetthreshold / fabs(inputSample);
 				muAttack = sqrt(fabs(muSpeedE));
-				muCoefficientE = muCoefficientE * (muAttack-1.0);
+				muCoefficientE = muCoefficientE * (muAttack-1.0f);
 				if (muVary < thresholdB)
 				{
 					muCoefficientE = muCoefficientE + targetthreshold;
@@ -296,8 +296,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			else
 			{
 				thresholdB = targetthreshold;
-				muCoefficientE = muCoefficientE * ((muSpeedE * muSpeedE)-1.0);
-				muCoefficientE = muCoefficientE + 1.0;
+				muCoefficientE = muCoefficientE * ((muSpeedE * muSpeedE)-1.0f);
+				muCoefficientE = muCoefficientE + 1.0f;
 				muCoefficientE = muCoefficientE / (muSpeedE * muSpeedE);
 			}
 			muNewSpeed = muSpeedE * (muSpeedE-1);
@@ -306,23 +306,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			lastCoefficientC = pow(muCoefficientE,2);
 			mergedCoefficients += lastCoefficientD;
 			mergedCoefficients += lastCoefficientC;
-			lastCoefficientC *= (1.0-lastCorrection);
+			lastCoefficientC *= (1.0f-lastCorrection);
 			lastCoefficientC += (muCoefficientE * lastCorrection);
 			lastCoefficientD = lastCoefficientC;
 		}
-		mergedCoefficients *= 0.25;
+		mergedCoefficients *= 0.25f;
 		inputSample *= mergedCoefficients;
 		
-		if (outMakeupGain != 1.0) inputSample = inputSample * outMakeupGain;
+		if (outMakeupGain != 1.0f) inputSample = inputSample * outMakeupGain;
 		
 		fpFlip = !fpFlip;
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
-		if (inputSample > 0.999) inputSample = 0.999;
-		if (inputSample < -0.999) inputSample = -0.999;
+		if (inputSample > 0.999f) inputSample = 0.999f;
+		if (inputSample < -0.999f) inputSample = -0.999f;
 		//iron bar clip comes after the dry/wet: alternate way to clean things up
 		
 		//begin 32 bit floating point dither

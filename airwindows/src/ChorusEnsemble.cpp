@@ -34,12 +34,12 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		const static int totalsamples = 32767;
-		Float64 sweep;
+		Float32 sweep;
 		int gcount;
-		Float64 airPrev;
-		Float64 airEven;
-		Float64 airOdd;
-		Float64 airFactor;
+		Float32 airPrev;
+		Float32 airEven;
+		Float32 airOdd;
+		Float32 airFactor;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -59,24 +59,24 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 speed = pow(GetParameter( kParam_One ),3) * 0.001;
+	Float32 speed = pow(GetParameter( kParam_One ),3) * 0.001f;
 	speed *= overallscale;
-	int loopLimit = (int)(totalsamples * 0.499);
+	int loopLimit = (int)(totalsamples * 0.499f);
 	int count;
-	Float64 range = pow(GetParameter( kParam_Two ),3) * loopLimit * 0.12;
-	Float64 wet = GetParameter( kParam_Three );
-	Float64 modulation = range*wet;
+	Float32 range = pow(GetParameter( kParam_Two ),3) * loopLimit * 0.12f;
+	Float32 wet = GetParameter( kParam_Three );
+	Float32 modulation = range*wet;
 	//removed unnecessary dry variable
-	Float64 tupi = 3.141592653589793238 * 2.0;
-	Float64 offset;
-	Float64 start[4];
+	Float32 tupi = 3.141592653589793238f * 2.0f;
+	Float32 offset;
+	Float32 start[4];
 	
-	double inputSample;
-	Float64 drySample;
+	float inputSample;
+	Float32 drySample;
 	//now we'll precalculate some stuff that needn't be in every sample
 	start[0] = range;
 	start[1] = range * 2;
@@ -85,22 +85,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 
 		airFactor = airPrev - inputSample;
 		if (fpFlip) {airEven += airFactor; airOdd -= airFactor; airFactor = airEven;}
 		else {airOdd += airFactor; airEven -= airFactor; airFactor = airOdd;}
-		airOdd = (airOdd - ((airOdd - airEven)/256.0)) / 1.0001;
-		airEven = (airEven - ((airEven - airOdd)/256.0)) / 1.0001;
+		airOdd = (airOdd - ((airOdd - airEven)/256.0f)) / 1.0001f;
+		airEven = (airEven - ((airEven - airOdd)/256.0f)) / 1.0001f;
 		airPrev = inputSample;
-		inputSample += (airFactor * wet * 0.64);
+		inputSample += (airFactor * wet * 0.64f);
 		//air, compensates for loss of highs in flanger's interpolation
 		
 		if (gcount < 1 || gcount > loopLimit) {gcount = loopLimit;}
 		count = gcount;
 		dram->d[count+loopLimit] = dram->d[count] = inputSample;
-		//double buffer, inverted so we get some cancellation at small range values
+		//float buffer, inverted so we get some cancellation at small range values
 		
 		
 		offset = start[0] + (modulation * sin(sweep));
@@ -110,7 +110,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += (dram->d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
 		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 
-		offset = start[1] + (modulation * sin(sweep + 1.0));
+		offset = start[1] + (modulation * sin(sweep + 1.0f));
 		count = gcount + (int)floor(offset);
 		inputSample += dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
 		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
@@ -118,7 +118,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 
 		
-		offset = start[2] + (modulation * sin(sweep + 2.0));
+		offset = start[2] + (modulation * sin(sweep + 2.0f));
 		count = gcount + (int)floor(offset);
 		inputSample += dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
 		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
@@ -126,14 +126,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 
 		
-		offset = start[3] + (modulation * sin(sweep + 3.0));
+		offset = start[3] + (modulation * sin(sweep + 3.0f));
 		count = gcount + (int)floor(offset);
 		inputSample += dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
 		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
 		inputSample += (dram->d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
 		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 		
-		inputSample *= 0.125; //to get a comparable level
+		inputSample *= 0.125f; //to get a comparable level
 		gcount--;
 		//sliding
 		
@@ -141,14 +141,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (sweep > tupi){sweep -= tupi;}
 		//still scrolling through the samples, remember
 		
-		if (wet != 1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet != 1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

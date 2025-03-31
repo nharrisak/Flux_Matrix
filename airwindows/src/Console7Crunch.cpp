@@ -29,13 +29,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 gainchase;
-		Float64 chasespeed;
-		double biquadA[11];
-		double biquadB[11];
-		double biquadC[11];
-		double biquadD[11];
-		double biquadE[11];
+		Float32 gainchase;
+		Float32 chasespeed;
+		float biquadA[11];
+		float biquadB[11];
+		float biquadC[11];
+		float biquadD[11];
+		float biquadE[11];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -53,128 +53,128 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double inputgain = 1.0-(pow(1.0-GetParameter( kParam_One ),2));
+	float inputgain = 1.0f-(pow(1.0f-GetParameter( kParam_One ),2));
 	//this happens to give us a boost factor where the track continues to get louder even
 	//as it saturates and loses a bit of peak energy. Console7Channel channels go to 12! (.272,etc)
-	//Neutral gain through the whole system with a full scale sine ia 0.772 on the gain knob
-	if (gainchase != inputgain) chasespeed *= 2.0;
+	//Neutral gain through the whole system with a full scale sine ia 0.772f on the gain knob
+	if (gainchase != inputgain) chasespeed *= 2.0f;
 	if (chasespeed > inFramesToProcess) chasespeed = inFramesToProcess;
-	if (gainchase < 0.0) gainchase = inputgain;
+	if (gainchase < 0.0f) gainchase = inputgain;
 	
-	biquadE[0] = biquadD[0] = biquadC[0] = biquadB[0] = biquadA[0] = 20000.0 / GetSampleRate();
-    biquadA[1] = 0.50623256;
-	biquadB[1] = 0.56116312;
-	biquadC[1] = 0.70710678;
-	biquadD[1] = 1.10134463; //sharpens final stages
-	biquadE[1] = 3.19622661; //tenth order Butterworth out of five biquads
+	biquadE[0] = biquadD[0] = biquadC[0] = biquadB[0] = biquadA[0] = 20000.0f / GetSampleRate();
+    biquadA[1] = 0.50623256f;
+	biquadB[1] = 0.56116312f;
+	biquadC[1] = 0.70710678f;
+	biquadD[1] = 1.10134463f; //sharpens final stages
+	biquadE[1] = 3.19622661f; //tenth order Butterworth out of five biquads
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadA[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / biquadC[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadC[1] + K * K);
 	biquadC[2] = K * K * norm;
-	biquadC[3] = 2.0 * biquadC[2];
+	biquadC[3] = 2.0f * biquadC[2];
 	biquadC[4] = biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / biquadC[1] + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadD[0]);
-	norm = 1.0 / (1.0 + K / biquadD[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadD[1] + K * K);
 	biquadD[2] = K * K * norm;
-	biquadD[3] = 2.0 * biquadD[2];
+	biquadD[3] = 2.0f * biquadD[2];
 	biquadD[4] = biquadD[2];
-	biquadD[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadD[6] = (1.0 - K / biquadD[1] + K * K) * norm;
+	biquadD[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadD[6] = (1.0f - K / biquadD[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadE[0]);
-	norm = 1.0 / (1.0 + K / biquadE[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadE[1] + K * K);
 	biquadE[2] = K * K * norm;
-	biquadE[3] = 2.0 * biquadE[2];
+	biquadE[3] = 2.0f * biquadE[2];
 	biquadE[4] = biquadE[2];
-	biquadE[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadE[6] = (1.0 - K / biquadE[1] + K * K) * norm;
+	biquadE[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadE[6] = (1.0f - K / biquadE[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1
 		
-		chasespeed *= 0.9999; chasespeed -= 0.01; if (chasespeed < 64.0) chasespeed = 64.0;
+		chasespeed *= 0.9999f; chasespeed -= 0.01f; if (chasespeed < 64.0f) chasespeed = 64.0f;
 		//we have our chase speed compensated for recent fader activity
-		gainchase = (((gainchase*chasespeed)+inputgain)/(chasespeed+1.0));
+		gainchase = (((gainchase*chasespeed)+inputgain)/(chasespeed+1.0f));
 		//gainchase is chasing the target, as a simple multiply gain factor
-		Float64 cascade = gainchase + (gainchase*0.62);
+		Float32 cascade = gainchase + (gainchase*0.62f);
 		
-		if (1.0 != cascade) inputSample *= cascade;
-		if (inputSample > 1.097) inputSample = 1.097;
-		if (inputSample < -1.097) inputSample = -1.097;
-		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.8)+(sin(inputSample)*0.2);
+		if (1.0f != cascade) inputSample *= cascade;
+		if (inputSample > 1.097f) inputSample = 1.097f;
+		if (inputSample < -1.097f) inputSample = -1.097f;
+		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.8f)+(sin(inputSample)*0.2f);
 		//Console7Channel distortion stage, with a simpler form of the gain boost: no extra accentuation, because it's repeated 5x
 		
 		tempSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = tempSample; 
 		biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (1.0 != cascade) inputSample *= cascade;
-		if (inputSample > 1.097) inputSample = 1.097;
-		if (inputSample < -1.097) inputSample = -1.097;
-		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.8)+(sin(inputSample)*0.2);
+		if (1.0f != cascade) inputSample *= cascade;
+		if (inputSample > 1.097f) inputSample = 1.097f;
+		if (inputSample < -1.097f) inputSample = -1.097f;
+		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.8f)+(sin(inputSample)*0.2f);
 		//Console7Channel distortion stage, with a simpler form of the gain boost: no extra accentuation, because it's repeated 5x
 		
 		tempSample = biquadC[2]*inputSample+biquadC[3]*biquadC[7]+biquadC[4]*biquadC[8]-biquadC[5]*biquadC[9]-biquadC[6]*biquadC[10];
 		biquadC[8] = biquadC[7]; biquadC[7] = inputSample; inputSample = tempSample; 
 		biquadC[10] = biquadC[9]; biquadC[9] = inputSample; //DF1
 		
-		if (1.0 != cascade) inputSample *= cascade;
-		if (inputSample > 1.097) inputSample = 1.097;
-		if (inputSample < -1.097) inputSample = -1.097;
-		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.8)+(sin(inputSample)*0.2);
+		if (1.0f != cascade) inputSample *= cascade;
+		if (inputSample > 1.097f) inputSample = 1.097f;
+		if (inputSample < -1.097f) inputSample = -1.097f;
+		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.8f)+(sin(inputSample)*0.2f);
 		//Console7Channel distortion stage, with a simpler form of the gain boost: no extra accentuation, because it's repeated 5x
 		
 		tempSample = biquadD[2]*inputSample+biquadD[3]*biquadD[7]+biquadD[4]*biquadD[8]-biquadD[5]*biquadD[9]-biquadD[6]*biquadD[10];
 		biquadD[8] = biquadD[7]; biquadD[7] = inputSample; inputSample = tempSample; 
 		biquadD[10] = biquadD[9]; biquadD[9] = inputSample; //DF1
 		
-		if (1.0 != cascade) inputSample *= cascade;
-		if (inputSample > 1.097) inputSample = 1.097;
-		if (inputSample < -1.097) inputSample = -1.097;
-		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.8)+(sin(inputSample)*0.2);
+		if (1.0f != cascade) inputSample *= cascade;
+		if (inputSample > 1.097f) inputSample = 1.097f;
+		if (inputSample < -1.097f) inputSample = -1.097f;
+		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.8f)+(sin(inputSample)*0.2f);
 		//Console7Channel distortion stage, with a simpler form of the gain boost: no extra accentuation, because it's repeated 5x
 		
 		tempSample = biquadE[2]*inputSample+biquadE[3]*biquadE[7]+biquadE[4]*biquadE[8]-biquadE[5]*biquadE[9]-biquadE[6]*biquadE[10];
 		biquadE[8] = biquadE[7]; biquadE[7] = inputSample; inputSample = tempSample; 
 		biquadE[10] = biquadE[9]; biquadE[9] = inputSample; //DF1
 		
-		if (1.0 != cascade) inputSample *= cascade;
-		if (inputSample > 1.097) inputSample = 1.097;
-		if (inputSample < -1.097) inputSample = -1.097;
-		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.8)+(sin(inputSample)*0.2);
+		if (1.0f != cascade) inputSample *= cascade;
+		if (inputSample > 1.097f) inputSample = 1.097f;
+		if (inputSample < -1.097f) inputSample = -1.097f;
+		inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.8f)+(sin(inputSample)*0.2f);
 		//Console7Channel distortion stage, with a simpler form of the gain boost: no extra accentuation, because it's repeated 5x
 		
-		if (cascade > 1.0) inputSample /= cascade;
+		if (cascade > 1.0f) inputSample /= cascade;
 		//we re-amplify after the distortion relative to how much we cut back previously.				
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -33,16 +33,16 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double last1Sample;
-		double halfwaySample;
-		double halfDrySample;
-		double halfDiffSample;
-		double diffSample;
-		double lastSample;
-		Float64 s1;
-		Float64 s2;
-		Float64 s3;
-		Float64 apply;
+		float last1Sample;
+		float halfwaySample;
+		float halfDrySample;
+		float halfDiffSample;
+		float diffSample;
+		float lastSample;
+		Float32 s1;
+		Float32 s2;
+		Float32 s3;
+		Float32 apply;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,32 +60,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float64 applyTarget = GetParameter( kParam_One );
-	Float64 threshold = pow((1-fabs(applyTarget)),3);
+	Float32 applyTarget = GetParameter( kParam_One );
+	Float32 threshold = pow((1-fabs(applyTarget)),3);
 	if (applyTarget > 0) applyTarget *= 3;
 	
-	Float64 intensity = pow(GetParameter( kParam_Two ),2)*5.0;
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 intensity = pow(GetParameter( kParam_Two ),2)*5.0f;
+	Float32 wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		halfDrySample = halfwaySample = (inputSample + last1Sample) / 2.0;
+		halfDrySample = halfwaySample = (inputSample + last1Sample) / 2.0f;
 		last1Sample = inputSample;
 		s3 = s2;
 		s2 = s1;
 		s1 = inputSample;
-		Float64 m1 = (s1-s2)*((s1-s2)/1.3);
-		Float64 m2 = (s2-s3)*((s1-s2)/1.3);
-		Float64 sense = fabs((m1-m2)*((m1-m2)/1.3))*intensity;
+		Float32 m1 = (s1-s2)*((s1-s2)/1.3f);
+		Float32 m2 = (s2-s3)*((s1-s2)/1.3f);
+		Float32 sense = fabs((m1-m2)*((m1-m2)/1.3f))*intensity;
 		//this will be 0 for smooth, high for SSS
 		apply += applyTarget - sense;
-		apply *= 0.5;
-		if (apply < -1.0) apply = -1.0;
+		apply *= 0.5f;
+		if (apply < -1.0f) apply = -1.0f;
 		
-		Float64 clamp = halfwaySample - halfDrySample;
+		Float32 clamp = halfwaySample - halfDrySample;
 		if (clamp > threshold) halfwaySample = lastSample + threshold;
 		if (-clamp > threshold) halfwaySample = lastSample - threshold;
 		lastSample = halfwaySample;
@@ -100,14 +100,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = *sourceP + ((diffSample + halfDiffSample)*apply);
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

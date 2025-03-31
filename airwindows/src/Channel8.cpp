@@ -39,12 +39,12 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		uint32_t fpd;
-		double iirSampleA;
-		double iirSampleB;
+		float iirSampleA;
+		float iirSampleB;
 		bool flip;
-		double lastSampleA;
-		double lastSampleB;
-		double lastSampleC;
+		float lastSampleA;
+		float lastSampleB;
+		float lastSampleC;
 	
 	struct _dram {
 		};
@@ -60,59 +60,59 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int console = (int) GetParameter( kParam_One );
-	Float64 density = GetParameter( kParam_Two )/100.0; //0-2
-	Float64 phattity = density - 1.0;
-	if (density > 1.0) density = 1.0; //max out at full wet for Spiral aspect
-	if (phattity < 0.0) phattity = 0.0; //
-	Float64 nonLin = 5.0-density; //number is smaller for more intense, larger for more subtle
-	Float64 output = GetParameter( kParam_Three );
-	Float64 iirAmount = 0.005832;
-	Float64 threshold = 0.33362176;	
+	Float32 density = GetParameter( kParam_Two )/100.0f; //0-2
+	Float32 phattity = density - 1.0f;
+	if (density > 1.0f) density = 1.0f; //max out at full wet for Spiral aspect
+	if (phattity < 0.0f) phattity = 0.0f; //
+	Float32 nonLin = 5.0f-density; //number is smaller for more intense, larger for more subtle
+	Float32 output = GetParameter( kParam_Three );
+	Float32 iirAmount = 0.005832f;
+	Float32 threshold = 0.33362176f;	
 	switch (console)
 	{
-		case 1: iirAmount = 0.005832; threshold = 0.33362176; break; //Neve
-		case 2: iirAmount = 0.004096; threshold = 0.59969536; break; //API
-		case 3: iirAmount = 0.004913; threshold = 0.84934656; break; //SSL
+		case 1: iirAmount = 0.005832f; threshold = 0.33362176f; break; //Neve
+		case 2: iirAmount = 0.004096f; threshold = 0.59969536f; break; //API
+		case 3: iirAmount = 0.004913f; threshold = 0.84934656f; break; //SSL
 	}
 	iirAmount /= overallscale; //we've learned not to try and adjust threshold for sample rate
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		Float64 dielectricScale = fabs(2.0-((inputSample+nonLin)/nonLin));
+		Float32 dielectricScale = fabs(2.0f-((inputSample+nonLin)/nonLin));
 		
 		if (flip)
 		{
-			iirSampleA = (iirSampleA * (1.0 - (iirAmount * dielectricScale))) + (inputSample * iirAmount * dielectricScale);
+			iirSampleA = (iirSampleA * (1.0f - (iirAmount * dielectricScale))) + (inputSample * iirAmount * dielectricScale);
 			inputSample = inputSample - iirSampleA;
 		}
 		else
 		{
-			iirSampleB = (iirSampleB * (1.0 - (iirAmount * dielectricScale))) + (inputSample * iirAmount * dielectricScale);
+			iirSampleB = (iirSampleB * (1.0f - (iirAmount * dielectricScale))) + (inputSample * iirAmount * dielectricScale);
 			inputSample = inputSample - iirSampleB;
 		}
 		//highpass section including capacitor modeling nonlinearity
-		double drySample = inputSample;
+		float drySample = inputSample;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		
-		double phatSample = sin(inputSample * 1.57079633);
-		inputSample *= 1.2533141373155;
-		//clip to 1.2533141373155 to reach maximum output, or 1.57079633 for pure sine 'phat' version
-		double distSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		float phatSample = sin(inputSample * 1.57079633f);
+		inputSample *= 1.2533141373155f;
+		//clip to 1.2533141373155f to reach maximum output, or 1.57079633f for pure sine 'phat' version
+		float distSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		
 		inputSample = distSample; //purest form is full Spiral
-		if (density < 1.0) inputSample = (drySample*(1-density))+(distSample*density); //fade Spiral aspect
-		if (phattity > 0.0) inputSample = (inputSample*(1-phattity))+(phatSample*phattity); //apply original Density on top
+		if (density < 1.0f) inputSample = (drySample*(1-density))+(distSample*density); //fade Spiral aspect
+		if (phattity > 0.0f) inputSample = (inputSample*(1-phattity))+(phatSample*phattity); //apply original Density on top
 		
-		Float64 clamp = (lastSampleB - lastSampleC) * 0.381966011250105;
-		clamp -= (lastSampleA - lastSampleB) * 0.6180339887498948482045;
+		Float32 clamp = (lastSampleB - lastSampleC) * 0.381966011250105f;
+		clamp -= (lastSampleA - lastSampleB) * 0.6180339887498948482045f;
 		clamp += inputSample - lastSampleA; //regular slew clamping added
 
 		lastSampleC = lastSampleB;
@@ -124,11 +124,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (-clamp > threshold)
 			inputSample = lastSampleB - threshold;
 		//slew section		
-		lastSampleA = (lastSampleA*0.381966011250105)+(inputSample*0.6180339887498948482045); //split the difference between raw and smoothed for buffer
+		lastSampleA = (lastSampleA*0.381966011250105f)+(inputSample*0.6180339887498948482045f); //split the difference between raw and smoothed for buffer
 				
 		flip = !flip;
 		
-		if (output < 1.0)
+		if (output < 1.0f)
 		{
 			inputSample *= output;
 		}
@@ -136,7 +136,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

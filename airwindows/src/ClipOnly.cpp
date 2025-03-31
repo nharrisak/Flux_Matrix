@@ -46,17 +46,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 hardness = 0.7390851332151606; // x == cos(x)
-	Float64 softness = 1.0 - hardness;
-	Float64 refclip = 0.9549925859; // -0.2dB
+	Float32 hardness = 0.7390851332151606f; // x == cos(x)
+	Float32 softness = 1.0f - hardness;
+	Float32 refclip = 0.9549925859f; // -0.2dB
 	Float32 inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
 		
 		
-		if (inputSample > 4.0) inputSample = 4.0;
-		if (inputSample < -4.0) inputSample = -4.0;
+		if (inputSample > 4.0f) inputSample = 4.0f;
+		if (inputSample < -4.0f) inputSample = -4.0f;
 		
 		if (wasPosClip == true) { //current will be over
 			if (inputSample < lastSample) { //next one will NOT be over

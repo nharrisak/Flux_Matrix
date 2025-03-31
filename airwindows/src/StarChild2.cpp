@@ -37,14 +37,14 @@ enum { kNumTemplateParameters = 6 };
 	UInt32 increment;
 	UInt32 dutyCycle;
 	
-	Float64 wearL[11];
-	Float64 wearR[11];
-	Float64 factor[11];		
-	Float64 wearLPrev;
-	Float64 wearRPrev;
+	Float32 wearL[11];
+	Float32 wearR[11];
+	Float32 factor[11];		
+	Float32 wearLPrev;
+	Float32 wearRPrev;
 	
-	double lastRefL[7];
-	double lastRefR[7];
+	float lastRefL[7];
+	float lastRefR[7];
 	int cycle;
 	
 	uint32_t fpdL;
@@ -63,48 +63,48 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double cyclescale = 1.0;
-	cyclescale /= 44100.0;
+	float cyclescale = 1.0f;
+	cyclescale /= 44100.0f;
 	cyclescale *= GetSampleRate();
 	int cycleEnd = floor(cyclescale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
 	
 	Float32 drySampleL;
 	Float32 drySampleR;
-	Float64 inputSampleL;
-	Float64 inputSampleR;
+	Float32 inputSampleL;
+	Float32 inputSampleR;
 	
 	int bufferL = 0;
 	int bufferR = 0;
 	//these are to build up the reverb tank outs
 	
-	UInt32 rangeDirect = (pow(GetParameter( kParam_Two ),2) * 156.0) + 7.0;
+	UInt32 rangeDirect = (pow(GetParameter( kParam_Two ),2) * 156.0f) + 7.0f;
 	//maximum safe delay is 259 * the prime tap, not including room for the pitch shift offset
 	
-	Float32 scaleDirect = (pow(GetParameter( kParam_One ),2) * (3280.0/rangeDirect)) + 2.0;
+	Float32 scaleDirect = (pow(GetParameter( kParam_One ),2) * (3280.0f/rangeDirect)) + 2.0f;
 	//let's try making it always be the max delay: smaller range forces scale to be longer
 	
 	Float32 outputPad = 4 * rangeDirect * sqrt(rangeDirect);
-	Float32 overallscale = ((1.0-GetParameter( kParam_Two ))*9.0)+1.0;
+	Float32 overallscale = ((1.0f-GetParameter( kParam_Two ))*9.0f)+1.0f;
 	//apply the singlestage groove wear strongest when bits are heavily crushed
 	Float32 gain = overallscale;
-	if (gain > 1.0) {factor[0] = 1.0; gain -= 1.0;} else {factor[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[1] = 1.0; gain -= 1.0;} else {factor[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[2] = 1.0; gain -= 1.0;} else {factor[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[3] = 1.0; gain -= 1.0;} else {factor[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[4] = 1.0; gain -= 1.0;} else {factor[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[5] = 1.0; gain -= 1.0;} else {factor[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[6] = 1.0; gain -= 1.0;} else {factor[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[7] = 1.0; gain -= 1.0;} else {factor[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[8] = 1.0; gain -= 1.0;} else {factor[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {factor[9] = 1.0; gain -= 1.0;} else {factor[9] = gain; gain = 0.0;}
+	if (gain > 1.0f) {factor[0] = 1.0f; gain -= 1.0f;} else {factor[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[1] = 1.0f; gain -= 1.0f;} else {factor[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[2] = 1.0f; gain -= 1.0f;} else {factor[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[3] = 1.0f; gain -= 1.0f;} else {factor[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[4] = 1.0f; gain -= 1.0f;} else {factor[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[5] = 1.0f; gain -= 1.0f;} else {factor[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[6] = 1.0f; gain -= 1.0f;} else {factor[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[7] = 1.0f; gain -= 1.0f;} else {factor[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[8] = 1.0f; gain -= 1.0f;} else {factor[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {factor[9] = 1.0f; gain -= 1.0f;} else {factor[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
 	
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	factor[0] /= overallscale;
 	factor[1] /= overallscale;
 	factor[2] /= overallscale;
@@ -119,7 +119,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 accumulatorSample;
 	Float32 correction;
 	Float32 wetness = GetParameter( kParam_Three );
-	Float32 dryness = 1.0 - wetness;	//reverb setup
+	Float32 dryness = 1.0f - wetness;	//reverb setup
 	
 	int count;
 	for(count = 1; count < 165; count++)
@@ -133,8 +133,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
 		//assign working variables like the dry
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		drySampleL = inputSampleL;
 		drySampleR = inputSampleR;
 		
@@ -462,10 +462,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		

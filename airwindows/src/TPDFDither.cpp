@@ -52,32 +52,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	double inputSample;
+	float inputSample;
 	
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		
 		inputSample *= scaleFactor;
 		//0-1 is now one bit, now we dither
 
-		inputSample -= 1.0;
-		inputSample += (double(fpd)/UINT32_MAX);
+		inputSample -= 1.0f;
+		inputSample += (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += (double(fpd)/UINT32_MAX);
+		inputSample += (float(fpd)/UINT32_MAX);
 		inputSample = floor(inputSample);
 		//TPDF: two 0-1 random noises
 		

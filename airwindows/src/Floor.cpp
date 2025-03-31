@@ -34,16 +34,16 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		bool flip; //end defining of antialiasing variables
-		Float64 iirSample1A;
-		Float64 iirSample1B;
-		Float64 iirSample1C;
-		Float64 iirSample1D;
-		Float64 iirSample1E;
-		Float64 iirSample2A;
-		Float64 iirSample2B;
-		Float64 iirSample2C;
-		Float64 iirSample2D;
-		Float64 iirSample2E;
+		Float32 iirSample1A;
+		Float32 iirSample1B;
+		Float32 iirSample1C;
+		Float32 iirSample1D;
+		Float32 iirSample1E;
+		Float32 iirSample2A;
+		Float32 iirSample2B;
+		Float32 iirSample2C;
+		Float32 iirSample2D;
+		Float32 iirSample2E;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,31 +60,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 setting = pow(GetParameter( kParam_One ),2);
-	Float64 iirAmount = (setting/4.0)/overallscale;
-	Float64 tight = -1.0;
-	Float64 gaintrim = 1.0 + (setting/4.0);
-	Float64 offset;
-	Float64 lows;
-	Float64 density = GetParameter( kParam_Two );
-	Float64 bridgerectifier;
-	Float64 temp;
+	Float32 setting = pow(GetParameter( kParam_One ),2);
+	Float32 iirAmount = (setting/4.0f)/overallscale;
+	Float32 tight = -1.0f;
+	Float32 gaintrim = 1.0f + (setting/4.0f);
+	Float32 offset;
+	Float32 lows;
+	Float32 density = GetParameter( kParam_Two );
+	Float32 bridgerectifier;
+	Float32 temp;
 	iirAmount += (iirAmount * tight * tight);
-	tight /=  3.0;
-	if (iirAmount <= 0.0) iirAmount = 0.0;
-	if (iirAmount > 1.0) iirAmount = 1.0;
-	Float64 wet = GetParameter( kParam_Three );
-	Float64 dry = 1.0-wet;
+	tight /=  3.0f;
+	if (iirAmount <= 0.0f) iirAmount = 0.0f;
+	if (iirAmount > 1.0f) iirAmount = 1.0f;
+	Float32 wet = GetParameter( kParam_Three );
+	Float32 dry = 1.0f-wet;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		
 		if (tight > 0) offset = (1 - tight) + (fabs(inputSample)*tight);
@@ -97,8 +97,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= lows;
 		
 		temp = lows;
-		if (lows < 0) {lows = -sin(-lows*1.5707963267949);}
-		if (lows > 0) {lows = sin(lows*1.5707963267949);}
+		if (lows < 0) {lows = -sin(-lows*1.5707963267949f);}
+		if (lows > 0) {lows = sin(lows*1.5707963267949f);}
 		lows -= temp;
 		
 		inputSample += lows;
@@ -115,8 +115,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= lows;
 		
 		temp = lows;
-		if (lows < 0) {lows = -sin(-lows*1.5707963267949);}
-		if (lows > 0) {lows = sin(lows*1.5707963267949);}
+		if (lows < 0) {lows = -sin(-lows*1.5707963267949f);}
+		if (lows > 0) {lows = sin(lows*1.5707963267949f);}
 		lows -= temp;
 		
 		inputSample += lows;
@@ -133,8 +133,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= lows;
 		
 		temp = lows;
-		if (lows < 0) {lows = -sin(-lows*1.5707963267949);}
-		if (lows > 0) {lows = sin(lows*1.5707963267949);}
+		if (lows < 0) {lows = -sin(-lows*1.5707963267949f);}
+		if (lows > 0) {lows = sin(lows*1.5707963267949f);}
 		lows -= temp;
 		
 		inputSample += lows;
@@ -151,8 +151,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= lows;
 		
 		temp = lows;
-		if (lows < 0) {lows = -sin(-lows*1.5707963267949);}
-		if (lows > 0) {lows = sin(lows*1.5707963267949);}
+		if (lows < 0) {lows = -sin(-lows*1.5707963267949f);}
+		if (lows > 0) {lows = sin(lows*1.5707963267949f);}
 		lows -= temp;
 		
 		inputSample += lows;
@@ -169,29 +169,29 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= lows;
 		
 		temp = lows;
-		if (lows < 0) {lows = -sin(-lows*1.5707963267949);}
-		if (lows > 0) {lows = sin(lows*1.5707963267949);}
+		if (lows < 0) {lows = -sin(-lows*1.5707963267949f);}
+		if (lows > 0) {lows = sin(lows*1.5707963267949f);}
 		lows -= temp;
 		
 		inputSample += lows;
 		inputSample *= gaintrim;
 
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		bridgerectifier = fabs(inputSample)*1.57079633;
-		bridgerectifier = sin(bridgerectifier)*1.57079633;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		bridgerectifier = fabs(inputSample)*1.57079633f;
+		bridgerectifier = sin(bridgerectifier)*1.57079633f;
 		bridgerectifier = (fabs(inputSample)*(1-density))+(bridgerectifier*density);
 		bridgerectifier = sin(bridgerectifier);
 		if (inputSample > 0) inputSample = (inputSample*(1-density))+(bridgerectifier*density);
 		else inputSample = (inputSample*(1-density))-(bridgerectifier*density);
 		//drive section
 		
-		if (wet < 1.0) inputSample = (drySample * dry)+(inputSample*wet);
+		if (wet < 1.0f) inputSample = (drySample * dry)+(inputSample*wet);
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -39,7 +39,7 @@ struct _kernel {
  
 		int dCount;
 		int lastWidth;
-		Float64 padFactor;
+		Float32 padFactor;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -58,42 +58,42 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float64 inputgain = pow(10.0,GetParameter( kParam_One )/20.0);
-	Float64 satComp = GetParameter( kParam_Two ) / 50;
+	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 satComp = GetParameter( kParam_Two ) / 50;
 	int widestRange = GetParameter( kParam_Three );
-	satComp += (((Float64)widestRange/3000.0)*satComp);
+	satComp += (((Float32)widestRange/3000.0f)*satComp);
 	//set the max wideness of comp zone, minimum range boosted (too much?)
-	Float64 output = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 output = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		double temp = inputSample;
+		float inputSample = *sourceP;
+		float temp = inputSample;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		if (dCount < 1 || dCount > 5000) {dCount = 5000;}
 
-		Float64 variSpeed = 1.0 + ((padFactor/lastWidth)*satComp);
-		if (variSpeed < 1.0) variSpeed = 1.0;
-		Float64 totalgain = inputgain / variSpeed;
-		if (totalgain != 1.0) {
+		Float32 variSpeed = 1.0f + ((padFactor/lastWidth)*satComp);
+		if (variSpeed < 1.0f) variSpeed = 1.0f;
+		Float32 totalgain = inputgain / variSpeed;
+		if (totalgain != 1.0f) {
 			inputSample *= totalgain;
-			if (totalgain < 1.0) {
+			if (totalgain < 1.0f) {
 				temp *= totalgain;
 				//no boosting beyond unity please
 			}
 		}
 		
-		double bridgerectifier = fabs(inputSample);
-		Float64 overspill = 0;
+		float bridgerectifier = fabs(inputSample);
+		Float32 overspill = 0;
 		int targetWidth = widestRange;
 		//we now have defaults and an absolute input value to work with
-		if (bridgerectifier < 0.01) padFactor *= 0.9999;
+		if (bridgerectifier < 0.01f) padFactor *= 0.9999f;
 		//in silences we bring back padFactor if it got out of hand		
-		if (bridgerectifier > 1.57079633) {
-			bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) {
+			bridgerectifier = 1.57079633f;
 			targetWidth = 8;
 		}
 		//if our output's gone beyond saturating to distorting, we begin chasing the
@@ -116,7 +116,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		dCount--;
 		
 		padFactor += dram->d[dCount];
-		Float64 randy = (double(fpd)/UINT32_MAX);
+		Float32 randy = (float(fpd)/UINT32_MAX);
 		if ((targetWidth*randy) > lastWidth) {
 			//we are expanding the buffer so we don't remove this trailing sample
 			lastWidth += 1;
@@ -135,12 +135,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (padFactor < 0) padFactor = 0;
 		
 
-		if (output < 1.0) {
+		if (output < 1.0f) {
 			inputSample *= output;
 		}
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither

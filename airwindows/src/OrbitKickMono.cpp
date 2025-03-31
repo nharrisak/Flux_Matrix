@@ -39,9 +39,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double orbit;
-		double position;
-		double speed;
+		float orbit;
+		float position;
+		float speed;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -58,41 +58,41 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 drop = 1.0+(GetParameter( kParam_One )*(0.001/overallscale)); //more is briefer bass
-	Float64 zone = GetParameter( kParam_Two )*0.01; //the max exponentiality of the falloff
-	Float64 start = GetParameter( kParam_Three ); //higher attack
-	Float64 envelope = 9.0-((1.0-pow(1.0-GetParameter( kParam_Four ),2))*4.0); //higher is allowing more subs before gate
-	envelope *= ((start*0.4)+0.6);
-	Float64 threshold = pow(GetParameter( kParam_Five ),3); // trigger threshold
-	Float64 wet = GetParameter( kParam_Six )*2.0;
-	Float64 dry = 2.0 - wet;
-	if (wet > 1.0) wet = 1.0;
-	if (dry > 1.0) dry = 1.0;
+	Float32 drop = 1.0f+(GetParameter( kParam_One )*(0.001f/overallscale)); //more is briefer bass
+	Float32 zone = GetParameter( kParam_Two )*0.01f; //the max exponentiality of the falloff
+	Float32 start = GetParameter( kParam_Three ); //higher attack
+	Float32 envelope = 9.0f-((1.0f-pow(1.0f-GetParameter( kParam_Four ),2))*4.0f); //higher is allowing more subs before gate
+	envelope *= ((start*0.4f)+0.6f);
+	Float32 threshold = pow(GetParameter( kParam_Five ),3); // trigger threshold
+	Float32 wet = GetParameter( kParam_Six )*2.0f;
+	Float32 dry = 2.0f - wet;
+	if (wet > 1.0f) wet = 1.0f;
+	if (dry > 1.0f) dry = 1.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		if ((inputSample > speed*start*2.0) && (inputSample > threshold)) speed = inputSample*start;
+		if ((inputSample > speed*start*2.0f) && (inputSample > threshold)) speed = inputSample*start;
 		position += (speed*start);
 		speed /= (drop+(speed*zone*start));
-		if (position > 31415.92653589793) position -= 31415.92653589793;		
-		orbit += (cos(position)*0.001); orbit *= 0.998272;
-		double applySpeed = cbrt(speed) * envelope;
-		if (applySpeed < 1.0) orbit *= applySpeed;
-		inputSample = orbit*2.0;
+		if (position > 31415.92653589793f) position -= 31415.92653589793f;		
+		orbit += (cos(position)*0.001f); orbit *= 0.998272f;
+		float applySpeed = cbrt(speed) * envelope;
+		if (applySpeed < 1.0f) orbit *= applySpeed;
+		inputSample = orbit*2.0f;
 		
 		inputSample = (inputSample * wet) + (drySample * dry);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -36,42 +36,42 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		Float64 midSampleA;
-		Float64 midSampleB;
-		Float64 midSampleC;
-		Float64 midSampleD;
-		Float64 midSampleE;
-		Float64 midSampleF;
-		Float64 midSampleG;
-		Float64 midSampleH;
-		Float64 midSampleI;
-		Float64 midSampleJ;
-		Float64 midSampleK;
-		Float64 midSampleL;
-		Float64 midSampleM;
-		Float64 midSampleN;
-		Float64 midSampleO;
-		Float64 midSampleP;
-		Float64 midSampleQ;
-		Float64 midSampleR;
-		Float64 midSampleS;
-		Float64 midSampleT;
-		Float64 midSampleU;
-		Float64 midSampleV;
-		Float64 midSampleW;
-		Float64 midSampleX;
-		Float64 midSampleY;
-		Float64 midSampleZ;
+		Float32 midSampleA;
+		Float32 midSampleB;
+		Float32 midSampleC;
+		Float32 midSampleD;
+		Float32 midSampleE;
+		Float32 midSampleF;
+		Float32 midSampleG;
+		Float32 midSampleH;
+		Float32 midSampleI;
+		Float32 midSampleJ;
+		Float32 midSampleK;
+		Float32 midSampleL;
+		Float32 midSampleM;
+		Float32 midSampleN;
+		Float32 midSampleO;
+		Float32 midSampleP;
+		Float32 midSampleQ;
+		Float32 midSampleR;
+		Float32 midSampleS;
+		Float32 midSampleT;
+		Float32 midSampleU;
+		Float32 midSampleV;
+		Float32 midSampleW;
+		Float32 midSampleX;
+		Float32 midSampleY;
+		Float32 midSampleZ;
 		
-		Float64 byn[13];
-		double noiseShaping;
+		Float32 byn[13];
+		float noiseShaping;
 		
-		Float64 lastSample;
-		Float64 IIRsample;
+		Float32 lastSample;
+		Float32 IIRsample;
 		
-		Float64 gwPrev;
-		Float64 gwA;
-		Float64 gwB;
+		Float32 gwPrev;
+		Float32 gwA;
+		Float32 gwB;
 		
 		uint32_t fpd;		
 	
@@ -89,63 +89,63 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double fpOld = 0.618033988749894848204586; //golden ratio!
-	double fpNew = 1.0 - fpOld;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	float fpOld = 0.618033988749894848204586f; //golden ratio!
+	float fpNew = 1.0f - fpOld;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 IIRscaleback = 0.0002597;//scaleback of harmonic avg
+	Float32 IIRscaleback = 0.0002597f;//scaleback of harmonic avg
 	IIRscaleback /= overallscale;
-	IIRscaleback = 1.0 - IIRscaleback;
+	IIRscaleback = 1.0f - IIRscaleback;
 		
-	Float64 target = GetParameter( kParam_One );
+	Float32 target = GetParameter( kParam_One );
 	target += 17; //gives us scaled distortion factor based on test conditions
-	target = pow(10.0,target/20.0); //we will multiply and divide by this
+	target = pow(10.0f,target/20.0f); //we will multiply and divide by this
 	//ShortBuss section
 	if (target == 0) target = 1; //insanity check
 	
 	int bitDepth = (int) GetParameter( kParam_Two ); // +1 for Reaper bug workaround
 	
-	Float64 fusswithscale = 149940.0; //corrected
-	Float64 cutofffreq = 20; //was 46/2.0
-	Float64 midAmount = (cutofffreq)/fusswithscale;
+	Float32 fusswithscale = 149940.0f; //corrected
+	Float32 cutofffreq = 20; //was 46/2.0f
+	Float32 midAmount = (cutofffreq)/fusswithscale;
 	midAmount /= overallscale;
-	Float64 midaltAmount = 1.0 - midAmount;
-	Float64 gwAfactor = 0.718;
-	gwAfactor -= (overallscale*0.05); //0.2 at 176K, 0.1 at 88.2K, 0.05 at 44.1K
-	//reduce slightly to not less than 0.5 to increase effect
-	Float64 gwBfactor = 1.0 - gwAfactor;
-	Float64 softness = 0.2135;
-	Float64 hardness = 1.0 - softness;
-	Float64 refclip = pow(10.0,-0.0058888);	
+	Float32 midaltAmount = 1.0f - midAmount;
+	Float32 gwAfactor = 0.718f;
+	gwAfactor -= (overallscale*0.05f); //0.2f at 176K, 0.1f at 88.2K, 0.05f at 44.1K
+	//reduce slightly to not less than 0.5f to increase effect
+	Float32 gwBfactor = 1.0f - gwAfactor;
+	Float32 softness = 0.2135f;
+	Float32 hardness = 1.0f - softness;
+	Float32 refclip = pow(10.0f,-0.0058888f);	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		Float64 drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		Float32 drySample = inputSample;
 		
 		//begin the whole distortion dealiebop
 		inputSample /= target;
 		
 		//running shortbuss on direct sample
 		IIRsample *= IIRscaleback;
-		Float64 secondharmonic = sin((2 * inputSample * inputSample) * IIRsample);
+		Float32 secondharmonic = sin((2 * inputSample * inputSample) * IIRsample);
 		//secondharmonic is calculated before IIRsample is updated, to delay reaction
 		
-		double bridgerectifier = inputSample;
-		if (bridgerectifier > 1.2533141373155) bridgerectifier = 1.2533141373155;
-		if (bridgerectifier < -1.2533141373155) bridgerectifier = -1.2533141373155;
-		//clip to 1.2533141373155 to reach maximum output
-		bridgerectifier = sin(bridgerectifier * fabs(bridgerectifier)) / ((bridgerectifier == 0.0) ?1:fabs(bridgerectifier));
-		if (inputSample > bridgerectifier) IIRsample += ((inputSample - bridgerectifier)*0.0009);
-		if (inputSample < -bridgerectifier) IIRsample += ((inputSample + bridgerectifier)*0.0009);
+		float bridgerectifier = inputSample;
+		if (bridgerectifier > 1.2533141373155f) bridgerectifier = 1.2533141373155f;
+		if (bridgerectifier < -1.2533141373155f) bridgerectifier = -1.2533141373155f;
+		//clip to 1.2533141373155f to reach maximum output
+		bridgerectifier = sin(bridgerectifier * fabs(bridgerectifier)) / ((bridgerectifier == 0.0f) ?1:fabs(bridgerectifier));
+		if (inputSample > bridgerectifier) IIRsample += ((inputSample - bridgerectifier)*0.0009f);
+		if (inputSample < -bridgerectifier) IIRsample += ((inputSample + bridgerectifier)*0.0009f);
 		//manipulate IIRSample
 		inputSample = bridgerectifier;
 		//apply the distortion transform for reals. Has been converted back to -1/1
 		
 		//apply resonant highpass
-		Float64 tempSample = inputSample;
-		midSampleA = (midSampleA * midaltAmount) + (tempSample * midAmount); tempSample -= midSampleA; Float64 correction = midSampleA;
+		Float32 tempSample = inputSample;
+		midSampleA = (midSampleA * midaltAmount) + (tempSample * midAmount); tempSample -= midSampleA; Float32 correction = midSampleA;
 		midSampleB = (midSampleB * midaltAmount) + (tempSample * midAmount); tempSample -= midSampleB; correction += midSampleB;
 		midSampleC = (midSampleC * midaltAmount) + (tempSample * midAmount); tempSample -= midSampleC; correction += midSampleC;
 		midSampleD = (midSampleD * midaltAmount) + (tempSample * midAmount); tempSample -= midSampleD; correction += midSampleD;
@@ -238,25 +238,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//begin 32 bit floating point dither
 			int expon; frexpf((float)inputSample, &expon);
 			fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-			inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+			inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 			//end 32 bit floating point dither
 		} else {
 			//entire Naturalize section used when not on 32 bit out
 			
 			inputSample -= noiseShaping;
-			if (bitDepth == 2) inputSample *= 8388608.0; //go to dither at 24 bit
-			if (bitDepth == 1) inputSample *= 32768.0; //go to dither at 16 bit
+			if (bitDepth == 2) inputSample *= 8388608.0f; //go to dither at 24 bit
+			if (bitDepth == 1) inputSample *= 32768.0f; //go to dither at 16 bit
 			
-			Float64 benfordize = floor(inputSample);
-			while (benfordize >= 1.0) {benfordize /= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
+			Float32 benfordize = floor(inputSample);
+			while (benfordize >= 1.0f) {benfordize /= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
 			int hotbinA = floor(benfordize);
 			//hotbin becomes the Benford bin value for this number floored
-			Float64 totalA = 0;
+			Float32 totalA = 0;
 			if ((hotbinA > 0) && (hotbinA < 10))
 			{
 				byn[hotbinA] += 1;
@@ -274,15 +274,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//produce total number- smaller is closer to Benford real
 			
 			benfordize = ceil(inputSample);
-			while (benfordize >= 1.0) {benfordize /= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
-			if (benfordize < 1.0) {benfordize *= 10;}
+			while (benfordize >= 1.0f) {benfordize /= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
+			if (benfordize < 1.0f) {benfordize *= 10;}
 			int hotbinB = floor(benfordize);
 			//hotbin becomes the Benford bin value for this number ceiled
-			Float64 totalB = 0;
+			Float32 totalB = 0;
 			if ((hotbinB > 0) && (hotbinB < 10))
 			{
 				byn[hotbinB] += 1;
@@ -326,8 +326,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			byn[9] /= totalA;
 			byn[10] /= 2; //catchall for garbage data
 			
-			if (bitDepth == 2) inputSample /= 8388608.0;
-			if (bitDepth == 1) inputSample /= 32768.0;
+			if (bitDepth == 2) inputSample /= 8388608.0f;
+			if (bitDepth == 1) inputSample /= 32768.0f;
 			noiseShaping += inputSample - drySample;
 		}
 		

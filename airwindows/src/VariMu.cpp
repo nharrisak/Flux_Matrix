@@ -35,14 +35,14 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 muVary;
-		Float64 muAttack;
-		Float64 muNewSpeed;
-		Float64 muSpeedA;
-		Float64 muSpeedB;
-		Float64 muCoefficientA;
-		Float64 muCoefficientB;
-		Float64 previous;
+		Float32 muVary;
+		Float32 muAttack;
+		Float32 muNewSpeed;
+		Float32 muSpeedA;
+		Float32 muSpeedB;
+		Float32 muCoefficientA;
+		Float32 muCoefficientB;
+		Float32 previous;
 		bool flip;
 		uint32_t fpd;
 	
@@ -60,30 +60,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 2.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 2.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 threshold = 1.001 - (1.0-pow(1.0-GetParameter( kParam_One ),3));
-	Float64 muMakeupGain = sqrt(1.0 / threshold);
-	muMakeupGain = (muMakeupGain + sqrt(muMakeupGain))/2.0;
+	Float32 threshold = 1.001f - (1.0f-pow(1.0f-GetParameter( kParam_One ),3));
+	Float32 muMakeupGain = sqrt(1.0f / threshold);
+	muMakeupGain = (muMakeupGain + sqrt(muMakeupGain))/2.0f;
 	muMakeupGain = sqrt(muMakeupGain);
-	Float64 outGain = sqrt(muMakeupGain);
+	Float32 outGain = sqrt(muMakeupGain);
 	//gain settings around threshold
-	Float64 release = pow((1.15-GetParameter( kParam_Two )),5)*32768.0;
+	Float32 release = pow((1.15f-GetParameter( kParam_Two )),5)*32768.0f;
 	release /= overallscale;
-	Float64 fastest = sqrt(release);
+	Float32 fastest = sqrt(release);
 	//speed settings around release
-	Float64 coefficient;
-	Float64 output = outGain * GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
-	double squaredSample;
+	Float32 coefficient;
+	Float32 output = outGain * GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
+	float squaredSample;
 
 	// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		if (fabs(inputSample) > fabs(previous)) squaredSample = previous * previous;
 		else squaredSample = inputSample * inputSample;
@@ -96,7 +96,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					{
 						muVary = threshold / fabs(squaredSample);
 						muAttack = sqrt(fabs(muSpeedA));
-						muCoefficientA = muCoefficientA * (muAttack-1.0);
+						muCoefficientA = muCoefficientA * (muAttack-1.0f);
 						if (muVary < threshold)
 							{
 								muCoefficientA = muCoefficientA + threshold;
@@ -109,8 +109,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					}
 				else
 					{
-						muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-						muCoefficientA = muCoefficientA + 1.0;
+						muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+						muCoefficientA = muCoefficientA + 1.0f;
 						muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 					}
 				muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -136,8 +136,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 					}
 				else
 					{
-						muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-						muCoefficientB = muCoefficientB + 1.0;
+						muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+						muCoefficientB = muCoefficientB + 1.0f;
 						muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 					}
 				muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -148,31 +148,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		if (flip)
 			{
-			coefficient = (muCoefficientA + pow(muCoefficientA,2))/2.0;
+			coefficient = (muCoefficientA + pow(muCoefficientA,2))/2.0f;
 			inputSample *= coefficient;
 			}
 		else
 			{
-			coefficient = (muCoefficientB + pow(muCoefficientB,2))/2.0;
+			coefficient = (muCoefficientB + pow(muCoefficientB,2))/2.0f;
 			inputSample *= coefficient;
 			}
 		//applied compression with vari-vari-µ-µ-µ-µ-µ-µ-is-the-kitten-song o/~
 		//applied gain correction to control output level- tends to constrain sound rather than inflate it
 		flip = !flip;		
 
-		if (output < 1.0) {
+		if (output < 1.0f) {
 			inputSample *= output;
 		}
-		if (wet < 1.0) {
-			inputSample = (drySample * (1.0-wet)) + (inputSample * wet);
+		if (wet < 1.0f) {
+			inputSample = (drySample * (1.0f-wet)) + (inputSample * wet);
 		}
 		//nice little output stage template: if we have another scale of floating point
-		//number, we really don't want to meaninglessly multiply that by 1.0.
+		//number, we really don't want to meaninglessly multiply that by 1.0f.
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

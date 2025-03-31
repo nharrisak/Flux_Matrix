@@ -66,7 +66,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double gslew[gslew_total]; //probably worth just using a number here
+			float gslew[gslew_total]; //probably worth just using a number here
 	};
 	_dram* dram;
 };
@@ -80,36 +80,36 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double source = pow(1-GetParameter( kParam_One ),4)/overallscale;
+	float source = pow(1-GetParameter( kParam_One ),4)/overallscale;
 	
 	dram->gslew[threshold10] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold9] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold8] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold7] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold6] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold5] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold4] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold3] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold2] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold1] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		for (int x = 0; x < gslew_total; x += 3) {
 			if ((inputSample - dram->gslew[x]) > dram->gslew[x+2])
@@ -128,7 +128,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

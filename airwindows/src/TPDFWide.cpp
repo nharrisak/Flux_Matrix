@@ -46,57 +46,57 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
 
 		inputSampleL *= scaleFactor;
 		inputSampleR *= scaleFactor;
 		//0-1 is now one bit, now we dither
 		
-		double ditherL = -1.0;
-		ditherL += (double(fpdL)/UINT32_MAX);
+		float ditherL = -1.0f;
+		ditherL += (float(fpdL)/UINT32_MAX);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		ditherL += (double(fpdL)/UINT32_MAX);
+		ditherL += (float(fpdL)/UINT32_MAX);
 		//TPDF: two 0-1 random noises
 		
-		double ditherR = -1.0;
-		ditherR += (double(fpdR)/UINT32_MAX);
+		float ditherR = -1.0f;
+		ditherR += (float(fpdR)/UINT32_MAX);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		ditherR += (double(fpdR)/UINT32_MAX);
+		ditherR += (float(fpdR)/UINT32_MAX);
 		//TPDF: two 0-1 random noises
 		
-		if (fabs(ditherL-ditherR) < 0.5) {
-			ditherL = -1.0;
-			ditherL += (double(fpdL)/UINT32_MAX);
+		if (fabs(ditherL-ditherR) < 0.5f) {
+			ditherL = -1.0f;
+			ditherL += (float(fpdL)/UINT32_MAX);
 			fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-			ditherL += (double(fpdL)/UINT32_MAX);
+			ditherL += (float(fpdL)/UINT32_MAX);
 		}
 		
-		if (fabs(ditherL-ditherR) < 0.5) {
-			ditherR = -1.0;
-			ditherR += (double(fpdR)/UINT32_MAX);
+		if (fabs(ditherL-ditherR) < 0.5f) {
+			ditherR = -1.0f;
+			ditherR += (float(fpdR)/UINT32_MAX);
 			fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-			ditherR += (double(fpdR)/UINT32_MAX);
+			ditherR += (float(fpdR)/UINT32_MAX);
 		}
 		
-		if (fabs(ditherL-ditherR) < 0.5) {
-			ditherL = -1.0;
-			ditherL += (double(fpdL)/UINT32_MAX);
+		if (fabs(ditherL-ditherR) < 0.5f) {
+			ditherL = -1.0f;
+			ditherL += (float(fpdL)/UINT32_MAX);
 			fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-			ditherL += (double(fpdL)/UINT32_MAX);
+			ditherL += (float(fpdL)/UINT32_MAX);
 		}
 				
 		inputSampleL = floor(inputSampleL+ditherL);

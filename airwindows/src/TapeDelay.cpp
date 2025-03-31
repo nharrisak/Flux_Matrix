@@ -47,7 +47,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[44100];
+			Float32 d[44100];
 	};
 	_dram* dram;
 };
@@ -61,30 +61,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 dry = pow(GetParameter( kParam_One ),2);
-	Float64 wet = pow(GetParameter( kParam_Two ),2);
+	Float32 dry = pow(GetParameter( kParam_One ),2);
+	Float32 wet = pow(GetParameter( kParam_Two ),2);
 	int targetdelay = (int)(44000*GetParameter( kParam_Three ));
-	Float64 feedback = (GetParameter( kParam_Four )*1.3);
-	Float64 leanfat = GetParameter( kParam_Five );
-	Float64 fatwet = fabs(leanfat);
-	Float64 storedelay;
+	Float32 feedback = (GetParameter( kParam_Four )*1.3f);
+	Float32 leanfat = GetParameter( kParam_Five );
+	Float32 fatwet = fabs(leanfat);
+	Float32 storedelay;
 	int fatness = (int)GetParameter( kParam_Six );
-	Float64 sum = 0.0;
-	Float64 floattotal = 0.0;
+	Float32 sum = 0.0f;
+	Float32 floattotal = 0.0f;
 	SInt32 sumtotal = 0;
 	SInt32 count;
 	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
 		if (gcount < 0 || gcount > 128) {gcount = 128;}
 		count = gcount;
 		if (delay < 0 || delay > maxdelay) {delay = maxdelay;}
 		sum = inputSample + (dram->d[delay]*feedback);
-		p[count+128] = p[count] = sumtotal = (SInt32)(sum*8388608.0);
+		p[count+128] = p[count] = sumtotal = (SInt32)(sum*8388608.0f);
 		switch (fatness)
 		{
 			case 32: sumtotal += p[count+127]; //note NO break statement.
@@ -121,8 +121,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 1: sumtotal += p[count+1];
 		}
 		
-		floattotal = (Float64)(sumtotal/fatness+1);
-		floattotal /= 8388608.0;
+		floattotal = (Float32)(sumtotal/fatness+1);
+		floattotal /= 8388608.0f;
 		floattotal *= fatwet;
 		if (leanfat < 0) {storedelay = sum-floattotal;}
 		else {storedelay = (sum * (1-fatwet))+floattotal;}
@@ -148,7 +148,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -91,7 +91,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double gslew[gslew_total]; //probably worth just using a number here
+			float gslew[gslew_total]; //probably worth just using a number here
 	};
 	_dram* dram;
 };
@@ -105,58 +105,58 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double source = pow(1-GetParameter( kParam_One ),4)/overallscale;
-	int stages = (1.0-GetParameter( kParam_Two ))*9.99;
+	float source = pow(1-GetParameter( kParam_One ),4)/overallscale;
+	int stages = (1.0f-GetParameter( kParam_Two ))*9.99f;
 	stages *= 5;
-	double halo = GetParameter( kParam_Three );
-	double wet = (GetParameter( kParam_Four )*2.0)-1.0; //inv-dry-wet for highpass
-	double dry = 2.0-(GetParameter( kParam_Four )*2.0);
-	if (dry > 1.0) dry = 1.0; //full dry for use with inv, to 0.0 at full wet
+	float halo = GetParameter( kParam_Three );
+	float wet = (GetParameter( kParam_Four )*2.0f)-1.0f; //inv-dry-wet for highpass
+	float dry = 2.0f-(GetParameter( kParam_Four )*2.0f);
+	if (dry > 1.0f) dry = 1.0f; //full dry for use with inv, to 0.0f at full wet
 	
 	dram->gslew[threshold10] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold9] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold8] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold7] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold6] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold5] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold4] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold3] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold2] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	dram->gslew[threshold1] = source;
-	source *= 1.618033988749894848204586;
+	source *= 1.618033988749894848204586f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		for (int x = stages; x < gslew_total; x += 5) {
 			
-			if (((inputSample-dram->gslew[x])-((dram->gslew[x]-dram->gslew[x+2])*0.618033988749894848204586)) > dram->gslew[x+4])
-				inputSample = (dram->gslew[x]-((dram->gslew[x]-dram->gslew[x+2])*halo)) + (dram->gslew[x+4]*(1.0-halo));
-			if (-((inputSample-dram->gslew[x])-((dram->gslew[x]-dram->gslew[x+2])*0.618033988749894848204586)) > dram->gslew[x+4])
-				inputSample = (dram->gslew[x]-((dram->gslew[x]-dram->gslew[x+2])*halo*0.78)) - (dram->gslew[x+4]*(1.0-(halo*0.78)));
-			dram->gslew[x+2] = dram->gslew[x]*(1.0-halo);
+			if (((inputSample-dram->gslew[x])-((dram->gslew[x]-dram->gslew[x+2])*0.618033988749894848204586f)) > dram->gslew[x+4])
+				inputSample = (dram->gslew[x]-((dram->gslew[x]-dram->gslew[x+2])*halo)) + (dram->gslew[x+4]*(1.0f-halo));
+			if (-((inputSample-dram->gslew[x])-((dram->gslew[x]-dram->gslew[x+2])*0.618033988749894848204586f)) > dram->gslew[x+4])
+				inputSample = (dram->gslew[x]-((dram->gslew[x]-dram->gslew[x+2])*halo*0.78f)) - (dram->gslew[x+4]*(1.0f-(halo*0.78f)));
+			dram->gslew[x+2] = dram->gslew[x]*(1.0f-halo);
 			dram->gslew[x] = inputSample;
 			
-			//if (((inputSampleR-dram->gslew[x+1])-((dram->gslew[x+1]-dram->gslew[x+3])*0.618033988749894848204586)) > dram->gslew[x+4])
-			//	inputSampleR = (dram->gslew[x+1]-((dram->gslew[x+1]-dram->gslew[x+3])*halo)) + (dram->gslew[x+4]*(1.0-halo));
-			//if (-((inputSampleR-dram->gslew[x+1])-((dram->gslew[x+1]-dram->gslew[x+3])*0.618033988749894848204586)) > dram->gslew[x+4])
-			//	inputSampleR = (dram->gslew[x+1]-((dram->gslew[x+1]-dram->gslew[x+3])*halo*0.78)) - (dram->gslew[x+4]*(1.0-(halo*0.78)));
-			//dram->gslew[x+3] = dram->gslew[x+1]*(1.0-halo);
+			//if (((inputSampleR-dram->gslew[x+1])-((dram->gslew[x+1]-dram->gslew[x+3])*0.618033988749894848204586f)) > dram->gslew[x+4])
+			//	inputSampleR = (dram->gslew[x+1]-((dram->gslew[x+1]-dram->gslew[x+3])*halo)) + (dram->gslew[x+4]*(1.0f-halo));
+			//if (-((inputSampleR-dram->gslew[x+1])-((dram->gslew[x+1]-dram->gslew[x+3])*0.618033988749894848204586f)) > dram->gslew[x+4])
+			//	inputSampleR = (dram->gslew[x+1]-((dram->gslew[x+1]-dram->gslew[x+3])*halo*0.78f)) - (dram->gslew[x+4]*(1.0f-(halo*0.78f)));
+			//dram->gslew[x+3] = dram->gslew[x+1]*(1.0f-halo);
 			//dram->gslew[x+1] = inputSampleR;
 		}
 		
@@ -167,7 +167,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

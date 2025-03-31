@@ -27,7 +27,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 b[11];	
+		Float32 b[11];	
 		uint32_t fpd;
 	
 	struct _dram {
@@ -44,28 +44,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 inputSample;
-	Float64 currentDither;
+	Float32 inputSample;
+	Float32 currentDither;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
-		inputSample *= 8388608.0;
+		inputSample *= 8388608.0f;
 		//0-1 is now one bit, now we dither
 		
 		b[9] = b[8]; b[8] = b[7]; b[7] = b[6]; b[6] = b[5];
 		b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1];
-		b[1] = b[0]; b[0] = (double(fpd)/UINT32_MAX);
+		b[1] = b[0]; b[0] = (float(fpd)/UINT32_MAX);
 		
-		currentDither  = (b[0] * 0.061);
-		currentDither -= (b[1] * 0.11);
-		currentDither += (b[8] * 0.126);
-		currentDither -= (b[7] * 0.23);
-		currentDither += (b[2] * 0.25);
-		currentDither -= (b[3] * 0.43);
-		currentDither += (b[6] * 0.5);
+		currentDither  = (b[0] * 0.061f);
+		currentDither -= (b[1] * 0.11f);
+		currentDither += (b[8] * 0.126f);
+		currentDither -= (b[7] * 0.23f);
+		currentDither += (b[2] * 0.25f);
+		currentDither -= (b[3] * 0.43f);
+		currentDither += (b[6] * 0.5f);
 		currentDither -= b[5];
 		currentDither += b[4];
 		//this sounds different from doing it in order of sample position
@@ -77,7 +77,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = floor(inputSample);
 		
-		inputSample /= 8388608.0;
+		inputSample /= 8388608.0f;
 
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		//pseudorandom number updater

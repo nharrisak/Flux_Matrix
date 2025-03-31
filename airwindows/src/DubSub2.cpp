@@ -30,8 +30,8 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	
-	double headBumpL;
-	double headBumpR;
+	float headBumpL;
+	float headBumpR;
 	enum {
 		hdb_freq,
 		hdb_reso,
@@ -51,8 +51,8 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdR;
 
 	struct _dram {
-		double hdbA[hdb_total];
-	double hdbB[hdb_total];
+		float hdbA[hdb_total];
+	float hdbB[hdb_total];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -60,70 +60,70 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	double headBumpDrive = (GetParameter( kParam_A )*0.1)/overallscale;
+	float headBumpDrive = (GetParameter( kParam_A )*0.1f)/overallscale;
 
 	dram->hdbA[hdb_freq] = GetParameter( kParam_B )/GetSampleRate();
-	dram->hdbB[hdb_freq] = dram->hdbA[hdb_freq]*0.9375;
-	//displayNumber = ((B*B)*175.0)+25.0
-	dram->hdbB[hdb_reso] = dram->hdbA[hdb_reso] = 0.618033988749894848204586;
-	dram->hdbB[hdb_a1] = dram->hdbA[hdb_a1] = 0.0;
+	dram->hdbB[hdb_freq] = dram->hdbA[hdb_freq]*0.9375f;
+	//displayNumber = ((B*B)*175.0f)+25.0f
+	dram->hdbB[hdb_reso] = dram->hdbA[hdb_reso] = 0.618033988749894848204586f;
+	dram->hdbB[hdb_a1] = dram->hdbA[hdb_a1] = 0.0f;
 	
-	double K = tan(M_PI * dram->hdbA[hdb_freq]);
-	double norm = 1.0 / (1.0 + K / dram->hdbA[hdb_reso] + K * K);
+	float K = tan(M_PI * dram->hdbA[hdb_freq]);
+	float norm = 1.0f / (1.0f + K / dram->hdbA[hdb_reso] + K * K);
 	dram->hdbA[hdb_a0] = K / dram->hdbA[hdb_reso] * norm;
 	dram->hdbA[hdb_a2] = -dram->hdbA[hdb_a0];
-	dram->hdbA[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hdbA[hdb_b2] = (1.0 - K / dram->hdbA[hdb_reso] + K * K) * norm;
+	dram->hdbA[hdb_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hdbA[hdb_b2] = (1.0f - K / dram->hdbA[hdb_reso] + K * K) * norm;
 	K = tan(M_PI * dram->hdbB[hdb_freq]);
-	norm = 1.0 / (1.0 + K / dram->hdbB[hdb_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->hdbB[hdb_reso] + K * K);
 	dram->hdbB[hdb_a0] = K / dram->hdbB[hdb_reso] * norm;
 	dram->hdbB[hdb_a2] = -dram->hdbB[hdb_a0];
-	dram->hdbB[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hdbB[hdb_b2] = (1.0 - K / dram->hdbB[hdb_reso] + K * K) * norm;
+	dram->hdbB[hdb_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hdbB[hdb_b2] = (1.0f - K / dram->hdbB[hdb_reso] + K * K) * norm;
 	
-	double headWet = GetParameter( kParam_C );	
+	float headWet = GetParameter( kParam_C );	
 		
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 				
 		//begin HeadBump
 		headBumpL += (inputSampleL * headBumpDrive);
-		headBumpL -= (headBumpL * headBumpL * headBumpL * (0.0618/sqrt(overallscale)));
+		headBumpL -= (headBumpL * headBumpL * headBumpL * (0.0618f/sqrt(overallscale)));
 		headBumpR += (inputSampleR * headBumpDrive);
-		headBumpR -= (headBumpR * headBumpR * headBumpR * (0.0618/sqrt(overallscale)));
-		double headBiqSampleL = (headBumpL * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sL1];
+		headBumpR -= (headBumpR * headBumpR * headBumpR * (0.0618f/sqrt(overallscale)));
+		float headBiqSampleL = (headBumpL * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sL1];
 		dram->hdbA[hdb_sL1] = (headBumpL * dram->hdbA[hdb_a1]) - (headBiqSampleL * dram->hdbA[hdb_b1]) + dram->hdbA[hdb_sL2];
 		dram->hdbA[hdb_sL2] = (headBumpL * dram->hdbA[hdb_a2]) - (headBiqSampleL * dram->hdbA[hdb_b2]);
-		double headBumpSampleL = (headBiqSampleL * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sL1];
+		float headBumpSampleL = (headBiqSampleL * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sL1];
 		dram->hdbB[hdb_sL1] = (headBiqSampleL * dram->hdbB[hdb_a1]) - (headBumpSampleL * dram->hdbB[hdb_b1]) + dram->hdbB[hdb_sL2];
 		dram->hdbB[hdb_sL2] = (headBiqSampleL * dram->hdbB[hdb_a2]) - (headBumpSampleL * dram->hdbB[hdb_b2]);
-		double headBiqSampleR = (headBumpR * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sR1];
+		float headBiqSampleR = (headBumpR * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sR1];
 		dram->hdbA[hdb_sR1] = (headBumpR * dram->hdbA[hdb_a1]) - (headBiqSampleR * dram->hdbA[hdb_b1]) + dram->hdbA[hdb_sR2];
 		dram->hdbA[hdb_sR2] = (headBumpR * dram->hdbA[hdb_a2]) - (headBiqSampleR * dram->hdbA[hdb_b2]);
-		double headBumpSampleR = (headBiqSampleR * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sR1];
+		float headBumpSampleR = (headBiqSampleR * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sR1];
 		dram->hdbB[hdb_sR1] = (headBiqSampleR * dram->hdbB[hdb_a1]) - (headBumpSampleR * dram->hdbB[hdb_b1]) + dram->hdbB[hdb_sR2];
 		dram->hdbB[hdb_sR2] = (headBiqSampleR * dram->hdbB[hdb_a2]) - (headBumpSampleR * dram->hdbB[hdb_b2]);
 		//end HeadBump
 		
-		inputSampleL = (headBumpSampleL * headWet) + (drySampleL * (1.0-headWet));
-		inputSampleR = (headBumpSampleR * headWet) + (drySampleR * (1.0-headWet));
+		inputSampleL = (headBumpSampleL * headWet) + (drySampleL * (1.0f-headWet));
+		inputSampleR = (headBumpSampleR * headWet) + (drySampleR * (1.0f-headWet));
 
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

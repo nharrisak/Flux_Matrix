@@ -33,16 +33,16 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample;
-		double heldSample;
-		double lastSoften;
-		double position;
-		double freq;
-		double freqA;
-		double freqB;
-		double rez;
-		double rezA;
-		double rezB;
+		float lastSample;
+		float heldSample;
+		float lastSoften;
+		float position;
+		float freq;
+		float freqA;
+		float freqB;
+		float rez;
+		float rezA;
+		float rezB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -59,31 +59,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double freqMin = 0.08 / overallscale;
-	freqA = freqB; freqB = (pow(1.0-GetParameter( kParam_One ),3)*(0.618033988749894848204586-freqMin))+freqMin;
+	float freqMin = 0.08f / overallscale;
+	freqA = freqB; freqB = (pow(1.0f-GetParameter( kParam_One ),3)*(0.618033988749894848204586f-freqMin))+freqMin;
 	//freq is always engaged at least a little
-	rezA = rezB; rezB = pow(GetParameter( kParam_Two )*0.618033988749894848204586,3)+0.000244140625;
+	rezA = rezB; rezB = pow(GetParameter( kParam_Two )*0.618033988749894848204586f,3)+0.000244140625f;
 	//rez is always at least 12 bit truncation
-	double wet = GetParameter( kParam_Three );
+	float wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double freq = (freqA*temp)+(freqB*(1.0-temp));
-		double rez = (rezA*temp)+(rezB*(1.0-temp));
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float freq = (freqA*temp)+(freqB*(1.0f-temp));
+		float rez = (rezA*temp)+(rezB*(1.0f-temp));
 		
-		if (inputSample > 1.0) inputSample = 1.0; if (inputSample < -1.0) inputSample = -1.0;
-		if (inputSample > 0) inputSample = log(1.0+(255*fabs(inputSample)))/log(255);
-		if (inputSample < 0) inputSample = -log(1.0+(255*fabs(inputSample)))/log(255);
+		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
+		if (inputSample > 0) inputSample = log(1.0f+(255*fabs(inputSample)))/log(255);
+		if (inputSample < 0) inputSample = -log(1.0f+(255*fabs(inputSample)))/log(255);
 		//end uLaw encode		
 		
-		double offset = inputSample;
+		float offset = inputSample;
 		if (inputSample > 0)
 		{
 			while (offset > 0) {offset -= rez;}
@@ -96,41 +96,41 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputSample -= offset;
 			//it's above 0 so subtracting subtracts the remainder
 		}
-		inputSample *= (1.0 - rez);
+		inputSample *= (1.0f - rez);
 			
-		if (inputSample > 1.0) inputSample = 1.0; if (inputSample < -1.0) inputSample = -1.0;
-		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0) / 255;
-		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0) / 255;
+		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
+		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0f) / 255;
 		//end uLaw decode
 		
 		position += freq;
-		double outputSample = heldSample;
-		if (position > 1.0)
+		float outputSample = heldSample;
+		if (position > 1.0f)
 		{
-			position -= 1.0;
+			position -= 1.0f;
 			heldSample = (lastSample * position) + (inputSample * (1-position));
 			outputSample = (heldSample * (1-position)) + (outputSample * position);
 		}
 		inputSample = outputSample;
 		
-		double slew = fabs(inputSample - lastSoften)*freq;
-		if (slew > 0.5) slew = 0.5;
-		inputSample = (inputSample * slew) + (lastSoften * (1.0-slew));
+		float slew = fabs(inputSample - lastSoften)*freq;
+		if (slew > 0.5f) slew = 0.5f;
+		inputSample = (inputSample * slew) + (lastSoften * (1.0f-slew));
 		//conditional average: only if we actually have brightness
 		
 		lastSample = drySample;
 		lastSoften = outputSample;
 		//end Frequency Derez
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

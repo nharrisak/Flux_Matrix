@@ -31,9 +31,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 b[11];
-		Float64 f[11];		
-		Float64 fpNShape;
+		Float32 b[11];
+		Float32 f[11];		
+		Float32 fpNShape;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -50,28 +50,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 inputSample;
-	Float64 correctionSample;
-	Float64 accumulatorSample;
-	Float64 drySample;
-	Float64 overallscale = GetParameter( kParam_One );
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 inputSample;
+	Float32 correctionSample;
+	Float32 accumulatorSample;
+	Float32 drySample;
+	Float32 overallscale = GetParameter( kParam_One );
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
-	Float64 gain = overallscale;
+	Float32 gain = overallscale;
 	
-	if (gain > 1.0) {f[0] = 1.0; gain -= 1.0;} else {f[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[1] = 1.0; gain -= 1.0;} else {f[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[2] = 1.0; gain -= 1.0;} else {f[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[3] = 1.0; gain -= 1.0;} else {f[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[4] = 1.0; gain -= 1.0;} else {f[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[5] = 1.0; gain -= 1.0;} else {f[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[6] = 1.0; gain -= 1.0;} else {f[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[7] = 1.0; gain -= 1.0;} else {f[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[8] = 1.0; gain -= 1.0;} else {f[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[9] = 1.0; gain -= 1.0;} else {f[9] = gain; gain = 0.0;}
+	if (gain > 1.0f) {f[0] = 1.0f; gain -= 1.0f;} else {f[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[1] = 1.0f; gain -= 1.0f;} else {f[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[2] = 1.0f; gain -= 1.0f;} else {f[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[3] = 1.0f; gain -= 1.0f;} else {f[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[4] = 1.0f; gain -= 1.0f;} else {f[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[5] = 1.0f; gain -= 1.0f;} else {f[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[6] = 1.0f; gain -= 1.0f;} else {f[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[7] = 1.0f; gain -= 1.0f;} else {f[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[8] = 1.0f; gain -= 1.0f;} else {f[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[9] = 1.0f; gain -= 1.0f;} else {f[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
 		
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	f[0] /= overallscale;
 	f[1] /= overallscale;
 	f[2] /= overallscale;
@@ -86,7 +86,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		b[9] = b[8]; b[8] = b[7]; b[7] = b[6]; b[6] = b[5];
@@ -116,15 +116,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= correctionSample;
 		//our one math operation on the input data coming in
 		
-		if (wet < 1.0) inputSample = (inputSample * wet) + (drySample * (1.0-wet));
-		//dry/wet control only applies if you're using it. We don't do a multiply by 1.0
+		if (wet < 1.0f) inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
+		//dry/wet control only applies if you're using it. We don't do a multiply by 1.0f
 		//if it 'won't change anything' but our sample might be at a very different scaling
 		//in the floating point system.
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 
 		*destP = inputSample;

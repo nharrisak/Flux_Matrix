@@ -35,8 +35,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 byn[13];
-		double noiseShaping;
+		Float32 byn[13];
+		float noiseShaping;
 	
 	struct _dram {
 		};
@@ -56,31 +56,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
 		inputSample *= scaleFactor;
 		//0-1 is now one bit, now we dither
 		
 		bool cutbins; cutbins = false;
-		double drySample = inputSample;
+		float drySample = inputSample;
 		inputSample -= noiseShaping;
 		
-		double benfordize; benfordize = floor(inputSample);
-		while (benfordize >= 1.0) benfordize /= 10;
-		while (benfordize < 1.0 && benfordize > 0.0000001) benfordize *= 10;
+		float benfordize; benfordize = floor(inputSample);
+		while (benfordize >= 1.0f) benfordize /= 10;
+		while (benfordize < 1.0f && benfordize > 0.0000001f) benfordize *= 10;
 		int hotbinA; hotbinA = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number floored
-		double totalA; totalA = 0;
+		float totalA; totalA = 0;
 		if ((hotbinA > 0) && (hotbinA < 10))
 		{
 			byn[hotbinA] += 1; if (byn[hotbinA] > 982) cutbins = true;
@@ -92,11 +92,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//produce total number- smaller is closer to Benford real
 		
 		benfordize = ceil(inputSample);
-		while (benfordize >= 1.0) benfordize /= 10;
-		while (benfordize < 1.0 && benfordize > 0.0000001) benfordize *= 10;
+		while (benfordize >= 1.0f) benfordize /= 10;
+		while (benfordize < 1.0f && benfordize > 0.0000001f) benfordize *= 10;
 		int hotbinB; hotbinB = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number ceiled
-		double totalB; totalB = 0;
+		float totalB; totalB = 0;
 		if ((hotbinB > 0) && (hotbinB < 10))
 		{
 			byn[hotbinB] += 1; if (byn[hotbinB] > 982) cutbins = true;
@@ -107,14 +107,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		} else hotbinB = 10;
 		//produce total number- smaller is closer to Benford real
 		
-		double outputSample;
+		float outputSample;
 		if (totalA < totalB) {byn[hotbinA] += 1; outputSample = floor(inputSample);}
 		else {byn[hotbinB] += 1; outputSample = floor(inputSample+1);}
 		//assign the relevant one to the delay line
 		//and floor/ceil signal accordingly
 		if (cutbins) {
-			byn[1] *= 0.99; byn[2] *= 0.99; byn[3] *= 0.99; byn[4] *= 0.99; byn[5] *= 0.99; 
-			byn[6] *= 0.99; byn[7] *= 0.99; byn[8] *= 0.99; byn[9] *= 0.99; byn[10] *= 0.99; 
+			byn[1] *= 0.99f; byn[2] *= 0.99f; byn[3] *= 0.99f; byn[4] *= 0.99f; byn[5] *= 0.99f; 
+			byn[6] *= 0.99f; byn[7] *= 0.99f; byn[8] *= 0.99f; byn[9] *= 0.99f; byn[10] *= 0.99f; 
 		}
 		noiseShaping += outputSample - drySample;
 		if (noiseShaping > fabs(inputSample)) noiseShaping = fabs(inputSample);
@@ -122,8 +122,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = outputSample / outScale;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 				
 		*destP = inputSample;
 		sourceP += inNumChannels; destP += inNumChannels;

@@ -65,67 +65,67 @@ struct _kernel {
 		int alpY, delayY;
 		int alpZ, delayZ;
 		
-		Float64 avgA;
-		Float64 avgB;
-		Float64 avgC;
-		Float64 avgD;
-		Float64 avgE;
-		Float64 avgF;
-		Float64 avgG;
-		Float64 avgH;
-		Float64 avgI;
-		Float64 avgJ;
-		Float64 avgK;
-		Float64 avgL;
-		Float64 avgM;
-		Float64 avgN;
-		Float64 avgO;
-		Float64 avgP;
-		Float64 avgQ;
-		Float64 avgR;
-		Float64 avgS;
-		Float64 avgT;
-		Float64 avgU;
-		Float64 avgV;
-		Float64 avgW;
-		Float64 avgX;
-		Float64 avgY;
-		Float64 avgZ;
+		Float32 avgA;
+		Float32 avgB;
+		Float32 avgC;
+		Float32 avgD;
+		Float32 avgE;
+		Float32 avgF;
+		Float32 avgG;
+		Float32 avgH;
+		Float32 avgI;
+		Float32 avgJ;
+		Float32 avgK;
+		Float32 avgL;
+		Float32 avgM;
+		Float32 avgN;
+		Float32 avgO;
+		Float32 avgP;
+		Float32 avgQ;
+		Float32 avgR;
+		Float32 avgS;
+		Float32 avgT;
+		Float32 avgU;
+		Float32 avgV;
+		Float32 avgW;
+		Float32 avgX;
+		Float32 avgY;
+		Float32 avgZ;
 		
-		Float64 feedback;
+		Float32 feedback;
 		
-		double lastRef[7];
+		float lastRef[7];
 		int cycle;		
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 aA[15150];
-		Float64 aB[14618];
-		Float64 aC[14358];
-		Float64 aD[13818];		
-		Float64 aE[13562];
-		Float64 aF[13046];
-		Float64 aG[11966];
-		Float64 aH[11130];
-		Float64 aI[10598];
-		Float64 aJ[9810];
-		Float64 aK[9522];
-		Float64 aL[8982];
-		Float64 aM[8786];
-		Float64 aN[8462];
-		Float64 aO[8310];
-		Float64 aP[7982];
-		Float64 aQ[7322];
-		Float64 aR[6818];
-		Float64 aS[6506];
-		Float64 aT[6002];
-		Float64 aU[5838];
-		Float64 aV[5502];
-		Float64 aW[5010];
-		Float64 aX[4850];
-		Float64 aY[4296];
-		Float64 aZ[4180];
+			Float32 aA[15150];
+		Float32 aB[14618];
+		Float32 aC[14358];
+		Float32 aD[13818];		
+		Float32 aE[13562];
+		Float32 aF[13046];
+		Float32 aG[11966];
+		Float32 aH[11130];
+		Float32 aI[10598];
+		Float32 aJ[9810];
+		Float32 aK[9522];
+		Float32 aL[8982];
+		Float32 aM[8786];
+		Float32 aN[8462];
+		Float32 aO[8310];
+		Float32 aP[7982];
+		Float32 aQ[7322];
+		Float32 aR[6818];
+		Float32 aS[6506];
+		Float32 aT[6002];
+		Float32 aU[5838];
+		Float32 aV[5502];
+		Float32 aW[5010];
+		Float32 aX[4850];
+		Float32 aY[4296];
+		Float32 aZ[4180];
 	};
 	_dram* dram;
 };
@@ -140,35 +140,35 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
 	int allpasstemp;
-	Float64 avgtemp;
-	int stage = GetParameter( kParam_One ) * 27.0;
-	int damp = (1.0-GetParameter( kParam_Two )) * stage;
-	Float64 feedbacklevel = GetParameter( kParam_Three );
-	if (feedbacklevel <= 0.0625) feedbacklevel = 0.0;
-	if (feedbacklevel > 0.0625 && feedbacklevel <= 0.125) feedbacklevel = 0.0625; //-24db
-	if (feedbacklevel > 0.125 && feedbacklevel <= 0.25) feedbacklevel = 0.125; //-18db
-	if (feedbacklevel > 0.25 && feedbacklevel <= 0.5) feedbacklevel = 0.25; //-12db
-	if (feedbacklevel > 0.5 && feedbacklevel <= 0.99) feedbacklevel = 0.5; //-6db
-	if (feedbacklevel > 0.99) feedbacklevel = 1.0;
+	Float32 avgtemp;
+	int stage = GetParameter( kParam_One ) * 27.0f;
+	int damp = (1.0f-GetParameter( kParam_Two )) * stage;
+	Float32 feedbacklevel = GetParameter( kParam_Three );
+	if (feedbacklevel <= 0.0625f) feedbacklevel = 0.0f;
+	if (feedbacklevel > 0.0625f && feedbacklevel <= 0.125f) feedbacklevel = 0.0625f; //-24db
+	if (feedbacklevel > 0.125f && feedbacklevel <= 0.25f) feedbacklevel = 0.125f; //-18db
+	if (feedbacklevel > 0.25f && feedbacklevel <= 0.5f) feedbacklevel = 0.25f; //-12db
+	if (feedbacklevel > 0.5f && feedbacklevel <= 0.99f) feedbacklevel = 0.5f; //-6db
+	if (feedbacklevel > 0.99f) feedbacklevel = 1.0f;
 	//we're forcing even the feedback level to be Midiverb-ized
-	Float64 gain = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 gain = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		
 		cycle++;
@@ -186,390 +186,390 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				case 26:
 					allpasstemp = alpA - 1;
 					if (allpasstemp < 0 || allpasstemp > delayA) {allpasstemp = delayA;}
-					inputSample -= dram->aA[allpasstemp]*0.5;
+					inputSample -= dram->aA[allpasstemp]*0.5f;
 					dram->aA[alpA] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpA--; if (alpA < 0 || alpA > delayA) {alpA = delayA;}
 					inputSample += (dram->aA[alpA]);
 					if (damp > 26) {
 						avgtemp = inputSample;
 						inputSample += avgA;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgA = avgtemp;
 					}
 					//allpass filter A		
 				case 25:
 					allpasstemp = alpB - 1;
 					if (allpasstemp < 0 || allpasstemp > delayB) {allpasstemp = delayB;}
-					inputSample -= dram->aB[allpasstemp]*0.5;
+					inputSample -= dram->aB[allpasstemp]*0.5f;
 					dram->aB[alpB] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpB--; if (alpB < 0 || alpB > delayB) {alpB = delayB;}
 					inputSample += (dram->aB[alpB]);
 					if (damp > 25) {
 						avgtemp = inputSample;
 						inputSample += avgB;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgB = avgtemp;
 					}
 					//allpass filter B
 				case 24:
 					allpasstemp = alpC - 1;
 					if (allpasstemp < 0 || allpasstemp > delayC) {allpasstemp = delayC;}
-					inputSample -= dram->aC[allpasstemp]*0.5;
+					inputSample -= dram->aC[allpasstemp]*0.5f;
 					dram->aC[alpC] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpC--; if (alpC < 0 || alpC > delayC) {alpC = delayC;}
 					inputSample += (dram->aC[alpC]);
 					if (damp > 24) {
 						avgtemp = inputSample;
 						inputSample += avgC;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgC = avgtemp;
 					}
 					//allpass filter C
 				case 23:
 					allpasstemp = alpD - 1;
 					if (allpasstemp < 0 || allpasstemp > delayD) {allpasstemp = delayD;}
-					inputSample -= dram->aD[allpasstemp]*0.5;
+					inputSample -= dram->aD[allpasstemp]*0.5f;
 					dram->aD[alpD] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpD--; if (alpD < 0 || alpD > delayD) {alpD = delayD;}
 					inputSample += (dram->aD[alpD]);
 					if (damp > 23) {
 						avgtemp = inputSample;
 						inputSample += avgD;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgD = avgtemp;
 					}
 					//allpass filter D
 				case 22:
 					allpasstemp = alpE - 1;
 					if (allpasstemp < 0 || allpasstemp > delayE) {allpasstemp = delayE;}
-					inputSample -= dram->aE[allpasstemp]*0.5;
+					inputSample -= dram->aE[allpasstemp]*0.5f;
 					dram->aE[alpE] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpE--; if (alpE < 0 || alpE > delayE) {alpE = delayE;}
 					inputSample += (dram->aE[alpE]);
 					if (damp > 22) {
 						avgtemp = inputSample;
 						inputSample += avgE;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgE = avgtemp;
 					}
 					//allpass filter E
 				case 21:
 					allpasstemp = alpF - 1;
 					if (allpasstemp < 0 || allpasstemp > delayF) {allpasstemp = delayF;}
-					inputSample -= dram->aF[allpasstemp]*0.5;
+					inputSample -= dram->aF[allpasstemp]*0.5f;
 					dram->aF[alpF] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpF--; if (alpF < 0 || alpF > delayF) {alpF = delayF;}
 					inputSample += (dram->aF[alpF]);
 					if (damp > 21) {
 						avgtemp = inputSample;
 						inputSample += avgF;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgF = avgtemp;
 					}
 					//allpass filter F
 				case 20:
 					allpasstemp = alpG - 1;
 					if (allpasstemp < 0 || allpasstemp > delayG) {allpasstemp = delayG;}
-					inputSample -= dram->aG[allpasstemp]*0.5;
+					inputSample -= dram->aG[allpasstemp]*0.5f;
 					dram->aG[alpG] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpG--; if (alpG < 0 || alpG > delayG) {alpG = delayG;}
 					inputSample += (dram->aG[alpG]);
 					if (damp > 20) {
 						avgtemp = inputSample;
 						inputSample += avgG;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgG = avgtemp;
 					}
 					//allpass filter G
 				case 19:
 					allpasstemp = alpH - 1;
 					if (allpasstemp < 0 || allpasstemp > delayH) {allpasstemp = delayH;}
-					inputSample -= dram->aH[allpasstemp]*0.5;
+					inputSample -= dram->aH[allpasstemp]*0.5f;
 					dram->aH[alpH] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpH--; if (alpH < 0 || alpH > delayH) {alpH = delayH;}
 					inputSample += (dram->aH[alpH]);
 					if (damp > 19) {
 						avgtemp = inputSample;
 						inputSample += avgH;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgH = avgtemp;
 					}
 					//allpass filter H
 				case 18:
 					allpasstemp = alpI - 1;
 					if (allpasstemp < 0 || allpasstemp > delayI) {allpasstemp = delayI;}
-					inputSample -= dram->aI[allpasstemp]*0.5;
+					inputSample -= dram->aI[allpasstemp]*0.5f;
 					dram->aI[alpI] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpI--; if (alpI < 0 || alpI > delayI) {alpI = delayI;}
 					inputSample += (dram->aI[alpI]);
 					if (damp > 18) {
 						avgtemp = inputSample;
 						inputSample += avgI;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgI = avgtemp;
 					}
 					//allpass filter I
 				case 17:
 					allpasstemp = alpJ - 1;
 					if (allpasstemp < 0 || allpasstemp > delayJ) {allpasstemp = delayJ;}
-					inputSample -= dram->aJ[allpasstemp]*0.5;
+					inputSample -= dram->aJ[allpasstemp]*0.5f;
 					dram->aJ[alpJ] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpJ--; if (alpJ < 0 || alpJ > delayJ) {alpJ = delayJ;}
 					inputSample += (dram->aJ[alpJ]);
 					if (damp > 17) {
 						avgtemp = inputSample;
 						inputSample += avgJ;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgJ = avgtemp;
 					}
 					//allpass filter J
 				case 16:
 					allpasstemp = alpK - 1;
 					if (allpasstemp < 0 || allpasstemp > delayK) {allpasstemp = delayK;}
-					inputSample -= dram->aK[allpasstemp]*0.5;
+					inputSample -= dram->aK[allpasstemp]*0.5f;
 					dram->aK[alpK] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpK--; if (alpK < 0 || alpK > delayK) {alpK = delayK;}
 					inputSample += (dram->aK[alpK]);
 					if (damp > 16) {
 						avgtemp = inputSample;
 						inputSample += avgK;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgK = avgtemp;
 					}
 					//allpass filter K
 				case 15:
 					allpasstemp = alpL - 1;
 					if (allpasstemp < 0 || allpasstemp > delayL) {allpasstemp = delayL;}
-					inputSample -= dram->aL[allpasstemp]*0.5;
+					inputSample -= dram->aL[allpasstemp]*0.5f;
 					dram->aL[alpL] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpL--; if (alpL < 0 || alpL > delayL) {alpL = delayL;}
 					inputSample += (dram->aL[alpL]);
 					if (damp > 15) {
 						avgtemp = inputSample;
 						inputSample += avgL;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgL = avgtemp;
 					}
 					//allpass filter L
 				case 14:
 					allpasstemp = alpM - 1;
 					if (allpasstemp < 0 || allpasstemp > delayM) {allpasstemp = delayM;}
-					inputSample -= dram->aM[allpasstemp]*0.5;
+					inputSample -= dram->aM[allpasstemp]*0.5f;
 					dram->aM[alpM] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpM--; if (alpM < 0 || alpM > delayM) {alpM = delayM;}
 					inputSample += (dram->aM[alpM]);
 					if (damp > 14) {
 						avgtemp = inputSample;
 						inputSample += avgM;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgM = avgtemp;
 					}
 					//allpass filter M
 				case 13:
 					allpasstemp = alpN - 1;
 					if (allpasstemp < 0 || allpasstemp > delayN) {allpasstemp = delayN;}
-					inputSample -= dram->aN[allpasstemp]*0.5;
+					inputSample -= dram->aN[allpasstemp]*0.5f;
 					dram->aN[alpN] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpN--; if (alpN < 0 || alpN > delayN) {alpN = delayN;}
 					inputSample += (dram->aN[alpN]);
 					if (damp > 13) {
 						avgtemp = inputSample;
 						inputSample += avgN;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgN = avgtemp;
 					}
 					//allpass filter N
 				case 12:
 					allpasstemp = alpO - 1;
 					if (allpasstemp < 0 || allpasstemp > delayO) {allpasstemp = delayO;}
-					inputSample -= dram->aO[allpasstemp]*0.5;
+					inputSample -= dram->aO[allpasstemp]*0.5f;
 					dram->aO[alpO] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpO--; if (alpO < 0 || alpO > delayO) {alpO = delayO;}
 					inputSample += (dram->aO[alpO]);
 					if (damp > 12) {
 						avgtemp = inputSample;
 						inputSample += avgO;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgO = avgtemp;
 					}
 					//allpass filter O
 				case 11:
 					allpasstemp = alpP - 1;
 					if (allpasstemp < 0 || allpasstemp > delayP) {allpasstemp = delayP;}
-					inputSample -= dram->aP[allpasstemp]*0.5;
+					inputSample -= dram->aP[allpasstemp]*0.5f;
 					dram->aP[alpP] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpP--; if (alpP < 0 || alpP > delayP) {alpP = delayP;}
 					inputSample += (dram->aP[alpP]);
 					if (damp > 11) {
 						avgtemp = inputSample;
 						inputSample += avgP;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgP = avgtemp;
 					}
 					//allpass filter P
 				case 10:
 					allpasstemp = alpQ - 1;
 					if (allpasstemp < 0 || allpasstemp > delayQ) {allpasstemp = delayQ;}
-					inputSample -= dram->aQ[allpasstemp]*0.5;
+					inputSample -= dram->aQ[allpasstemp]*0.5f;
 					dram->aQ[alpQ] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpQ--; if (alpQ < 0 || alpQ > delayQ) {alpQ = delayQ;}
 					inputSample += (dram->aQ[alpQ]);
 					if (damp > 10) {
 						avgtemp = inputSample;
 						inputSample += avgQ;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgQ = avgtemp;
 					}
 					//allpass filter Q
 				case 9:
 					allpasstemp = alpR - 1;
 					if (allpasstemp < 0 || allpasstemp > delayR) {allpasstemp = delayR;}
-					inputSample -= dram->aR[allpasstemp]*0.5;
+					inputSample -= dram->aR[allpasstemp]*0.5f;
 					dram->aR[alpR] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpR--; if (alpR < 0 || alpR > delayR) {alpR = delayR;}
 					inputSample += (dram->aR[alpR]);
 					if (damp > 9) {
 						avgtemp = inputSample;
 						inputSample += avgR;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgR = avgtemp;
 					}
 					//allpass filter R
 				case 8:
 					allpasstemp = alpS - 1;
 					if (allpasstemp < 0 || allpasstemp > delayS) {allpasstemp = delayS;}
-					inputSample -= dram->aS[allpasstemp]*0.5;
+					inputSample -= dram->aS[allpasstemp]*0.5f;
 					dram->aS[alpS] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpS--; if (alpS < 0 || alpS > delayS) {alpS = delayS;}
 					inputSample += (dram->aS[alpS]);
 					if (damp > 8) {
 						avgtemp = inputSample;
 						inputSample += avgS;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgS = avgtemp;
 					}
 					//allpass filter S
 				case 7:
 					allpasstemp = alpT - 1;
 					if (allpasstemp < 0 || allpasstemp > delayT) {allpasstemp = delayT;}
-					inputSample -= dram->aT[allpasstemp]*0.5;
+					inputSample -= dram->aT[allpasstemp]*0.5f;
 					dram->aT[alpT] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpT--; if (alpT < 0 || alpT > delayT) {alpT = delayT;}
 					inputSample += (dram->aT[alpT]);
 					if (damp > 7) {
 						avgtemp = inputSample;
 						inputSample += avgT;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgT = avgtemp;
 					}
 					//allpass filter T
 				case 6:
 					allpasstemp = alpU - 1;
 					if (allpasstemp < 0 || allpasstemp > delayU) {allpasstemp = delayU;}
-					inputSample -= dram->aU[allpasstemp]*0.5;
+					inputSample -= dram->aU[allpasstemp]*0.5f;
 					dram->aU[alpU] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpU--; if (alpU < 0 || alpU > delayU) {alpU = delayU;}
 					inputSample += (dram->aU[alpU]);
 					if (damp > 6) {
 						avgtemp = inputSample;
 						inputSample += avgU;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgU = avgtemp;
 					}
 					//allpass filter U
 				case 5:
 					allpasstemp = alpV - 1;
 					if (allpasstemp < 0 || allpasstemp > delayV) {allpasstemp = delayV;}
-					inputSample -= dram->aV[allpasstemp]*0.5;
+					inputSample -= dram->aV[allpasstemp]*0.5f;
 					dram->aV[alpV] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpV--; if (alpV < 0 || alpV > delayV) {alpV = delayV;}
 					inputSample += (dram->aV[alpV]);
 					if (damp > 5) {
 						avgtemp = inputSample;
 						inputSample += avgV;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgV = avgtemp;
 					}
 					//allpass filter V
 				case 4:
 					allpasstemp = alpW - 1;
 					if (allpasstemp < 0 || allpasstemp > delayW) {allpasstemp = delayW;}
-					inputSample -= dram->aW[allpasstemp]*0.5;
+					inputSample -= dram->aW[allpasstemp]*0.5f;
 					dram->aW[alpW] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpW--; if (alpW < 0 || alpW > delayW) {alpW = delayW;}
 					inputSample += (dram->aW[alpW]);
 					if (damp > 4) {
 						avgtemp = inputSample;
 						inputSample += avgW;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgW = avgtemp;
 					}
 					//allpass filter W
 				case 3:
 					allpasstemp = alpX - 1;
 					if (allpasstemp < 0 || allpasstemp > delayX) {allpasstemp = delayX;}
-					inputSample -= dram->aX[allpasstemp]*0.5;
+					inputSample -= dram->aX[allpasstemp]*0.5f;
 					dram->aX[alpX] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpX--; if (alpX < 0 || alpX > delayX) {alpX = delayX;}
 					inputSample += (dram->aX[alpX]);
 					if (damp > 3) {
 						avgtemp = inputSample;
 						inputSample += avgX;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgX = avgtemp;
 					}
 					//allpass filter X
 				case 2:
 					allpasstemp = alpY - 1;
 					if (allpasstemp < 0 || allpasstemp > delayY) {allpasstemp = delayY;}
-					inputSample -= dram->aY[allpasstemp]*0.5;
+					inputSample -= dram->aY[allpasstemp]*0.5f;
 					dram->aY[alpY] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpY--; if (alpY < 0 || alpY > delayY) {alpY = delayY;}
 					inputSample += (dram->aY[alpY]);
 					if (damp > 2) {
 						avgtemp = inputSample;
 						inputSample += avgY;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgY = avgtemp;
 					}
 					//allpass filter Y
 				case 1:
 					allpasstemp = alpZ - 1;
 					if (allpasstemp < 0 || allpasstemp > delayZ) {allpasstemp = delayZ;}
-					inputSample -= dram->aZ[allpasstemp]*0.5;
+					inputSample -= dram->aZ[allpasstemp]*0.5f;
 					dram->aZ[alpZ] = inputSample;
-					inputSample *= 0.5;
+					inputSample *= 0.5f;
 					alpZ--; if (alpZ < 0 || alpZ > delayZ) {alpZ = delayZ;}
 					inputSample += (dram->aZ[alpZ]);
 					if (damp > 1) {
 						avgtemp = inputSample;
 						inputSample += avgZ;
-						inputSample *= 0.5;
+						inputSample *= 0.5f;
 						avgZ = avgtemp;
 					}
 					//allpass filter Z
@@ -577,13 +577,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			
 			feedback = inputSample * feedbacklevel;
 			
-			if (gain != 1.0) {
+			if (gain != 1.0f) {
 				inputSample *= gain;
 			}
 			//we can pad with the gain to tame distortyness from the PurestConsole code
 			
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			//without this, you can get a NaN condition where it spits out DC offset at full blast!
 			
 			inputSample = asin(inputSample);
@@ -616,8 +616,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		

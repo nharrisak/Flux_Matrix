@@ -23,7 +23,7 @@ static const uint8_t page1[] = {
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
 
-	double demotimer;
+	float demotimer;
 	uint32_t fpd;
 
 	struct _dram {
@@ -34,24 +34,24 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
 		
-		double duck = 0.0;
-		demotimer -= (1.0/overallscale);
+		float duck = 0.0f;
+		demotimer -= (1.0f/overallscale);
 		
-		if (demotimer < 441.0) duck = 1.0 - (demotimer/441.0);
-		if (demotimer > 44100.0) duck = ((demotimer-44100.0)/441.0);
-		if (duck > 1.0) duck = 1.0; duck = sin((1.0-duck)*1.57);
+		if (demotimer < 441.0f) duck = 1.0f - (demotimer/441.0f);
+		if (demotimer > 44100.0f) duck = ((demotimer-44100.0f)/441.0f);
+		if (duck > 1.0f) duck = 1.0f; duck = sin((1.0f-duck)*1.57f);
 		
-		if ((demotimer < 1) || (demotimer > 441000.0)) {
-			double randy = (double(fpd)/(double)UINT32_MAX); //0 to 1 the noise, may not be needed		
-			demotimer = 100000.0*(randy+2.0);
+		if ((demotimer < 1) || (demotimer > 441000.0f)) {
+			float randy = (float(fpd)/(float)UINT32_MAX); //0 to 1 the noise, may not be needed		
+			demotimer = 100000.0f*(randy+2.0f);
 		}
 		
 		inputSampleL *= duck;

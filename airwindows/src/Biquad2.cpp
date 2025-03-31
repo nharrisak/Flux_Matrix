@@ -37,18 +37,18 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquad[11];
-		Float64 b[11];
-		Float64 f[11];		
-		Float64 frequencychase;
-		Float64 resonancechase;
-		Float64 outputchase;
-		Float64 wetchase;
-		Float64 frequencysetting;
-		Float64 resonancesetting;
-		Float64 outputsetting;
-		Float64 wetsetting;
-		Float64 chasespeed;
+		float biquad[11];
+		Float32 b[11];
+		Float32 f[11];		
+		Float32 frequencychase;
+		Float32 resonancechase;
+		Float32 outputchase;
+		Float32 wetchase;
+		Float32 frequencysetting;
+		Float32 resonancesetting;
+		Float32 outputsetting;
+		Float32 wetsetting;
+		Float32 chasespeed;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -65,24 +65,24 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int type = GetParameter( kParam_One);
-	Float64 average = GetParameter( kParam_Two );
-	Float64 frequencytarget = average*0.39; //biquad[0], goes to 1.0
+	Float32 average = GetParameter( kParam_Two );
+	Float32 frequencytarget = average*0.39f; //biquad[0], goes to 1.0f
 	frequencytarget /= overallscale;
-	if (frequencytarget < 0.0015/overallscale) frequencytarget = 0.0015/overallscale;
-    Float64 resonancetarget = GetParameter( kParam_Three ); //biquad[1], goes to 50.0
-	if (resonancetarget < 1.0) resonancetarget = 1.0;
-	Float64 outputtarget = GetParameter( kParam_Four ); //scaled to res
+	if (frequencytarget < 0.0015f/overallscale) frequencytarget = 0.0015f/overallscale;
+    Float32 resonancetarget = GetParameter( kParam_Three ); //biquad[1], goes to 50.0f
+	if (resonancetarget < 1.0f) resonancetarget = 1.0f;
+	Float32 outputtarget = GetParameter( kParam_Four ); //scaled to res
 	if (type < 3) outputtarget /= sqrt(resonancetarget);
-	Float64 wettarget = GetParameter( kParam_Five ); //wet, goes -1.0 to 1.0
+	Float32 wettarget = GetParameter( kParam_Five ); //wet, goes -1.0f to 1.0f
 	
 	//biquad contains these values:
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
 	//[2] is a0 but you need distinct ones for additional biquad instances so it's here
 	//[3] is a1 but you need distinct ones for additional biquad instances so it's here
 	//[4] is a2 but you need distinct ones for additional biquad instances so it's here
@@ -92,28 +92,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//[8] is a stored delayed sample (you have to include the coefficient making code if you do that)
 	//[9] is a stored delayed sample (you have to include the coefficient making code if you do that)
 	//[10] is a stored delayed sample (you have to include the coefficient making code if you do that)
-	Float64 K = tan(M_PI * biquad[0]);
-	Float64 norm = 1.0 / (1.0 + K / biquad[1] + K * K);
+	Float32 K = tan(M_PI * biquad[0]);
+	Float32 norm = 1.0f / (1.0f + K / biquad[1] + K * K);
 	//finished setting up biquad
 	
-	average = (1.0-average)*10.0; //max taps is 10, and low settings use more
+	average = (1.0f-average)*10.0f; //max taps is 10, and low settings use more
 	
-	if (type == 1 || type == 3) average = 1.0;
+	if (type == 1 || type == 3) average = 1.0f;
 	
-	Float64 gain = average;
-	if (gain > 1.0) {f[0] = 1.0; gain -= 1.0;} else {f[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[1] = 1.0; gain -= 1.0;} else {f[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[2] = 1.0; gain -= 1.0;} else {f[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[3] = 1.0; gain -= 1.0;} else {f[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[4] = 1.0; gain -= 1.0;} else {f[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[5] = 1.0; gain -= 1.0;} else {f[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[6] = 1.0; gain -= 1.0;} else {f[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[7] = 1.0; gain -= 1.0;} else {f[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[8] = 1.0; gain -= 1.0;} else {f[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {f[9] = 1.0; gain -= 1.0;} else {f[9] = gain; gain = 0.0;}
+	Float32 gain = average;
+	if (gain > 1.0f) {f[0] = 1.0f; gain -= 1.0f;} else {f[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[1] = 1.0f; gain -= 1.0f;} else {f[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[2] = 1.0f; gain -= 1.0f;} else {f[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[3] = 1.0f; gain -= 1.0f;} else {f[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[4] = 1.0f; gain -= 1.0f;} else {f[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[5] = 1.0f; gain -= 1.0f;} else {f[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[6] = 1.0f; gain -= 1.0f;} else {f[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[7] = 1.0f; gain -= 1.0f;} else {f[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[8] = 1.0f; gain -= 1.0f;} else {f[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {f[9] = 1.0f; gain -= 1.0f;} else {f[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
 	
-	if (average < 1.0) average = 1.0;
+	if (average < 1.0f) average = 1.0f;
 	f[0] /= average;
 	f[1] /= average;
 	f[2] /= average;
@@ -128,62 +128,62 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//finished setting up average
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = *sourceP;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = *sourceP;
 		
-		Float64 chasespeed = 50000;
+		Float32 chasespeed = 50000;
 		if (frequencychase < frequencytarget) chasespeed = 500000;
 		chasespeed /= resonancechase;
 		chasespeed *= overallscale;
 		
-		frequencychase = (((frequencychase*chasespeed)+frequencytarget)/(chasespeed+1.0));
+		frequencychase = (((frequencychase*chasespeed)+frequencytarget)/(chasespeed+1.0f));
 		
-		Float64 fasterchase = 1000 * overallscale;		
-		resonancechase = (((resonancechase*fasterchase)+resonancetarget)/(fasterchase+1.0));
-		outputchase = (((outputchase*fasterchase)+outputtarget)/(fasterchase+1.0));
-		wetchase = (((wetchase*fasterchase)+wettarget)/(fasterchase+1.0));
+		Float32 fasterchase = 1000 * overallscale;		
+		resonancechase = (((resonancechase*fasterchase)+resonancetarget)/(fasterchase+1.0f));
+		outputchase = (((outputchase*fasterchase)+outputtarget)/(fasterchase+1.0f));
+		wetchase = (((wetchase*fasterchase)+wettarget)/(fasterchase+1.0f));
 		if (biquad[0] != frequencychase) {biquad[0] = frequencychase; K = tan(M_PI * biquad[0]);}
-		if (biquad[1] != resonancechase) {biquad[1] = resonancechase; norm = 1.0 / (1.0 + K / biquad[1] + K * K);}
+		if (biquad[1] != resonancechase) {biquad[1] = resonancechase; norm = 1.0f / (1.0f + K / biquad[1] + K * K);}
 		
 		if (type == 1) { //lowpass
 			biquad[2] = K * K * norm;
-			biquad[3] = 2.0 * biquad[2];
+			biquad[3] = 2.0f * biquad[2];
 			biquad[4] = biquad[2];
-			biquad[5] = 2.0 * (K * K - 1.0) * norm;
+			biquad[5] = 2.0f * (K * K - 1.0f) * norm;
 		}
 		
 		if (type == 2) { //highpass
 			biquad[2] = norm;
-			biquad[3] = -2.0 * biquad[2];
+			biquad[3] = -2.0f * biquad[2];
 			biquad[4] = biquad[2];
-			biquad[5] = 2.0 * (K * K - 1.0) * norm;
+			biquad[5] = 2.0f * (K * K - 1.0f) * norm;
 		}
 		
 		if (type == 3) { //bandpass
 			biquad[2] = K / biquad[1] * norm;
-			biquad[3] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+			biquad[3] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 			biquad[4] = -biquad[2];
-			biquad[5] = 2.0 * (K * K - 1.0) * norm;
+			biquad[5] = 2.0f * (K * K - 1.0f) * norm;
 		}
 		
 		if (type == 4) { //notch
-			biquad[2] = (1.0 + K * K) * norm;
-			biquad[3] = 2.0 * (K * K - 1) * norm;
+			biquad[2] = (1.0f + K * K) * norm;
+			biquad[3] = 2.0f * (K * K - 1) * norm;
 			biquad[4] = biquad[2];
 			biquad[5] = biquad[3];
 		}
 		
-		biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+		biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 				
 		inputSample = sin(inputSample);
 		//encode Console5: good cleanness
 				
-		double outSample = biquad[2]*inputSample+biquad[3]*biquad[7]+biquad[4]*biquad[8]-biquad[5]*biquad[9]-biquad[6]*biquad[10];
+		float outSample = biquad[2]*inputSample+biquad[3]*biquad[7]+biquad[4]*biquad[8]-biquad[5]*biquad[9]-biquad[6]*biquad[10];
 		biquad[8] = biquad[7]; biquad[7] = inputSample; inputSample = outSample; biquad[10] = biquad[9]; biquad[9] = inputSample; //DF1
 				
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 			
 		b[9] = b[8]; b[8] = b[7]; b[7] = b[6]; b[6] = b[5];
 		b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1];
@@ -200,28 +200,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += (b[8] * f[8]);
 		inputSample += (b[9] * f[9]); //intense averaging on deeper cutoffs
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//and then Console5 will spit out overs if you let it
 		
-		if (outputchase < 1.0) {
+		if (outputchase < 1.0f) {
 			inputSample *= outputchase;
 		}
 		
-		if (wetchase < 1.0) {
-			inputSample = (inputSample*wetchase) + (drySample*(1.0-fabs(wetchase)));
+		if (wetchase < 1.0f) {
+			inputSample = (inputSample*wetchase) + (drySample*(1.0f-fabs(wetchase)));
 			//inv/dry/wet lets us turn LP into HP and band into notch
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

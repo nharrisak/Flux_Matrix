@@ -36,12 +36,12 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 fpNShapeA;
-		Float64 fpNShapeB;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 fpNShapeA;
+		Float32 fpNShapeB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		bool flip;
-		Float64 lastSample;
+		Float32 lastSample;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -58,25 +58,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int console = (int) GetParameter( kParam_One );
-	Float64 density = pow(GetParameter( kParam_Two )/100.0,2);
-	double bridgerectifier;
-	Float64 iirAmount = 0.005832;
-	Float64 threshold = 0.33362176;
-	Float64 clamp;
-	double inputSample;
+	Float32 density = pow(GetParameter( kParam_Two )/100.0f,2);
+	float bridgerectifier;
+	Float32 iirAmount = 0.005832f;
+	Float32 threshold = 0.33362176f;
+	Float32 clamp;
+	float inputSample;
 	Float32 fpTemp;
-	Float64 fpOld = 0.618033988749894848204586; //golden ratio!
-	Float64 fpNew = 1.0 - fpOld;
+	Float32 fpOld = 0.618033988749894848204586f; //golden ratio!
+	Float32 fpNew = 1.0f - fpOld;
 	
 	switch (console)
 	{
-		case 1: iirAmount = 0.005832; threshold = 0.33362176; break; //Neve
-		case 2: iirAmount = 0.004096; threshold = 0.59969536; break; //API
-		case 3: iirAmount = 0.004913; threshold = 0.84934656; break; //SSL
+		case 1: iirAmount = 0.005832f; threshold = 0.33362176f; break; //Neve
+		case 2: iirAmount = 0.004096f; threshold = 0.59969536f; break; //API
+		case 3: iirAmount = 0.004913f; threshold = 0.84934656f; break; //SSL
 	}
 	iirAmount /= overallscale;
 	threshold /= overallscale; //now with 96K AND working selector!
@@ -95,8 +95,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputSample = inputSample - iirSampleB;
 		}
 		//highpass section
-		bridgerectifier = fabs(inputSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		bridgerectifier = fabs(inputSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		if (inputSample > 0) inputSample = (inputSample*(1-density))+(bridgerectifier*density);
 		else inputSample = (inputSample*(1-density))-(bridgerectifier*density);

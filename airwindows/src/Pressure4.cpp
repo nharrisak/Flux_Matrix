@@ -31,13 +31,13 @@ kParam0, kParam1, kParam2, kParam3, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		Float64 muVary;
-		Float64 muAttack;
-		Float64 muNewSpeed;
-		Float64 muSpeedA;
-		Float64 muSpeedB;
-		Float64 muCoefficientA;
-		Float64 muCoefficientB;
+		Float32 muVary;
+		Float32 muAttack;
+		Float32 muNewSpeed;
+		Float32 muSpeedA;
+		Float32 muSpeedB;
+		Float32 muCoefficientA;
+		Float32 muCoefficientB;
 	uint32_t fpdL;
 	uint32_t fpdR;
 	bool flip;
@@ -54,44 +54,44 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	
 	UInt32 nSampleFrames = inFramesToProcess;
 //	const Float32 *sourceP = inSourceP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 //	Float32 *destP = inDestP;
-	Float64 threshold = 1.0 - (GetParameter( kParam_One ) * 0.95);
-	Float64 muMakeupGain = 1.0 / threshold;
+	Float32 threshold = 1.0f - (GetParameter( kParam_One ) * 0.95f);
+	Float32 muMakeupGain = 1.0f / threshold;
 	//gain settings around threshold
-	Float64 release = pow((1.28-GetParameter( kParam_Two )),5)*32768.0;
+	Float32 release = pow((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
 	release /= overallscale;
-	Float64 fastest = sqrt(release);
+	Float32 fastest = sqrt(release);
 	//speed settings around release
-	double bridgerectifier;
-	Float64 coefficient;
-	Float64 inputSense;
-	Float64 mewiness = GetParameter( kParam_Three );
-	Float64 outputGain = GetParameter( kParam_Four );
-	Float64 unmewiness;
+	float bridgerectifier;
+	Float32 coefficient;
+	Float32 inputSense;
+	Float32 mewiness = GetParameter( kParam_Three );
+	Float32 outputGain = GetParameter( kParam_Four );
+	Float32 unmewiness;
 	bool positivemu;
 	if (mewiness >= 0)
 	{
 		positivemu = true;
-		unmewiness = 1.0-mewiness;
+		unmewiness = 1.0f-mewiness;
 	}
 	else
 	{
 		positivemu = false;
 		mewiness = -mewiness;
-		unmewiness = 1.0-mewiness;
+		unmewiness = 1.0f-mewiness;
 	}
 	// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
-	double inputSampleL;
-	double inputSampleR;
+	float inputSampleL;
+	float inputSampleR;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 
 		inputSampleL = inputSampleL * muMakeupGain;
 		inputSampleR = inputSampleR * muMakeupGain;
@@ -108,7 +108,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			{
 				muVary = threshold / inputSense;
 				muAttack = sqrt(fabs(muSpeedA));
-				muCoefficientA = muCoefficientA * (muAttack-1.0);
+				muCoefficientA = muCoefficientA * (muAttack-1.0f);
 				if (muVary < threshold)
 				{
 					muCoefficientA = muCoefficientA + threshold;
@@ -121,8 +121,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			else
 			{
-				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-				muCoefficientA = muCoefficientA + 1.0;
+				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+				muCoefficientA = muCoefficientA + 1.0f;
 				muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 			}
 			muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -148,8 +148,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			else
 			{
-				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-				muCoefficientB = muCoefficientB + 1.0;
+				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+				muCoefficientB = muCoefficientB + 1.0f;
 				muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 			}
 			muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -177,19 +177,19 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//applied compression with vari-vari-µ-µ-µ-µ-µ-µ-is-the-kitten-song o/~
 		//applied gain correction to control output level- tends to constrain sound rather than inflate it
 		
-		if (outputGain != 1.0) {
+		if (outputGain != 1.0f) {
 			inputSampleL *= outputGain;
 			inputSampleR *= outputGain;
 		}		
 		
 		bridgerectifier = fabs(inputSampleL);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		if (inputSampleL > 0){inputSampleL = bridgerectifier;}
 		else {inputSampleL = -bridgerectifier;}
 		//second stage of overdrive to prevent overs and allow bloody loud extremeness
 		bridgerectifier = fabs(inputSampleR);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		if (inputSampleR > 0){inputSampleR = bridgerectifier;}
 		else {inputSampleR = -bridgerectifier;}
@@ -200,10 +200,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

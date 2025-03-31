@@ -35,73 +35,73 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 ataLast6Sample;
-		Float64 ataLast5Sample;
-		Float64 ataLast4Sample;
-		Float64 ataLast3Sample;
-		Float64 ataLast2Sample;
-		Float64 ataLast1Sample;
-		Float64 ataHalfwaySample;
-		Float64 ataHalfDrySample;
-		Float64 ataHalfDiffSample;
-		Float64 ataLastDiffSample;
-		Float64 ataDrySample;
-		Float64 ataDiffSample;
-		Float64 ataPrevDiffSample;
-		Float64 ataK1;
-		Float64 ataK2;
-		Float64 ataK3;
-		Float64 ataK4;
-		Float64 ataK5;
-		Float64 ataK6;
-		Float64 ataK7;
-		Float64 ataK8; //end antialiasing variables
+		Float32 ataLast6Sample;
+		Float32 ataLast5Sample;
+		Float32 ataLast4Sample;
+		Float32 ataLast3Sample;
+		Float32 ataLast2Sample;
+		Float32 ataLast1Sample;
+		Float32 ataHalfwaySample;
+		Float32 ataHalfDrySample;
+		Float32 ataHalfDiffSample;
+		Float32 ataLastDiffSample;
+		Float32 ataDrySample;
+		Float32 ataDiffSample;
+		Float32 ataPrevDiffSample;
+		Float32 ataK1;
+		Float32 ataK2;
+		Float32 ataK3;
+		Float32 ataK4;
+		Float32 ataK5;
+		Float32 ataK6;
+		Float32 ataK7;
+		Float32 ataK8; //end antialiasing variables
 		
-		Float64 iirDriveSampleA;
-		Float64 iirDriveSampleB;
-		Float64 iirDriveSampleC;
-		Float64 iirDriveSampleD;
-		Float64 iirDriveSampleE;
-		Float64 iirDriveSampleF;
+		Float32 iirDriveSampleA;
+		Float32 iirDriveSampleB;
+		Float32 iirDriveSampleC;
+		Float32 iirDriveSampleD;
+		Float32 iirDriveSampleE;
+		Float32 iirDriveSampleF;
 		bool flip; //drive things
 		
 		int bflip;
 		bool WasNegative;
 		bool SubOctave;
-		Float64 iirHeadBumpA;
-		Float64 iirHeadBumpB;
-		Float64 iirHeadBumpC;
+		Float32 iirHeadBumpA;
+		Float32 iirHeadBumpB;
+		Float32 iirHeadBumpC;
 		
-		Float64 iirSubBumpA;
-		Float64 iirSubBumpB;
-		Float64 iirSubBumpC;
+		Float32 iirSubBumpA;
+		Float32 iirSubBumpB;
+		Float32 iirSubBumpC;
 				
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		Float64 iirSampleG;
-		Float64 iirSampleH;
-		Float64 iirSampleI;
-		Float64 iirSampleJ;
-		Float64 iirSampleK;
-		Float64 iirSampleL;
-		Float64 iirSampleM;
-		Float64 iirSampleN;
-		Float64 iirSampleO;
-		Float64 iirSampleP;
-		Float64 iirSampleQ;
-		Float64 iirSampleR;
-		Float64 iirSampleS;
-		Float64 iirSampleT;
-		Float64 iirSampleU;
-		Float64 iirSampleV;
-		Float64 iirSampleW;
-		Float64 iirSampleX;
-		Float64 iirSampleY;
-		Float64 iirSampleZ;		
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		Float32 iirSampleG;
+		Float32 iirSampleH;
+		Float32 iirSampleI;
+		Float32 iirSampleJ;
+		Float32 iirSampleK;
+		Float32 iirSampleL;
+		Float32 iirSampleM;
+		Float32 iirSampleN;
+		Float32 iirSampleO;
+		Float32 iirSampleP;
+		Float32 iirSampleQ;
+		Float32 iirSampleR;
+		Float32 iirSampleS;
+		Float32 iirSampleT;
+		Float32 iirSampleU;
+		Float32 iirSampleV;
+		Float32 iirSampleW;
+		Float32 iirSampleX;
+		Float32 iirSampleY;
+		Float32 iirSampleZ;		
 		
 		uint32_t fpd;
 	
@@ -119,44 +119,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 contHigh = GetParameter( kParam_One );
-	Float64 dry = GetParameter( kParam_Two );
-	Float64 contDub = GetParameter( kParam_Three )*1.3;
-	Float64 contSub = GetParameter( kParam_Four )/2.0;
+	Float32 contHigh = GetParameter( kParam_One );
+	Float32 dry = GetParameter( kParam_Two );
+	Float32 contDub = GetParameter( kParam_Three )*1.3f;
+	Float32 contSub = GetParameter( kParam_Four )/2.0f;
 	
-	Float64 driveone = pow(contHigh*3.0,2);
-	Float64 driveoutput = contHigh;
-	Float64 iirAmount = 0.344/overallscale;
-	Float64 altAmount = 1.0 - iirAmount;	
-	Float64 BassGain = contDub * 0.1;
-	Float64 HeadBumpFreq = (BassGain+0.0001)/overallscale;
-	Float64 BassOutGain = contDub * 0.2;
-	Float64 SubGain = contSub * 0.1;
-	Float64 SubBumpFreq = (SubGain+0.0001)/overallscale;
-	Float64 SubOutGain = contSub * 0.3;
-	Float64 iirHPAmount = 0.0000014/overallscale;
-	Float64 altHPAmount = 1.0 - iirHPAmount;
+	Float32 driveone = pow(contHigh*3.0f,2);
+	Float32 driveoutput = contHigh;
+	Float32 iirAmount = 0.344f/overallscale;
+	Float32 altAmount = 1.0f - iirAmount;	
+	Float32 BassGain = contDub * 0.1f;
+	Float32 HeadBumpFreq = (BassGain+0.0001f)/overallscale;
+	Float32 BassOutGain = contDub * 0.2f;
+	Float32 SubGain = contSub * 0.1f;
+	Float32 SubBumpFreq = (SubGain+0.0001f)/overallscale;
+	Float32 SubOutGain = contSub * 0.3f;
+	Float32 iirHPAmount = 0.0000014f/overallscale;
+	Float32 altHPAmount = 1.0f - iirHPAmount;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		ataDrySample = inputSample = *sourceP;
-		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + (ataLast2Sample*ataK1) + (ataLast3Sample*ataK2) + (ataLast4Sample*ataK6) + (ataLast5Sample*ataK7) + (ataLast6Sample*ataK8)) / 2.0;
+		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + (ataLast2Sample*ataK1) + (ataLast3Sample*ataK2) + (ataLast4Sample*ataK6) + (ataLast5Sample*ataK7) + (ataLast6Sample*ataK8)) / 2.0f;
 		ataLast6Sample = ataLast5Sample; ataLast5Sample = ataLast4Sample; ataLast4Sample = ataLast3Sample; ataLast3Sample = ataLast2Sample; ataLast2Sample = ataLast1Sample; ataLast1Sample = inputSample;
 		//setting up oversampled special antialiasing
 		
-		Float64 correction;
-		Float64 subtractSample;
-		Float64 tempSample; //used repeatedly in different places
+		Float32 correction;
+		Float32 subtractSample;
+		Float32 tempSample; //used repeatedly in different places
 		
 		//begin first half- change inputSample -> ataHalfwaySample, ataDrySample -> ataHalfDrySample
 		
-		Float64 ataHalfwayLowpass;
+		Float32 ataHalfwayLowpass;
 		if (flip)
 		{
 			tempSample = subtractSample = ataHalfwaySample;
@@ -176,25 +176,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			ataHalfwayLowpass = subtractSample - ataHalfwaySample;
 		}
 		//highpass section
-		if (ataHalfwaySample > 1.0) {ataHalfwaySample = 1.0;}
-		if (ataHalfwaySample < -1.0) {ataHalfwaySample = -1.0;}
-		Float64 out = driveone;
-		while (out > 0.60)
+		if (ataHalfwaySample > 1.0f) {ataHalfwaySample = 1.0f;}
+		if (ataHalfwaySample < -1.0f) {ataHalfwaySample = -1.0f;}
+		Float32 out = driveone;
+		while (out > 0.60f)
 		{
-			out -= 0.60;
-			ataHalfwaySample -= (ataHalfwaySample * (fabs(ataHalfwaySample) * 0.60) * (fabs(ataHalfwaySample) * 0.60) );
-			ataHalfwaySample *= (1.0+0.60);
+			out -= 0.60f;
+			ataHalfwaySample -= (ataHalfwaySample * (fabs(ataHalfwaySample) * 0.60f) * (fabs(ataHalfwaySample) * 0.60f) );
+			ataHalfwaySample *= (1.0f+0.60f);
 		}
 		//that's taken care of the really high gain stuff
 		
 		ataHalfwaySample -= (ataHalfwaySample * (fabs(ataHalfwaySample) * out) * (fabs(ataHalfwaySample) * out) );
-		ataHalfwaySample *= (1.0+out);
+		ataHalfwaySample *= (1.0f+out);
 		
 		
 		//end first half
 		//begin second half- inputSample and ataDrySample handled separately here
 		
-		Float64 ataLowpass;
+		Float32 ataLowpass;
 		if (flip)
 		{
 			tempSample = subtractSample = inputSample;
@@ -214,26 +214,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			ataLowpass = subtractSample - inputSample;
 		}
 		//highpass section
-		if (inputSample > 1.0) {inputSample = 1.0;}
-		if (inputSample < -1.0) {inputSample = -1.0;}
+		if (inputSample > 1.0f) {inputSample = 1.0f;}
+		if (inputSample < -1.0f) {inputSample = -1.0f;}
 		out = driveone;
-		while (out > 0.60)
+		while (out > 0.60f)
 		{
-			out -= 0.60;
-			inputSample -= (inputSample * (fabs(inputSample) * 0.60) * (fabs(inputSample) * 0.60) );
-			inputSample *= (1.0+0.60);
+			out -= 0.60f;
+			inputSample -= (inputSample * (fabs(inputSample) * 0.60f) * (fabs(inputSample) * 0.60f) );
+			inputSample *= (1.0f+0.60f);
 		}
 		//that's taken care of the really high gain stuff
 		
 		inputSample -= (inputSample * (fabs(inputSample) * out) * (fabs(inputSample) * out) );
-		inputSample *= (1.0+out);
+		inputSample *= (1.0f+out);
 		//end second half
 		
 		
 		ataHalfDrySample = (ataDrySample*ataK3)+(ataHalfDrySample*ataK4);
-		ataHalfDiffSample = (ataHalfwaySample - ataHalfDrySample)/2.0;
+		ataHalfDiffSample = (ataHalfwaySample - ataHalfDrySample)/2.0f;
 		ataLastDiffSample = ataDiffSample*ataK5;
-		ataDiffSample = (inputSample - ataDrySample)/2.0;
+		ataDiffSample = (inputSample - ataDrySample)/2.0f;
 		ataDiffSample += ataHalfDiffSample;
 		ataDiffSample -= ataLastDiffSample;
 		inputSample = ataDrySample;
@@ -245,31 +245,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		//set up polarities for sub-bass version
-		Float64 randy = (double(fpd)/UINT32_MAX)*0.0555; //0 to 1 the noise, may not be needed		
+		Float32 randy = (float(fpd)/UINT32_MAX)*0.0555f; //0 to 1 the noise, may not be needed		
 		
 		switch (bflip)
 		{
 			case 1:				
 				iirHeadBumpA += (ataLowpass * BassGain);
 				iirHeadBumpA -= (iirHeadBumpA * iirHeadBumpA * iirHeadBumpA * HeadBumpFreq);
-				iirHeadBumpA = ((1.0-randy) * iirHeadBumpA) + (randy * 0.5 * iirHeadBumpB) + (randy * 0.5 * iirHeadBumpC);
+				iirHeadBumpA = ((1.0f-randy) * iirHeadBumpA) + (randy * 0.5f * iirHeadBumpB) + (randy * 0.5f * iirHeadBumpC);
 				break;
 			case 2:
 				iirHeadBumpB += (ataLowpass * BassGain);
 				iirHeadBumpB -= (iirHeadBumpB * iirHeadBumpB * iirHeadBumpB * HeadBumpFreq);
-				iirHeadBumpB = (randy * 0.5 * iirHeadBumpA) + ((1.0-randy) * iirHeadBumpB) + (randy * 0.5 * iirHeadBumpC);
+				iirHeadBumpB = (randy * 0.5f * iirHeadBumpA) + ((1.0f-randy) * iirHeadBumpB) + (randy * 0.5f * iirHeadBumpC);
 				break;
 			case 3:
 				iirHeadBumpC += (ataLowpass * BassGain);
 				iirHeadBumpC -= (iirHeadBumpC * iirHeadBumpC * iirHeadBumpC * HeadBumpFreq);
-				iirHeadBumpC = (randy * 0.5 * iirHeadBumpA) + (randy * 0.5 * iirHeadBumpB) + ((1.0-randy) * iirHeadBumpC);
+				iirHeadBumpC = (randy * 0.5f * iirHeadBumpA) + (randy * 0.5f * iirHeadBumpB) + ((1.0f-randy) * iirHeadBumpC);
 				break;
 		}
-		Float64 HeadBump = iirHeadBumpA + iirHeadBumpB + iirHeadBumpC;
+		Float32 HeadBump = iirHeadBumpA + iirHeadBumpB + iirHeadBumpC;
 		
-		Float64 SubBump = fabs(HeadBump);
+		Float32 SubBump = fabs(HeadBump);
 		
-		if (HeadBump > 0.0) {
+		if (HeadBump > 0.0f) {
 			if (WasNegative) SubOctave = !SubOctave;
 			WasNegative = false;
 		} else WasNegative = true;
@@ -280,17 +280,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 1:				
 				iirSubBumpA += (SubBump * SubGain);
 				iirSubBumpA -= (iirSubBumpA * iirSubBumpA * iirSubBumpA * SubBumpFreq);
-				iirSubBumpA = ((1.0-randy) * iirSubBumpA) + (randy * 0.5 * iirSubBumpB) + (randy * 0.5 * iirSubBumpC);
+				iirSubBumpA = ((1.0f-randy) * iirSubBumpA) + (randy * 0.5f * iirSubBumpB) + (randy * 0.5f * iirSubBumpC);
 				break;
 			case 2:
 				iirSubBumpB += (SubBump * SubGain);
 				iirSubBumpB -= (iirSubBumpB * iirSubBumpB * iirSubBumpB * SubBumpFreq);
-				iirSubBumpB = (randy * 0.5 * iirSubBumpA) + ((1.0-randy) * iirSubBumpB) + (randy * 0.5 * iirSubBumpC);
+				iirSubBumpB = (randy * 0.5f * iirSubBumpA) + ((1.0f-randy) * iirSubBumpB) + (randy * 0.5f * iirSubBumpC);
 				break;
 			case 3:
 				iirSubBumpC += (SubBump * SubGain);
 				iirSubBumpC -= (iirSubBumpC * iirSubBumpC * iirSubBumpC * SubBumpFreq);
-				iirSubBumpC = (randy * 0.5 * iirSubBumpA) + (randy * 0.5 * iirSubBumpB) + ((1.0-randy) * iirSubBumpC);
+				iirSubBumpC = (randy * 0.5f * iirSubBumpA) + (randy * 0.5f * iirSubBumpB) + ((1.0f-randy) * iirSubBumpC);
 				break;
 		}
 		SubBump = iirSubBumpA + iirSubBumpB + iirSubBumpC;
@@ -342,7 +342,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

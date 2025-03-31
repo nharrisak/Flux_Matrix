@@ -34,31 +34,31 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		
-		Float64 iirHighpassA;
-		Float64 iirHighpassB;
-		Float64 iirHighpassC;
-		Float64 iirHighpassD;
-		Float64 iirHighpassE;
-		Float64 iirHighpassF;
-		Float64 iirLowpassA;
-		Float64 iirLowpassB;
-		Float64 iirLowpassC;
-		Float64 iirLowpassD;
-		Float64 iirLowpassE;
-		Float64 iirLowpassF;
+		Float32 iirHighpassA;
+		Float32 iirHighpassB;
+		Float32 iirHighpassC;
+		Float32 iirHighpassD;
+		Float32 iirHighpassE;
+		Float32 iirHighpassF;
+		Float32 iirLowpassA;
+		Float32 iirLowpassB;
+		Float32 iirLowpassC;
+		Float32 iirLowpassD;
+		Float32 iirLowpassE;
+		Float32 iirLowpassF;
 		int count;
 		
-		Float64 lowpassChase;
-		Float64 highpassChase;
-		Float64 wetChase;
+		Float32 lowpassChase;
+		Float32 highpassChase;
+		Float32 wetChase;
 		
-		Float64 lowpassAmount;
-		Float64 highpassAmount;
-		Float64 wet;
+		Float32 lowpassAmount;
+		Float32 highpassAmount;
+		Float32 wet;
 		
-		Float64 lastLowpass;
-		Float64 lastHighpass;
-		Float64 lastWet;
+		Float32 lastLowpass;
+		Float32 lastHighpass;
+		Float32 lastWet;
 		
 		uint32_t fpd;
 	
@@ -82,28 +82,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	wetChase = GetParameter( kParam_Three );
 	//should not scale with sample rate, because values reaching 1 are important
 	//to its ability to bypass when set to max
-	Float64 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0);
-	Float64 highpassSpeed = 300 / (fabs( lastHighpass - highpassChase)+1.0);
-	Float64 wetSpeed = 300 / (fabs( lastWet - wetChase)+1.0);
+	Float32 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0f);
+	Float32 highpassSpeed = 300 / (fabs( lastHighpass - highpassChase)+1.0f);
+	Float32 wetSpeed = 300 / (fabs( lastWet - wetChase)+1.0f);
 	lastLowpass = lowpassChase;
 	lastHighpass = highpassChase;
 	lastWet = wetChase;
 	
-	Float64 invLowpass;
-	Float64 invHighpass;
-	Float64 dry;
+	Float32 invLowpass;
+	Float32 invHighpass;
+	Float32 dry;
 
-	double inputSample;
+	float inputSample;
 	Float32 drySample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 
-		lowpassAmount = (((lowpassAmount*lowpassSpeed)+lowpassChase)/(lowpassSpeed + 1.0)); invLowpass = 1.0 - lowpassAmount;
-		highpassAmount = (((highpassAmount*highpassSpeed)+highpassChase)/(highpassSpeed + 1.0)); invHighpass = 1.0 - highpassAmount;
-		wet = (((wet*wetSpeed)+wetChase)/(wetSpeed+1.0)); dry = 1.0 - wet;
+		lowpassAmount = (((lowpassAmount*lowpassSpeed)+lowpassChase)/(lowpassSpeed + 1.0f)); invLowpass = 1.0f - lowpassAmount;
+		highpassAmount = (((highpassAmount*highpassSpeed)+highpassChase)/(highpassSpeed + 1.0f)); invHighpass = 1.0f - highpassAmount;
+		wet = (((wet*wetSpeed)+wetChase)/(wetSpeed+1.0f)); dry = 1.0f - wet;
 		
 		count++; if (count > 5) count = 0; switch (count)
 		{
@@ -164,7 +164,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

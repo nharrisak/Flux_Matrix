@@ -35,15 +35,15 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 ataLastSample;
-		Float64 ataHalfwaySample;
-		Float64 ataDrySample;
-		Float64 lastSample;
-		Float64 heldSampleA;
-		Float64 heldSampleB;
-		Float64 positionA;
-		Float64 positionB;
-		Float64 lastOutputSample;
+		Float32 ataLastSample;
+		Float32 ataHalfwaySample;
+		Float32 ataDrySample;
+		Float32 lastSample;
+		Float32 heldSampleA;
+		Float32 heldSampleB;
+		Float32 positionA;
+		Float32 positionB;
+		Float32 lastOutputSample;
 	
 	struct _dram {
 		};
@@ -59,47 +59,47 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 factor = GetParameter( kParam_Two )+1.0;
-	factor = pow(factor,7)+2.0;
+	Float32 factor = GetParameter( kParam_Two )+1.0f;
+	factor = pow(factor,7)+2.0f;
 	int divvy = (int)(factor*overallscale);
-	Float64 rateA = 1.0 / divvy;
-	Float64 rezA = 0.0016666666666667; //looks to be a fixed bitcrush
-	Float64 rateB = 1.61803398875 / divvy;
-	Float64 rezB = 0.0026666666666667; //looks to be a fixed bitcrush
-	Float64 offset;
-	Float64 ingain = pow(10.0,GetParameter( kParam_One )/14.0); //add adjustment factor
-	Float64 outgain = pow(10.0,GetParameter( kParam_Three )/14.0); //add adjustment factor
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 rateA = 1.0f / divvy;
+	Float32 rezA = 0.0016666666666667f; //looks to be a fixed bitcrush
+	Float32 rateB = 1.61803398875f / divvy;
+	Float32 rezB = 0.0026666666666667f; //looks to be a fixed bitcrush
+	Float32 offset;
+	Float32 ingain = pow(10.0f,GetParameter( kParam_One )/14.0f); //add adjustment factor
+	Float32 outgain = pow(10.0f,GetParameter( kParam_Three )/14.0f); //add adjustment factor
+	Float32 wet = GetParameter( kParam_Four );
 
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		float drySample = inputSample;
 		//first, the distortion section
 		inputSample *= ingain;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		inputSample *= 1.2533141373155;
-		//clip to 1.2533141373155 to reach maximum output
-		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample *= 1.2533141373155f;
+		//clip to 1.2533141373155f to reach maximum output
+		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		
 		ataDrySample = inputSample;
-		ataHalfwaySample = (inputSample + ataLastSample ) / 2.0;
+		ataHalfwaySample = (inputSample + ataLastSample ) / 2.0f;
 		ataLastSample = inputSample;
 		//setting up crude oversampling
 		
 		//begin raw sample
 		positionA += rateA;
-		double outputSample = heldSampleA;
-		if (positionA > 1.0)
+		float outputSample = heldSampleA;
+		if (positionA > 1.0f)
 		{
-			positionA -= 1.0;
+			positionA -= 1.0f;
 			heldSampleA = (lastSample * positionA) + (inputSample * (1-positionA));
-			outputSample = (outputSample * 0.5) + (heldSampleA * 0.5);
+			outputSample = (outputSample * 0.5f) + (heldSampleA * 0.5f);
 			//softens the edge of the derez
 		}
 		if (outputSample > 0)
@@ -116,19 +116,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			outputSample -= offset;
 			//it's above 0 so subtracting subtracts the remainder
 		}
-		outputSample *= (1.0 - rezA);
-		if (fabs(outputSample) < rezA) outputSample = 0.0;
+		outputSample *= (1.0f - rezA);
+		if (fabs(outputSample) < rezA) outputSample = 0.0f;
 		inputSample = outputSample;
 		//end raw sample
 		
 		//begin interpolated sample
 		positionB += rateB;
 		outputSample = heldSampleB;
-		if (positionB > 1.0)
+		if (positionB > 1.0f)
 		{
-			positionB -= 1.0;
+			positionB -= 1.0f;
 			heldSampleB = (lastSample * positionB) + (ataHalfwaySample * (1-positionB));
-			outputSample = (outputSample * 0.5) + (heldSampleB * 0.5);
+			outputSample = (outputSample * 0.5f) + (heldSampleB * 0.5f);
 			//softens the edge of the derez
 		}
 		if (outputSample > 0)
@@ -145,22 +145,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			outputSample -= offset;
 			//it's above 0 so subtracting subtracts the remainder
 		}
-		outputSample *= (1.0 - rezB);
-		if (fabs(outputSample) < rezB) outputSample = 0.0;
+		outputSample *= (1.0f - rezB);
+		if (fabs(outputSample) < rezB) outputSample = 0.0f;
 		ataHalfwaySample = outputSample;
 		//end interpolated sample
 		
 		inputSample += ataHalfwaySample;
-		inputSample /= 2.0;
+		inputSample /= 2.0f;
 		//plain old blend the two
 		
-		outputSample = (inputSample * (1.0-(wet/2))) + (lastOutputSample*(wet/2));
+		outputSample = (inputSample * (1.0f-(wet/2))) + (lastOutputSample*(wet/2));
 		//darken to extent of wet in wet/dry, maximum 50%
 		lastOutputSample = inputSample;
 		outputSample *= outgain;
 		
-		if (wet < 1.0) {
-			outputSample = (drySample * (1.0-wet)) + (outputSample * wet);
+		if (wet < 1.0f) {
+			outputSample = (drySample * (1.0f-wet)) + (outputSample * wet);
 		}
 		
 		*destP = outputSample;

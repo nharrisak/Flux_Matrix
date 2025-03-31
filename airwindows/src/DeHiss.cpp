@@ -31,10 +31,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 stored[2];
-		Float64 diff[6];
-		Float64 gate;
-		Float64 raw;
+		Float32 stored[2];
+		Float32 diff[6];
+		Float32 gate;
+		Float32 raw;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -51,22 +51,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 meanA;
-	Float64 meanB;
-	Float64 meanOut = 0;
-	Float64 meanLast;
-	Float64 average[5];
-	Float64 threshold = pow(GetParameter( kParam_One ),9);
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 meanA;
+	Float32 meanB;
+	Float32 meanOut = 0;
+	Float32 meanLast;
+	Float32 average[5];
+	Float32 threshold = pow(GetParameter( kParam_One ),9);
+	Float32 wet = GetParameter( kParam_Two );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		stored[1] = stored[0];
 		stored[0] = inputSample;
@@ -77,11 +77,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		diff[1] = diff[0];
 		diff[0] = stored[0] - stored[1];
 		
-		average[4] = (diff[0] + diff[1] + diff[2] + diff[3] + diff[4] + diff[5])/6.0;
-		average[3] = (diff[0] + diff[1] + diff[2] + diff[3] + diff[4])/5.0;
-		average[2] = (diff[0] + diff[1] + diff[2] + diff[3])/4.0;
-		average[1] = (diff[0] + diff[1] + diff[2])/3.0;
-		average[0] = (diff[0] + diff[1])/2.0;
+		average[4] = (diff[0] + diff[1] + diff[2] + diff[3] + diff[4] + diff[5])/6.0f;
+		average[3] = (diff[0] + diff[1] + diff[2] + diff[3] + diff[4])/5.0f;
+		average[2] = (diff[0] + diff[1] + diff[2] + diff[3])/4.0f;
+		average[1] = (diff[0] + diff[1] + diff[2])/3.0f;
+		average[0] = (diff[0] + diff[1])/2.0f;
 		
 		meanA = diff[0];
 		meanB = diff[0];
@@ -91,26 +91,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(average[1]) < fabs(meanB)) {meanA = meanB; meanB = average[1];}
 		if (fabs(average[0]) < fabs(meanB)) {meanA = meanB; meanB = average[0];}
 		meanLast = meanOut;
-		meanOut = ((meanA+meanB)/2.0);
+		meanOut = ((meanA+meanB)/2.0f);
 		
-		if (raw > 0) raw -= 0.001;
-		if (fabs(inputSample) > threshold) {gate = 1.0; raw = 2.0;}
-		else {gate = (gate * 0.999); if (threshold > 0) gate += ((fabs(inputSample)/threshold) * 0.001);}
+		if (raw > 0) raw -= 0.001f;
+		if (fabs(inputSample) > threshold) {gate = 1.0f; raw = 2.0f;}
+		else {gate = (gate * 0.999f); if (threshold > 0) gate += ((fabs(inputSample)/threshold) * 0.001f);}
 		
 		if ((fabs(meanOut) > threshold) || (fabs(meanLast) > threshold)){}
 		else stored[0] = stored[1] + (meanOut * gate);
 		
 		if (raw < 1) inputSample = (inputSample * raw) + (stored[0] * (1-raw));
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

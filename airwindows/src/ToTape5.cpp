@@ -40,53 +40,53 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		SInt32 gcount;
-		Float64 rateof;
-		Float64 sweep;
-		Float64 nextmax;
+		Float32 rateof;
+		Float32 sweep;
+		Float32 nextmax;
 		
 		SInt32 hcount;		
 				
-		Float64 iirMidRollerA;
-		Float64 iirMidRollerB;
-		Float64 iirMidRollerC;
-		Float64 iirHeadBumpA;
-		Float64 iirHeadBumpB;
-		Float64 iirHeadBumpC;
+		Float32 iirMidRollerA;
+		Float32 iirMidRollerB;
+		Float32 iirMidRollerC;
+		Float32 iirHeadBumpA;
+		Float32 iirHeadBumpB;
+		Float32 iirHeadBumpC;
 		
-		Float64 iirMinHeadBump;
+		Float32 iirMinHeadBump;
 		
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		Float64 iirSampleG;
-		Float64 iirSampleH;
-		Float64 iirSampleI;
-		Float64 iirSampleJ;
-		Float64 iirSampleK;
-		Float64 iirSampleL;
-		Float64 iirSampleM;
-		Float64 iirSampleN;
-		Float64 iirSampleO;
-		Float64 iirSampleP;
-		Float64 iirSampleQ;
-		Float64 iirSampleR;
-		Float64 iirSampleS;
-		Float64 iirSampleT;
-		Float64 iirSampleU;
-		Float64 iirSampleV;
-		Float64 iirSampleW;
-		Float64 iirSampleX;
-		Float64 iirSampleY;
-		Float64 iirSampleZ;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		Float32 iirSampleG;
+		Float32 iirSampleH;
+		Float32 iirSampleI;
+		Float32 iirSampleJ;
+		Float32 iirSampleK;
+		Float32 iirSampleL;
+		Float32 iirSampleM;
+		Float32 iirSampleN;
+		Float32 iirSampleO;
+		Float32 iirSampleP;
+		Float32 iirSampleQ;
+		Float32 iirSampleR;
+		Float32 iirSampleS;
+		Float32 iirSampleT;
+		Float32 iirSampleU;
+		Float32 iirSampleV;
+		Float32 iirSampleW;
+		Float32 iirSampleX;
+		Float32 iirSampleY;
+		Float32 iirSampleZ;
 		int flip;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[1000];
-		Float64 e[1000];
+			Float32 d[1000];
+		Float32 e[1000];
 	};
 	_dram* dram;
 };
@@ -100,58 +100,58 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double fpOld = 0.618033988749894848204586; //golden ratio!
+	float fpOld = 0.618033988749894848204586f; //golden ratio!
 
-	Float64 inputgain = pow(GetParameter( kParam_One )+1.0,3);
-	Float64 outputgain = GetParameter( kParam_Five );
-	Float64 wet = GetParameter( kParam_Six );
+	Float32 inputgain = pow(GetParameter( kParam_One )+1.0f,3);
+	Float32 outputgain = GetParameter( kParam_Five );
+	Float32 wet = GetParameter( kParam_Six );
 	//removed unnecessary dry variable
-	Float64 trim = 0.211324865405187117745425;
-	Float64 SoftenControl = pow(GetParameter( kParam_Two ),2);
-	Float64 tempRandy = 0.06 + (SoftenControl/10.0);
-	//Float64 RollAmount = (1.0-((SoftenControl * 0.45)/overallscale));
-	Float64 RollAmount = (1.0-(SoftenControl * 0.45))/overallscale;
-	Float64 HeadBumpControl = pow(GetParameter( kParam_Three ),2);
+	Float32 trim = 0.211324865405187117745425f;
+	Float32 SoftenControl = pow(GetParameter( kParam_Two ),2);
+	Float32 tempRandy = 0.06f + (SoftenControl/10.0f);
+	//Float32 RollAmount = (1.0f-((SoftenControl * 0.45f)/overallscale));
+	Float32 RollAmount = (1.0f-(SoftenControl * 0.45f))/overallscale;
+	Float32 HeadBumpControl = pow(GetParameter( kParam_Three ),2);
 	int allpasstemp;
-	int maxdelay = (int)(floor(((HeadBumpControl+0.3)*2.2)*overallscale));
+	int maxdelay = (int)(floor(((HeadBumpControl+0.3f)*2.2f)*overallscale));
 	HeadBumpControl *= fabs(HeadBumpControl);
-	Float64 HeadBumpFreq = 0.044/overallscale;
-	Float64 iirAmount = 0.000001/overallscale;
-	Float64 altAmount = 1.0 - iirAmount;
-	Float64 iirHBoostAmount = 0.0001/overallscale;
-	Float64 altHBoostAmount = 1.0 - iirAmount;
-	Float64 depth = pow(GetParameter( kParam_Four ),2)*overallscale;
-	Float64 fluttertrim = 0.005/overallscale;
-	Float64 sweeptrim = (0.0006*depth)/overallscale;
-	Float64 offset;	
-	Float64 tupi = 3.141592653589793238 * 2.0;
-	Float64 newrate = 0.005/overallscale;
-	Float64 oldrate = 1.0-newrate;
-	Float64 HighsSample = 0.0;
-	Float64 NonHighsSample = 0.0;
-	Float64 HeadBump = 0.0;
-	Float64 Subtract;
-	Float64 bridgerectifier;
-	Float64 flutterrandy;
-	Float64 randy;
-	Float64 invrandy;
+	Float32 HeadBumpFreq = 0.044f/overallscale;
+	Float32 iirAmount = 0.000001f/overallscale;
+	Float32 altAmount = 1.0f - iirAmount;
+	Float32 iirHBoostAmount = 0.0001f/overallscale;
+	Float32 altHBoostAmount = 1.0f - iirAmount;
+	Float32 depth = pow(GetParameter( kParam_Four ),2)*overallscale;
+	Float32 fluttertrim = 0.005f/overallscale;
+	Float32 sweeptrim = (0.0006f*depth)/overallscale;
+	Float32 offset;	
+	Float32 tupi = 3.141592653589793238f * 2.0f;
+	Float32 newrate = 0.005f/overallscale;
+	Float32 oldrate = 1.0f-newrate;
+	Float32 HighsSample = 0.0f;
+	Float32 NonHighsSample = 0.0f;
+	Float32 HeadBump = 0.0f;
+	Float32 Subtract;
+	Float32 bridgerectifier;
+	Float32 flutterrandy;
+	Float32 randy;
+	Float32 invrandy;
 	SInt32 count;
-	Float64 tempSample;
-	Float64 drySample;
-	double inputSample;
+	Float32 tempSample;
+	Float32 drySample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 
-		flutterrandy = (double(fpd)/UINT32_MAX);
+		flutterrandy = (float(fpd)/UINT32_MAX);
 		randy = flutterrandy * tempRandy; //for soften
-		invrandy = (1.0-randy);
-		randy /= 2.0;
+		invrandy = (1.0f-randy);
+		randy /= 2.0f;
 		//we've set up so that we dial in the amount of the alt sections (in pairs) with invrandy being the source section
 		
 			//now we've got a random flutter, so we're messing with the pitch before tape effects go on
@@ -161,8 +161,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		gcount--;
 		//we will also keep the buffer going, even when not in use
 		
-		if (depth != 0.0) {
-			offset = (1.0 + sin(sweep)) * depth;
+		if (depth != 0.0f) {
+			offset = (1.0f + sin(sweep)) * depth;
 			count += (int)floor(offset);
 			bridgerectifier = (dram->d[count] * (1-(offset-floor(offset))));
 			bridgerectifier += (dram->d[count+1] * (offset-floor(offset)));
@@ -170,12 +170,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			rateof = (nextmax * newrate) + (rateof * oldrate);
 			sweep += rateof * fluttertrim;
 			sweep += sweep * sweeptrim;
-			if (sweep >= tupi){sweep = 0.0; nextmax = 0.02 + (flutterrandy*0.98);}
+			if (sweep >= tupi){sweep = 0.0f; nextmax = 0.02f + (flutterrandy*0.98f);}
 			inputSample = bridgerectifier;
 			//apply to input signal only when flutter is present, interpolate samples
 		}
 		
-		if (inputgain != 1.0) {
+		if (inputgain != 1.0f) {
 			inputSample *= inputgain;
 		}
 		
@@ -183,32 +183,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		switch (flip)
 		{
 			case 1:				
-				iirMidRollerA = (iirMidRollerA * (1.0 - RollAmount)) + (inputSample * RollAmount);
+				iirMidRollerA = (iirMidRollerA * (1.0f - RollAmount)) + (inputSample * RollAmount);
 				iirMidRollerA = (invrandy * iirMidRollerA) + (randy * iirMidRollerB) + (randy * iirMidRollerC);
 				HighsSample = inputSample - iirMidRollerA;
 				NonHighsSample = iirMidRollerA;
 				
-				iirHeadBumpA += (inputSample * 0.05);
+				iirHeadBumpA += (inputSample * 0.05f);
 				iirHeadBumpA -= (iirHeadBumpA * iirHeadBumpA * iirHeadBumpA * HeadBumpFreq);
 				iirHeadBumpA = (invrandy * iirHeadBumpA) + (randy * iirHeadBumpB) + (randy * iirHeadBumpC);
 				break;
 			case 2:
-				iirMidRollerB = (iirMidRollerB * (1.0 - RollAmount)) + (inputSample * RollAmount);
+				iirMidRollerB = (iirMidRollerB * (1.0f - RollAmount)) + (inputSample * RollAmount);
 				iirMidRollerB = (randy * iirMidRollerA) + (invrandy * iirMidRollerB) + (randy * iirMidRollerC);
 				HighsSample = inputSample - iirMidRollerB;
 				NonHighsSample = iirMidRollerB;
 				
-				iirHeadBumpB += (inputSample * 0.05);
+				iirHeadBumpB += (inputSample * 0.05f);
 				iirHeadBumpB -= (iirHeadBumpB * iirHeadBumpB * iirHeadBumpB * HeadBumpFreq);
 				iirHeadBumpB = (randy * iirHeadBumpA) + (invrandy * iirHeadBumpB) + (randy * iirHeadBumpC);
 				break;
 			case 3:
-				iirMidRollerC = (iirMidRollerC * (1.0 - RollAmount)) + (inputSample * RollAmount);
+				iirMidRollerC = (iirMidRollerC * (1.0f - RollAmount)) + (inputSample * RollAmount);
 				iirMidRollerC = (randy * iirMidRollerA) + (randy * iirMidRollerB) + (invrandy * iirMidRollerC);
 				HighsSample = inputSample - iirMidRollerC;
 				NonHighsSample = iirMidRollerC;
 				
-				iirHeadBumpC += (inputSample * 0.05);
+				iirHeadBumpC += (inputSample * 0.05f);
 				iirHeadBumpC -= (iirHeadBumpC * iirHeadBumpC * iirHeadBumpC * HeadBumpFreq);
 				iirHeadBumpC = (randy * iirHeadBumpA) + (randy * iirHeadBumpB) + (invrandy * iirHeadBumpC);
 				break;
@@ -216,8 +216,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		flip++; //increment the triplet counter
 
 		Subtract = HighsSample;		
-		bridgerectifier = fabs(Subtract)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bridgerectifier = fabs(Subtract)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = 1-cos(bridgerectifier);
 		if (Subtract > 0) Subtract = bridgerectifier;
 		if (Subtract < 0) Subtract = -bridgerectifier;
@@ -227,7 +227,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//transients, plus we are subtracting any artifacts we got from the negative Density.		
 		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		bridgerectifier = sin(bridgerectifier);
 		if (inputSample > 0) inputSample = bridgerectifier;
 		if (inputSample < 0) inputSample = -bridgerectifier;
@@ -251,7 +251,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		tempSample = inputSample;
 		iirMinHeadBump = (iirMinHeadBump * altHBoostAmount) + (fabs(inputSample) * iirHBoostAmount);
-		if (iirMinHeadBump > 0.01) iirMinHeadBump = 0.01;
+		if (iirMinHeadBump > 0.01f) iirMinHeadBump = 0.01f;
 		//we want this one rectified so that it's a relatively steady positive value. Boosts can cause it to be
 		//greater than 1 so we clamp it in that case.
 		
@@ -287,19 +287,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample -= Subtract;
 		//apply stored up tiny corrections.
 		
-		if (outputgain != 1.0) {
+		if (outputgain != 1.0f) {
 			inputSample *= outputgain;
 		}
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

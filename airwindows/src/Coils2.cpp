@@ -32,9 +32,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquadA[9];
-		double biquadB[9];
-		double hysteresis;
+		float biquadA[9];
+		float biquadB[9];
+		float hysteresis;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -51,65 +51,65 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 distScaling = pow(1.0-GetParameter( kParam_One ),2);
-	if (distScaling < 0.0001) distScaling = 0.0001;
-	biquadA[0] = 600.0/GetSampleRate();
-	biquadA[1] = 0.01+(pow(GetParameter( kParam_Two ),2)*0.5);
-	double iirAmount = biquadA[1]/overallscale;
-	double K = tan(M_PI * biquadA[0]);
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	Float32 distScaling = pow(1.0f-GetParameter( kParam_One ),2);
+	if (distScaling < 0.0001f) distScaling = 0.0001f;
+	biquadA[0] = 600.0f/GetSampleRate();
+	biquadA[1] = 0.01f+(pow(GetParameter( kParam_Two ),2)*0.5f);
+	float iirAmount = biquadA[1]/overallscale;
+	float K = tan(M_PI * biquadA[0]);
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K / biquadA[1] * norm;
 	biquadA[4] = -biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
-	biquadB[0] = (21890.0-(biquadA[1]*890.0))/GetSampleRate();
-	biquadB[1] = 0.89;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
+	biquadB[0] = (21890.0f-(biquadA[1]*890.0f))/GetSampleRate();
+	biquadB[1] = 0.89f;
 	K = tan(M_PI * biquadB[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
-	Float64 wet = GetParameter( kParam_Three );
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
+	Float32 wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		if (biquadA[0] < 0.49999) {
-			double tempSample = (inputSample * biquadA[2]) + biquadA[7];
+		if (biquadA[0] < 0.49999f) {
+			float tempSample = (inputSample * biquadA[2]) + biquadA[7];
 			biquadA[7] = -(tempSample * biquadA[5]) + biquadA[8];
 			biquadA[8] = (inputSample * biquadA[4]) - (tempSample * biquadA[6]);
 			inputSample = tempSample; //create bandpass of clean tone
 		}
-		double diffSample = (drySample-inputSample)/distScaling; //mids notched out		
-		if (biquadB[0] < 0.49999) {
-			double tempSample = (diffSample * biquadB[2]) + biquadB[7];
+		float diffSample = (drySample-inputSample)/distScaling; //mids notched out		
+		if (biquadB[0] < 0.49999f) {
+			float tempSample = (diffSample * biquadB[2]) + biquadB[7];
 			biquadB[7] = (diffSample * biquadB[3]) - (tempSample * biquadB[5]) + biquadB[8];
 			biquadB[8] = (diffSample * biquadB[4]) - (tempSample * biquadB[6]);
 			diffSample = tempSample; //lowpass filter the notch content before distorting
 		}
-		hysteresis = (hysteresis * (1.0-iirAmount)) + (diffSample * iirAmount);
-		if (fabs(hysteresis)<1.18e-37) hysteresis = 0.0; else diffSample -= hysteresis;
-		if (diffSample > 1.571) diffSample = 1.571; else if (diffSample < -1.571) diffSample = -1.571;
-		if (hysteresis > 1.571) hysteresis = 1.571; else if (hysteresis < -1.571) hysteresis = -1.571;
+		hysteresis = (hysteresis * (1.0f-iirAmount)) + (diffSample * iirAmount);
+		if (fabs(hysteresis)<1.18e-37f) hysteresis = 0.0f; else diffSample -= hysteresis;
+		if (diffSample > 1.571f) diffSample = 1.571f; else if (diffSample < -1.571f) diffSample = -1.571f;
+		if (hysteresis > 1.571f) hysteresis = 1.571f; else if (hysteresis < -1.571f) hysteresis = -1.571f;
 		inputSample += (sin(diffSample)-sin(hysteresis))*distScaling; //apply transformer distortions
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

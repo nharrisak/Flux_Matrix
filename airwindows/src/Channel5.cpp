@@ -38,11 +38,11 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 fpNShape;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 fpNShape;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		bool flip;
-		Float64 lastSample;
+		Float32 lastSample;
 	
 	struct _dram {
 		};
@@ -58,25 +58,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int console = (int) GetParameter( kParam_One );
-	Float64 density = pow(GetParameter( kParam_Two )/100.0,2);
-	Float64 output = GetParameter( kParam_Three );
-	Float64 iirAmount = 0.005832;
-	Float64 threshold = 0.33362176;	
+	Float32 density = pow(GetParameter( kParam_Two )/100.0f,2);
+	Float32 output = GetParameter( kParam_Three );
+	Float32 iirAmount = 0.005832f;
+	Float32 threshold = 0.33362176f;	
 	switch (console)
 	{
-		case 1: iirAmount = 0.005832; threshold = 0.33362176; break; //Neve
-		case 2: iirAmount = 0.004096; threshold = 0.59969536; break; //API
-		case 3: iirAmount = 0.004913; threshold = 0.84934656; break; //SSL
+		case 1: iirAmount = 0.005832f; threshold = 0.33362176f; break; //Neve
+		case 2: iirAmount = 0.004096f; threshold = 0.59969536f; break; //API
+		case 3: iirAmount = 0.004913f; threshold = 0.84934656f; break; //SSL
 	}
 	iirAmount /= overallscale;
 	threshold /= overallscale; //now with 96K AND working selector!
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
 		
 		if (flip)
@@ -90,13 +90,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputSample = inputSample - iirSampleB;
 		}
 		//highpass section
-		double bridgerectifier = fabs(inputSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		float bridgerectifier = fabs(inputSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		if (inputSample > 0) inputSample = (inputSample*(1-density))+(bridgerectifier*density);
 		else inputSample = (inputSample*(1-density))-(bridgerectifier*density);
 		//drive section
-		Float64 clamp = inputSample - lastSample;
+		Float32 clamp = inputSample - lastSample;
 		if (clamp > threshold)
 			inputSample = lastSample + threshold;
 		if (-clamp > threshold)
@@ -105,7 +105,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//slew section
 		flip = !flip;
 		
-		if (output < 1.0)
+		if (output < 1.0f)
 		{
 			inputSample *= output;
 		}
@@ -122,7 +122,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		sourceP += inNumChannels; destP += inNumChannels;
 	}
-	fpNShape *= 0.999999;
+	fpNShape *= 0.999999f;
 	//we will just delicately dial back the FP noise shaping, not even every sample
 	//this is a good place to put subtle 'no runaway' calculations, though bear in mind
 	//that it will be called more often when you use shorter sample buffers in the DAW.

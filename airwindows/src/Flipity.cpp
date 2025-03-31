@@ -48,9 +48,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	int flipity = (int) GetParameter( kParam_One );
 
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		double temp;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		float temp;
 
 		switch (flipity)
 		{

@@ -31,12 +31,12 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 slide;
+		Float32 slide;
 		int gcount;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 p[4001];
+			Float32 p[4001];
 	};
 	_dram* dram;
 };
@@ -50,30 +50,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 target = GetParameter( kParam_One );
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 target = GetParameter( kParam_One );
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 offsetA;
-	Float64 offsetB;
-	int widthA = (int)(1.0*overallscale);
-	int widthB = (int)(7.0*overallscale); //max 364 at 44.1, 792 at 96K
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 offsetA;
+	Float32 offsetB;
+	int widthA = (int)(1.0f*overallscale);
+	int widthB = (int)(7.0f*overallscale); //max 364 at 44.1f, 792 at 96K
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
-	double inputSample;
-	Float64 drySample;
-	Float64 total;
+	float inputSample;
+	Float32 drySample;
+	Float32 total;
 	int count;	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 
-		slide = (slide * 0.9997)+(target*0.0003);
+		slide = (slide * 0.9997f)+(target*0.0003f);
 
-		offsetA = ((pow(slide,2)) * 77)+3.2;
-		offsetB = (3.85 * offsetA)+41;
+		offsetA = ((pow(slide,2)) * 77)+3.2f;
+		offsetB = (3.85f * offsetA)+41;
 		offsetA *= overallscale;
 		offsetB *= overallscale;
 		//adjust for sample rate
@@ -82,37 +82,37 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		count = gcount;
 
 		dram->p[count+2000] = dram->p[count] = inputSample;
-		//double buffer
+		//float buffer
 		
 		count = (int)(gcount+floor(offsetA));
 
-		total = dram->p[count] * 0.391; //less as value moves away from .0
+		total = dram->p[count] * 0.391f; //less as value moves away from .0
 		total += dram->p[count+widthA]; //we can assume always using this in one way or another?
-		total += dram->p[count+widthA+widthA] * 0.391; //greater as value moves away from .0
+		total += dram->p[count+widthA+widthA] * 0.391f; //greater as value moves away from .0
 
-		inputSample += ((total * 0.274));
+		inputSample += ((total * 0.274f));
 
 		count = (int)(gcount+floor(offsetB));
 
-		total = dram->p[count] * 0.918; //less as value moves away from .0
+		total = dram->p[count] * 0.918f; //less as value moves away from .0
 		total += dram->p[count+widthB]; //we can assume always using this in one way or another?
-		total += dram->p[count+widthB+widthB] * 0.918; //greater as value moves away from .0
+		total += dram->p[count+widthB+widthB] * 0.918f; //greater as value moves away from .0
 
-		inputSample -= ((total * 0.629));
+		inputSample -= ((total * 0.629f));
 
 		inputSample /= 4;
 		
 		gcount--;
 		//still scrolling through the samples, remember
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

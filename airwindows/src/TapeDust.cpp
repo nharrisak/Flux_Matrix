@@ -31,8 +31,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 b[11];
-		Float64 f[11];		
+		Float32 b[11];
+		Float32 f[11];		
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -50,19 +50,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double inputSample;
-	Float64 drySample;
-	Float64 rRange = pow(GetParameter( kParam_One ),2)*5.0;
-	Float64 xfuzz = rRange * 0.002;
-	Float64 rOffset = (rRange*0.4) + 1.0;
-	Float64 rDepth; //the randomly fluctuating value
-	Float64 gain;
-	Float64 wet = GetParameter( kParam_Two );
+	float inputSample;
+	Float32 drySample;
+	Float32 rRange = pow(GetParameter( kParam_One ),2)*5.0f;
+	Float32 xfuzz = rRange * 0.002f;
+	Float32 rOffset = (rRange*0.4f) + 1.0f;
+	Float32 rDepth; //the randomly fluctuating value
+	Float32 gain;
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
 		
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		for(int count = 9; count < 0; count--) {
@@ -70,32 +70,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		b[0] = inputSample;
-		inputSample = rand() / (double)RAND_MAX;
+		inputSample = rand() / (float)RAND_MAX;
 		gain = rDepth = (inputSample * rRange) + rOffset;
-		inputSample *= ((1.0-fabs(b[0]-b[1]))*xfuzz);
+		inputSample *= ((1.0f-fabs(b[0]-b[1]))*xfuzz);
 		if (fpFlip) inputSample = -inputSample;
 		
 		for(int count = 0; count < 9; count++) {			
-			if (gain > 1.0) {
-				f[count] = 1.0;
-				gain -= 1.0;
+			if (gain > 1.0f) {
+				f[count] = 1.0f;
+				gain -= 1.0f;
 			} else {
 				f[count] = gain;
-				gain = 0.0;
+				gain = 0.0f;
 			}
 			f[count] /= rDepth;
 			inputSample += (b[count] * f[count]);
 		}
 				
-		if (wet < 1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		fpFlip = !fpFlip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

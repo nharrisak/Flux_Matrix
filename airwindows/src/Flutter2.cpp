@@ -34,13 +34,13 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		int gcount;		
-		double sweep;
-		double nextmax;
+		float sweep;
+		float nextmax;
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			double dL[1002];
+			float dL[1002];
 	};
 	_dram* dram;
 };
@@ -54,38 +54,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double flutDepth = pow(GetParameter( kParam_A ),4)*overallscale*90;
-	if (flutDepth > 498.0) flutDepth = 498.0;
-	double flutFrequency = (0.02*pow(GetParameter( kParam_B ),3))/overallscale;
-	double wet = GetParameter( kParam_C );
+	float flutDepth = pow(GetParameter( kParam_A ),4)*overallscale*90;
+	if (flutDepth > 498.0f) flutDepth = 498.0f;
+	float flutFrequency = (0.02f*pow(GetParameter( kParam_B ),3))/overallscale;
+	float wet = GetParameter( kParam_C );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		//begin Flutter
 		if (gcount < 0 || gcount > 999) gcount = 999;
 		dram->dL[gcount] = inputSample;
 		int count = gcount;
-		double offset = flutDepth + (flutDepth * sin(sweep));
+		float offset = flutDepth + (flutDepth * sin(sweep));
 		sweep += nextmax * flutFrequency;
-		if (sweep > (M_PI*2.0)) {sweep -= M_PI*2.0; nextmax = 0.24 + (fpd / (double)UINT32_MAX * 0.74);}
+		if (sweep > (M_PI*2.0f)) {sweep -= M_PI*2.0f; nextmax = 0.24f + (fpd / (float)UINT32_MAX * 0.74f);}
 		count += (int)floor(offset);
 		inputSample = (dram->dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
 		inputSample += (dram->dL[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
 		gcount--;
 		//end Flutter
 		
-		if (wet < 1.0) {inputSample = (inputSample * wet) + (drySample * (1.0-wet));}
+		if (wet < 1.0f) {inputSample = (inputSample * wet) + (drySample * (1.0f-wet));}
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

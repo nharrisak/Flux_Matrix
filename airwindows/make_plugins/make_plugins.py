@@ -60,6 +60,18 @@ def matchCurly( t ):
 				return s
 	return ''
 
+def repl_fconst( m ):
+	return m.group(1) + 'f' + m.group(2)
+
+def adjustFloatTypes( text ):
+	text = text.replace( 'long double ', 'double ' )
+	if True:
+		text = text.replace( 'double', 'float' )
+		text = text.replace( 'Float64', 'Float32' )
+		text = re.sub( r'(\d+\.\d+)(\W)', repl_fconst, text )
+		text = re.sub( r'(\d+\.\d+e-?\d+)(\W)', repl_fconst, text )
+	return text
+
 def repl( m ):
 	return m.group(1) + 'dram->' + m.group(2) + '['
 	
@@ -109,7 +121,7 @@ for f in files:
 			if len(bits) == 2:
 				bits = '{' + bits[1]
 				privates = matchCurly( bits )[1:-1]
-		privates = privates.replace( 'long double ', 'double ' )
+		privates = adjustFloatTypes( privates )
 		
 		# look for large arrays and move them to dram
 		dram = ''
@@ -163,7 +175,7 @@ for f in files:
 				bits = content.split( '(Float32*)(outBuffer.mBuffers[1].mData);' )
 				bits = bits[1].split( 'return noErr;' )
 				renderCall = bits[0]
-				renderCall = renderCall.replace( 'long double ', 'double ' )
+				renderCall = adjustFloatTypes( renderCall )
 				renderCall = processDramSymbols( renderCall, dramSymbols )
 				bits = content.split( '::Reset(AudioUnitScope inScope, AudioUnitElement inElement)' )
 				resetCall = bits[1].split( '//~~~~~~~~~~~' )[0]
@@ -216,7 +228,7 @@ for f in files:
 				bits = content.split( 'Kernel::Process(' )
 				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
 				renderCall = matchCurly( bits )
-				renderCall = renderCall.replace( 'long double ', 'double ' )
+				renderCall = adjustFloatTypes( renderCall )
 				renderCall = processDramSymbols( renderCall, dramSymbols )
 				bits = content.split( 'Kernel::Reset()', maxsplit=1 )
 				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]

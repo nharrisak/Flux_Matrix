@@ -36,19 +36,19 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	bool polarityM;
-	double lastSampleM;
-	double iirSampleM;
-	double noiseAM;
-	double noiseBM;
-	double noiseCM;
+	float lastSampleM;
+	float iirSampleM;
+	float noiseAM;
+	float noiseBM;
+	float noiseCM;
 	bool flipM;
 	
 	bool polarityS;
-	double lastSampleS;
-	double iirSampleS;
-	double noiseAS;
-	double noiseBS;
-	double noiseCS;
+	float lastSampleS;
+	float iirSampleS;
+	float noiseAS;
+	float noiseBS;
+	float noiseCS;
 	bool flipS;
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -61,29 +61,29 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double slewAmountM = ((pow(GetParameter( kParam_One ),2.0)*4.0)+0.71)/overallscale;
-	double dynAmountM = pow(GetParameter( kParam_Two ),2.0);
-	double wetM = pow(GetParameter( kParam_Three ),5);
+	float slewAmountM = ((pow(GetParameter( kParam_One ),2.0f)*4.0f)+0.71f)/overallscale;
+	float dynAmountM = pow(GetParameter( kParam_Two ),2.0f);
+	float wetM = pow(GetParameter( kParam_Three ),5);
 	
-	double slewAmountS = ((pow(GetParameter( kParam_Four ),2.0)*4.0)+0.71)/overallscale;
-	double dynAmountS = pow(GetParameter( kParam_Five ),2.0);
-	double wetS = pow(GetParameter( kParam_Six ),5);
+	float slewAmountS = ((pow(GetParameter( kParam_Four ),2.0f)*4.0f)+0.71f)/overallscale;
+	float dynAmountS = pow(GetParameter( kParam_Five ),2.0f);
+	float wetS = pow(GetParameter( kParam_Six ),5);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		double mid = inputSampleL + inputSampleR;
-		double side = inputSampleL - inputSampleR;
+		float mid = inputSampleL + inputSampleR;
+		float side = inputSampleL - inputSampleR;
 		//assign mid and side.Between these sections, you can do mid/side processing
-		double drySampleM = mid;
-		double drySampleS = side;
+		float drySampleM = mid;
+		float drySampleS = side;
 		
 		//begin mid
 		if (mid < 0) {
@@ -94,33 +94,33 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			polarityM = false;
 		} else polarityM = true;		
 		
-		if (flipM) noiseAM += (double(fpdL)/UINT32_MAX);
-		else noiseAM -= (double(fpdL)/UINT32_MAX);
+		if (flipM) noiseAM += (float(fpdL)/UINT32_MAX);
+		else noiseAM -= (float(fpdL)/UINT32_MAX);
 		//here's the guts of the random walk		
 		flipM = !flipM;
 		
-		if (mid > 1.0) mid = 1.0; if (mid < -1.0) mid = -1.0;
-		if (dynAmountM < 0.4999) mid = (mid*dynAmountM*2.0) + (sin(mid)*(1.0-(dynAmountM*2.0)));		
-		if (dynAmountM > 0.5001) mid = (asin(mid)*((dynAmountM*2.0)-1.0)) + (mid*(1.0-((dynAmountM*2.0)-1.0)));
+		if (mid > 1.0f) mid = 1.0f; if (mid < -1.0f) mid = -1.0f;
+		if (dynAmountM < 0.4999f) mid = (mid*dynAmountM*2.0f) + (sin(mid)*(1.0f-(dynAmountM*2.0f)));		
+		if (dynAmountM > 0.5001f) mid = (asin(mid)*((dynAmountM*2.0f)-1.0f)) + (mid*(1.0f-((dynAmountM*2.0f)-1.0f)));
 		//doing this in two steps means I get to not run an extra sin/asin function per sample
 		
-		noiseBM = sin(noiseAM*(0.2-(dynAmountM*0.125))*fabs(mid));
+		noiseBM = sin(noiseAM*(0.2f-(dynAmountM*0.125f))*fabs(mid));
 		
-		double slew = fabs(mid-lastSampleM)*slewAmountM;
-		lastSampleM = mid*(0.86-(dynAmountM*0.125));
+		float slew = fabs(mid-lastSampleM)*slewAmountM;
+		lastSampleM = mid*(0.86f-(dynAmountM*0.125f));
 		
-		if (slew > 1.0) slew = 1.0;
-		double iirIntensity = slew;
-		iirIntensity *= 2.472;
+		if (slew > 1.0f) slew = 1.0f;
+		float iirIntensity = slew;
+		iirIntensity *= 2.472f;
 		iirIntensity *= iirIntensity;
-		if (iirIntensity > 1.0) iirIntensity = 1.0;
+		if (iirIntensity > 1.0f) iirIntensity = 1.0f;
 		
-		iirSampleM = (iirSampleM * (1.0 - iirIntensity)) + (noiseBM * iirIntensity);
+		iirSampleM = (iirSampleM * (1.0f - iirIntensity)) + (noiseBM * iirIntensity);
 		noiseBM = iirSampleM;
-		noiseBM = (noiseBM * slew) + (noiseCM * (1.0-slew));
+		noiseBM = (noiseBM * slew) + (noiseCM * (1.0f-slew));
 		noiseCM = noiseBM;
 		
-		mid = (noiseCM * wetM) + (drySampleM * (1.0-wetM));
+		mid = (noiseCM * wetM) + (drySampleM * (1.0f-wetM));
 		//end mid
 
 		//begin side
@@ -132,46 +132,46 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			polarityS = false;
 		} else polarityS = true;		
 		
-		if (flipS) noiseAS += (double(fpdR)/UINT32_MAX);
-		else noiseAS -= (double(fpdR)/UINT32_MAX);
+		if (flipS) noiseAS += (float(fpdR)/UINT32_MAX);
+		else noiseAS -= (float(fpdR)/UINT32_MAX);
 		//here's the guts of the random walk		
 		flipS = !flipS;
 		
-		if (side > 1.0) side = 1.0; if (side < -1.0) side = -1.0;
-		if (dynAmountS < 0.4999) side = (side*dynAmountS*2.0) + (sin(side)*(1.0-(dynAmountS*2.0)));		
-		if (dynAmountS > 0.5001) side = (asin(side)*((dynAmountS*2.0)-1.0)) + (side*(1.0-((dynAmountS*2.0)-1.0)));
+		if (side > 1.0f) side = 1.0f; if (side < -1.0f) side = -1.0f;
+		if (dynAmountS < 0.4999f) side = (side*dynAmountS*2.0f) + (sin(side)*(1.0f-(dynAmountS*2.0f)));		
+		if (dynAmountS > 0.5001f) side = (asin(side)*((dynAmountS*2.0f)-1.0f)) + (side*(1.0f-((dynAmountS*2.0f)-1.0f)));
 		//doing this in two steps means I get to not run an extra sin/asin function per sample
 		
-		noiseBS = sin(noiseAS*(0.2-(dynAmountS*0.125))*fabs(side));
+		noiseBS = sin(noiseAS*(0.2f-(dynAmountS*0.125f))*fabs(side));
 		
 		slew = fabs(side-lastSampleS)*slewAmountS;
-		lastSampleS = side*(0.86-(dynAmountS*0.125));
+		lastSampleS = side*(0.86f-(dynAmountS*0.125f));
 		
-		if (slew > 1.0) slew = 1.0;
+		if (slew > 1.0f) slew = 1.0f;
 		iirIntensity = slew;
-		iirIntensity *= 2.472;
+		iirIntensity *= 2.472f;
 		iirIntensity *= iirIntensity;
-		if (iirIntensity > 1.0) iirIntensity = 1.0;
+		if (iirIntensity > 1.0f) iirIntensity = 1.0f;
 		
-		iirSampleS = (iirSampleS * (1.0 - iirIntensity)) + (noiseBS * iirIntensity);
+		iirSampleS = (iirSampleS * (1.0f - iirIntensity)) + (noiseBS * iirIntensity);
 		noiseBS = iirSampleS;
-		noiseBS = (noiseBS * slew) + (noiseCS * (1.0-slew));
+		noiseBS = (noiseBS * slew) + (noiseCS * (1.0f-slew));
 		noiseCS = noiseBS;
 		
-		side = (noiseCS * wetS) + (drySampleS * (1.0-wetS));
+		side = (noiseCS * wetS) + (drySampleS * (1.0f-wetS));
 		//end side
 		
-		inputSampleL = (mid+side)/2.0;
-		inputSampleR = (mid-side)/2.0;
+		inputSampleL = (mid+side)/2.0f;
+		inputSampleR = (mid-side)/2.0f;
 		//unassign mid and side
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

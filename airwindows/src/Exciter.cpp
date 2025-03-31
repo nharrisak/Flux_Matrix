@@ -31,7 +31,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquad[11];
+		float biquad[11];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -49,23 +49,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	biquad[0] = ((GetParameter( kParam_One )*7000.0)+8000.0)/GetSampleRate();
-	biquad[1] = GetParameter( kParam_One )+GetParameter( kParam_Two )+0.7071;
+	biquad[0] = ((GetParameter( kParam_One )*7000.0f)+8000.0f)/GetSampleRate();
+	biquad[1] = GetParameter( kParam_One )+GetParameter( kParam_Two )+0.7071f;
 	//tighter resonance as frequency and boost increases
-	double boost = pow(GetParameter( kParam_Two ),2.0)*16.0;
-	double K = tan(M_PI * biquad[0]);
-	double norm = 1.0 / (1.0 + K / biquad[1] + K * K);
-	biquad[2] = K / 0.7071 * norm;
+	float boost = pow(GetParameter( kParam_Two ),2.0f)*16.0f;
+	float K = tan(M_PI * biquad[0]);
+	float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
+	biquad[2] = K / 0.7071f * norm;
 	biquad[4] = -biquad[2];
-	biquad[5] = 2.0 * (K * K - 1.0) * norm;
-	biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+	biquad[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 	//bandpass to focus the intensity of the effect
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		double outSample = biquad[2]*inputSample+biquad[4]*biquad[8]-biquad[5]*biquad[9]-biquad[6]*biquad[10];
+		float outSample = biquad[2]*inputSample+biquad[4]*biquad[8]-biquad[5]*biquad[9]-biquad[6]*biquad[10];
 		biquad[8] = biquad[7]; biquad[7] = inputSample; biquad[10] = biquad[9];
 		biquad[9] = outSample; //DF1
 		//so the audio we're working with is going to be a bandpassed signal: only high mids
@@ -88,15 +88,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//the original full bandwidth audio. And that's how analog aural exciters basically work.
 		//The real ones used a 4049 chip sometimes to produce the soft saturation we're getting with sin()	
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//and we'll do the harshest of hardclips to cope with how intense the new peaks can get,
 		//without in any way dialing back the ruthless brightness the exciter can create.
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

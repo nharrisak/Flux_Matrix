@@ -46,34 +46,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double zoom = (GetParameter( kParam_A )*2.0)-1.0;
-	double zoomStages = (fabs(zoom)*4.0)+1.0;
+	float zoom = (GetParameter( kParam_A )*2.0f)-1.0f;
+	float zoomStages = (fabs(zoom)*4.0f)+1.0f;
 	for (int count = 0; count < sqrt(zoomStages); count++) zoom *= fabs(zoom);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		for (int count = 0; count < zoomStages; count++) {
-			if (zoom > 0.0) {
-				double closer = inputSample * 1.57079633;
-				if (closer > 1.57079633) closer = 1.57079633;
-				if (closer < -1.57079633) closer = -1.57079633;
-				inputSample = (inputSample*(1.0-zoom))+(sin(closer)*zoom);
+			if (zoom > 0.0f) {
+				float closer = inputSample * 1.57079633f;
+				if (closer > 1.57079633f) closer = 1.57079633f;
+				if (closer < -1.57079633f) closer = -1.57079633f;
+				inputSample = (inputSample*(1.0f-zoom))+(sin(closer)*zoom);
 			} //zooming in will make the body of the sound louder: it's just Density
-			if (zoom < 0.0) {
-				double farther = fabs(inputSample) * 1.57079633;
-				if (farther > 1.57079633) farther = 1.0;
-				else farther = 1.0-cos(farther);
-				if (inputSample > 0.0) inputSample = (inputSample*(1.0+zoom))-(farther*zoom*1.57079633);
-				if (inputSample < 0.0) inputSample = (inputSample*(1.0+zoom))+(farther*zoom*1.57079633);			
+			if (zoom < 0.0f) {
+				float farther = fabs(inputSample) * 1.57079633f;
+				if (farther > 1.57079633f) farther = 1.0f;
+				else farther = 1.0f-cos(farther);
+				if (inputSample > 0.0f) inputSample = (inputSample*(1.0f+zoom))-(farther*zoom*1.57079633f);
+				if (inputSample < 0.0f) inputSample = (inputSample*(1.0f+zoom))+(farther*zoom*1.57079633f);			
 			} //zooming out boosts the hottest peaks but cuts back softer stuff
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

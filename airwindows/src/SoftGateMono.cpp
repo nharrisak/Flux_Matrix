@@ -33,9 +33,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 storedL[2];
-		Float64 diffL;
-		Float64 gate;
+		Float32 storedL[2];
+		Float32 diffL;
+		Float32 gate;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -52,18 +52,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 threshold = pow(GetParameter( kParam_One ),6);
-	Float64 recovery = pow((GetParameter( kParam_Two )*0.5),6);
+	Float32 threshold = pow(GetParameter( kParam_One ),6);
+	Float32 recovery = pow((GetParameter( kParam_Two )*0.5f),6);
 	recovery /= overallscale;
-	Float64 baseline = pow(GetParameter( kParam_Three ),6);
-	Float64 invrec = 1.0 - recovery;
+	Float32 baseline = pow(GetParameter( kParam_Three ),6);
+	Float32 invrec = 1.0f - recovery;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		storedL[1] = storedL[0];
 		storedL[0] = inputSample;
@@ -71,22 +71,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (gate > 0) {gate = ((gate-baseline) * invrec) + baseline;}
 		
-		if (fabs(diffL) > threshold) {gate = 1.1;}
+		if (fabs(diffL) > threshold) {gate = 1.1f;}
 		else {gate = (gate * invrec); if (threshold > 0) {gate += ((fabs(inputSample)/threshold) * recovery);}}
 		
 		if (gate < 0) gate = 0;
 		
-		if (gate < 1.0)
+		if (gate < 1.0f)
 		{
 			storedL[0] = storedL[1] + (diffL * gate);		
 		}
 		
-		if (gate < 1) inputSample = (inputSample * gate) + (storedL[0] * (1.0-gate));
+		if (gate < 1) inputSample = (inputSample * gate) + (storedL[0] * (1.0f-gate));
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

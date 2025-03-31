@@ -34,7 +34,7 @@ enum { kNumTemplateParameters = 6 };
 	int count;
 
 	struct _dram {
-		Float64 p[4099];
+		Float32 p[4099];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -42,39 +42,39 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double inputSampleL;
-	double inputSampleR;
-	Float64 drySampleL;
-	Float64 drySampleR;
-	double mid;
-	double side;
-	Float64 out;
-	Float64 densityside = GetParameter( kParam_One );
-	Float64 densitymid = GetParameter( kParam_Two );
-	Float64 wet = GetParameter( kParam_Three );
+	float inputSampleL;
+	float inputSampleR;
+	Float32 drySampleL;
+	Float32 drySampleR;
+	float mid;
+	float side;
+	Float32 out;
+	Float32 densityside = GetParameter( kParam_One );
+	Float32 densitymid = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Three );
 	//removed unnecessary dry variable
-	wet *= 0.5; //we make mid-side by adding/subtracting both channels into each channel
-	//and that's why we gotta divide it by 2: otherwise everything's doubled. So, premultiply it to save an extra 'math'
-	Float64 offset = (densityside-densitymid)/2;
+	wet *= 0.5f; //we make mid-side by adding/subtracting both channels into each channel
+	//and that's why we gotta divide it by 2: otherwise everything's floatd. So, premultiply it to save an extra 'math'
+	Float32 offset = (densityside-densitymid)/2;
 	if (offset > 0) offset = sin(offset);
 	if (offset < 0) offset = -sin(-offset);
 	offset = -(pow(offset,4) * 20 * overallscale);
 	int near = (int)floor(fabs(offset));
-	Float64 farLevel = fabs(offset) - near;
+	Float32 farLevel = fabs(offset) - near;
 	int far = near + 1;
-	Float64 nearLevel = 1.0 - farLevel;
-	Float64 bridgerectifier;
+	Float32 nearLevel = 1.0f - farLevel;
+	Float32 bridgerectifier;
 	//interpolating the sample
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		drySampleL = inputSampleL;
 		drySampleR = inputSampleR;
 		//assign working variables		
@@ -82,11 +82,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		side = inputSampleL - inputSampleR;
 		//assign mid and side. Now, High Impact code
 		
-		if (densityside != 0.0)
+		if (densityside != 0.0f)
 		{
 			out = fabs(densityside);
-			bridgerectifier = fabs(side)*1.57079633;
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			bridgerectifier = fabs(side)*1.57079633f;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			//max value for sine function
 			if (densityside > 0) bridgerectifier = sin(bridgerectifier);
 			else bridgerectifier = 1-cos(bridgerectifier);
@@ -96,11 +96,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//blend according to density control
 		}
 		
-		if (densitymid != 0.0)
+		if (densitymid != 0.0f)
 		{
 			out = fabs(densitymid);
-			bridgerectifier = fabs(mid)*1.57079633;
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			bridgerectifier = fabs(mid)*1.57079633f;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			//max value for sine function
 			if (densitymid > 0) bridgerectifier = sin(bridgerectifier);
 			else bridgerectifier = 1-cos(bridgerectifier);
@@ -126,16 +126,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		}
 		count -= 1;
 		
-		inputSampleL = (drySampleL * (1.0-wet)) + ((mid+side) * wet);
-		inputSampleR = (drySampleR * (1.0-wet)) + ((mid-side) * wet);
+		inputSampleL = (drySampleL * (1.0f-wet)) + ((mid+side) * wet);
+		inputSampleR = (drySampleR * (1.0f-wet)) + ((mid-side) * wet);
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 
 		*outputL = inputSampleL;

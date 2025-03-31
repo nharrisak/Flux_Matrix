@@ -29,8 +29,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastFXBuss;
-		Float64 lastSampleBuss;
+		Float32 lastFXBuss;
+		Float32 lastSampleBuss;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -48,43 +48,43 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	double centering = GetParameter( kParam_One ) * 0.5;
-	centering = 1.0 - pow(centering,5);
+	float centering = GetParameter( kParam_One ) * 0.5f;
+	centering = 1.0f - pow(centering,5);
 	//we can set our centering force from zero to rather high, but
-	//there's a really intense taper on it forcing it to mostly be almost 1.0.
-	//If it's literally 1.0, we don't even apply it, and you get the original
+	//there's a really intense taper on it forcing it to mostly be almost 1.0f.
+	//If it's literally 1.0f, we don't even apply it, and you get the original
 	//Xmas Morning bugged-out Console5, which is the default setting for Raw Console5.
-	Float64 difference;
+	Float32 difference;
 
-	double inputSample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		inputSample = asin(inputSample);
 		//amplitude aspect
 		
 		difference = lastSampleBuss - inputSample;
 		lastSampleBuss = inputSample;
 		//derive slew part off direct sample measurement + from last time
-		if (difference > 1.57079633) difference = 1.57079633;
-		if (difference < -1.57079633) difference = -1.57079633;
+		if (difference > 1.57079633f) difference = 1.57079633f;
+		if (difference < -1.57079633f) difference = -1.57079633f;
 		inputSample = lastFXBuss + sin(difference);
 		lastFXBuss = inputSample;
-		if (centering < 1.0) lastFXBuss *= centering;
+		if (centering < 1.0f) lastFXBuss *= centering;
 		//if we're using the crude centering force, it's applied here
-		if (lastFXBuss > 1.0) lastFXBuss = 1.0;
-		if (lastFXBuss < -1.0) lastFXBuss = -1.0;
+		if (lastFXBuss > 1.0f) lastFXBuss = 1.0f;
+		if (lastFXBuss < -1.0f) lastFXBuss = -1.0f;
 		//build new signal off what was present in output last time
 		//slew aspect
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

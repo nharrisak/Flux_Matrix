@@ -33,7 +33,7 @@ struct _kernel {
  
 		bool WasNegative;
 		int ZeroCross;
-		Float64 gateroller;
+		Float32 gateroller;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -50,18 +50,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 threshold = (pow(GetParameter( kParam_One ),4)/3)+0.00018;
-	Float64 release = 0.0064 / overallscale;
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 threshold = (pow(GetParameter( kParam_One ),4)/3)+0.00018f;
+	Float32 release = 0.0064f / overallscale;
+	Float32 wet = GetParameter( kParam_Two );
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		if (inputSample > 0) {
 			if (WasNegative == true) ZeroCross = 0;
@@ -79,27 +79,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			gateroller -= release;
 		}
 		
-		if (gateroller < 0.0) gateroller = 0.0;
+		if (gateroller < 0.0f) gateroller = 0.0f;
 		
-		Float64 gate = 1.0;
-		if (gateroller < 1.0) gate = gateroller;
+		Float32 gate = 1.0f;
+		if (gateroller < 1.0f) gate = gateroller;
 		
-		double bridgerectifier = 1-cos(fabs(inputSample));
+		float bridgerectifier = 1-cos(fabs(inputSample));
 		
 		if (inputSample > 0) inputSample = (inputSample*gate)+(bridgerectifier*(1-gate));
 		else inputSample = (inputSample*gate)-(bridgerectifier*(1-gate));
 		
-		if ((gate == 0.0) && (fabs(inputSample*3) < threshold)) inputSample = 0.0;
+		if ((gate == 0.0f) && (fabs(inputSample*3) < threshold)) inputSample = 0.0f;
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

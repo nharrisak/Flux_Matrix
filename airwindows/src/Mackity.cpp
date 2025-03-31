@@ -31,10 +31,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double iirSampleA;
-		double iirSampleB;
-		double biquadA[11];
-		double biquadB[11];
+		float iirSampleA;
+		float iirSampleB;
+		float biquadA[11];
+		float biquadB[11];
 
 		uint32_t fpd;
 	
@@ -52,67 +52,67 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	double inTrim = GetParameter( kParam_One )*10.0;
-	double outPad = GetParameter( kParam_Two );
+	float inTrim = GetParameter( kParam_One )*10.0f;
+	float outPad = GetParameter( kParam_Two );
 	inTrim *= inTrim;
 	
-	double iirAmountA = 0.001860867/overallscale;
-	double iirAmountB = 0.000287496/overallscale;
+	float iirAmountA = 0.001860867f/overallscale;
+	float iirAmountB = 0.000287496f/overallscale;
 	
-	biquadB[0] = biquadA[0] = 19160.0 / GetSampleRate();
-    biquadA[1] = 0.431684981684982;
-	biquadB[1] = 1.1582298;
+	biquadB[0] = biquadA[0] = 19160.0f / GetSampleRate();
+    biquadA[1] = 0.431684981684982f;
+	biquadB[1] = 1.1582298f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadB[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		if (fabs(iirSampleA)<1.18e-37) iirSampleA = 0.0;
-		iirSampleA = (iirSampleA * (1.0 - iirAmountA)) + (inputSample * iirAmountA);
+		if (fabs(iirSampleA)<1.18e-37f) iirSampleA = 0.0f;
+		iirSampleA = (iirSampleA * (1.0f - iirAmountA)) + (inputSample * iirAmountA);
 		inputSample -= iirSampleA;
 		
-		if (inTrim != 1.0) inputSample *= inTrim;
+		if (inTrim != 1.0f) inputSample *= inTrim;
 		
-		double outSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float outSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = outSample; biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1		
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		inputSample -= pow(inputSample,5)*0.1768;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample -= pow(inputSample,5)*0.1768f;
 		
 		outSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = outSample; biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (fabs(iirSampleB)<1.18e-37) iirSampleB = 0.0;
-		iirSampleB = (iirSampleB * (1.0 - iirAmountB)) + (inputSample * iirAmountB);
+		if (fabs(iirSampleB)<1.18e-37f) iirSampleB = 0.0f;
+		iirSampleB = (iirSampleB * (1.0f - iirAmountB)) + (inputSample * iirAmountB);
 		inputSample -= iirSampleB;
 		
-		if (outPad != 1.0) inputSample *= outPad;
+		if (outPad != 1.0f) inputSample *= outPad;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

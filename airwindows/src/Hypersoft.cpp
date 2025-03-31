@@ -35,7 +35,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double lastSample;
+		float lastSample;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -53,27 +53,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	double inputGain = GetParameter( kParam_A )*2.0;
-	if (inputGain > 1.0) inputGain *= inputGain; else inputGain = 1.0-pow(1.0-inputGain,2);
-	//this is the fader curve from ConsoleX with 0.5 being unity gain
-	int stages = (int)(GetParameter( kParam_B )*12.0)+2;
+	float inputGain = GetParameter( kParam_A )*2.0f;
+	if (inputGain > 1.0f) inputGain *= inputGain; else inputGain = 1.0f-pow(1.0f-inputGain,2);
+	//this is the fader curve from ConsoleX with 0.5f being unity gain
+	int stages = (int)(GetParameter( kParam_B )*12.0f)+2;
 	//each stage brings in an additional layer of harmonics on the waveshaping
-	double bright = (1.0-GetParameter( kParam_C ))*0.15;
+	float bright = (1.0f-GetParameter( kParam_C ))*0.15f;
 	//higher slews suppress these higher harmonics when they are sure to just alias
-	double outputGain = GetParameter( kParam_D )*2.0;
-	if (outputGain > 1.0) outputGain *= outputGain; else outputGain = 1.0-pow(1.0-outputGain,2);
-	outputGain *= 0.68;
+	float outputGain = GetParameter( kParam_D )*2.0f;
+	if (outputGain > 1.0f) outputGain *= outputGain; else outputGain = 1.0f-pow(1.0f-outputGain,2);
+	outputGain *= 0.68f;
 	//this is the fader curve from ConsoleX, rescaled to work with Hypersoft
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		inputSample *= inputGain;
 		
-		inputSample = sin(inputSample); inputSample += (sin(inputSample*2.0)/2.0);
+		inputSample = sin(inputSample); inputSample += (sin(inputSample*2.0f)/2.0f);
 		for (int count = 2; count<stages; count++){
-			inputSample += ((sin(inputSample*(double)count)/(double)pow(count,3))*fmax(0.0,1.0-fabs((inputSample-lastSample)*bright*(double)(count*count))));
+			inputSample += ((sin(inputSample*(float)count)/(float)pow(count,3))*fmax(0.0f,1.0f-fabs((inputSample-lastSample)*bright*(float)(count*count))));
 		}
 		lastSample = inputSample;
 		
@@ -82,7 +82,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -48,7 +48,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double biqs[biqs_total];
+			float biqs[biqs_total];
 	};
 	_dram* dram;
 };
@@ -62,8 +62,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	dram->biqs[biqs_levelA] = dram->biqs[biqs_levelB];
@@ -79,27 +79,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//previous run through the buffer is still in the filter, so we move it
 	//to the A section and now it's the new starting point.
 	
-	dram->biqs[biqs_freq] = (((pow(GetParameter( kParam_A ),4)*19980.0)+20.0)/GetSampleRate());	
+	dram->biqs[biqs_freq] = (((pow(GetParameter( kParam_A ),4)*19980.0f)+20.0f)/GetSampleRate());	
 	dram->biqs[biqs_nonlin] = GetParameter( kParam_B );
-	dram->biqs[biqs_levelB] = (dram->biqs[biqs_nonlin]*2.0)-1.0;
-	if (dram->biqs[biqs_levelB] > 0.0) dram->biqs[biqs_levelB] *= 2.0;
-	dram->biqs[biqs_reso] = ((0.5+(dram->biqs[biqs_nonlin]*0.5)+sqrt(dram->biqs[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_C ),2.0)))+0.5+(dram->biqs[biqs_nonlin]*0.5);
+	dram->biqs[biqs_levelB] = (dram->biqs[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->biqs[biqs_levelB] > 0.0f) dram->biqs[biqs_levelB] *= 2.0f;
+	dram->biqs[biqs_reso] = ((0.5f+(dram->biqs[biqs_nonlin]*0.5f)+sqrt(dram->biqs[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_C ),2.0f)))+0.5f+(dram->biqs[biqs_nonlin]*0.5f);
 
-	double K = tan(M_PI * dram->biqs[biqs_freq]);
-	double norm = 1.0 / (1.0 + K / (dram->biqs[biqs_reso]*1.93185165) + K * K);
-	dram->biqs[biqs_aB0] = K / (dram->biqs[biqs_reso]*1.93185165) * norm;
-	dram->biqs[biqs_bB1] = 2.0 * (K * K - 1.0) * norm;
-	dram->biqs[biqs_bB2] = (1.0 - K / (dram->biqs[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->biqs[biqs_reso]*0.70710678) + K * K);
-	dram->biqs[biqs_cB0] = K / (dram->biqs[biqs_reso]*0.70710678) * norm;
-	dram->biqs[biqs_dB1] = 2.0 * (K * K - 1.0) * norm;
-	dram->biqs[biqs_dB2] = (1.0 - K / (dram->biqs[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->biqs[biqs_reso]*0.51763809) + K * K);
-	dram->biqs[biqs_eB0] = K / (dram->biqs[biqs_reso]*0.51763809) * norm;
-	dram->biqs[biqs_fB1] = 2.0 * (K * K - 1.0) * norm;
-	dram->biqs[biqs_fB2] = (1.0 - K / (dram->biqs[biqs_reso]*0.51763809) + K * K) * norm;
+	float K = tan(M_PI * dram->biqs[biqs_freq]);
+	float norm = 1.0f / (1.0f + K / (dram->biqs[biqs_reso]*1.93185165f) + K * K);
+	dram->biqs[biqs_aB0] = K / (dram->biqs[biqs_reso]*1.93185165f) * norm;
+	dram->biqs[biqs_bB1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->biqs[biqs_bB2] = (1.0f - K / (dram->biqs[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->biqs[biqs_reso]*0.70710678f) + K * K);
+	dram->biqs[biqs_cB0] = K / (dram->biqs[biqs_reso]*0.70710678f) * norm;
+	dram->biqs[biqs_dB1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->biqs[biqs_dB2] = (1.0f - K / (dram->biqs[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->biqs[biqs_reso]*0.51763809f) + K * K);
+	dram->biqs[biqs_eB0] = K / (dram->biqs[biqs_reso]*0.51763809f) * norm;
+	dram->biqs[biqs_fB1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->biqs[biqs_fB2] = (1.0f - K / (dram->biqs[biqs_reso]*0.51763809f) + K * K) * norm;
 
-	if (dram->biqs[biqs_aA0] == 0.0) { // if we have just started, start directly with raw info
+	if (dram->biqs[biqs_aA0] == 0.0f) { // if we have just started, start directly with raw info
 		dram->biqs[biqs_levelA] = dram->biqs[biqs_levelB];
 		dram->biqs[biqs_aA0] = dram->biqs[biqs_aB0];
 		dram->biqs[biqs_bA1] = dram->biqs[biqs_bB1];
@@ -113,43 +113,43 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	}
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double buf = (double)nSampleFrames/inFramesToProcess;
-		dram->biqs[biqs_level] = (dram->biqs[biqs_levelA]*buf)+(dram->biqs[biqs_levelB]*(1.0-buf));
-		dram->biqs[biqs_a0] = (dram->biqs[biqs_aA0]*buf)+(dram->biqs[biqs_aB0]*(1.0-buf));
-		dram->biqs[biqs_b1] = (dram->biqs[biqs_bA1]*buf)+(dram->biqs[biqs_bB1]*(1.0-buf));
-		dram->biqs[biqs_b2] = (dram->biqs[biqs_bA2]*buf)+(dram->biqs[biqs_bB2]*(1.0-buf));
-		dram->biqs[biqs_c0] = (dram->biqs[biqs_cA0]*buf)+(dram->biqs[biqs_cB0]*(1.0-buf));
-		dram->biqs[biqs_d1] = (dram->biqs[biqs_dA1]*buf)+(dram->biqs[biqs_dB1]*(1.0-buf));
-		dram->biqs[biqs_d2] = (dram->biqs[biqs_dA2]*buf)+(dram->biqs[biqs_dB2]*(1.0-buf));
-		dram->biqs[biqs_e0] = (dram->biqs[biqs_eA0]*buf)+(dram->biqs[biqs_eB0]*(1.0-buf));
-		dram->biqs[biqs_f1] = (dram->biqs[biqs_fA1]*buf)+(dram->biqs[biqs_fB1]*(1.0-buf));
-		dram->biqs[biqs_f2] = (dram->biqs[biqs_fA2]*buf)+(dram->biqs[biqs_fB2]*(1.0-buf));
+		float buf = (float)nSampleFrames/inFramesToProcess;
+		dram->biqs[biqs_level] = (dram->biqs[biqs_levelA]*buf)+(dram->biqs[biqs_levelB]*(1.0f-buf));
+		dram->biqs[biqs_a0] = (dram->biqs[biqs_aA0]*buf)+(dram->biqs[biqs_aB0]*(1.0f-buf));
+		dram->biqs[biqs_b1] = (dram->biqs[biqs_bA1]*buf)+(dram->biqs[biqs_bB1]*(1.0f-buf));
+		dram->biqs[biqs_b2] = (dram->biqs[biqs_bA2]*buf)+(dram->biqs[biqs_bB2]*(1.0f-buf));
+		dram->biqs[biqs_c0] = (dram->biqs[biqs_cA0]*buf)+(dram->biqs[biqs_cB0]*(1.0f-buf));
+		dram->biqs[biqs_d1] = (dram->biqs[biqs_dA1]*buf)+(dram->biqs[biqs_dB1]*(1.0f-buf));
+		dram->biqs[biqs_d2] = (dram->biqs[biqs_dA2]*buf)+(dram->biqs[biqs_dB2]*(1.0f-buf));
+		dram->biqs[biqs_e0] = (dram->biqs[biqs_eA0]*buf)+(dram->biqs[biqs_eB0]*(1.0f-buf));
+		dram->biqs[biqs_f1] = (dram->biqs[biqs_fA1]*buf)+(dram->biqs[biqs_fB1]*(1.0f-buf));
+		dram->biqs[biqs_f2] = (dram->biqs[biqs_fA2]*buf)+(dram->biqs[biqs_fB2]*(1.0f-buf));
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->biqs[biqs_outL] = inputSample * fabs(dram->biqs[biqs_level]);
-		dram->biqs[biqs_dis] = fabs(dram->biqs[biqs_a0] * (1.0+(dram->biqs[biqs_outL]*dram->biqs[biqs_nonlin])));
-		if (dram->biqs[biqs_dis] > 1.0) dram->biqs[biqs_dis] = 1.0;
+		dram->biqs[biqs_dis] = fabs(dram->biqs[biqs_a0] * (1.0f+(dram->biqs[biqs_outL]*dram->biqs[biqs_nonlin])));
+		if (dram->biqs[biqs_dis] > 1.0f) dram->biqs[biqs_dis] = 1.0f;
 		dram->biqs[biqs_temp] = (dram->biqs[biqs_outL] * dram->biqs[biqs_dis]) + dram->biqs[biqs_aL1];
 		dram->biqs[biqs_aL1] = dram->biqs[biqs_aL2] - (dram->biqs[biqs_temp]*dram->biqs[biqs_b1]);
 		dram->biqs[biqs_aL2] = (dram->biqs[biqs_outL] * -dram->biqs[biqs_dis]) - (dram->biqs[biqs_temp]*dram->biqs[biqs_b2]);
 		dram->biqs[biqs_outL] = dram->biqs[biqs_temp];
-		dram->biqs[biqs_dis] = fabs(dram->biqs[biqs_c0] * (1.0+(dram->biqs[biqs_outL]*dram->biqs[biqs_nonlin])));
-		if (dram->biqs[biqs_dis] > 1.0) dram->biqs[biqs_dis] = 1.0;
+		dram->biqs[biqs_dis] = fabs(dram->biqs[biqs_c0] * (1.0f+(dram->biqs[biqs_outL]*dram->biqs[biqs_nonlin])));
+		if (dram->biqs[biqs_dis] > 1.0f) dram->biqs[biqs_dis] = 1.0f;
 		dram->biqs[biqs_temp] = (dram->biqs[biqs_outL] * dram->biqs[biqs_dis]) + dram->biqs[biqs_cL1];
 		dram->biqs[biqs_cL1] = dram->biqs[biqs_cL2] - (dram->biqs[biqs_temp]*dram->biqs[biqs_d1]);
 		dram->biqs[biqs_cL2] = (dram->biqs[biqs_outL] * -dram->biqs[biqs_dis]) - (dram->biqs[biqs_temp]*dram->biqs[biqs_d2]);
 		dram->biqs[biqs_outL] = dram->biqs[biqs_temp];
-		dram->biqs[biqs_dis] = fabs(dram->biqs[biqs_e0] * (1.0+(dram->biqs[biqs_outL]*dram->biqs[biqs_nonlin])));
-		if (dram->biqs[biqs_dis] > 1.0) dram->biqs[biqs_dis] = 1.0;
+		dram->biqs[biqs_dis] = fabs(dram->biqs[biqs_e0] * (1.0f+(dram->biqs[biqs_outL]*dram->biqs[biqs_nonlin])));
+		if (dram->biqs[biqs_dis] > 1.0f) dram->biqs[biqs_dis] = 1.0f;
 		dram->biqs[biqs_temp] = (dram->biqs[biqs_outL] * dram->biqs[biqs_dis]) + dram->biqs[biqs_eL1];
 		dram->biqs[biqs_eL1] = dram->biqs[biqs_eL2] - (dram->biqs[biqs_temp]*dram->biqs[biqs_f1]);
 		dram->biqs[biqs_eL2] = (dram->biqs[biqs_outL] * -dram->biqs[biqs_dis]) - (dram->biqs[biqs_temp]*dram->biqs[biqs_f2]);
 		dram->biqs[biqs_outL] = dram->biqs[biqs_temp];
 		dram->biqs[biqs_outL] *= dram->biqs[biqs_level];
-		if (dram->biqs[biqs_level] > 1.0) dram->biqs[biqs_outL] *= dram->biqs[biqs_level];
+		if (dram->biqs[biqs_level] > 1.0f) dram->biqs[biqs_outL] *= dram->biqs[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		inputSample += dram->biqs[biqs_outL]; //purely a parallel filter stage here
@@ -157,7 +157,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

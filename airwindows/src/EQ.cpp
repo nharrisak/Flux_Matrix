@@ -43,52 +43,52 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirHighSampleA;
-		Float64 iirHighSampleB;
-		Float64 iirHighSampleC;
-		Float64 iirHighSampleD;
-		Float64 iirHighSampleE;
-		Float64 iirLowSampleA;
-		Float64 iirLowSampleB;
-		Float64 iirLowSampleC;
-		Float64 iirLowSampleD;
-		Float64 iirLowSampleE;
-		Float64 iirHighSample;
-		Float64 iirLowSample;
+		Float32 iirHighSampleA;
+		Float32 iirHighSampleB;
+		Float32 iirHighSampleC;
+		Float32 iirHighSampleD;
+		Float32 iirHighSampleE;
+		Float32 iirLowSampleA;
+		Float32 iirLowSampleB;
+		Float32 iirLowSampleC;
+		Float32 iirLowSampleD;
+		Float32 iirLowSampleE;
+		Float32 iirHighSample;
+		Float32 iirLowSample;
 		
-		Float64 tripletA;
-		Float64 tripletB;
-		Float64 tripletC;
-		Float64 tripletFactor;
+		Float32 tripletA;
+		Float32 tripletB;
+		Float32 tripletC;
+		Float32 tripletFactor;
 		
-		Float64 lowpassSampleAA;
-		Float64 lowpassSampleAB;
-		Float64 lowpassSampleBA;
-		Float64 lowpassSampleBB;
-		Float64 lowpassSampleCA;
-		Float64 lowpassSampleCB;
-		Float64 lowpassSampleDA;
-		Float64 lowpassSampleDB;
-		Float64 lowpassSampleE;
-		Float64 lowpassSampleF;
-		Float64 lowpassSampleG;
+		Float32 lowpassSampleAA;
+		Float32 lowpassSampleAB;
+		Float32 lowpassSampleBA;
+		Float32 lowpassSampleBB;
+		Float32 lowpassSampleCA;
+		Float32 lowpassSampleCB;
+		Float32 lowpassSampleDA;
+		Float32 lowpassSampleDB;
+		Float32 lowpassSampleE;
+		Float32 lowpassSampleF;
+		Float32 lowpassSampleG;
 		
-		Float64 highpassSampleAA;
-		Float64 highpassSampleAB;
-		Float64 highpassSampleBA;
-		Float64 highpassSampleBB;
-		Float64 highpassSampleCA;
-		Float64 highpassSampleCB;
-		Float64 highpassSampleDA;
-		Float64 highpassSampleDB;
-		Float64 highpassSampleE;
-		Float64 highpassSampleF;
+		Float32 highpassSampleAA;
+		Float32 highpassSampleAB;
+		Float32 highpassSampleBA;
+		Float32 highpassSampleBB;
+		Float32 highpassSampleCA;
+		Float32 highpassSampleCB;
+		Float32 highpassSampleDA;
+		Float32 highpassSampleDB;
+		Float32 highpassSampleE;
+		Float32 highpassSampleF;
 		
 		bool flip;
 		int flipthree;
 		
-		Float64 lastSample;
-		Float64 last2Sample;
+		Float32 lastSample;
+		Float32 last2Sample;
 
 		uint32_t fpd;
 	
@@ -106,46 +106,46 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = GetSampleRate();
-	Float64 inputSample;
-	Float64 highSample = 0.0;
-	Float64 midSample = 0.0;
-	Float64 bassSample = 0.0;
-	Float64 densityA = GetParameter( kParam_One )/2.0;
-	Float64 densityB = GetParameter( kParam_Two )/2.0;
-	Float64 densityC = GetParameter( kParam_Three )/2.0;
+	Float32 overallscale = GetSampleRate();
+	Float32 inputSample;
+	Float32 highSample = 0.0f;
+	Float32 midSample = 0.0f;
+	Float32 bassSample = 0.0f;
+	Float32 densityA = GetParameter( kParam_One )/2.0f;
+	Float32 densityB = GetParameter( kParam_Two )/2.0f;
+	Float32 densityC = GetParameter( kParam_Three )/2.0f;
 
-	densityA = pow(10.0,densityA/20.0)-1.0;
-	densityB = pow(10.0,densityB/20.0)-1.0;
-	densityC = pow(10.0,densityC/20.0)-1.0;
-	//convert to 0 to X multiplier with 1.0 being O db
+	densityA = pow(10.0f,densityA/20.0f)-1.0f;
+	densityB = pow(10.0f,densityB/20.0f)-1.0f;
+	densityC = pow(10.0f,densityC/20.0f)-1.0f;
+	//convert to 0 to X multiplier with 1.0f being O db
 	//minus one gives nearly -1 to ? (should top out at 1)
 	//calibrate so that X db roughly equals X db with maximum topping out at 1 internally
 	
-	Float64 tripletIntensity = -densityA;
+	Float32 tripletIntensity = -densityA;
 	
-	Float64 iirAmountC = (GetParameter( kParam_Four )*0.0188) + 0.7;
-	if (iirAmountC > 1.0) iirAmountC = 1.0;
+	Float32 iirAmountC = (GetParameter( kParam_Four )*0.0188f) + 0.7f;
+	if (iirAmountC > 1.0f) iirAmountC = 1.0f;
 	bool engageLowpass = false;
-	if (GetParameter( kParam_Four ) < 15.99) engageLowpass = true;
+	if (GetParameter( kParam_Four ) < 15.99f) engageLowpass = true;
 	
-	Float64 iirAmountA = (GetParameter( kParam_Five )*1000)/overallscale;
-	Float64 iirAmountB = (GetParameter( kParam_Six )*10)/overallscale;
-	Float64 iirAmountD = (GetParameter( kParam_Seven )*1.0)/overallscale;
+	Float32 iirAmountA = (GetParameter( kParam_Five )*1000)/overallscale;
+	Float32 iirAmountB = (GetParameter( kParam_Six )*10)/overallscale;
+	Float32 iirAmountD = (GetParameter( kParam_Seven )*1.0f)/overallscale;
 	bool engageHighpass = false;
-	if (GetParameter( kParam_Seven ) > 30.01) engageHighpass = true;
+	if (GetParameter( kParam_Seven ) > 30.01f) engageHighpass = true;
 	//bypass the highpass and lowpass if set to extremes
-	Float64 bridgerectifier;
-	Float64 outA = fabs(densityA);
-	Float64 outB = fabs(densityB);
-	Float64 outC = fabs(densityC);
-	Float64 outputgain = pow(10.0,GetParameter( kParam_Eight )/20.0);
+	Float32 bridgerectifier;
+	Float32 outA = fabs(densityA);
+	Float32 outB = fabs(densityB);
+	Float32 outC = fabs(densityC);
+	Float32 outputgain = pow(10.0f,GetParameter( kParam_Eight )/20.0f);
 	
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		last2Sample = lastSample;
 		lastSample = inputSample;
@@ -187,9 +187,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				bassSample = iirLowSampleE;
 				break;
 		}
-		tripletA /= 2.0;
-		tripletB /= 2.0;
-		tripletC /= 2.0;
+		tripletA /= 2.0f;
+		tripletB /= 2.0f;
+		tripletC /= 2.0f;
 		highSample = highSample + tripletFactor;
 		
 		if (flip)
@@ -214,9 +214,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		midSample = (inputSample-bassSample)-highSample;
 
 		//drive section
-		highSample *= (densityA+1.0);
-		bridgerectifier = fabs(highSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		highSample *= (densityA+1.0f);
+		bridgerectifier = fabs(highSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		if (densityA > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier);
@@ -225,9 +225,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else highSample = (highSample*(1-outA))-(bridgerectifier*outA);
 		//blend according to densityA control
 		
-		midSample *= (densityB+1.0);
-		bridgerectifier = fabs(midSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		midSample *= (densityB+1.0f);
+		bridgerectifier = fabs(midSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		if (densityB > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier);
@@ -236,9 +236,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else midSample = (midSample*(1-outB))-(bridgerectifier*outB);
 		//blend according to densityB control
 		
-		bassSample *= (densityC+1.0);
-		bridgerectifier = fabs(bassSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bassSample *= (densityC+1.0f);
+		bridgerectifier = fabs(bassSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		if (densityC > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier);
@@ -315,12 +315,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		//built in output trim and dry/wet if desired
-		if (outputgain != 1.0) inputSample *= outputgain;
+		if (outputgain != 1.0f) inputSample *= outputgain;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 	
 		*destP = inputSample;

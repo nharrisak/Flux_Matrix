@@ -36,31 +36,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double soar = 0.3-(GetParameter( kParam_A )*0.3);
+	float soar = 0.3f-(GetParameter( kParam_A )*0.3f);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;		
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;		
 		
 		//blame Jannik Asfaig (BoyXx76) for this (and me) :D
-		double out = 0.0;
-		double inL = fabs(inputSampleL)+(soar*soar);
-		double inR = fabs(inputSampleR)+(soar*soar);		
-		if (inputSampleL > 0.0 && inputSampleR > 0.0) out = fmax((sqrt(inR/inL)*inL)-soar,0.0);
-		if (inputSampleL < 0.0 && inputSampleR > 0.0) out = fmin((-sqrt(inR/inL)*inL)+soar,0.0);
-		if (inputSampleL > 0.0 && inputSampleR < 0.0) out = fmin((-sqrt(inR/inL)*inL)+soar,0.0);
-		if (inputSampleL < 0.0 && inputSampleR < 0.0) out = fmax((sqrt(inR/inL)*inL)-soar,0.0);
+		float out = 0.0f;
+		float inL = fabs(inputSampleL)+(soar*soar);
+		float inR = fabs(inputSampleR)+(soar*soar);		
+		if (inputSampleL > 0.0f && inputSampleR > 0.0f) out = fmax((sqrt(inR/inL)*inL)-soar,0.0f);
+		if (inputSampleL < 0.0f && inputSampleR > 0.0f) out = fmin((-sqrt(inR/inL)*inL)+soar,0.0f);
+		if (inputSampleL > 0.0f && inputSampleR < 0.0f) out = fmin((-sqrt(inR/inL)*inL)+soar,0.0f);
+		if (inputSampleL < 0.0f && inputSampleR < 0.0f) out = fmax((sqrt(inR/inL)*inL)-soar,0.0f);
 		inputSampleL = inputSampleR = out;
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

@@ -36,39 +36,39 @@ struct _kernel {
  
 		
 		
-		double lastclampAL;
-		double clampAL;
-		double changeAL;
-		double prevresultAL;
-		double lastAL;
+		float lastclampAL;
+		float clampAL;
+		float changeAL;
+		float prevresultAL;
+		float lastAL;
 		
-		double lastclampBL;
-		double clampBL;
-		double changeBL;
-		double prevresultBL;
-		double lastBL;
+		float lastclampBL;
+		float clampBL;
+		float changeBL;
+		float prevresultBL;
+		float lastBL;
 		
-		double lastclampCL;
-		double clampCL;
-		double changeCL;
-		double prevresultCL;
-		double lastCL;
+		float lastclampCL;
+		float clampCL;
+		float changeCL;
+		float prevresultCL;
+		float lastCL;
 		
-		double dBaPosL;
+		float dBaPosL;
 		int dBaXL;
 		
-		double dBbPosL;
+		float dBbPosL;
 		int dBbXL;
 		
-		double dBcPosL;
+		float dBcPosL;
 		int dBcXL;
 				
 		uint32_t fpd;
 	
 	struct _dram {
-			double dBaL[dscBuf+5];
-		double dBbL[dscBuf+5];
-		double dBcL[dscBuf+5];
+			float dBaL[dscBuf+5];
+		float dBbL[dscBuf+5];
+		float dBcL[dscBuf+5];
 	};
 	_dram* dram;
 };
@@ -82,39 +82,39 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	double softslew = (GetParameter( kParam_One )*10.0)+0.5;
+	float softslew = (GetParameter( kParam_One )*10.0f)+0.5f;
 	softslew *= overallscale;
-	double outslew = softslew * (1.0-(GetParameter( kParam_One )*0.0333));
-	double refdB = GetParameter( kParam_Two );
-	double topdB = 0.000000075 * pow(10.0,refdB/20.0) * overallscale;
-	double wet = GetParameter( kParam_Three );
+	float outslew = softslew * (1.0f-(GetParameter( kParam_One )*0.0333f));
+	float refdB = GetParameter( kParam_Two );
+	float topdB = 0.000000075f * pow(10.0f,refdB/20.0f) * overallscale;
+	float wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *sourceP;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpd * 1.18e-17;
-		double drySampleL = inputSampleL;
+		float inputSampleL = *sourceP;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpd * 1.18e-17f;
+		float drySampleL = inputSampleL;
 		
 		inputSampleL *= softslew;
 		lastclampAL = clampAL; clampAL = inputSampleL - lastAL;
-		double postfilter = changeAL = fabs(clampAL - lastclampAL);
-		postfilter += (softslew / 2.0);
+		float postfilter = changeAL = fabs(clampAL - lastclampAL);
+		postfilter += (softslew / 2.0f);
 		inputSampleL /= outslew;
 		inputSampleL += (prevresultAL * postfilter);
-		inputSampleL /= (postfilter + 1.0);
+		inputSampleL /= (postfilter + 1.0f);
 		prevresultAL = inputSampleL;
 		//do an IIR like thing to further squish superdistant stuff
 		
 		inputSampleL *= topdB;
-		if (inputSampleL < -0.222) inputSampleL = -0.222; if (inputSampleL > 0.222) inputSampleL = 0.222;
+		if (inputSampleL < -0.222f) inputSampleL = -0.222f; if (inputSampleL > 0.222f) inputSampleL = 0.222f;
 		//Air Discontinuity A begin
-		dram->dBaL[dBaXL] = inputSampleL; dBaPosL *= 0.5; dBaPosL += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*0.5);
+		dram->dBaL[dBaXL] = inputSampleL; dBaPosL *= 0.5f; dBaPosL += fabs((inputSampleL*((inputSampleL*0.25f)-0.5f))*0.5f);
 		int dBdly = floor(dBaPosL*dscBuf);
-		double dBi = (dBaPosL*dscBuf)-dBdly;
-		inputSampleL = dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		float dBi = (dBaPosL*dscBuf)-dBdly;
+		inputSampleL = dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0f-dBi);
 		dBdly++; inputSampleL += dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBaXL++; if (dBaXL < 0 || dBaXL >= dscBuf) dBaXL = 0;
 		//Air Discontinuity A end
@@ -123,20 +123,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSampleL *= softslew;
 		lastclampBL = clampBL; clampBL = inputSampleL - lastBL;
 		postfilter = changeBL = fabs(clampBL - lastclampBL);
-		postfilter += (softslew / 2.0);
+		postfilter += (softslew / 2.0f);
 		lastBL = inputSampleL;
 		inputSampleL /= outslew;
 		inputSampleL += (prevresultBL * postfilter);
-		inputSampleL /= (postfilter + 1.0);
+		inputSampleL /= (postfilter + 1.0f);
 		prevresultBL = inputSampleL;
 		//do an IIR like thing to further squish superdistant stuff
 		
 		inputSampleL *= topdB;
-		if (inputSampleL < -0.222) inputSampleL = -0.222; if (inputSampleL > 0.222) inputSampleL = 0.222;
+		if (inputSampleL < -0.222f) inputSampleL = -0.222f; if (inputSampleL > 0.222f) inputSampleL = 0.222f;
 		//Air Discontinuity B begin
-		dram->dBbL[dBbXL] = inputSampleL;  dBbPosL *= 0.5; dBbPosL += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*0.5);
+		dram->dBbL[dBbXL] = inputSampleL;  dBbPosL *= 0.5f; dBbPosL += fabs((inputSampleL*((inputSampleL*0.25f)-0.5f))*0.5f);
 		dBdly = floor(dBbPosL*dscBuf); dBi = (dBbPosL*dscBuf)-dBdly;
-		inputSampleL = dram->dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		inputSampleL = dram->dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*(1.0f-dBi);
 		dBdly++; inputSampleL += dram->dBbL[dBbXL-dBdly +((dBbXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBbXL++; if (dBbXL < 0 || dBbXL >= dscBuf) dBbXL = 0;
 		//Air Discontinuity B end
@@ -145,31 +145,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSampleL *= softslew;
 		lastclampCL = clampCL; clampCL = inputSampleL - lastCL;
 		postfilter = changeCL = fabs(clampCL - lastclampCL);
-		postfilter += (softslew / 2.0);
+		postfilter += (softslew / 2.0f);
 		lastCL = inputSampleL;
 		inputSampleL /= softslew; //don't boost the final time!
 		inputSampleL += (prevresultCL * postfilter);
-		inputSampleL /= (postfilter + 1.0);
+		inputSampleL /= (postfilter + 1.0f);
 		prevresultCL = inputSampleL;
 		//do an IIR like thing to further squish superdistant stuff
 		
 		inputSampleL *= topdB;
-		if (inputSampleL < -0.222) inputSampleL = -0.222; if (inputSampleL > 0.222) inputSampleL = 0.222;		
+		if (inputSampleL < -0.222f) inputSampleL = -0.222f; if (inputSampleL > 0.222f) inputSampleL = 0.222f;		
 		//Air Discontinuity C begin
-		dram->dBcL[dBcXL] = inputSampleL;  dBcPosL *= 0.5; dBcPosL += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*0.5);
+		dram->dBcL[dBcXL] = inputSampleL;  dBcPosL *= 0.5f; dBcPosL += fabs((inputSampleL*((inputSampleL*0.25f)-0.5f))*0.5f);
 		dBdly = floor(dBcPosL*dscBuf); dBi = (dBcPosL*dscBuf)-dBdly;
-		inputSampleL = dram->dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		inputSampleL = dram->dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*(1.0f-dBi);
 		dBdly++; inputSampleL += dram->dBcL[dBcXL-dBdly +((dBcXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBcXL++; if (dBcXL < 0 || dBcXL >= dscBuf) dBcXL = 0;
 		//Air Discontinuity C end
 		inputSampleL /= topdB;
 		
-		if (wet < 1.0) inputSampleL = (drySampleL * (1.0-wet))+(inputSampleL*wet);
+		if (wet < 1.0f) inputSampleL = (drySampleL * (1.0f-wet))+(inputSampleL*wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSampleL += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSampleL;

@@ -27,7 +27,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 byn[13];
+		Float32 byn[13];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -45,30 +45,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double inputSample;
-	Float64 benfordize;
+	float inputSample;
+	Float32 benfordize;
 	int hotbinA;
 	int hotbinB;
-	Float64 totalA;
-	Float64 totalB;	
+	Float32 totalA;
+	Float32 totalB;	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
-		inputSample *= 8388608.0;
+		inputSample *= 8388608.0f;
 		//0-1 is now one bit, now we dither
 		
-		if (inputSample > 0) inputSample += (0.3333333333);
-		if (inputSample < 0) inputSample -= (0.3333333333);
+		if (inputSample > 0) inputSample += (0.3333333333f);
+		if (inputSample < 0) inputSample -= (0.3333333333f);
 		
-		inputSample += (double(fpd)/UINT32_MAX)*0.6666666666;
+		inputSample += (float(fpd)/UINT32_MAX)*0.6666666666f;
 		
 		benfordize = floor(inputSample);
-		while (benfordize >= 1.0) {benfordize /= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
+		while (benfordize >= 1.0f) {benfordize /= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
 		hotbinA = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number floored
 		totalA = 0;
@@ -89,9 +89,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//produce total number- smaller is closer to Benford real
 		
 		benfordize = ceil(inputSample);
-		while (benfordize >= 1.0) {benfordize /= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
+		while (benfordize >= 1.0f) {benfordize /= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
 		hotbinB = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number ceiled
 		totalB = 0;
@@ -138,7 +138,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		byn[9] /= totalA;
 		byn[10] /= 2; //catchall for garbage data
 		
-		inputSample /= 8388608.0;
+		inputSample /= 8388608.0f;
 
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		//pseudorandom number updater

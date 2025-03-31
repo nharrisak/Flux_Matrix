@@ -52,36 +52,36 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	double in = GetParameter( kParam_A )*2.0; in *= in;
-	double soar = 0.3-(GetParameter( kParam_B )*0.3);
-	double out = GetParameter( kParam_C )*2.0; out *= out;
-	double wet = GetParameter( kParam_D );
+	float in = GetParameter( kParam_A )*2.0f; in *= in;
+	float soar = 0.3f-(GetParameter( kParam_B )*0.3f);
+	float out = GetParameter( kParam_C )*2.0f; out *= out;
+	float wet = GetParameter( kParam_D );
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		if (in !=1.0) {
+		if (in !=1.0f) {
 			inputSample *= in;
 		}
 		
-		double temp = fabs(inputSample)+(soar*soar);
-		if (inputSample > 0.0) inputSample = fmax((sqrt(1.0/temp)*temp)-soar,0.0);
-		if (inputSample < 0.0) inputSample = fmin((-sqrt(1.0/temp)*temp)+soar,0.0);
+		float temp = fabs(inputSample)+(soar*soar);
+		if (inputSample > 0.0f) inputSample = fmax((sqrt(1.0f/temp)*temp)-soar,0.0f);
+		if (inputSample < 0.0f) inputSample = fmin((-sqrt(1.0f/temp)*temp)+soar,0.0f);
 				
-		if (out !=1.0) {
+		if (out !=1.0f) {
 			inputSample *= out;
 		}
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -26,15 +26,15 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	int gcount;		
-	double rateof;
-	double sweep;
-	double nextmax;
+	float rateof;
+	float sweep;
+	float nextmax;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
 	struct _dram {
-		double dL[1002];
-	double dR[1002];
+		float dL[1002];
+	float dR[1002];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -42,23 +42,23 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double depth = pow(GetParameter( kParam_One ),2)*overallscale*70;
-	double fluttertrim = (0.0024*pow(GetParameter( kParam_One ),2))/overallscale;
+	float depth = pow(GetParameter( kParam_One ),2)*overallscale*70;
+	float fluttertrim = (0.0024f*pow(GetParameter( kParam_One ),2))/overallscale;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		if (gcount < 0 || gcount > 999) gcount = 999;
 		dram->dL[gcount] = inputSampleL; dram->dR[gcount] = inputSampleR;
 		int count = gcount;
-		double offset = depth + (depth * pow(rateof,2) * sin(sweep));
+		float offset = depth + (depth * pow(rateof,2) * sin(sweep));
 		count += (int)floor(offset);
 		
 		inputSampleL = (dram->dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
@@ -66,19 +66,19 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		inputSampleR = (dram->dR[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
 		inputSampleR += (dram->dR[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
 		
-		rateof = (rateof * (1.0-fluttertrim)) + (nextmax * fluttertrim);
+		rateof = (rateof * (1.0f-fluttertrim)) + (nextmax * fluttertrim);
 		sweep += rateof * fluttertrim;
-		if (sweep >= (M_PI*2.0)) {sweep -= M_PI; nextmax = 0.24 + (fpdL / (double)UINT32_MAX * 0.74);}
+		if (sweep >= (M_PI*2.0f)) {sweep -= M_PI; nextmax = 0.24f + (fpdL / (float)UINT32_MAX * 0.74f);}
 		//apply to input signal only when flutter is present, interpolate samples
 		gcount--;
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

@@ -29,8 +29,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double inTrimA;
-		double inTrimB;
+		float inTrimA;
+		float inTrimB;
 		bool hsr;
 		enum {
 			fix_freq,
@@ -49,7 +49,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double fix[fix_total];
+			float fix[fix_total];
 	};
 	_dram* dram;
 };
@@ -64,49 +64,49 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	inTrimA = inTrimB; inTrimB = GetParameter( kParam_One )*2.0;
-	//0.5 is unity gain, and we can attenuate to silence or boost slightly over 12dB
+	inTrimA = inTrimB; inTrimB = GetParameter( kParam_One )*2.0f;
+	//0.5f is unity gain, and we can attenuate to silence or boost slightly over 12dB
 	//into softclipping overdrive.
-	if (GetSampleRate() > 49000.0) hsr = true; else hsr = false;
-	dram->fix[fix_freq] = 24000.0 / GetSampleRate();
-	dram->fix[fix_reso] = 3.51333709;
-	double K = tan(M_PI * dram->fix[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / dram->fix[fix_reso] + K * K);
+	if (GetSampleRate() > 49000.0f) hsr = true; else hsr = false;
+	dram->fix[fix_freq] = 24000.0f / GetSampleRate();
+	dram->fix[fix_reso] = 3.51333709f;
+	float K = tan(M_PI * dram->fix[fix_freq]); //lowpass
+	float norm = 1.0f / (1.0f + K / dram->fix[fix_reso] + K * K);
 	dram->fix[fix_a0] = K * K * norm;
-	dram->fix[fix_a1] = 2.0 * dram->fix[fix_a0];
+	dram->fix[fix_a1] = 2.0f * dram->fix[fix_a0];
 	dram->fix[fix_a2] = dram->fix[fix_a0];
-	dram->fix[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fix[fix_b2] = (1.0 - K / dram->fix[fix_reso] + K * K) * norm;
+	dram->fix[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fix[fix_b2] = (1.0f - K / dram->fix[fix_reso] + K * K) * norm;
 	//this is the fixed biquad distributed anti-aliasing filter
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
-		double position = (double)nSampleFrames/inFramesToProcess;
-		double inTrim = (inTrimA*position)+(inTrimB*(1.0-position));
+		float position = (float)nSampleFrames/inFramesToProcess;
+		float inTrim = (inTrimA*position)+(inTrimB*(1.0f-position));
 		//input trim smoothed to cut out zipper noise
 		inputSample *= inTrim;
-		if (inputSample > 1.57079633) inputSample = 1.57079633; if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f; if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		inputSample = sin(inputSample);
-		//Console8 gain stage clips at exactly 1.0 post-sin()
+		//Console8 gain stage clips at exactly 1.0f post-sin()
 		if (hsr){
-			double outSample = (inputSample * dram->fix[fix_a0]) + dram->fix[fix_sL1];
+			float outSample = (inputSample * dram->fix[fix_a0]) + dram->fix[fix_sL1];
 			dram->fix[fix_sL1] = (inputSample * dram->fix[fix_a1]) - (outSample * dram->fix[fix_b1]) + dram->fix[fix_sL2];
 			dram->fix[fix_sL2] = (inputSample * dram->fix[fix_a2]) - (outSample * dram->fix[fix_b2]);
 			inputSample = outSample;
 		} //fixed biquad filtering ultrasonics
 		inputSample *= inTrim;
-		if (inputSample > 1.57079633) inputSample = 1.57079633; if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f; if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		inputSample = sin(inputSample);
-		//Console8 gain stage clips at exactly 1.0 post-sin()
+		//Console8 gain stage clips at exactly 1.0f post-sin()
 		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

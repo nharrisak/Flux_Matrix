@@ -35,37 +35,37 @@ enum { kNumTemplateParameters = 6 };
 	//begin Gate
 	bool WasNegativeL;
 	int ZeroCrossL;
-	double gaterollerL;
-	double gateL;
+	float gaterollerL;
+	float gateL;
 	
 	bool WasNegativeR;
 	int ZeroCrossR;
-	double gaterollerR;
-	double gateR;
+	float gaterollerR;
+	float gateR;
 	//end Gate
 	
 	//begin ButterComp
-	double controlAposL;
-	double controlAnegL;
-	double controlBposL;
-	double controlBnegL;
-	double targetposL;
-	double targetnegL;
-	double avgLA;
-	double avgLB;
-	double nvgLA;
-	double nvgLB;
+	float controlAposL;
+	float controlAnegL;
+	float controlBposL;
+	float controlBnegL;
+	float targetposL;
+	float targetnegL;
+	float avgLA;
+	float avgLB;
+	float nvgLA;
+	float nvgLB;
 	
-	double controlAposR;
-	double controlAnegR;
-	double controlBposR;
-	double controlBnegR;
-	double targetposR;
-	double targetnegR;
-	double avgRA;
-	double avgRB;
-	double nvgRA;
-	double nvgRB;
+	float controlAposR;
+	float controlAnegR;
+	float controlBposR;
+	float controlBnegR;
+	float targetposR;
+	float targetnegR;
+	float avgRA;
+	float avgRB;
+	float nvgRA;
+	float nvgRB;
 	bool flip;
 	//end ButterComp
 	
@@ -80,56 +80,56 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 		
 	//begin ButterComp
-	double inputgain = (pow(GetParameter( kParam_One ),5)*35)+1.0;
-	double divisor = (pow(GetParameter( kParam_Two ),4) * 0.01)+0.0005;
+	float inputgain = (pow(GetParameter( kParam_One ),5)*35)+1.0f;
+	float divisor = (pow(GetParameter( kParam_Two ),4) * 0.01f)+0.0005f;
 	divisor /= overallscale;
-	double remainder = divisor;
-	divisor = 1.0 - divisor;
+	float remainder = divisor;
+	divisor = 1.0f - divisor;
 	//end ButterComp
 	
 	//begin Gate
-	double onthreshold = (pow(GetParameter( kParam_Three ),3)/3)+0.00018;
-	double offthreshold = onthreshold * 1.1;	
-	double release = 0.028331119964586;
-	double absmax = 220.9;
+	float onthreshold = (pow(GetParameter( kParam_Three ),3)/3)+0.00018f;
+	float offthreshold = onthreshold * 1.1f;	
+	float release = 0.028331119964586f;
+	float absmax = 220.9f;
 	//speed to be compensated w.r.t sample rate
 	//end Gate
 	
-	double wet = GetParameter(kParam_Four );
+	float wet = GetParameter(kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;		
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;		
 		
 		//begin compressor
 		//begin L
 		inputSampleL *= inputgain;
-		double inputpos = inputSampleL + 1.0;		
-		if (inputpos < 0.0) inputpos = 0.0;
-		double outputpos = inputpos / 2.0;
-		if (outputpos > 1.0) outputpos = 1.0;		
+		float inputpos = inputSampleL + 1.0f;		
+		if (inputpos < 0.0f) inputpos = 0.0f;
+		float outputpos = inputpos / 2.0f;
+		if (outputpos > 1.0f) outputpos = 1.0f;		
 		inputpos *= inputpos;
 		targetposL *= divisor;
 		targetposL += (inputpos * remainder);
-		double calcpos = 1.0/targetposL;
+		float calcpos = 1.0f/targetposL;
 		
-		double inputneg = -inputSampleL + 1.0;		
-		if (inputneg < 0.0) inputneg = 0.0;
-		double outputneg = inputneg / 2.0;
-		if (outputneg > 1.0) outputneg = 1.0;		
+		float inputneg = -inputSampleL + 1.0f;		
+		if (inputneg < 0.0f) inputneg = 0.0f;
+		float outputneg = inputneg / 2.0f;
+		if (outputneg > 1.0f) outputneg = 1.0f;		
 		inputneg *= inputneg;
 		targetnegL *= divisor;
 		targetnegL += (inputneg * remainder);
-		double calcneg = 1.0/targetnegL;
+		float calcneg = 1.0f/targetnegL;
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		
@@ -155,7 +155,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		}
 		//this causes each of the four to update only when active and in the correct 'flip'
 		
-		double totalmultiplier;
+		float totalmultiplier;
 		if (true == flip) totalmultiplier = (controlAposL * outputpos) + (controlAnegL * outputneg);
 		else totalmultiplier = (controlBposL * outputpos) + (controlBnegL * outputneg);
 		//this combines the sides according to flip, blending relative to the input value
@@ -165,23 +165,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		//begin R
 		inputSampleR *= inputgain;
-		inputpos = inputSampleR + 1.0;		
-		if (inputpos < 0.0) inputpos = 0.0;
-		outputpos = inputpos / 2.0;
-		if (outputpos > 1.0) outputpos = 1.0;		
+		inputpos = inputSampleR + 1.0f;		
+		if (inputpos < 0.0f) inputpos = 0.0f;
+		outputpos = inputpos / 2.0f;
+		if (outputpos > 1.0f) outputpos = 1.0f;		
 		inputpos *= inputpos;
 		targetposR *= divisor;
 		targetposR += (inputpos * remainder);
-		calcpos = 1.0/targetposR;
+		calcpos = 1.0f/targetposR;
 		
-		inputneg = -inputSampleR + 1.0;		
-		if (inputneg < 0.0) inputneg = 0.0;
-		outputneg = inputneg / 2.0;
-		if (outputneg > 1.0) outputneg = 1.0;		
+		inputneg = -inputSampleR + 1.0f;		
+		if (inputneg < 0.0f) inputneg = 0.0f;
+		outputneg = inputneg / 2.0f;
+		if (outputneg > 1.0f) outputneg = 1.0f;		
 		inputneg *= inputneg;
 		targetnegR *= divisor;
 		targetnegR += (inputneg * remainder);
-		calcneg = 1.0/targetnegR;
+		calcneg = 1.0f/targetnegR;
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		
@@ -220,17 +220,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		
 		//begin Gate
-		if (drySampleL > 0.0)
+		if (drySampleL > 0.0f)
 		{
-			if (WasNegativeL == true) ZeroCrossL = absmax * 0.3;
+			if (WasNegativeL == true) ZeroCrossL = absmax * 0.3f;
 			WasNegativeL = false;
 		} else {
 			ZeroCrossL += 1; WasNegativeL = true;
 		}
 		
-		if (drySampleR > 0.0)
+		if (drySampleR > 0.0f)
 		{
-			if (WasNegativeR == true) ZeroCrossR = absmax * 0.3;
+			if (WasNegativeR == true) ZeroCrossR = absmax * 0.3f;
 			WasNegativeR = false;
 		} else {
 			ZeroCrossR += 1; WasNegativeR = true;
@@ -239,12 +239,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (ZeroCrossL > absmax) ZeroCrossL = absmax;
 		if (ZeroCrossR > absmax) ZeroCrossR = absmax;
 		
-		if (gateL == 0.0)
+		if (gateL == 0.0f)
 		{
 			//if gate is totally silent
 			if (fabs(drySampleL) > onthreshold)
 			{
-				if (gaterollerL == 0.0) gaterollerL = ZeroCrossL;
+				if (gaterollerL == 0.0f) gaterollerL = ZeroCrossL;
 				else gaterollerL -= release;
 				// trigger from total silence only- if we're active then signal must clear offthreshold
 			}
@@ -260,12 +260,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			else gaterollerL -= release;
 		}
 		
-		if (gateR == 0.0)
+		if (gateR == 0.0f)
 		{
 			//if gate is totally silent
 			if (fabs(drySampleR) > onthreshold)
 			{
-				if (gaterollerR == 0.0) gaterollerR = ZeroCrossR;
+				if (gaterollerR == 0.0f) gaterollerR = ZeroCrossR;
 				else gaterollerR -= release;
 				// trigger from total silence only- if we're active then signal must clear offthreshold
 			}
@@ -281,41 +281,41 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			else gaterollerR -= release;
 		}
 		
-		if (gaterollerL < 0.0) gaterollerL = 0.0;
-		if (gaterollerR < 0.0) gaterollerR = 0.0;
+		if (gaterollerL < 0.0f) gaterollerL = 0.0f;
+		if (gaterollerR < 0.0f) gaterollerR = 0.0f;
 		
-		if (gaterollerL < 1.0)
+		if (gaterollerL < 1.0f)
 		{
 			gateL = gaterollerL;
-			double bridgerectifier = 1-cos(fabs(inputSampleL));			
-			if (inputSampleL > 0) inputSampleL = (inputSampleL*gateL)+(bridgerectifier*(1.0-gateL));
-			else inputSampleL = (inputSampleL*gateL)-(bridgerectifier*(1.0-gateL));
-			if (gateL == 0.0) inputSampleL = 0.0;			
-		} else gateL = 1.0;
+			float bridgerectifier = 1-cos(fabs(inputSampleL));			
+			if (inputSampleL > 0) inputSampleL = (inputSampleL*gateL)+(bridgerectifier*(1.0f-gateL));
+			else inputSampleL = (inputSampleL*gateL)-(bridgerectifier*(1.0f-gateL));
+			if (gateL == 0.0f) inputSampleL = 0.0f;			
+		} else gateL = 1.0f;
 		
-		if (gaterollerR < 1.0)
+		if (gaterollerR < 1.0f)
 		{
 			gateR = gaterollerR;
-			double bridgerectifier = 1-cos(fabs(inputSampleR));			
-			if (inputSampleR > 0) inputSampleR = (inputSampleR*gateR)+(bridgerectifier*(1.0-gateR));
-			else inputSampleR = (inputSampleR*gateR)-(bridgerectifier*(1.0-gateR));
-			if (gateR == 0.0) inputSampleR = 0.0;			
-		} else gateR = 1.0;
+			float bridgerectifier = 1-cos(fabs(inputSampleR));			
+			if (inputSampleR > 0) inputSampleR = (inputSampleR*gateR)+(bridgerectifier*(1.0f-gateR));
+			else inputSampleR = (inputSampleR*gateR)-(bridgerectifier*(1.0f-gateR));
+			if (gateR == 0.0f) inputSampleR = 0.0f;			
+		} else gateR = 1.0f;
 		//end Gate
 		
-		if (wet != 1.0) {
-		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+		if (wet != 1.0f) {
+		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

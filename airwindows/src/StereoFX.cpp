@@ -29,8 +29,8 @@ kParam0, kParam1, kParam2, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 iirSampleA;
-	Float64 iirSampleB;
+	Float32 iirSampleA;
+	Float32 iirSampleB;
 	uint32_t fpdL;
 	uint32_t fpdR;
 	bool flip;
@@ -44,66 +44,66 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double inputSampleL;
-	double inputSampleR;
-	double mid;
-	double side;
+	float inputSampleL;
+	float inputSampleR;
+	float mid;
+	float side;
 	//High Impact section
-	Float64 stereowide = GetParameter( kParam_One );
-	Float64 centersquish = GetParameter( kParam_Three );
-	Float64 density = stereowide * 2.4;
-	Float64 sustain = 1.0 - (1.0/(1.0 + (density/7.0)));
+	Float32 stereowide = GetParameter( kParam_One );
+	Float32 centersquish = GetParameter( kParam_Three );
+	Float32 density = stereowide * 2.4f;
+	Float32 sustain = 1.0f - (1.0f/(1.0f + (density/7.0f)));
 	//this way, enhance increases up to 50% and then mid falls off beyond that
-	Float64 bridgerectifier;
-	Float64 count;
+	Float32 bridgerectifier;
+	Float32 count;
 	//Highpass section
-	Float64 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
-	Float64 tight = -0.33333333333333;
-	Float64 offset;
+	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 tight = -0.33333333333333f;
+	Float32 offset;
 	//we are setting it up so that to either extreme we can get an audible sound,
 	//but sort of scaled so small adjustments don't shift the cutoff frequency yet.
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		//assign working variables		
 		mid = inputSampleL + inputSampleR;
 		side = inputSampleL - inputSampleR;
 		//assign mid and side. Now, High Impact code
 		count = density;
-		while (count > 1.0)
+		while (count > 1.0f)
 			{
-				bridgerectifier = fabs(side)*1.57079633;
-				if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+				bridgerectifier = fabs(side)*1.57079633f;
+				if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 				//max value for sine function
 				bridgerectifier = sin(bridgerectifier);
-				if (side > 0.0) side = bridgerectifier;
+				if (side > 0.0f) side = bridgerectifier;
 				else side = -bridgerectifier;
-				count = count - 1.0;
+				count = count - 1.0f;
 			}
 		//we have now accounted for any really high density settings.
-		bridgerectifier = fabs(side)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bridgerectifier = fabs(side)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		bridgerectifier = sin(bridgerectifier);
 		if (side > 0) side = (side*(1-count))+(bridgerectifier*count);
 		else side = (side*(1-count))-(bridgerectifier*count);
 		//blend according to density control
 		//done first density. Next, sustain-reducer
-		bridgerectifier = fabs(side)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = (1-cos(bridgerectifier))*3.141592653589793;
+		bridgerectifier = fabs(side)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = (1-cos(bridgerectifier))*3.141592653589793f;
 		if (side > 0) side = (side*(1-sustain))+(bridgerectifier*sustain);
 		else side = (side*(1-sustain))-(bridgerectifier*sustain);
 		//done with High Impact code
 		
 		//now, Highpass code
-		offset = 0.666666666666666 + ((1-fabs(side))*tight);
+		offset = 0.666666666666666f + ((1-fabs(side))*tight);
 		if (offset < 0) offset = 0;
 		if (offset > 1) offset = 1;
 		if (flip)
@@ -118,24 +118,24 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 		//done with Highpass code
 		
-		bridgerectifier = fabs(mid)/1.273239544735162;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = sin(bridgerectifier)*1.273239544735162;
+		bridgerectifier = fabs(mid)/1.273239544735162f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = sin(bridgerectifier)*1.273239544735162f;
 		if (mid > 0) mid = (mid*(1-centersquish))+(bridgerectifier*centersquish);
 		else mid = (mid*(1-centersquish))-(bridgerectifier*centersquish);
 		//done with the mid saturating section.
 		
-		inputSampleL = (mid+side)/2.0;
-		inputSampleR = (mid-side)/2.0;
+		inputSampleL = (mid+side)/2.0f;
+		inputSampleR = (mid-side)/2.0f;
 		flip = !flip;
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

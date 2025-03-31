@@ -44,7 +44,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 voltage = GetParameter( kParam_One );
+	Float32 voltage = GetParameter( kParam_One );
 
 	while (nSampleFrames-- > 0) {
 		*destP = *sourceP + voltage;

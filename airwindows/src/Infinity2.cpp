@@ -39,9 +39,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquadA[11];
-		double biquadB[11];
-		double biquadC[11];
+		float biquadA[11];
+		float biquadB[11];
+		float biquadC[11];
 		
 		
 		int countA, delayA;
@@ -58,31 +58,31 @@ struct _kernel {
 		int countL, delayL;
 		int countM, delayM;
 		
-		Float64 feedbackA;
-		Float64 feedbackB;
-		Float64 feedbackC;
-		Float64 feedbackD;
-		Float64 feedbackE;
-		Float64 feedbackF;
-		Float64 feedbackG;
-		Float64 feedbackH;
+		Float32 feedbackA;
+		Float32 feedbackB;
+		Float32 feedbackC;
+		Float32 feedbackD;
+		Float32 feedbackE;
+		Float32 feedbackF;
+		Float32 feedbackG;
+		Float32 feedbackH;
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 aA[8111];
-		Float64 aB[7511];
-		Float64 aC[7311];
-		Float64 aD[6911];		
-		Float64 aE[6311];
-		Float64 aF[6111];
-		Float64 aG[5511];
-		Float64 aH[4911];
-		Float64 aI[4511];
-		Float64 aJ[4311];
-		Float64 aK[3911];
-		Float64 aL[3311];
-		Float64 aM[3111];
+			Float32 aA[8111];
+		Float32 aB[7511];
+		Float32 aC[7311];
+		Float32 aD[6911];		
+		Float32 aE[6311];
+		Float32 aF[6111];
+		Float32 aG[5511];
+		Float32 aH[4911];
+		Float32 aI[4511];
+		Float32 aJ[4311];
+		Float32 aK[3911];
+		Float32 aL[3311];
+		Float32 aM[3111];
 	};
 	_dram* dram;
 };
@@ -97,40 +97,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	biquadC[0] = biquadB[0] = biquadA[0] = ((pow(GetParameter( kParam_One ),2)*9900.0)+100.0) / GetSampleRate();
-	biquadA[1] = 0.618033988749894848204586;
-	biquadB[1] = (GetParameter( kParam_One )*0.5)+0.118033988749894848204586;
-    biquadC[1] = 0.5;
+	biquadC[0] = biquadB[0] = biquadA[0] = ((pow(GetParameter( kParam_One ),2)*9900.0f)+100.0f) / GetSampleRate();
+	biquadA[1] = 0.618033988749894848204586f;
+	biquadB[1] = (GetParameter( kParam_One )*0.5f)+0.118033988749894848204586f;
+    biquadC[1] = 0.5f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadA[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / biquadC[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadC[1] + K * K);
 	biquadC[2] = K * K * norm;
-	biquadC[3] = 2.0 * biquadC[2];
+	biquadC[3] = 2.0f * biquadC[2];
 	biquadC[4] = biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / biquadC[1] + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
-	Float64 size = (pow(GetParameter( kParam_Two ),2)*99.0)+1.0;
-	Float64 damping = pow(GetParameter( kParam_Three ),2)*0.5;
-	Float64 rawPass = GetParameter( kParam_Four );
-	Float64 feedback = 1.0-(pow(1.0-GetParameter( kParam_Five ),4));
-	Float64 wet = GetParameter( kParam_Six );
+	Float32 size = (pow(GetParameter( kParam_Two ),2)*99.0f)+1.0f;
+	Float32 damping = pow(GetParameter( kParam_Three ),2)*0.5f;
+	Float32 rawPass = GetParameter( kParam_Four );
+	Float32 feedback = 1.0f-(pow(1.0f-GetParameter( kParam_Five ),4));
+	Float32 wet = GetParameter( kParam_Six );
 	
 	delayA = 79*size;
 	delayB = 73*size;
@@ -148,57 +148,57 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1
 				
-		double allpassI = inputSample;
-		double allpassJ = inputSample;
-		double allpassK = inputSample;
-		double allpassL = inputSample;
+		float allpassI = inputSample;
+		float allpassJ = inputSample;
+		float allpassK = inputSample;
+		float allpassL = inputSample;
 		
 		int allpasstemp = countI + 1;
 		if (allpasstemp < 0 || allpasstemp > delayI) {allpasstemp = 0;}
-		allpassI -= dram->aI[allpasstemp]*0.5;
+		allpassI -= dram->aI[allpasstemp]*0.5f;
 		dram->aI[countI] = allpassI;
-		allpassI *= 0.5;
+		allpassI *= 0.5f;
 		countI++; if (countI < 0 || countI > delayI) {countI = 0;}		
 		allpassI += (dram->aI[countI]);
 		
 		allpasstemp = countJ + 1;
 		if (allpasstemp < 0 || allpasstemp > delayJ) {allpasstemp = 0;}
-		allpassJ -= dram->aJ[allpasstemp]*0.5;
+		allpassJ -= dram->aJ[allpasstemp]*0.5f;
 		dram->aJ[countJ] = allpassJ;
-		allpassJ *= 0.5;
+		allpassJ *= 0.5f;
 		countJ++; if (countJ < 0 || countJ > delayJ) {countJ = 0;}		
 		allpassJ += (dram->aJ[countJ]);
 		
 		allpasstemp = countK + 1;
 		if (allpasstemp < 0 || allpasstemp > delayK) {allpasstemp = 0;}
-		allpassK -= dram->aK[allpasstemp]*0.5;
+		allpassK -= dram->aK[allpasstemp]*0.5f;
 		dram->aK[countK] = allpassK;
-		allpassK *= 0.5;
+		allpassK *= 0.5f;
 		countK++; if (countK < 0 || countK > delayK) {countK = 0;}		
 		allpassK += (dram->aK[countK]);
 		
 		allpasstemp = countL + 1;
 		if (allpasstemp < 0 || allpasstemp > delayL) {allpasstemp = 0;}
-		allpassL -= dram->aL[allpasstemp]*0.5;
+		allpassL -= dram->aL[allpasstemp]*0.5f;
 		dram->aL[countL] = allpassL;
-		allpassL *= 0.5;
+		allpassL *= 0.5f;
 		countL++; if (countL < 0 || countL > delayL) {countL = 0;}		
 		allpassL += (dram->aL[countL]);		
 		//the big allpass in front of everything
 		
-		if (rawPass !=1.0) {
-			allpassI = (allpassI * rawPass) + (drySample * (1.0-rawPass));
-			allpassJ = (allpassJ * rawPass) + (drySample * (1.0-rawPass));
-			allpassK = (allpassK * rawPass) + (drySample * (1.0-rawPass));
-			allpassL = (allpassL * rawPass) + (drySample * (1.0-rawPass));
+		if (rawPass !=1.0f) {
+			allpassI = (allpassI * rawPass) + (drySample * (1.0f-rawPass));
+			allpassJ = (allpassJ * rawPass) + (drySample * (1.0f-rawPass));
+			allpassK = (allpassK * rawPass) + (drySample * (1.0f-rawPass));
+			allpassL = (allpassL * rawPass) + (drySample * (1.0f-rawPass));
 		}
 		
 		dram->aA[countA] = allpassI + (feedbackA*feedback);
@@ -220,30 +220,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		countH++; if (countH < 0 || countH > delayH) {countH = 0;}
 		//the Householder matrices
 		
-		Float64 infiniteA = (dram->aA[countA-((countA > delayA)?delayA+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteA = (dram->aA[countA-((countA > delayA)?delayA+1:0)] * (1-(damping-floor(damping))) );
 		infiniteA += (dram->aA[countA+1-((countA+1 > delayA)?delayA+1:0)] * ((damping-floor(damping))) );
-		Float64 infiniteB = (dram->aB[countB-((countB > delayB)?delayB+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteB = (dram->aB[countB-((countB > delayB)?delayB+1:0)] * (1-(damping-floor(damping))) );
 		infiniteB += (dram->aB[countB+1-((countB+1 > delayB)?delayB+1:0)] * ((damping-floor(damping))) );
-		Float64 infiniteC = (dram->aC[countC-((countC > delayC)?delayC+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteC = (dram->aC[countC-((countC > delayC)?delayC+1:0)] * (1-(damping-floor(damping))) );
 		infiniteC += (dram->aC[countC+1-((countC+1 > delayC)?delayC+1:0)] * ((damping-floor(damping))) );
-		Float64 infiniteD = (dram->aD[countD-((countD > delayD)?delayD+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteD = (dram->aD[countD-((countD > delayD)?delayD+1:0)] * (1-(damping-floor(damping))) );
 		infiniteD += (dram->aD[countD+1-((countD+1 > delayD)?delayD+1:0)] * ((damping-floor(damping))) );
 		
-		Float64 infiniteE = (dram->aE[countE-((countE > delayE)?delayE+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteE = (dram->aE[countE-((countE > delayE)?delayE+1:0)] * (1-(damping-floor(damping))) );
 		infiniteE += (dram->aE[countE+1-((countE+1 > delayE)?delayE+1:0)] * ((damping-floor(damping))) );
-		Float64 infiniteF = (dram->aF[countF-((countF > delayF)?delayF+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteF = (dram->aF[countF-((countF > delayF)?delayF+1:0)] * (1-(damping-floor(damping))) );
 		infiniteF += (dram->aF[countF+1-((countF+1 > delayF)?delayF+1:0)] * ((damping-floor(damping))) );
-		Float64 infiniteG = (dram->aG[countG-((countG > delayG)?delayG+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteG = (dram->aG[countG-((countG > delayG)?delayG+1:0)] * (1-(damping-floor(damping))) );
 		infiniteG += (dram->aG[countG+1-((countG+1 > delayG)?delayG+1:0)] * ((damping-floor(damping))) );
-		Float64 infiniteH = (dram->aH[countH-((countH > delayH)?delayH+1:0)] * (1-(damping-floor(damping))) );
+		Float32 infiniteH = (dram->aH[countH-((countH > delayH)?delayH+1:0)] * (1-(damping-floor(damping))) );
 		infiniteH += (dram->aH[countH+1-((countH+1 > delayH)?delayH+1:0)] * ((damping-floor(damping))) );
 		
-		Float64 dialBackA = 0.5;
-		Float64 dialBackE = 0.5;
-		Float64 dialBackDry = 0.5;
-		if (fabs(infiniteA)>0.4) dialBackA -= ((fabs(infiniteA)-0.4)*0.2);
-		if (fabs(infiniteE)>0.4) dialBackE -= ((fabs(infiniteE)-0.4)*0.2);
-		if (fabs(drySample)>0.4) dialBackDry -= ((fabs(drySample)-0.4)*0.2);
+		Float32 dialBackA = 0.5f;
+		Float32 dialBackE = 0.5f;
+		Float32 dialBackDry = 0.5f;
+		if (fabs(infiniteA)>0.4f) dialBackA -= ((fabs(infiniteA)-0.4f)*0.2f);
+		if (fabs(infiniteE)>0.4f) dialBackE -= ((fabs(infiniteE)-0.4f)*0.2f);
+		if (fabs(drySample)>0.4f) dialBackDry -= ((fabs(drySample)-0.4f)*0.2f);
 		//we're compressing things subtly so we can feed energy in and not overload
 		
 		feedbackA = (infiniteA - (infiniteB + infiniteC + infiniteD))*dialBackA;
@@ -256,14 +256,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		feedbackG = (infiniteG - (infiniteE + infiniteF + infiniteH))*dialBackDry;
 		feedbackH = (infiniteH - (infiniteE + infiniteF + infiniteG))*dialBackDry;
 		
-		inputSample = (infiniteA + infiniteB + infiniteC + infiniteD + infiniteE + infiniteF + infiniteG + infiniteH)/8.0;
+		inputSample = (infiniteA + infiniteB + infiniteC + infiniteD + infiniteE + infiniteF + infiniteG + infiniteH)/8.0f;
 		
 		tempSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = tempSample; 
 		biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		
 		inputSample = asin(inputSample);
@@ -272,14 +272,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		biquadC[8] = biquadC[7]; biquadC[7] = inputSample; inputSample = tempSample; 
 		biquadC[10] = biquadC[9]; biquadC[9] = inputSample; //DF1
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

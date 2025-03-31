@@ -29,9 +29,9 @@ kParam0, kParam1, kParam2, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		double chaseA;
-		double chaseB;
-		double chaseC;
+		float chaseA;
+		float chaseB;
+		float chaseC;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -43,33 +43,33 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 		
-	double inputSampleL;
-	double inputSampleR;
-	double drySampleL;
-	double drySampleR;
+	float inputSampleL;
+	float inputSampleR;
+	float drySampleL;
+	float drySampleR;
 	
-	Float64 intensity = GetParameter( kParam_One );
-	Float64 attack = ((GetParameter( kParam_Two )+0.1)*0.0005)/overallscale;
-	Float64 decay = ((GetParameter( kParam_Two )+0.001)*0.00005)/overallscale;
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 intensity = GetParameter( kParam_One );
+	Float32 attack = ((GetParameter( kParam_Two )+0.1f)*0.0005f)/overallscale;
+	Float32 decay = ((GetParameter( kParam_Two )+0.001f)*0.00005f)/overallscale;
+	Float32 wet = GetParameter( kParam_Three );
 	//removed unnecessary dry variable
-	Float64 inputSense;
+	Float32 inputSense;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		drySampleL = inputSampleL;
 		drySampleR = inputSampleR;
 		
-		inputSampleL *= 8.0;
-		inputSampleR *= 8.0;
+		inputSampleL *= 8.0f;
+		inputSampleR *= 8.0f;
 		inputSampleL *= intensity;
 		inputSampleR *= intensity;
 
@@ -89,24 +89,24 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (chaseB < -attack) chaseB = -attack;
 		
 		chaseC += (chaseB/overallscale);
-		if (chaseC > 1.0) chaseC = 1.0;
-		if (chaseC < 0.0) chaseC = 0.0;
+		if (chaseC > 1.0f) chaseC = 1.0f;
+		if (chaseC < 0.0f) chaseC = 0.0f;
 		
 		inputSampleL *= chaseC;
 		inputSampleL = drySampleL - (inputSampleL * intensity);
-		inputSampleL = (drySampleL * (1.0-wet)) + (inputSampleL * wet);
+		inputSampleL = (drySampleL * (1.0f-wet)) + (inputSampleL * wet);
 
 		inputSampleR *= chaseC;
 		inputSampleR = drySampleR - (inputSampleR * intensity);
-		inputSampleR = (drySampleR * (1.0-wet)) + (inputSampleR * wet);
+		inputSampleR = (drySampleR * (1.0f-wet)) + (inputSampleR * wet);
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

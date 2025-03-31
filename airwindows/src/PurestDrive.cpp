@@ -29,7 +29,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double previousSample;
+		float previousSample;
 		uint32_t fpd;		
 	
 	struct _dram {
@@ -46,24 +46,24 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 intensity = GetParameter( kParam_One );
-	double inputSample;
-	double drySample;
-	Float64 apply;
+	Float32 intensity = GetParameter( kParam_One );
+	float inputSample;
+	float drySample;
+	Float32 apply;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		inputSample = sin(inputSample);
 		//basic distortion factor
 		
-		apply = (fabs(previousSample + inputSample) / 2.0) * intensity;
+		apply = (fabs(previousSample + inputSample) / 2.0f) * intensity;
 		//saturate less if previous sample was undistorted and low level, or if it was
 		//inverse polarity. Lets through highs and brightness more.
 		
-		inputSample = (drySample * (1.0 - apply)) + (inputSample * apply);		
+		inputSample = (drySample * (1.0f - apply)) + (inputSample * apply);		
 		//dry-wet control for intensity also has FM modulation to clean up highs
 		
 		previousSample = sin(drySample);
@@ -72,7 +72,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

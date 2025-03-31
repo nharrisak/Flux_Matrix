@@ -27,10 +27,10 @@ kParam0, kParam1, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double panA;
-	double panB;
-	double inTrimA;
-	double inTrimB;
+	float panA;
+	float panB;
+	float inTrimA;
+	float inTrimB;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -43,33 +43,33 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	panA = panB; panB = GetParameter( kParam_One )*1.57079633;
-	inTrimA = inTrimB; inTrimB = GetParameter( kParam_Two )*2.0;
+	panA = panB; panB = GetParameter( kParam_One )*1.57079633f;
+	inTrimA = inTrimB; inTrimB = GetParameter( kParam_Two )*2.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		if (inputSampleL > 1.0) inputSampleL = 1.0;
-		else if (inputSampleL > 0.0) inputSampleL = -expm1((log1p(-inputSampleL) * 0.6180339887498949));
-		if (inputSampleL < -1.0) inputSampleL = -1.0;
-		else if (inputSampleL < 0.0) inputSampleL = expm1((log1p(inputSampleL) * 0.6180339887498949));
+		if (inputSampleL > 1.0f) inputSampleL = 1.0f;
+		else if (inputSampleL > 0.0f) inputSampleL = -expm1((log1p(-inputSampleL) * 0.6180339887498949f));
+		if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+		else if (inputSampleL < 0.0f) inputSampleL = expm1((log1p(inputSampleL) * 0.6180339887498949f));
 		
-		if (inputSampleR > 1.0) inputSampleR = 1.0;
-		else if (inputSampleR > 0.0) inputSampleR = -expm1((log1p(-inputSampleR) * 0.6180339887498949));
-		if (inputSampleR < -1.0) inputSampleR = -1.0;
-		else if (inputSampleR < 0.0) inputSampleR = expm1((log1p(inputSampleR) * 0.6180339887498949));
+		if (inputSampleR > 1.0f) inputSampleR = 1.0f;
+		else if (inputSampleR > 0.0f) inputSampleR = -expm1((log1p(-inputSampleR) * 0.6180339887498949f));
+		if (inputSampleR < -1.0f) inputSampleR = -1.0f;
+		else if (inputSampleR < 0.0f) inputSampleR = expm1((log1p(inputSampleR) * 0.6180339887498949f));
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double gainR = (panA*temp)+(panB*(1.0-temp));
-		double gainL = 1.57079633-gainR;
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float gainR = (panA*temp)+(panB*(1.0f-temp));
+		float gainL = 1.57079633f-gainR;
 		gainR = sin(gainR); gainL = sin(gainL);
-		double gain = (inTrimA*temp)+(inTrimB*(1.0-temp));
-		if (gain > 1.0) gain *= gain;
-		if (gain < 1.0) gain = 1.0-pow(1.0-gain,2);
-		gain *= 2.0;
+		float gain = (inTrimA*temp)+(inTrimB*(1.0f-temp));
+		if (gain > 1.0f) gain *= gain;
+		if (gain < 1.0f) gain = 1.0f-pow(1.0f-gain,2);
+		gain *= 2.0f;
 				
 		inputSampleL = inputSampleL * gainL * gain;
 		inputSampleR = inputSampleR * gainR * gain;
@@ -78,10 +78,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

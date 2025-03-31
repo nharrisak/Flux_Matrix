@@ -27,8 +27,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double inband[9];
-		double outband[9];
+		float inband[9];
+		float outband[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -45,37 +45,37 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	inband[0] = 0.025/overallscale;
-	outband[0] = 0.025/overallscale;
-	inband[1] = 0.001;
-	outband[1] = 0.001;	
+	inband[0] = 0.025f/overallscale;
+	outband[0] = 0.025f/overallscale;
+	inband[1] = 0.001f;
+	outband[1] = 0.001f;	
 	//hardwired for wide bandpass around the rectification
 	
-	double K = tan(M_PI * inband[0]);
-	double norm = 1.0 / (1.0 + K / inband[1] + K * K);
+	float K = tan(M_PI * inband[0]);
+	float norm = 1.0f / (1.0f + K / inband[1] + K * K);
 	inband[2] = K / inband[1] * norm;
 	inband[4] = -inband[2];
-	inband[5] = 2.0 * (K * K - 1.0) * norm;
-	inband[6] = (1.0 - K / inband[1] + K * K) * norm;
+	inband[5] = 2.0f * (K * K - 1.0f) * norm;
+	inband[6] = (1.0f - K / inband[1] + K * K) * norm;
 	
 	K = tan(M_PI * outband[0]);
-	norm = 1.0 / (1.0 + K / outband[1] + K * K);
+	norm = 1.0f / (1.0f + K / outband[1] + K * K);
 	outband[2] = K / outband[1] * norm;
 	outband[4] = -outband[2];
-	outband[5] = 2.0 * (K * K - 1.0) * norm;
-	outband[6] = (1.0 - K / outband[1] + K * K) * norm;
+	outband[5] = 2.0f * (K * K - 1.0f) * norm;
+	outband[6] = (1.0f - K / outband[1] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		inputSample = sin(inputSample);
 		//encode Console5: good cleanness
 		
-		double tempSample = (inputSample * inband[2]) + inband[7];
+		float tempSample = (inputSample * inband[2]) + inband[7];
 		inband[7] = -(tempSample * inband[5]) + inband[8];
 		inband[8] = (inputSample * inband[4]) - (tempSample * inband[6]);
 		
@@ -88,8 +88,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		outband[8] = (inputSample * outband[4]) - (tempSample * outband[6]);
 		inputSample = tempSample;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
@@ -97,7 +97,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

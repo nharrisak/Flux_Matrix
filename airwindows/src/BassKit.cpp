@@ -31,55 +31,55 @@ kParam0, kParam1, kParam2, kParam3, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 iirDriveSampleA;
-	Float64 iirDriveSampleB;
-	Float64 iirDriveSampleC;
-	Float64 iirDriveSampleD;
-	Float64 iirDriveSampleE;
-	Float64 iirDriveSampleF;
+	Float32 iirDriveSampleA;
+	Float32 iirDriveSampleB;
+	Float32 iirDriveSampleC;
+	Float32 iirDriveSampleD;
+	Float32 iirDriveSampleE;
+	Float32 iirDriveSampleF;
 	bool flip; //drive things
 	
 	int bflip;
 	bool WasNegative;
 	bool SubOctave;
-	Float64 iirHeadBumpA;
-	Float64 iirHeadBumpB;
-	Float64 iirHeadBumpC;
+	Float32 iirHeadBumpA;
+	Float32 iirHeadBumpB;
+	Float32 iirHeadBumpC;
 	
-	Float64 iirSubBumpA;
-	Float64 iirSubBumpB;
-	Float64 iirSubBumpC;
+	Float32 iirSubBumpA;
+	Float32 iirSubBumpB;
+	Float32 iirSubBumpC;
 	
-	Float64 lastHeadBump;
-	Float64 lastSubBump;
+	Float32 lastHeadBump;
+	Float32 lastSubBump;
 	
-	Float64 iirSampleA;
-	Float64 iirSampleB;
-	Float64 iirSampleC;
-	Float64 iirSampleD;
-	Float64 iirSampleE;
-	Float64 iirSampleF;
-	Float64 iirSampleG;
-	Float64 iirSampleH;
-	Float64 iirSampleI;
-	Float64 iirSampleJ;
-	Float64 iirSampleK;
-	Float64 iirSampleL;
-	Float64 iirSampleM;
-	Float64 iirSampleN;
-	Float64 iirSampleO;
-	Float64 iirSampleP;
-	Float64 iirSampleQ;
-	Float64 iirSampleR;
-	Float64 iirSampleS;
-	Float64 iirSampleT;
-	Float64 iirSampleU;
-	Float64 iirSampleV;
-	Float64 iirSampleW;
-	Float64 iirSampleX;
-	Float64 iirSampleY;
-	Float64 iirSampleZ;		
-	Float64 oscGate;
+	Float32 iirSampleA;
+	Float32 iirSampleB;
+	Float32 iirSampleC;
+	Float32 iirSampleD;
+	Float32 iirSampleE;
+	Float32 iirSampleF;
+	Float32 iirSampleG;
+	Float32 iirSampleH;
+	Float32 iirSampleI;
+	Float32 iirSampleJ;
+	Float32 iirSampleK;
+	Float32 iirSampleL;
+	Float32 iirSampleM;
+	Float32 iirSampleN;
+	Float32 iirSampleO;
+	Float32 iirSampleP;
+	Float32 iirSampleQ;
+	Float32 iirSampleR;
+	Float32 iirSampleS;
+	Float32 iirSampleT;
+	Float32 iirSampleU;
+	Float32 iirSampleV;
+	Float32 iirSampleW;
+	Float32 iirSampleX;
+	Float32 iirSampleY;
+	Float32 iirSampleZ;		
+	Float32 oscGate;
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -92,73 +92,73 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 ataLowpass;
-	Float64 randy;
-	Float64 invrandy;
-	Float64 HeadBump = 0.0;
-	Float64 BassGain = GetParameter( kParam_One ) * 0.1;
-	Float64 HeadBumpFreq = ((GetParameter( kParam_Two )*0.1)+0.02)/overallscale;
-	Float64 iirAmount = HeadBumpFreq/44.1;
-	Float64 BassOutGain = GetParameter( kParam_Three )*fabs(GetParameter( kParam_Three ));
-	Float64 SubBump = 0.0;
-	Float64 SubOutGain = GetParameter( kParam_Four )*fabs(GetParameter( kParam_Four ))*4.0;
-	Float64 clamp = 0.0;
-	Float64 fuzz = 0.111;
+	Float32 ataLowpass;
+	Float32 randy;
+	Float32 invrandy;
+	Float32 HeadBump = 0.0f;
+	Float32 BassGain = GetParameter( kParam_One ) * 0.1f;
+	Float32 HeadBumpFreq = ((GetParameter( kParam_Two )*0.1f)+0.02f)/overallscale;
+	Float32 iirAmount = HeadBumpFreq/44.1f;
+	Float32 BassOutGain = GetParameter( kParam_Three )*fabs(GetParameter( kParam_Three ));
+	Float32 SubBump = 0.0f;
+	Float32 SubOutGain = GetParameter( kParam_Four )*fabs(GetParameter( kParam_Four ))*4.0f;
+	Float32 clamp = 0.0f;
+	Float32 fuzz = 0.111f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		ataLowpass = (inputSampleL + inputSampleR) / 2.0;
-		iirDriveSampleA = (iirDriveSampleA * (1.0 - HeadBumpFreq)) + (ataLowpass * HeadBumpFreq); ataLowpass = iirDriveSampleA;
-		iirDriveSampleB = (iirDriveSampleB * (1.0 - HeadBumpFreq)) + (ataLowpass * HeadBumpFreq); ataLowpass = iirDriveSampleB;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		ataLowpass = (inputSampleL + inputSampleR) / 2.0f;
+		iirDriveSampleA = (iirDriveSampleA * (1.0f - HeadBumpFreq)) + (ataLowpass * HeadBumpFreq); ataLowpass = iirDriveSampleA;
+		iirDriveSampleB = (iirDriveSampleB * (1.0f - HeadBumpFreq)) + (ataLowpass * HeadBumpFreq); ataLowpass = iirDriveSampleB;
 
 				
-		oscGate += fabs(ataLowpass * 10.0);
-		oscGate -= 0.001;
-		if (oscGate > 1.0) oscGate = 1.0;
+		oscGate += fabs(ataLowpass * 10.0f);
+		oscGate -= 0.001f;
+		if (oscGate > 1.0f) oscGate = 1.0f;
 		if (oscGate < 0) oscGate = 0;
 		//got a value that only goes down low when there's silence or near silence on input
-		clamp = 1.0-oscGate;
-		clamp *= 0.00001;
+		clamp = 1.0f-oscGate;
+		clamp *= 0.00001f;
 		//set up the thing to choke off oscillations- belt and suspenders affair
 		
 		if (ataLowpass > 0)
 		{if (WasNegative){SubOctave = !SubOctave;} WasNegative = false;}
 		else {WasNegative = true;}
 		//set up polarities for sub-bass version
-		randy = (double(fpdL)/UINT32_MAX)*fuzz; //0 to 1 the noise, may not be needed
-		invrandy = (1.0-randy);
-		randy /= 2.0;
+		randy = (float(fpdL)/UINT32_MAX)*fuzz; //0 to 1 the noise, may not be needed
+		invrandy = (1.0f-randy);
+		randy /= 2.0f;
 		//set up the noise
 		
-		iirSampleA = (iirSampleA * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleA;
-		iirSampleB = (iirSampleB * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleB;
-		iirSampleC = (iirSampleC * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleC;
-		iirSampleD = (iirSampleD * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleD;
-		iirSampleE = (iirSampleE * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleE;
-		iirSampleF = (iirSampleF * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleF;
-		iirSampleG = (iirSampleG * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleG;
-		iirSampleH = (iirSampleH * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleH;
-		iirSampleI = (iirSampleI * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleI;
-		iirSampleJ = (iirSampleJ * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleJ;
-		iirSampleK = (iirSampleK * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleK;
-		iirSampleL = (iirSampleL * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleL;
-		iirSampleM = (iirSampleM * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleM;
-		iirSampleN = (iirSampleN * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleN;
-		iirSampleO = (iirSampleO * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleO;
-		iirSampleP = (iirSampleP * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleP;
-		iirSampleQ = (iirSampleQ * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleQ;
-		iirSampleR = (iirSampleR * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleR;
-		iirSampleS = (iirSampleS * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleS;
-		iirSampleT = (iirSampleT * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleT;
-		iirSampleU = (iirSampleU * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleU;
-		iirSampleV = (iirSampleV * (1.0 - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleV;
+		iirSampleA = (iirSampleA * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleA;
+		iirSampleB = (iirSampleB * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleB;
+		iirSampleC = (iirSampleC * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleC;
+		iirSampleD = (iirSampleD * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleD;
+		iirSampleE = (iirSampleE * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleE;
+		iirSampleF = (iirSampleF * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleF;
+		iirSampleG = (iirSampleG * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleG;
+		iirSampleH = (iirSampleH * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleH;
+		iirSampleI = (iirSampleI * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleI;
+		iirSampleJ = (iirSampleJ * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleJ;
+		iirSampleK = (iirSampleK * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleK;
+		iirSampleL = (iirSampleL * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleL;
+		iirSampleM = (iirSampleM * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleM;
+		iirSampleN = (iirSampleN * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleN;
+		iirSampleO = (iirSampleO * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleO;
+		iirSampleP = (iirSampleP * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleP;
+		iirSampleQ = (iirSampleQ * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleQ;
+		iirSampleR = (iirSampleR * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleR;
+		iirSampleS = (iirSampleS * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleS;
+		iirSampleT = (iirSampleT * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleT;
+		iirSampleU = (iirSampleU * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleU;
+		iirSampleV = (iirSampleV * (1.0f - iirAmount)) + (ataLowpass * iirAmount); ataLowpass -= iirSampleV;
 		
 		switch (bflip)
 		{
@@ -188,14 +188,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				break;
 		}
 		
-		iirSampleW = (iirSampleW * (1.0 - iirAmount)) + (HeadBump * iirAmount); HeadBump -= iirSampleW;
-		iirSampleX = (iirSampleX * (1.0 - iirAmount)) + (HeadBump * iirAmount); HeadBump -= iirSampleX;
+		iirSampleW = (iirSampleW * (1.0f - iirAmount)) + (HeadBump * iirAmount); HeadBump -= iirSampleW;
+		iirSampleX = (iirSampleX * (1.0f - iirAmount)) + (HeadBump * iirAmount); HeadBump -= iirSampleX;
 		
 		SubBump = HeadBump;
-		iirSampleY = (iirSampleY * (1.0 - iirAmount)) + (SubBump * iirAmount); SubBump -= iirSampleY;
+		iirSampleY = (iirSampleY * (1.0f - iirAmount)) + (SubBump * iirAmount); SubBump -= iirSampleY;
 		
-		iirDriveSampleC = (iirDriveSampleC * (1.0 - HeadBumpFreq)) + (SubBump * HeadBumpFreq); SubBump = iirDriveSampleC;
-		iirDriveSampleD = (iirDriveSampleD * (1.0 - HeadBumpFreq)) + (SubBump * HeadBumpFreq); SubBump = iirDriveSampleD;
+		iirDriveSampleC = (iirDriveSampleC * (1.0f - HeadBumpFreq)) + (SubBump * HeadBumpFreq); SubBump = iirDriveSampleC;
+		iirDriveSampleD = (iirDriveSampleD * (1.0f - HeadBumpFreq)) + (SubBump * HeadBumpFreq); SubBump = iirDriveSampleD;
 		
 		
 		SubBump = fabs(SubBump);
@@ -229,9 +229,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				break;
 		}
 		
-		iirSampleZ = (iirSampleZ * (1.0 - HeadBumpFreq)) + (SubBump * HeadBumpFreq); SubBump = iirSampleZ;
-		iirDriveSampleE = (iirDriveSampleE * (1.0 - iirAmount)) + (SubBump * iirAmount); SubBump = iirDriveSampleE;
-		iirDriveSampleF = (iirDriveSampleF * (1.0 - iirAmount)) + (SubBump * iirAmount); SubBump = iirDriveSampleF;
+		iirSampleZ = (iirSampleZ * (1.0f - HeadBumpFreq)) + (SubBump * HeadBumpFreq); SubBump = iirSampleZ;
+		iirDriveSampleE = (iirDriveSampleE * (1.0f - iirAmount)) + (SubBump * iirAmount); SubBump = iirDriveSampleE;
+		iirDriveSampleF = (iirDriveSampleF * (1.0f - iirAmount)) + (SubBump * iirAmount); SubBump = iirDriveSampleF;
 
 		
 		inputSampleL += (HeadBump * BassOutGain);
@@ -248,10 +248,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 				
 		*outputL = inputSampleL;

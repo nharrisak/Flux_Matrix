@@ -42,7 +42,7 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdR;
 
 	struct _dram {
-		Float64 p[4099];
+		Float32 p[4099];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -51,32 +51,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	int phase = (int) GetParameter( kParam_Three );
-	Float64 balance = GetParameter( kParam_One ) / 2.0;
-	Float64 gainL = 0.5 - balance;
-	Float64 gainR = 0.5 + balance;
-	Float64 range = 30.0;
-	if (phase == 3) range = 700.0;
-	if (phase == 4) range = 700.0;
-	Float64 offset = pow(GetParameter( kParam_Two ),5) * range;
-	if (phase > 4) offset = 0.0;
+	Float32 balance = GetParameter( kParam_One ) / 2.0f;
+	Float32 gainL = 0.5f - balance;
+	Float32 gainR = 0.5f + balance;
+	Float32 range = 30.0f;
+	if (phase == 3) range = 700.0f;
+	if (phase == 4) range = 700.0f;
+	Float32 offset = pow(GetParameter( kParam_Two ),5) * range;
+	if (phase > 4) offset = 0.0f;
 	if (phase > 5)
 		{
-			gainL = 0.5;
-			gainR = 0.5;
+			gainL = 0.5f;
+			gainR = 0.5f;
 		}
 	int near = (int)floor(fabs(offset));
-	Float64 farLevel = fabs(offset) - near;
+	Float32 farLevel = fabs(offset) - near;
 	int far = near + 1;
-	Float64 nearLevel = 1.0 - farLevel;
+	Float32 nearLevel = 1.0f - farLevel;
 	
-	double inputSampleL;
-	double inputSampleR;
+	float inputSampleL;
+	float inputSampleR;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		//assign working variables
 
 		if (phase == 2) inputSampleL = -inputSampleL;
@@ -114,10 +114,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 				
 		*outputL = inputSampleL;

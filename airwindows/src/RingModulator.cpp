@@ -31,12 +31,12 @@ kParam0, kParam1, kParam2, kParam3, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
 
-	double sinePosL;
-	double sinePosR;
-	double incLA;
-	double incLB;
-	double incRA;
-	double incRB;
+	float sinePosL;
+	float sinePosR;
+	float incLA;
+	float incLB;
+	float incRA;
+	float incRB;
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -49,49 +49,49 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
 	incLA = incLB; incLB = pow(GetParameter( kParam_A ),5)/overallscale;
 	incRA = incRB; incRB = pow(GetParameter( kParam_B ),5)/overallscale;
-	double soar = 0.3-(GetParameter( kParam_C )*0.3);
-	double wet = pow(GetParameter( kParam_D ),2);
+	float soar = 0.3f-(GetParameter( kParam_C )*0.3f);
+	float wet = pow(GetParameter( kParam_D ),2);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double incL = (incLA*temp)+(incLB*(1.0-temp));
-		double incR = (incRA*temp)+(incRB*(1.0-temp));
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float incL = (incLA*temp)+(incLB*(1.0f-temp));
+		float incR = (incRA*temp)+(incRB*(1.0f-temp));
 
 		sinePosL += incL;
-		if (sinePosL > 6.283185307179586) sinePosL -= 6.283185307179586;
-		double sinResultL = sin(sinePosL);
+		if (sinePosL > 6.283185307179586f) sinePosL -= 6.283185307179586f;
+		float sinResultL = sin(sinePosL);
 		sinePosR += incR;
-		if (sinePosR > 6.283185307179586) sinePosR -= 6.283185307179586;
-		double sinResultR = sin(sinePosR);
+		if (sinePosR > 6.283185307179586f) sinePosR -= 6.283185307179586f;
+		float sinResultR = sin(sinePosR);
 		
-		double out = 0.0;
-		double snM = fabs(sinResultL)+(soar*soar);
-		double inM = fabs(inputSampleL);
+		float out = 0.0f;
+		float snM = fabs(sinResultL)+(soar*soar);
+		float inM = fabs(inputSampleL);
 		if (inM < snM) {
 			inM = fabs(sinResultL);
 			snM = fabs(inputSampleL)+(soar*soar);
 		}
 		
-		if (inputSampleL > 0.0 && sinResultL > 0.0) out = fmax((sqrt(inM/snM)*snM)-soar,0.0);
-		if (inputSampleL < 0.0 && sinResultL > 0.0) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0);
-		if (inputSampleL > 0.0 && sinResultL < 0.0) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0);
-		if (inputSampleL < 0.0 && sinResultL < 0.0) out = fmax((sqrt(inM/snM)*snM)-soar,0.0);
+		if (inputSampleL > 0.0f && sinResultL > 0.0f) out = fmax((sqrt(inM/snM)*snM)-soar,0.0f);
+		if (inputSampleL < 0.0f && sinResultL > 0.0f) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0f);
+		if (inputSampleL > 0.0f && sinResultL < 0.0f) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0f);
+		if (inputSampleL < 0.0f && sinResultL < 0.0f) out = fmax((sqrt(inM/snM)*snM)-soar,0.0f);
 		inputSampleL = out;
 		
-		out = 0.0;
+		out = 0.0f;
 		snM = fabs(sinResultR)+(soar*soar);
 		inM = fabs(inputSampleR);
 		if (inM < snM) {
@@ -99,25 +99,25 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			snM = fabs(inputSampleR)+(soar*soar);
 		}
 		
-		if (inputSampleR > 0.0 && sinResultR > 0.0) out = fmax((sqrt(inM/snM)*snM)-soar,0.0);
-		if (inputSampleR < 0.0 && sinResultR > 0.0) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0);
-		if (inputSampleR > 0.0 && sinResultR < 0.0) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0);
-		if (inputSampleR < 0.0 && sinResultR < 0.0) out = fmax((sqrt(inM/snM)*snM)-soar,0.0);
+		if (inputSampleR > 0.0f && sinResultR > 0.0f) out = fmax((sqrt(inM/snM)*snM)-soar,0.0f);
+		if (inputSampleR < 0.0f && sinResultR > 0.0f) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0f);
+		if (inputSampleR > 0.0f && sinResultR < 0.0f) out = fmin((-sqrt(inM/snM)*snM)+soar,0.0f);
+		if (inputSampleR < 0.0f && sinResultR < 0.0f) out = fmax((sqrt(inM/snM)*snM)-soar,0.0f);
 		inputSampleR = out;
 		
-		if (wet != 1.0) {
-		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+		if (wet != 1.0f) {
+		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

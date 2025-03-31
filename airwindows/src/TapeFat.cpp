@@ -50,21 +50,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 leanfat = GetParameter( kParam_One );
-	Float64 wet = fabs(leanfat);
+	Float32 leanfat = GetParameter( kParam_One );
+	Float32 wet = fabs(leanfat);
 	int fatness = (int)GetParameter( kParam_Two );
-	Float64 floattotal = 0.0;
+	Float32 floattotal = 0.0f;
 	int sumtotal = 0;
 	int count;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		if (gcount < 0 || gcount > 128) {gcount = 128;}
 		count = gcount;
 		
-		p[count+128] = p[count] = sumtotal = (SInt32)(inputSample*8388608.0);
+		p[count+128] = p[count] = sumtotal = (SInt32)(inputSample*8388608.0f);
 		switch (fatness)
 		{
 			case 32: sumtotal += p[count+127]; //note NO break statement.
@@ -101,8 +101,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 1: sumtotal += p[count+1];
 		}
 
-		floattotal = (Float64)(sumtotal/fatness+1);
-		floattotal /= 8388608.0;
+		floattotal = (Float32)(sumtotal/fatness+1);
+		floattotal /= 8388608.0f;
 		floattotal *= wet;
 		
 		if (leanfat < 0) { inputSample = inputSample-floattotal;}
@@ -113,7 +113,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

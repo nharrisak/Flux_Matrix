@@ -35,15 +35,15 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 b[11][11];
-		Float64 f[11];		
+		Float32 b[11][11];
+		Float32 f[11];		
 		int freq;
-		Float64 lastRandy;
-		Float64 outputNoise;
+		Float32 lastRandy;
+		Float32 outputNoise;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 r[8193];
+			Float32 r[8193];
 	};
 	_dram* dram;
 };
@@ -58,55 +58,55 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	int freqTarget = (int)(pow(GetParameter( kParam_One ),3)*8192.0);
+	int freqTarget = (int)(pow(GetParameter( kParam_One ),3)*8192.0f);
 	if (freqTarget < 2) freqTarget = 2;
-	Float64 volumeScale = (1.0/freqTarget) * sqrt(freqTarget);
+	Float32 volumeScale = (1.0f/freqTarget) * sqrt(freqTarget);
 	
-	Float64 overalltaps = (pow(GetParameter( kParam_One ),2)*8.0)+2.0;
-	Float64 taps = overalltaps;
+	Float32 overalltaps = (pow(GetParameter( kParam_One ),2)*8.0f)+2.0f;
+	Float32 taps = overalltaps;
 	//this is our averaging, which is not integer but continuous
 	
-	Float64 overallpoles = (GetParameter( kParam_One )*9.0)+1.0;
+	Float32 overallpoles = (GetParameter( kParam_One )*9.0f)+1.0f;
 	//this is the poles of the filter, also not integer but continuous
 	int yLimit = floor(overallpoles)+1;
-	Float64 yPartial = overallpoles - floor(overallpoles);
+	Float32 yPartial = overallpoles - floor(overallpoles);
 	//now we can do a for loop, and also apply the final pole continuously
 	int xLimit = 1;
 	for(int x = 0; x < 11; x++) {
-		if (taps > 1.0) {
-			f[x] = 1.0;
-			taps -= 1.0;
+		if (taps > 1.0f) {
+			f[x] = 1.0f;
+			taps -= 1.0f;
 			xLimit++;
 		} else {
 			f[x] = taps;
-			taps = 0.0;
+			taps = 0.0f;
 		}
 	} //there, now we have a neat little moving average with remainders
 	if (xLimit > 9) xLimit = 9;
 	
-	if (overalltaps < 1.0) overalltaps = 1.0;
+	if (overalltaps < 1.0f) overalltaps = 1.0f;
 	for(int x = 0; x < xLimit; x++) {
 		f[x] /= overalltaps;
 	} //and now it's neatly scaled, too	
 	
-	Float64 dark  = GetParameter( kParam_Two );
-	Float64 out  = GetParameter( kParam_Three )*0.5;
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 dark  = GetParameter( kParam_Two );
+	Float32 out  = GetParameter( kParam_Three )*0.5f;
+	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		if (freqTarget < freq) {
-			outputNoise = ((outputNoise-0.5)*(1.0-(1.0/freq)))+0.5;
-			dram->r[freq] = 0.5;
+			outputNoise = ((outputNoise-0.5f)*(1.0f-(1.0f/freq)))+0.5f;
+			dram->r[freq] = 0.5f;
 			freq--;
 		}
 		if (freqTarget > freq) freq++;
 		//our tone control chases the input one bin at a time
 		
-		Float64 randy = (Float64)fpd / UINT32_MAX;
+		Float32 randy = (Float32)fpd / UINT32_MAX;
 		// 0 to 1 random value
 		
 		int replacementBin = randy * freq;
@@ -116,36 +116,36 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		lastRandy = randy;
 		//we update only one of the slots we're using
 		
-		inputSample = (-0.5 + outputNoise) * volumeScale;
+		inputSample = (-0.5f + outputNoise) * volumeScale;
 		
-		Float64 nondarkSample = inputSample;
+		Float32 nondarkSample = inputSample;
 		
-		double previousPole = 0;		
+		float previousPole = 0;		
 		for (int y = 0; y < yLimit; y++) {
 			for (int x = xLimit; x >= 0; x--) b[x+1][y] = b[x][y];
 			b[0][y] = previousPole = inputSample;
-			inputSample = 0.0;
+			inputSample = 0.0f;
 			for (int x = 0; x < xLimit; x++) inputSample += (b[x][y] * f[x]);
 		}
-		inputSample = (previousPole * (1.0-yPartial)) + (inputSample * yPartial);
+		inputSample = (previousPole * (1.0f-yPartial)) + (inputSample * yPartial);
 		//in this way we can blend in the final pole
 		
 		
-		if (dark !=1.0) {
-			inputSample = (inputSample * dark) + (nondarkSample * (1.0-dark));
+		if (dark !=1.0f) {
+			inputSample = (inputSample * dark) + (nondarkSample * (1.0f-dark));
 		}
-		if (out !=1.0) {
+		if (out !=1.0f) {
 			inputSample *= out;
 		}
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

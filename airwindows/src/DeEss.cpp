@@ -33,28 +33,28 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 s1;
-		Float64 s2;
-		Float64 s3;
-		Float64 s4;
-		Float64 s5;
-		Float64 s6;
-		Float64 s7;
-		Float64 m1;
-		Float64 m2;
-		Float64 m3;
-		Float64 m4;
-		Float64 m5;
-		Float64 m6;
-		Float64 c1;
-		Float64 c2;
-		Float64 c3;
-		Float64 c4;
-		Float64 c5;
-		Float64 ratioA;
-		Float64 ratioB;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 s1;
+		Float32 s2;
+		Float32 s3;
+		Float32 s4;
+		Float32 s5;
+		Float32 s6;
+		Float32 s7;
+		Float32 m1;
+		Float32 m2;
+		Float32 m3;
+		Float32 m4;
+		Float32 m5;
+		Float32 m6;
+		Float32 c1;
+		Float32 c2;
+		Float32 c3;
+		Float32 c4;
+		Float32 c5;
+		Float32 ratioA;
+		Float32 ratioB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		bool flip;
 		uint32_t fpd;
 	
@@ -72,46 +72,46 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 intensity = pow(GetParameter( kParam_One ),5)*(8192/overallscale);
-	Float64 maxdess = 1.0 / pow(10.0,GetParameter( kParam_Two )/20);
-	Float64 iirAmount = pow(GetParameter( kParam_Three ),2)/overallscale;
-	Float64 offset;
-	Float64 sense;
-	Float64 recovery;
-	Float64 attackspeed;
+	Float32 intensity = pow(GetParameter( kParam_One ),5)*(8192/overallscale);
+	Float32 maxdess = 1.0f / pow(10.0f,GetParameter( kParam_Two )/20);
+	Float32 iirAmount = pow(GetParameter( kParam_Three ),2)/overallscale;
+	Float32 offset;
+	Float32 sense;
+	Float32 recovery;
+	Float32 attackspeed;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		s3 = s2;
 		s2 = s1;
 		s1 = inputSample;
-		m1 = (s1-s2)*((s1-s2)/1.3);
-		m2 = (s2-s3)*((s1-s2)/1.3);
-		sense = fabs((m1-m2)*((m1-m2)/1.3));
+		m1 = (s1-s2)*((s1-s2)/1.3f);
+		m2 = (s2-s3)*((s1-s2)/1.3f);
+		sense = fabs((m1-m2)*((m1-m2)/1.3f));
 		//this will be 0 for smooth, high for SSS
-		attackspeed = 7.0+(sense*1024);
+		attackspeed = 7.0f+(sense*1024);
 		//this does not vary with intensity, but it does react to onset transients
 		
-		sense = 1.0+(intensity*intensity*sense);
+		sense = 1.0f+(intensity*intensity*sense);
 		if (sense > intensity) {sense = intensity;}
 		//this will be 1 for smooth, 'intensity' for SSS
-		recovery = 1.0+(0.01/sense);
-		//this will be 1.1 for smooth, 1.0000000...1 for SSS
+		recovery = 1.0f+(0.01f/sense);
+		//this will be 1.1f for smooth, 1.0000000f...1 for SSS
 		
-		offset = 1.0-fabs(inputSample);
+		offset = 1.0f-fabs(inputSample);
 		
 		if (flip) {
 			iirSampleA = (iirSampleA * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
 			if (ratioA < sense)
-			{ratioA = ((ratioA*attackspeed)+sense)/(attackspeed+1.0);}
+			{ratioA = ((ratioA*attackspeed)+sense)/(attackspeed+1.0f);}
 			else
-			{ratioA = 1.0+((ratioA-1.0)/recovery);}
+			{ratioA = 1.0f+((ratioA-1.0f)/recovery);}
 			//returny to 1/1 code
 			if (ratioA > maxdess){ratioA = maxdess;}
 			inputSample = iirSampleA+((inputSample-iirSampleA)/ratioA);
@@ -119,9 +119,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else {
 			iirSampleB = (iirSampleB * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));	
 			if (ratioB < sense)
-			{ratioB = ((ratioB*attackspeed)+sense)/(attackspeed+1.0);}
+			{ratioB = ((ratioB*attackspeed)+sense)/(attackspeed+1.0f);}
 			else
-			{ratioB = 1.0+((ratioB-1.0)/recovery);}
+			{ratioB = 1.0f+((ratioB-1.0f)/recovery);}
 			//returny to 1/1 code
 			if (ratioB > maxdess){ratioB = maxdess;}
 			inputSample = iirSampleB+((inputSample-iirSampleB)/ratioB);
@@ -132,7 +132,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -34,11 +34,11 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		bool polarity;
-		double lastSample;
-		double iirSample;
-		double noiseA;
-		double noiseB;
-		double noiseC;
+		float lastSample;
+		float iirSample;
+		float noiseA;
+		float noiseB;
+		float noiseC;
 		bool flip;
 		uint32_t fpd;
 	
@@ -56,18 +56,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 slewAmount = ((pow(GetParameter( kParam_One ),2.0)*4.0)+0.71)/overallscale;
-	Float64 dynAmount = pow(GetParameter( kParam_Two ),2.0);
-	Float64 wet = pow(GetParameter( kParam_Three ),5);
+	Float32 slewAmount = ((pow(GetParameter( kParam_One ),2.0f)*4.0f)+0.71f)/overallscale;
+	Float32 dynAmount = pow(GetParameter( kParam_Two ),2.0f);
+	Float32 wet = pow(GetParameter( kParam_Three ),5);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
 		if (inputSample < 0) {
 			if (polarity == true) {
@@ -77,38 +77,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			polarity = false;
 		} else polarity = true;		
 		
-		if (flip) noiseA += (double(fpd)/UINT32_MAX);
-		else noiseA -= (double(fpd)/UINT32_MAX);
+		if (flip) noiseA += (float(fpd)/UINT32_MAX);
+		else noiseA -= (float(fpd)/UINT32_MAX);
 		//here's the guts of the random walk		
 		flip = !flip;
 		
-		if (inputSample > 1.0) inputSample = 1.0; if (inputSample < -1.0) inputSample = -1.0;
-		if (dynAmount < 0.4999) inputSample = (inputSample*dynAmount*2.0) + (sin(inputSample)*(1.0-(dynAmount*2.0)));		
-		if (dynAmount > 0.5001) inputSample = (asin(inputSample)*((dynAmount*2.0)-1.0)) + (inputSample*(1.0-((dynAmount*2.0)-1.0)));
+		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
+		if (dynAmount < 0.4999f) inputSample = (inputSample*dynAmount*2.0f) + (sin(inputSample)*(1.0f-(dynAmount*2.0f)));		
+		if (dynAmount > 0.5001f) inputSample = (asin(inputSample)*((dynAmount*2.0f)-1.0f)) + (inputSample*(1.0f-((dynAmount*2.0f)-1.0f)));
 		//doing this in two steps means I get to not run an extra sin/asin function per sample
 		
-		noiseB = sin(noiseA*(0.2-(dynAmount*0.125))*fabs(inputSample));
+		noiseB = sin(noiseA*(0.2f-(dynAmount*0.125f))*fabs(inputSample));
 		
-		double slew = fabs(inputSample-lastSample)*slewAmount;
-		lastSample = inputSample*(0.86-(dynAmount*0.125));
+		float slew = fabs(inputSample-lastSample)*slewAmount;
+		lastSample = inputSample*(0.86f-(dynAmount*0.125f));
 		
-		if (slew > 1.0) slew = 1.0;
-		double iirIntensity = slew;
-		iirIntensity *= 2.472;
+		if (slew > 1.0f) slew = 1.0f;
+		float iirIntensity = slew;
+		iirIntensity *= 2.472f;
 		iirIntensity *= iirIntensity;
-		if (iirIntensity > 1.0) iirIntensity = 1.0;
+		if (iirIntensity > 1.0f) iirIntensity = 1.0f;
 		
-		iirSample = (iirSample * (1.0 - iirIntensity)) + (noiseB * iirIntensity);
+		iirSample = (iirSample * (1.0f - iirIntensity)) + (noiseB * iirIntensity);
 		noiseB = iirSample;
-		noiseB = (noiseB * slew) + (noiseC * (1.0-slew));
+		noiseB = (noiseB * slew) + (noiseC * (1.0f-slew));
 		noiseC = noiseB;
 		
-		inputSample = (noiseC * wet) + (drySample * (1.0-wet));
+		inputSample = (noiseC * wet) + (drySample * (1.0f-wet));
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

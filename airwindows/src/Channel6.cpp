@@ -39,10 +39,10 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		uint32_t fpd;
-		double iirSampleA;
-		double iirSampleB;
+		float iirSampleA;
+		float iirSampleB;
 		bool flip;
-		double lastSample;
+		float lastSample;
 	
 	struct _dram {
 		};
@@ -58,27 +58,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int console = (int) GetParameter( kParam_One );
-	Float64 density = pow(GetParameter( kParam_Two )/100.0,2);
-	Float64 output = GetParameter( kParam_Three );
-	Float64 iirAmount = 0.005832;
-	Float64 threshold = 0.33362176;	
+	Float32 density = pow(GetParameter( kParam_Two )/100.0f,2);
+	Float32 output = GetParameter( kParam_Three );
+	Float32 iirAmount = 0.005832f;
+	Float32 threshold = 0.33362176f;	
 	switch (console)
 	{
-		case 1: iirAmount = 0.005832; threshold = 0.33362176; break; //Neve
-		case 2: iirAmount = 0.004096; threshold = 0.59969536; break; //API
-		case 3: iirAmount = 0.004913; threshold = 0.84934656; break; //SSL
+		case 1: iirAmount = 0.005832f; threshold = 0.33362176f; break; //Neve
+		case 2: iirAmount = 0.004096f; threshold = 0.59969536f; break; //API
+		case 3: iirAmount = 0.004913f; threshold = 0.84934656f; break; //SSL
 	}
 	iirAmount /= overallscale;
 	threshold /= overallscale; //now with 96K AND working selector!
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		if (flip)
 		{
@@ -91,18 +91,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputSample = inputSample - iirSampleB;
 		}
 		//highpass section
-		double drySample = inputSample;
+		float drySample = inputSample;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		inputSample *= 1.2533141373155;
-		//clip to 1.2533141373155 to reach maximum output
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample *= 1.2533141373155f;
+		//clip to 1.2533141373155f to reach maximum output
 		
-		double distSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		float distSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		inputSample = (drySample*(1-density))+(distSample*density);
 		//drive section
 		
-		Float64 clamp = inputSample - lastSample;
+		Float32 clamp = inputSample - lastSample;
 		if (clamp > threshold)
 			inputSample = lastSample + threshold;
 		if (-clamp > threshold)
@@ -111,7 +111,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//slew section
 		flip = !flip;
 		
-		if (output < 1.0)
+		if (output < 1.0f)
 		{
 			inputSample *= output;
 		}

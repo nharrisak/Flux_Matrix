@@ -35,51 +35,51 @@ kParam0, kParam1, kParam2, kParam3, kParam4, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double iirAL;
-	double iirBL;
+	float iirAL;
+	float iirBL;
 	
-	double gainIn;
-	double gainOutL;
-	double gainOutR;
+	float gainIn;
+	float gainOutL;
+	float gainOutR;
 		
 	
 	
 	
-	double feedbackAL;
-	double feedbackBL;
-	double feedbackCL;
-	double feedbackDL;
-	double feedbackEL;
+	float feedbackAL;
+	float feedbackBL;
+	float feedbackCL;
+	float feedbackDL;
+	float feedbackEL;
 	
-	double feedbackER;
-	double feedbackJR;
-	double feedbackOR;
-	double feedbackTR;
-	double feedbackYR;
+	float feedbackER;
+	float feedbackJR;
+	float feedbackOR;
+	float feedbackTR;
+	float feedbackYR;
 	
-	double feedblurAL;
-	double feedblurBL;
-	double feedblurCL;
-	double feedblurDL;
-	double feedblurEL;
+	float feedblurAL;
+	float feedblurBL;
+	float feedblurCL;
+	float feedblurDL;
+	float feedblurEL;
 	
-	double feedblurER;
-	double feedblurJR;
-	double feedblurOR;
-	double feedblurTR;
-	double feedblurYR;
+	float feedblurER;
+	float feedblurJR;
+	float feedblurOR;
+	float feedblurTR;
+	float feedblurYR;
 	
-	double sbAL;
-	double sbBL;
-	double sbCL;
-	double sbDL;
-	double sbEL;
+	float sbAL;
+	float sbBL;
+	float sbCL;
+	float sbDL;
+	float sbEL;
 	
-	double sbER;
-	double sbJR;
-	double sbOR;
-	double sbTR;
-	double sbYR;
+	float sbER;
+	float sbJR;
+	float sbOR;
+	float sbTR;
+	float sbYR;
 	
 	
 	enum {
@@ -127,34 +127,34 @@ enum { kNumTemplateParameters = 6 };
 	}; //fixed frequency pear filter for ultrasonics, stereo
 	
 	
-	double vibratoL;
-	double vibratoR;
-	double vibAL;
-	double vibAR;
-	double vibBL;
-	double vibBR;
+	float vibratoL;
+	float vibratoR;
+	float vibAL;
+	float vibAR;
+	float vibBL;
+	float vibBR;
 	
-	double subAL;
-	double subAR;
-	double subBL;
-	double subBR;
-	double subCL;
-	double subCR;
+	float subAL;
+	float subAR;
+	float subBL;
+	float subBR;
+	float subCL;
+	float subCR;
 	
-	double previousAL;
-	double previousBL;
-	double previousCL;
-	double previousDL;
-	double previousEL;
+	float previousAL;
+	float previousBL;
+	float previousCL;
+	float previousDL;
+	float previousEL;
 	
-	double iirAR;
-	double iirBR;
+	float iirAR;
+	float iirBR;
 	
-	double previousAR;
-	double previousBR;
-	double previousCR;
-	double previousDR;
-	double previousER;
+	float previousAR;
+	float previousBR;
+	float previousCR;
+	float previousDR;
+	float previousER;
 	
 	int countAL;
 	int countBL;
@@ -211,24 +211,24 @@ enum { kNumTemplateParameters = 6 };
 	int countZ;		
 	int countVLF;		
 	
-	double prevMulchBL;
-	double prevMulchBR;
-	double prevMulchCL;
-	double prevMulchCR;
-	double prevMulchDL;
-	double prevMulchDR;
-	double prevMulchEL;
-	double prevMulchER;
+	float prevMulchBL;
+	float prevMulchBR;
+	float prevMulchCL;
+	float prevMulchCR;
+	float prevMulchDL;
+	float prevMulchDR;
+	float prevMulchEL;
+	float prevMulchER;
 	
-	double prevOutDL;
-	double prevOutDR;
-	double prevOutEL;
-	double prevOutER;
+	float prevOutDL;
+	float prevOutDR;
+	float prevOutEL;
+	float prevOutER;
 	
-	double prevInDL;
-	double prevInDR;
-	double prevInEL;
-	double prevInER;
+	float prevInDL;
+	float prevInDR;
+	float prevInEL;
+	float prevInER;
 	
 	enum {
 		bez_AL,
@@ -251,67 +251,67 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdR;
 
 	struct _dram {
-		double aAL[delayA+5];
-	double aBL[delayB+5];
-	double aCL[delayC+5];
-	double aDL[delayD+5];
-	double aEL[delayE+5];
-	double aFL[delayF+5];
-	double aGL[delayG+5];
-	double aHL[delayH+5];
-	double aIL[delayI+5];
-	double aJL[delayJ+5];
-	double aKL[delayK+5];
-	double aLL[delayL+5];
-	double aML[delayM+5];
-	double aNL[delayN+5];
-	double aOL[delayO+5];
-	double aPL[delayP+5];
-	double aQL[delayQ+5];
-	double aRL[delayR+5];
-	double aSL[delayS+5];
-	double aTL[delayT+5];
-	double aUL[delayU+5];
-	double aVL[delayV+5];
-	double aWL[delayW+5];
-	double aXL[delayX+5];
-	double aYL[delayY+5];
-	double aAR[delayA+5];
-	double aBR[delayB+5];
-	double aCR[delayC+5];
-	double aDR[delayD+5];
-	double aER[delayE+5];
-	double aFR[delayF+5];
-	double aGR[delayG+5];
-	double aHR[delayH+5];
-	double aIR[delayI+5];
-	double aJR[delayJ+5];
-	double aKR[delayK+5];
-	double aLR[delayL+5];
-	double aMR[delayM+5];
-	double aNR[delayN+5];
-	double aOR[delayO+5];
-	double aPR[delayP+5];
-	double aQR[delayQ+5];
-	double aRR[delayR+5];
-	double aSR[delayS+5];
-	double aTR[delayT+5];
-	double aUR[delayU+5];
-	double aVR[delayV+5];
-	double aWR[delayW+5];
-	double aXR[delayX+5];
-	double aYR[delayY+5];
-	double aZL[predelay+5];
-	double aZR[predelay+5];
-	double aVLFL[vlfpredelay+5];
-	double aVLFR[vlfpredelay+5];
-	double pearA[pear_total]; //probably worth just using a number here
-	double pearB[pear_total]; //probably worth just using a number here
-	double pearC[pear_total]; //probably worth just using a number here
-	double pearD[pear_total]; //probably worth just using a number here
-	double pearE[pear_total]; //probably worth just using a number here
-	double pearF[pear_total]; //probably worth just using a number here
-	double bez[bez_total];
+		float aAL[delayA+5];
+	float aBL[delayB+5];
+	float aCL[delayC+5];
+	float aDL[delayD+5];
+	float aEL[delayE+5];
+	float aFL[delayF+5];
+	float aGL[delayG+5];
+	float aHL[delayH+5];
+	float aIL[delayI+5];
+	float aJL[delayJ+5];
+	float aKL[delayK+5];
+	float aLL[delayL+5];
+	float aML[delayM+5];
+	float aNL[delayN+5];
+	float aOL[delayO+5];
+	float aPL[delayP+5];
+	float aQL[delayQ+5];
+	float aRL[delayR+5];
+	float aSL[delayS+5];
+	float aTL[delayT+5];
+	float aUL[delayU+5];
+	float aVL[delayV+5];
+	float aWL[delayW+5];
+	float aXL[delayX+5];
+	float aYL[delayY+5];
+	float aAR[delayA+5];
+	float aBR[delayB+5];
+	float aCR[delayC+5];
+	float aDR[delayD+5];
+	float aER[delayE+5];
+	float aFR[delayF+5];
+	float aGR[delayG+5];
+	float aHR[delayH+5];
+	float aIR[delayI+5];
+	float aJR[delayJ+5];
+	float aKR[delayK+5];
+	float aLR[delayL+5];
+	float aMR[delayM+5];
+	float aNR[delayN+5];
+	float aOR[delayO+5];
+	float aPR[delayP+5];
+	float aQR[delayQ+5];
+	float aRR[delayR+5];
+	float aSR[delayS+5];
+	float aTR[delayT+5];
+	float aUR[delayU+5];
+	float aVR[delayV+5];
+	float aWR[delayW+5];
+	float aXR[delayX+5];
+	float aYR[delayY+5];
+	float aZL[predelay+5];
+	float aZR[predelay+5];
+	float aVLFL[vlfpredelay+5];
+	float aVLFR[vlfpredelay+5];
+	float pearA[pear_total]; //probably worth just using a number here
+	float pearB[pear_total]; //probably worth just using a number here
+	float pearC[pear_total]; //probably worth just using a number here
+	float pearD[pear_total]; //probably worth just using a number here
+	float pearE[pear_total]; //probably worth just using a number here
+	float pearF[pear_total]; //probably worth just using a number here
+	float bez[bez_total];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -319,41 +319,41 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double inputPad = GetParameter( kParam_A );
-	double sbScale = pow(1.0-GetParameter( kParam_B ),3)*-0.0000001;
-	double sbRebound = (pow(GetParameter( kParam_B ),2)*24.448)+39.552;
-	double blur = (1.0-GetParameter( kParam_B ))*0.5;
-	double regen = 1.0-pow(1.0-GetParameter(kParam_B),2);
-	regen = (regen*0.0001)+0.000195;
-	double derez = GetParameter( kParam_C )/overallscale;
-	if (derez < 0.0005) derez = 0.0005; if (derez > 1.0) derez = 1.0;
-	derez = 1.0 / ((int)(1.0/derez));
-	//this hard-locks derez to exact subdivisions of 1.0
+	float inputPad = GetParameter( kParam_A );
+	float sbScale = pow(1.0f-GetParameter( kParam_B ),3)*-0.0000001f;
+	float sbRebound = (pow(GetParameter( kParam_B ),2)*24.448f)+39.552f;
+	float blur = (1.0f-GetParameter( kParam_B ))*0.5f;
+	float regen = 1.0f-pow(1.0f-GetParameter(kParam_B),2);
+	regen = (regen*0.0001f)+0.000195f;
+	float derez = GetParameter( kParam_C )/overallscale;
+	if (derez < 0.0005f) derez = 0.0005f; if (derez > 1.0f) derez = 1.0f;
+	derez = 1.0f / ((int)(1.0f/derez));
+	//this hard-locks derez to exact subdivisions of 1.0f
 	int adjPredelay = predelay*GetParameter( kParam_D )*derez;
 	int adjSubDelay = vlfpredelay*derez;
-	double wet = GetParameter( kParam_E )*2.0;
-	double dry = 2.0 - wet;
-	if (wet > 1.0) wet = 1.0; else wet *= wet;
-	if (wet < 0.0) wet = 0.0;
-	if (dry > 1.0) dry = 1.0;
-	if (dry < 0.0) dry = 0.0;
+	float wet = GetParameter( kParam_E )*2.0f;
+	float dry = 2.0f - wet;
+	if (wet > 1.0f) wet = 1.0f; else wet *= wet;
+	if (wet < 0.0f) wet = 0.0f;
+	if (dry > 1.0f) dry = 1.0f;
+	if (dry < 0.0f) dry = 0.0f;
 	//this reverb makes 50% full dry AND full wet, not crossfaded.
 	//that's so it can be on submixes without cutting back dry channel when adjusted:
 	//unless you go super heavy, you are only adjusting the added verb loudness.
 		
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
-		if (inputPad < 1.0) {
+		if (inputPad < 1.0f) {
 			inputSampleL *= inputPad;
 			inputSampleR *= inputPad;
 		}
@@ -362,8 +362,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		dram->bez[bez_SampL] += ((inputSampleL+dram->bez[bez_InL]) * derez);
 		dram->bez[bez_SampR] += ((inputSampleR+dram->bez[bez_InR]) * derez);
 		dram->bez[bez_InL] = inputSampleL; dram->bez[bez_InR] = inputSampleR;
-		if (dram->bez[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
-			dram->bez[bez_cycle] = 0.0;
+		if (dram->bez[bez_cycle] > 1.0f) { //hit the end point and we do a reverb sample
+			dram->bez[bez_cycle] = 0.0f;
 			
 			//predelay
 			dram->aZL[countZ] = dram->bez[bez_SampL];
@@ -373,37 +373,37 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->bez[bez_SampR] = dram->aZR[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
 			//end predelay
 			
-			double avgSampL = (dram->bez[bez_SampL]+dram->bez[bez_UnInL]) * 0.125;
-			double avgSampR = (dram->bez[bez_SampR]+dram->bez[bez_UnInR]) * 0.125;
+			float avgSampL = (dram->bez[bez_SampL]+dram->bez[bez_UnInL]) * 0.125f;
+			float avgSampR = (dram->bez[bez_SampR]+dram->bez[bez_UnInR]) * 0.125f;
 			dram->bez[bez_UnInL] = dram->bez[bez_SampL];
 			dram->bez[bez_UnInR] = dram->bez[bez_SampR];
 
 			//begin SubTight section
-			double outSampleL = avgSampL * 0.00187;
-			double outSampleR = avgSampR * 0.00187;
-			double scale = 0.5+fabs(outSampleL*0.5);
+			float outSampleL = avgSampL * 0.00187f;
+			float outSampleR = avgSampR * 0.00187f;
+			float scale = 0.5f+fabs(outSampleL*0.5f);
 			outSampleL = (subAL+(sin(subAL-outSampleL)*scale));
 			subAL = outSampleL*scale;
-			scale = 0.5+fabs(outSampleR*0.5);
+			scale = 0.5f+fabs(outSampleR*0.5f);
 			outSampleR = (subAR+(sin(subAR-outSampleR)*scale));
 			subAR = outSampleR*scale;
-			scale = 0.5+fabs(outSampleL*0.5);
+			scale = 0.5f+fabs(outSampleL*0.5f);
 			outSampleL = (subBL+(sin(subBL-outSampleL)*scale));
 			subBL = outSampleL*scale;
-			scale = 0.5+fabs(outSampleR*0.5);
+			scale = 0.5f+fabs(outSampleR*0.5f);
 			outSampleR = (subBR+(sin(subBR-outSampleR)*scale));
 			subBR = outSampleR*scale;
-			scale = 0.5+fabs(outSampleL*0.5);
+			scale = 0.5f+fabs(outSampleL*0.5f);
 			outSampleL = (subCL+(sin(subCL-outSampleL)*scale));
 			subCL = outSampleL*scale;
-			scale = 0.5+fabs(outSampleR*0.5);
+			scale = 0.5f+fabs(outSampleR*0.5f);
 			outSampleR = (subCR+(sin(subCR-outSampleR)*scale));
 			subCR = outSampleR*scale;
 			outSampleL = -outSampleL; outSampleR = -outSampleR;
-			if (outSampleL > 0.25) outSampleL = 0.25; if (outSampleL < -0.25) outSampleL = -0.25;
-			if (outSampleR > 0.25) outSampleR = 0.25; if (outSampleR < -0.25) outSampleR = -0.25;
-			outSampleL *= 16.0;
-			outSampleR *= 16.0;
+			if (outSampleL > 0.25f) outSampleL = 0.25f; if (outSampleL < -0.25f) outSampleL = -0.25f;
+			if (outSampleR > 0.25f) outSampleR = 0.25f; if (outSampleR < -0.25f) outSampleR = -0.25f;
+			outSampleL *= 16.0f;
+			outSampleR *= 16.0f;
 			avgSampL -= outSampleL;
 			avgSampR -= outSampleR;
 			//end SubTight section
@@ -411,8 +411,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->aVLFL[countVLF] = outSampleL;
 			dram->aVLFR[countVLF] = outSampleR;
 			countVLF++; if (countVLF < 0 || countVLF > adjSubDelay) countVLF = 0;
-			outSampleL = dram->aVLFL[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0;
-			outSampleR = dram->aVLFR[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0;
+			outSampleL = dram->aVLFL[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0f;
+			outSampleR = dram->aVLFR[countVLF-((countVLF > adjSubDelay)?adjSubDelay+1:0)] * 2.0f;
 			//end VLF predelay
 			
 			avgSampL += outSampleL;
@@ -442,31 +442,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countTR++; if (countTR < 0 || countTR > delayT) countTR = 0;
 			countYR++; if (countYR < 0 || countYR > delayY) countYR = 0;
 			
-			double outAL = dram->aAL[countAL-((countAL > delayA)?delayA+1:0)];
-			double outBL = dram->aBL[countBL-((countBL > delayB)?delayB+1:0)];
-			double outCL = dram->aCL[countCL-((countCL > delayC)?delayC+1:0)];
-			double outDL = dram->aDL[countDL-((countDL > delayD)?delayD+1:0)];
-			double outEL = dram->aEL[countEL-((countEL > delayE)?delayE+1:0)];
+			float outAL = dram->aAL[countAL-((countAL > delayA)?delayA+1:0)];
+			float outBL = dram->aBL[countBL-((countBL > delayB)?delayB+1:0)];
+			float outCL = dram->aCL[countCL-((countCL > delayC)?delayC+1:0)];
+			float outDL = dram->aDL[countDL-((countDL > delayD)?delayD+1:0)];
+			float outEL = dram->aEL[countEL-((countEL > delayE)?delayE+1:0)];
 			
-			double outER = dram->aER[countER-((countER > delayE)?delayE+1:0)];
-			double outJR = dram->aJR[countJR-((countJR > delayJ)?delayJ+1:0)];
-			double outOR = dram->aOR[countOR-((countOR > delayO)?delayO+1:0)];
-			double outTR = dram->aTR[countTR-((countTR > delayT)?delayT+1:0)];
-			double outYR = dram->aYR[countYR-((countYR > delayY)?delayY+1:0)];
+			float outER = dram->aER[countER-((countER > delayE)?delayE+1:0)];
+			float outJR = dram->aJR[countJR-((countJR > delayJ)?delayJ+1:0)];
+			float outOR = dram->aOR[countOR-((countOR > delayO)?delayO+1:0)];
+			float outTR = dram->aTR[countTR-((countTR > delayT)?delayT+1:0)];
+			float outYR = dram->aYR[countYR-((countYR > delayY)?delayY+1:0)];
 			
 			//-------- one
 			
-			dram->aFL[countFL] = ((outAL*3.0) - ((outBL + outCL + outDL + outEL)*2.0));
-			dram->aGL[countGL] = ((outBL*3.0) - ((outAL + outCL + outDL + outEL)*2.0));
-			dram->aHL[countHL] = ((outCL*3.0) - ((outAL + outBL + outDL + outEL)*2.0));
-			dram->aIL[countIL] = ((outDL*3.0) - ((outAL + outBL + outCL + outEL)*2.0));
-			dram->aJL[countJL] = ((outEL*3.0) - ((outAL + outBL + outCL + outDL)*2.0));
+			dram->aFL[countFL] = ((outAL*3.0f) - ((outBL + outCL + outDL + outEL)*2.0f));
+			dram->aGL[countGL] = ((outBL*3.0f) - ((outAL + outCL + outDL + outEL)*2.0f));
+			dram->aHL[countHL] = ((outCL*3.0f) - ((outAL + outBL + outDL + outEL)*2.0f));
+			dram->aIL[countIL] = ((outDL*3.0f) - ((outAL + outBL + outCL + outEL)*2.0f));
+			dram->aJL[countJL] = ((outEL*3.0f) - ((outAL + outBL + outCL + outDL)*2.0f));
 			
-			dram->aDR[countDR] = ((outER*3.0) - ((outJR + outOR + outTR + outYR)*2.0));
-			dram->aIR[countIR] = ((outJR*3.0) - ((outER + outOR + outTR + outYR)*2.0));
-			dram->aNR[countNR] = ((outOR*3.0) - ((outER + outJR + outTR + outYR)*2.0));
-			dram->aSR[countSR] = ((outTR*3.0) - ((outER + outJR + outOR + outYR)*2.0));
-			dram->aXR[countXR] = ((outYR*3.0) - ((outER + outJR + outOR + outTR)*2.0));
+			dram->aDR[countDR] = ((outER*3.0f) - ((outJR + outOR + outTR + outYR)*2.0f));
+			dram->aIR[countIR] = ((outJR*3.0f) - ((outER + outOR + outTR + outYR)*2.0f));
+			dram->aNR[countNR] = ((outOR*3.0f) - ((outER + outJR + outTR + outYR)*2.0f));
+			dram->aSR[countSR] = ((outTR*3.0f) - ((outER + outJR + outOR + outYR)*2.0f));
+			dram->aXR[countXR] = ((outYR*3.0f) - ((outER + outJR + outOR + outTR)*2.0f));
 			
 			countFL++; if (countFL < 0 || countFL > delayF) countFL = 0;
 			countGL++; if (countGL < 0 || countGL > delayG) countGL = 0;
@@ -480,31 +480,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countSR++; if (countSR < 0 || countSR > delayS) countSR = 0;
 			countXR++; if (countXR < 0 || countXR > delayX) countXR = 0;
 			
-			double outFL = dram->aFL[countFL-((countFL > delayF)?delayF+1:0)];
-			double outGL = dram->aGL[countGL-((countGL > delayG)?delayG+1:0)];
-			double outHL = dram->aHL[countHL-((countHL > delayH)?delayH+1:0)];
-			double outIL = dram->aIL[countIL-((countIL > delayI)?delayI+1:0)];
-			double outJL = dram->aJL[countJL-((countJL > delayJ)?delayJ+1:0)];
+			float outFL = dram->aFL[countFL-((countFL > delayF)?delayF+1:0)];
+			float outGL = dram->aGL[countGL-((countGL > delayG)?delayG+1:0)];
+			float outHL = dram->aHL[countHL-((countHL > delayH)?delayH+1:0)];
+			float outIL = dram->aIL[countIL-((countIL > delayI)?delayI+1:0)];
+			float outJL = dram->aJL[countJL-((countJL > delayJ)?delayJ+1:0)];
 			
-			double outDR = dram->aDR[countDR-((countDR > delayD)?delayD+1:0)];
-			double outIR = dram->aIR[countIR-((countIR > delayI)?delayI+1:0)];
-			double outNR = dram->aNR[countNR-((countNR > delayN)?delayN+1:0)];
-			double outSR = dram->aSR[countSR-((countSR > delayS)?delayS+1:0)];
-			double outXR = dram->aXR[countXR-((countXR > delayX)?delayX+1:0)];
+			float outDR = dram->aDR[countDR-((countDR > delayD)?delayD+1:0)];
+			float outIR = dram->aIR[countIR-((countIR > delayI)?delayI+1:0)];
+			float outNR = dram->aNR[countNR-((countNR > delayN)?delayN+1:0)];
+			float outSR = dram->aSR[countSR-((countSR > delayS)?delayS+1:0)];
+			float outXR = dram->aXR[countXR-((countXR > delayX)?delayX+1:0)];
 			
 			//-------- two
 			
-			dram->aKL[countKL] = ((outFL*3.0) - ((outGL + outHL + outIL + outJL)*2.0));
-			dram->aLL[countLL] = ((outGL*3.0) - ((outFL + outHL + outIL + outJL)*2.0));
-			dram->aML[countML] = ((outHL*3.0) - ((outFL + outGL + outIL + outJL)*2.0));
-			dram->aNL[countNL] = ((outIL*3.0) - ((outFL + outGL + outHL + outJL)*2.0));
-			dram->aOL[countOL] = ((outJL*3.0) - ((outFL + outGL + outHL + outIL)*2.0));
+			dram->aKL[countKL] = ((outFL*3.0f) - ((outGL + outHL + outIL + outJL)*2.0f));
+			dram->aLL[countLL] = ((outGL*3.0f) - ((outFL + outHL + outIL + outJL)*2.0f));
+			dram->aML[countML] = ((outHL*3.0f) - ((outFL + outGL + outIL + outJL)*2.0f));
+			dram->aNL[countNL] = ((outIL*3.0f) - ((outFL + outGL + outHL + outJL)*2.0f));
+			dram->aOL[countOL] = ((outJL*3.0f) - ((outFL + outGL + outHL + outIL)*2.0f));
 			
-			dram->aCR[countCR] = ((outDR*3.0) - ((outIR + outNR + outSR + outXR)*2.0));
-			dram->aHR[countHR] = ((outIR*3.0) - ((outDR + outNR + outSR + outXR)*2.0));
-			dram->aMR[countMR] = ((outNR*3.0) - ((outDR + outIR + outSR + outXR)*2.0));
-			dram->aRR[countRR] = ((outSR*3.0) - ((outDR + outIR + outNR + outXR)*2.0));
-			dram->aWR[countWR] = ((outXR*3.0) - ((outDR + outIR + outNR + outSR)*2.0));
+			dram->aCR[countCR] = ((outDR*3.0f) - ((outIR + outNR + outSR + outXR)*2.0f));
+			dram->aHR[countHR] = ((outIR*3.0f) - ((outDR + outNR + outSR + outXR)*2.0f));
+			dram->aMR[countMR] = ((outNR*3.0f) - ((outDR + outIR + outSR + outXR)*2.0f));
+			dram->aRR[countRR] = ((outSR*3.0f) - ((outDR + outIR + outNR + outXR)*2.0f));
+			dram->aWR[countWR] = ((outXR*3.0f) - ((outDR + outIR + outNR + outSR)*2.0f));
 			
 			countKL++; if (countKL < 0 || countKL > delayK) countKL = 0;
 			countLL++; if (countLL < 0 || countLL > delayL) countLL = 0;
@@ -518,31 +518,31 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countRR++; if (countRR < 0 || countRR > delayR) countRR = 0;
 			countWR++; if (countWR < 0 || countWR > delayW) countWR = 0;
 			
-			double outKL = dram->aKL[countKL-((countKL > delayK)?delayK+1:0)];
-			double outLL = dram->aLL[countLL-((countLL > delayL)?delayL+1:0)];
-			double outML = dram->aML[countML-((countML > delayM)?delayM+1:0)];
-			double outNL = dram->aNL[countNL-((countNL > delayN)?delayN+1:0)];
-			double outOL = dram->aOL[countOL-((countOL > delayO)?delayO+1:0)];
+			float outKL = dram->aKL[countKL-((countKL > delayK)?delayK+1:0)];
+			float outLL = dram->aLL[countLL-((countLL > delayL)?delayL+1:0)];
+			float outML = dram->aML[countML-((countML > delayM)?delayM+1:0)];
+			float outNL = dram->aNL[countNL-((countNL > delayN)?delayN+1:0)];
+			float outOL = dram->aOL[countOL-((countOL > delayO)?delayO+1:0)];
 			
-			double outCR = dram->aCR[countCR-((countCR > delayC)?delayC+1:0)];
-			double outHR = dram->aHR[countHR-((countHR > delayH)?delayH+1:0)];
-			double outMR = dram->aMR[countMR-((countMR > delayM)?delayM+1:0)];
-			double outRR = dram->aRR[countRR-((countRR > delayR)?delayR+1:0)];
-			double outWR = dram->aWR[countWR-((countWR > delayW)?delayW+1:0)];
+			float outCR = dram->aCR[countCR-((countCR > delayC)?delayC+1:0)];
+			float outHR = dram->aHR[countHR-((countHR > delayH)?delayH+1:0)];
+			float outMR = dram->aMR[countMR-((countMR > delayM)?delayM+1:0)];
+			float outRR = dram->aRR[countRR-((countRR > delayR)?delayR+1:0)];
+			float outWR = dram->aWR[countWR-((countWR > delayW)?delayW+1:0)];
 						
 			//-------- three
 			
-			dram->aPL[countPL] = ((outKL*3.0) - ((outLL + outML + outNL + outOL)*2.0));
-			dram->aQL[countQL] = ((outLL*3.0) - ((outKL + outML + outNL + outOL)*2.0));
-			dram->aRL[countRL] = ((outML*3.0) - ((outKL + outLL + outNL + outOL)*2.0));
-			dram->aSL[countSL] = ((outNL*3.0) - ((outKL + outLL + outML + outOL)*2.0));
-			dram->aTL[countTL] = ((outOL*3.0) - ((outKL + outLL + outML + outNL)*2.0));
+			dram->aPL[countPL] = ((outKL*3.0f) - ((outLL + outML + outNL + outOL)*2.0f));
+			dram->aQL[countQL] = ((outLL*3.0f) - ((outKL + outML + outNL + outOL)*2.0f));
+			dram->aRL[countRL] = ((outML*3.0f) - ((outKL + outLL + outNL + outOL)*2.0f));
+			dram->aSL[countSL] = ((outNL*3.0f) - ((outKL + outLL + outML + outOL)*2.0f));
+			dram->aTL[countTL] = ((outOL*3.0f) - ((outKL + outLL + outML + outNL)*2.0f));
 			
-			dram->aBR[countBR] = ((outCR*3.0) - ((outHR + outMR + outRR + outWR)*2.0));
-			dram->aGR[countGR] = ((outHR*3.0) - ((outCR + outMR + outRR + outWR)*2.0));
-			dram->aLR[countLR] = ((outMR*3.0) - ((outCR + outHR + outRR + outWR)*2.0));
-			dram->aQR[countQR] = ((outRR*3.0) - ((outCR + outHR + outMR + outWR)*2.0));
-			dram->aVR[countVR] = ((outWR*3.0) - ((outCR + outHR + outMR + outRR)*2.0));
+			dram->aBR[countBR] = ((outCR*3.0f) - ((outHR + outMR + outRR + outWR)*2.0f));
+			dram->aGR[countGR] = ((outHR*3.0f) - ((outCR + outMR + outRR + outWR)*2.0f));
+			dram->aLR[countLR] = ((outMR*3.0f) - ((outCR + outHR + outRR + outWR)*2.0f));
+			dram->aQR[countQR] = ((outRR*3.0f) - ((outCR + outHR + outMR + outWR)*2.0f));
+			dram->aVR[countVR] = ((outWR*3.0f) - ((outCR + outHR + outMR + outRR)*2.0f));
 			
 			countPL++; if (countPL < 0 || countPL > delayP) countPL = 0;
 			countQL++; if (countQL < 0 || countQL > delayQ) countQL = 0;
@@ -556,52 +556,52 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countQR++; if (countQR < 0 || countQR > delayQ) countQR = 0;
 			countVR++; if (countVR < 0 || countVR > delayV) countVR = 0;
 			
-			double outPL = dram->aPL[countPL-((countPL > delayP)?delayP+1:0)];
-			double outQL = dram->aQL[countQL-((countQL > delayQ)?delayQ+1:0)];
-			double outRL = dram->aRL[countRL-((countRL > delayR)?delayR+1:0)];
-			double outSL = dram->aSL[countSL-((countSL > delayS)?delayS+1:0)];
-			double outTL = dram->aTL[countTL-((countTL > delayT)?delayT+1:0)];
+			float outPL = dram->aPL[countPL-((countPL > delayP)?delayP+1:0)];
+			float outQL = dram->aQL[countQL-((countQL > delayQ)?delayQ+1:0)];
+			float outRL = dram->aRL[countRL-((countRL > delayR)?delayR+1:0)];
+			float outSL = dram->aSL[countSL-((countSL > delayS)?delayS+1:0)];
+			float outTL = dram->aTL[countTL-((countTL > delayT)?delayT+1:0)];
 			
-			double outBR = dram->aBR[countBR-((countBR > delayB)?delayB+1:0)];
-			double outGR = dram->aGR[countGR-((countGR > delayG)?delayG+1:0)];
-			double outLR = dram->aLR[countLR-((countLR > delayL)?delayL+1:0)];
-			double outQR = dram->aQR[countQR-((countQR > delayQ)?delayQ+1:0)];
-			double outVR = dram->aVR[countVR-((countVR > delayV)?delayV+1:0)];
+			float outBR = dram->aBR[countBR-((countBR > delayB)?delayB+1:0)];
+			float outGR = dram->aGR[countGR-((countGR > delayG)?delayG+1:0)];
+			float outLR = dram->aLR[countLR-((countLR > delayL)?delayL+1:0)];
+			float outQR = dram->aQR[countQR-((countQR > delayQ)?delayQ+1:0)];
+			float outVR = dram->aVR[countVR-((countVR > delayV)?delayV+1:0)];
 			
 			//-------- four
 			
-			dram->aVL[countVL] = ((outQL*3.0) - ((outPL + outRL + outSL + outTL)*2.0));
-			dram->aWL[countWL] = ((outRL*3.0) - ((outPL + outQL + outSL + outTL)*2.0));
-			dram->aXL[countXL] = ((outSL*3.0) - ((outPL + outQL + outRL + outTL)*2.0));
-			dram->aYL[countYL] = ((outTL*3.0) - ((outPL + outQL + outRL + outSL)*2.0));
+			dram->aVL[countVL] = ((outQL*3.0f) - ((outPL + outRL + outSL + outTL)*2.0f));
+			dram->aWL[countWL] = ((outRL*3.0f) - ((outPL + outQL + outSL + outTL)*2.0f));
+			dram->aXL[countXL] = ((outSL*3.0f) - ((outPL + outQL + outRL + outTL)*2.0f));
+			dram->aYL[countYL] = ((outTL*3.0f) - ((outPL + outQL + outRL + outSL)*2.0f));
 			
-			dram->aAR[countAR] = ((outBR*3.0) - ((outGR + outLR + outQR + outVR)*2.0));
-			dram->aFR[countFR] = ((outGR*3.0) - ((outBR + outLR + outQR + outVR)*2.0));
-			dram->aKR[countKR] = ((outLR*3.0) - ((outBR + outGR + outQR + outVR)*2.0));
-			dram->aPR[countPR] = ((outQR*3.0) - ((outBR + outGR + outLR + outVR)*2.0));
+			dram->aAR[countAR] = ((outBR*3.0f) - ((outGR + outLR + outQR + outVR)*2.0f));
+			dram->aFR[countFR] = ((outGR*3.0f) - ((outBR + outLR + outQR + outVR)*2.0f));
+			dram->aKR[countKR] = ((outLR*3.0f) - ((outBR + outGR + outQR + outVR)*2.0f));
+			dram->aPR[countPR] = ((outQR*3.0f) - ((outBR + outGR + outLR + outVR)*2.0f));
 			
-			double outUL = ((outPL*3.0) - ((outQL + outRL + outSL + outTL)*2.0)) - (dram->aUL[(countUL+1)-((countUL+1 > delayU)?delayU+1:0)]*0.618033988749894848204586);
-			dram->aUL[countUL] = outUL; outUL *= 0.618033988749894848204586;
+			float outUL = ((outPL*3.0f) - ((outQL + outRL + outSL + outTL)*2.0f)) - (dram->aUL[(countUL+1)-((countUL+1 > delayU)?delayU+1:0)]*0.618033988749894848204586f);
+			dram->aUL[countUL] = outUL; outUL *= 0.618033988749894848204586f;
 			countUL++; if (countUL < 0 || countUL > delayU) countUL = 0;
 			outUL += dram->aUL[countUL-((countUL > delayU)?delayU+1:0)];
 			//a delay slot becomes an allpass
 			vibBL = vibAL; vibAL = outUL; //tiny two sample delay chains
-			vibratoL += fpdL * 0.5e-13; if (vibratoL > M_PI*2.0) vibratoL -= M_PI*2.0;
-			double quadL = sin(vibratoL)+1.0;
-			if (quadL < 1.0) outUL = (outUL*(1.0-quadL))+(vibAL*quadL);
-			else outUL = (vibAL*(1.0-(quadL-1.0)))+(vibBL*(quadL-1.0));
+			vibratoL += fpdL * 0.5e-13f; if (vibratoL > M_PI*2.0f) vibratoL -= M_PI*2.0f;
+			float quadL = sin(vibratoL)+1.0f;
+			if (quadL < 1.0f) outUL = (outUL*(1.0f-quadL))+(vibAL*quadL);
+			else outUL = (vibAL*(1.0f-(quadL-1.0f)))+(vibBL*(quadL-1.0f));
 			//also, pitch drift this allpass slot for very subtle motion
 			
-			double outUR = ((outVR*3.0) - ((outBR + outGR + outLR + outQR)*2.0)) - (dram->aUR[(countUR+1)-((countUR+1 > delayU)?delayU+1:0)]*0.618033988749894848204586);
-			dram->aUR[countUR] = outUR; outUR *= 0.618033988749894848204586;
+			float outUR = ((outVR*3.0f) - ((outBR + outGR + outLR + outQR)*2.0f)) - (dram->aUR[(countUR+1)-((countUR+1 > delayU)?delayU+1:0)]*0.618033988749894848204586f);
+			dram->aUR[countUR] = outUR; outUR *= 0.618033988749894848204586f;
 			countUR++; if (countUR < 0 || countUR > delayU) countUR = 0;
 			outUR += dram->aUR[countUR-((countUR > delayU)?delayU+1:0)];
 			//a delay slot becomes an allpass
 			vibBR = vibAR; vibAR = outUR; //tiny two sample delay chains
-			vibratoR += fpdR * 0.5e-13; if (vibratoR > M_PI*2.0) vibratoR -= M_PI*2.0;
-			double quadR = sin(vibratoR)+1.0;
-			if (quadR < 1.0) outUR = (outUR*(1.0-quadR))+(vibAR*quadR);
-			else outUR = (vibAR*(1.0-(quadR-1.0)))+(vibBR*(quadR-1.0));
+			vibratoR += fpdR * 0.5e-13f; if (vibratoR > M_PI*2.0f) vibratoR -= M_PI*2.0f;
+			float quadR = sin(vibratoR)+1.0f;
+			if (quadR < 1.0f) outUR = (outUR*(1.0f-quadR))+(vibAR*quadR);
+			else outUR = (vibAR*(1.0f-(quadR-1.0f)))+(vibBR*(quadR-1.0f));
 			//also, pitch drift this allpass slot for very subtle motion
 						
 			countVL++; if (countVL < 0 || countVL > delayV) countVL = 0;
@@ -614,134 +614,134 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			countKR++; if (countKR < 0 || countKR > delayK) countKR = 0;
 			countPR++; if (countPR < 0 || countPR > delayP) countPR = 0;
 			
-			double outVL = dram->aVL[countVL-((countVL > delayV)?delayV+1:0)];
-			double outWL = dram->aWL[countWL-((countWL > delayW)?delayW+1:0)];
-			double outXL = dram->aXL[countXL-((countXL > delayX)?delayX+1:0)];
-			double outYL = dram->aYL[countYL-((countYL > delayY)?delayY+1:0)];
+			float outVL = dram->aVL[countVL-((countVL > delayV)?delayV+1:0)];
+			float outWL = dram->aWL[countWL-((countWL > delayW)?delayW+1:0)];
+			float outXL = dram->aXL[countXL-((countXL > delayX)?delayX+1:0)];
+			float outYL = dram->aYL[countYL-((countYL > delayY)?delayY+1:0)];
 			
-			double outAR = dram->aAR[countAR-((countAR > delayA)?delayA+1:0)];
-			double outFR = dram->aFR[countFR-((countFR > delayF)?delayF+1:0)];
-			double outKR = dram->aKR[countKR-((countKR > delayK)?delayK+1:0)];
-			double outPR = dram->aPR[countPR-((countPR > delayP)?delayP+1:0)];
+			float outAR = dram->aAR[countAR-((countAR > delayA)?delayA+1:0)];
+			float outFR = dram->aFR[countFR-((countFR > delayF)?delayF+1:0)];
+			float outKR = dram->aKR[countKR-((countKR > delayK)?delayK+1:0)];
+			float outPR = dram->aPR[countPR-((countPR > delayP)?delayP+1:0)];
 			
 			//-------- five
 			
-			feedbackER = ((outUL*3.0) - ((outVL + outWL + outXL + outYL)*2.0));
-			feedbackAL = ((outAR*3.0) - ((outFR + outKR + outPR + outUR)*2.0));
-			feedbackJR = ((outVL*3.0) - ((outUL + outWL + outXL + outYL)*2.0));
-			feedbackBL = ((outFR*3.0) - ((outAR + outKR + outPR + outUR)*2.0));
-			feedbackOR = ((outWL*3.0) - ((outUL + outVL + outXL + outYL)*2.0));
-			feedbackCL = ((outKR*3.0) - ((outAR + outFR + outPR + outUR)*2.0));
-			feedbackTR = ((outXL*3.0) - ((outUL + outVL + outWL + outYL)*2.0));
-			feedbackDL = ((outPR*3.0) - ((outAR + outFR + outKR + outUR)*2.0));
-			feedbackYR = ((outYL*3.0) - ((outUL + outVL + outWL + outXL)*2.0));
-			feedbackEL = ((outUR*3.0) - ((outAR + outFR + outKR + outPR)*2.0));
+			feedbackER = ((outUL*3.0f) - ((outVL + outWL + outXL + outYL)*2.0f));
+			feedbackAL = ((outAR*3.0f) - ((outFR + outKR + outPR + outUR)*2.0f));
+			feedbackJR = ((outVL*3.0f) - ((outUL + outWL + outXL + outYL)*2.0f));
+			feedbackBL = ((outFR*3.0f) - ((outAR + outKR + outPR + outUR)*2.0f));
+			feedbackOR = ((outWL*3.0f) - ((outUL + outVL + outXL + outYL)*2.0f));
+			feedbackCL = ((outKR*3.0f) - ((outAR + outFR + outPR + outUR)*2.0f));
+			feedbackTR = ((outXL*3.0f) - ((outUL + outVL + outWL + outYL)*2.0f));
+			feedbackDL = ((outPR*3.0f) - ((outAR + outFR + outKR + outUR)*2.0f));
+			feedbackYR = ((outYL*3.0f) - ((outUL + outVL + outWL + outXL)*2.0f));
+			feedbackEL = ((outUR*3.0f) - ((outAR + outFR + outKR + outPR)*2.0f));
 			//which we need to feed back into the input again, a bit
 			
-			if (fabs(feedbackER) < 2000.0) {
-				feedbackER += (2.0 * feedbackER * feedbackER) * sbER;
+			if (fabs(feedbackER) < 2000.0f) {
+				feedbackER += (2.0f * feedbackER * feedbackER) * sbER;
 				sbER += ((feedbackER - sin(feedbackER))*sbScale);
 			}
-			sbER = sin(sbER*0.015625)*sbRebound;
-			if (fabs(feedbackAL) < 2000.0) {
-				feedbackAL += (2.0 * feedbackAL * feedbackAL) * sbAL;
+			sbER = sin(sbER*0.015625f)*sbRebound;
+			if (fabs(feedbackAL) < 2000.0f) {
+				feedbackAL += (2.0f * feedbackAL * feedbackAL) * sbAL;
 				sbAL += ((feedbackAL - sin(feedbackAL))*sbScale);
 			}
-			sbAL = sin(sbAL*0.015625)*sbRebound;
-			if (fabs(feedbackJR) < 2000.0) {
-				feedbackJR += (2.0 * feedbackJR * feedbackJR) * sbJR;
+			sbAL = sin(sbAL*0.015625f)*sbRebound;
+			if (fabs(feedbackJR) < 2000.0f) {
+				feedbackJR += (2.0f * feedbackJR * feedbackJR) * sbJR;
 				sbJR += ((feedbackJR - sin(feedbackJR))*sbScale);
 			}
-			sbJR = sin(sbJR*0.015625)*sbRebound;
-			if (fabs(feedbackBL) < 2000.0) {
-				feedbackBL += (2.0 * feedbackBL * feedbackBL) * sbBL;
+			sbJR = sin(sbJR*0.015625f)*sbRebound;
+			if (fabs(feedbackBL) < 2000.0f) {
+				feedbackBL += (2.0f * feedbackBL * feedbackBL) * sbBL;
 				sbBL += ((feedbackBL - sin(feedbackBL))*sbScale);
 			}
-			sbBL = sin(sbBL*0.015625)*sbRebound;
-			if (fabs(feedbackOR) < 2000.0) {
-				feedbackOR += (2.0 * feedbackOR * feedbackOR) * sbOR;
+			sbBL = sin(sbBL*0.015625f)*sbRebound;
+			if (fabs(feedbackOR) < 2000.0f) {
+				feedbackOR += (2.0f * feedbackOR * feedbackOR) * sbOR;
 				sbOR += ((feedbackOR - sin(feedbackOR))*sbScale);
 			}
-			sbOR = sin(sbOR*0.015625)*sbRebound;
-			if (fabs(feedbackCL) < 2000.0) {
-				feedbackCL += (2.0 * feedbackCL * feedbackCL) * sbCL;
+			sbOR = sin(sbOR*0.015625f)*sbRebound;
+			if (fabs(feedbackCL) < 2000.0f) {
+				feedbackCL += (2.0f * feedbackCL * feedbackCL) * sbCL;
 				sbCL += ((feedbackCL - sin(feedbackCL))*sbScale);
 			}
-			sbCL = sin(sbCL*0.015625)*sbRebound;
-			if (fabs(feedbackTR) < 2000.0) {
-				feedbackTR += (2.0 * feedbackTR * feedbackTR) * sbTR;
+			sbCL = sin(sbCL*0.015625f)*sbRebound;
+			if (fabs(feedbackTR) < 2000.0f) {
+				feedbackTR += (2.0f * feedbackTR * feedbackTR) * sbTR;
 				sbTR += ((feedbackTR - sin(feedbackTR))*sbScale);
 			}
-			sbTR = sin(sbTR*0.015625)*sbRebound;
-			if (fabs(feedbackDL) < 2000.0) {
-				feedbackDL += (2.0 * feedbackDL * feedbackDL) * sbDL;
+			sbTR = sin(sbTR*0.015625f)*sbRebound;
+			if (fabs(feedbackDL) < 2000.0f) {
+				feedbackDL += (2.0f * feedbackDL * feedbackDL) * sbDL;
 				sbDL += ((feedbackDL - sin(feedbackDL))*sbScale);
 			}
-			sbDL = sin(sbDL*0.015625)*sbRebound;
-			if (fabs(feedbackYR) < 2000.0) {
-				feedbackYR += (2.0 * feedbackYR * feedbackYR) * sbYR;
+			sbDL = sin(sbDL*0.015625f)*sbRebound;
+			if (fabs(feedbackYR) < 2000.0f) {
+				feedbackYR += (2.0f * feedbackYR * feedbackYR) * sbYR;
 				sbYR += ((feedbackYR - sin(feedbackYR))*sbScale);
 			}
-			sbYR = sin(sbYR*0.015625)*sbRebound;
-			if (fabs(feedbackEL) < 2000.0) {
-				feedbackEL += (2.0 * feedbackEL * feedbackEL) * sbEL;
+			sbYR = sin(sbYR*0.015625f)*sbRebound;
+			if (fabs(feedbackEL) < 2000.0f) {
+				feedbackEL += (2.0f * feedbackEL * feedbackEL) * sbEL;
 				sbEL += ((feedbackEL - sin(feedbackEL))*sbScale);
 			}
-			sbEL = sin(sbEL*0.015625)*sbRebound;
+			sbEL = sin(sbEL*0.015625f)*sbRebound;
 			
-			double temp;
-			temp = ((feedbackER*(1.0-blur)) + (feedblurER*blur)); feedblurER = feedbackER; feedbackER = temp;
-			temp = ((feedbackAL*(1.0-blur)) + (feedblurAL*blur)); feedblurAL = feedbackAL; feedbackAL = temp;
-			temp = ((feedbackJR*(1.0-blur)) + (feedblurJR*blur)); feedblurJR = feedbackJR; feedbackJR = temp;
-			temp = ((feedbackBL*(1.0-blur)) + (feedblurBL*blur)); feedblurBL = feedbackBL; feedbackBL = temp;
-			temp = ((feedbackOR*(1.0-blur)) + (feedblurOR*blur)); feedblurOR = feedbackOR; feedbackOR = temp;
-			temp = ((feedbackCL*(1.0-blur)) + (feedblurCL*blur)); feedblurCL = feedbackCL; feedbackCL = temp;
-			temp = ((feedbackTR*(1.0-blur)) + (feedblurTR*blur)); feedblurTR = feedbackTR; feedbackTR = temp;
-			temp = ((feedbackDL*(1.0-blur)) + (feedblurDL*blur)); feedblurDL = feedbackDL; feedbackDL = temp;
-			temp = ((feedbackYR*(1.0-blur)) + (feedblurYR*blur)); feedblurYR = feedbackYR; feedbackYR = temp;
-			temp = ((feedbackEL*(1.0-blur)) + (feedblurEL*blur)); feedblurEL = feedbackEL; feedbackEL = temp;
+			float temp;
+			temp = ((feedbackER*(1.0f-blur)) + (feedblurER*blur)); feedblurER = feedbackER; feedbackER = temp;
+			temp = ((feedbackAL*(1.0f-blur)) + (feedblurAL*blur)); feedblurAL = feedbackAL; feedbackAL = temp;
+			temp = ((feedbackJR*(1.0f-blur)) + (feedblurJR*blur)); feedblurJR = feedbackJR; feedbackJR = temp;
+			temp = ((feedbackBL*(1.0f-blur)) + (feedblurBL*blur)); feedblurBL = feedbackBL; feedbackBL = temp;
+			temp = ((feedbackOR*(1.0f-blur)) + (feedblurOR*blur)); feedblurOR = feedbackOR; feedbackOR = temp;
+			temp = ((feedbackCL*(1.0f-blur)) + (feedblurCL*blur)); feedblurCL = feedbackCL; feedbackCL = temp;
+			temp = ((feedbackTR*(1.0f-blur)) + (feedblurTR*blur)); feedblurTR = feedbackTR; feedbackTR = temp;
+			temp = ((feedbackDL*(1.0f-blur)) + (feedblurDL*blur)); feedblurDL = feedbackDL; feedbackDL = temp;
+			temp = ((feedbackYR*(1.0f-blur)) + (feedblurYR*blur)); feedblurYR = feedbackYR; feedbackYR = temp;
+			temp = ((feedbackEL*(1.0f-blur)) + (feedblurEL*blur)); feedblurEL = feedbackEL; feedbackEL = temp;
 			
-			inputSampleL = (outUL + outVL + outWL + outXL + outYL)*0.0016;
-			inputSampleR = (outAR + outFR + outKR + outPR + outUR)*0.0016;
+			inputSampleL = (outUL + outVL + outWL + outXL + outYL)*0.0016f;
+			inputSampleR = (outAR + outFR + outKR + outPR + outUR)*0.0016f;
 			//and take the final combined sum of outputs, corrected for Householder gain
 			
 			dram->bez[bez_CL] = dram->bez[bez_BL];
 			dram->bez[bez_BL] = dram->bez[bez_AL];
 			dram->bez[bez_AL] = inputSampleL;
-			dram->bez[bez_SampL] = 0.0;
+			dram->bez[bez_SampL] = 0.0f;
 			
 			dram->bez[bez_CR] = dram->bez[bez_BR];
 			dram->bez[bez_BR] = dram->bez[bez_AR];
 			dram->bez[bez_AR] = inputSampleR;
-			dram->bez[bez_SampR] = 0.0;
+			dram->bez[bez_SampR] = 0.0f;
 		}
-		double CBL = (dram->bez[bez_CL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
-		double CBR = (dram->bez[bez_CR]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BR]*dram->bez[bez_cycle]);
-		double BAL = (dram->bez[bez_BL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
-		double BAR = (dram->bez[bez_BR]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AR]*dram->bez[bez_cycle]);
-		double CBAL = (dram->bez[bez_BL]+(CBL*(1.0-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.125;
-		double CBAR = (dram->bez[bez_BR]+(CBR*(1.0-dram->bez[bez_cycle]))+(BAR*dram->bez[bez_cycle]))*0.125;
+		float CBL = (dram->bez[bez_CL]*(1.0f-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
+		float CBR = (dram->bez[bez_CR]*(1.0f-dram->bez[bez_cycle]))+(dram->bez[bez_BR]*dram->bez[bez_cycle]);
+		float BAL = (dram->bez[bez_BL]*(1.0f-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
+		float BAR = (dram->bez[bez_BR]*(1.0f-dram->bez[bez_cycle]))+(dram->bez[bez_AR]*dram->bez[bez_cycle]);
+		float CBAL = (dram->bez[bez_BL]+(CBL*(1.0f-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.125f;
+		float CBAR = (dram->bez[bez_BR]+(CBR*(1.0f-dram->bez[bez_cycle]))+(BAR*dram->bez[bez_cycle]))*0.125f;
 		inputSampleL = CBAL;
 		inputSampleR = CBAR;
 		
-		if (inputSampleL > 1.0) inputSampleL = 1.0;
-		if (inputSampleL < -1.0) inputSampleL = -1.0;
-		if (inputSampleR > 1.0) inputSampleR = 1.0;
-		if (inputSampleR < -1.0) inputSampleR = -1.0;
+		if (inputSampleL > 1.0f) inputSampleL = 1.0f;
+		if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+		if (inputSampleR > 1.0f) inputSampleR = 1.0f;
+		if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 		
-		if (wet < 1.0) {inputSampleL *= wet; inputSampleR *= wet;}
-		if (dry < 1.0) {drySampleL *= dry; drySampleR *= dry;}
+		if (wet < 1.0f) {inputSampleL *= wet; inputSampleR *= wet;}
+		if (dry < 1.0f) {drySampleL *= dry; drySampleR *= dry;}
 		inputSampleL += drySampleL; inputSampleR += drySampleR;
-		//this is our submix verb dry/wet: 0.5 is BOTH at FULL VOLUME
+		//this is our submix verb dry/wet: 0.5f is BOTH at FULL VOLUME
 		//purpose is that, if you're adding verb, you're not altering other balances
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

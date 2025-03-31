@@ -31,13 +31,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample;
-		Float64 previousVelocity;
+		float lastSample;
+		Float32 previousVelocity;
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 b[21];
-		Float64 f[21];		
+			Float32 b[21];
+		Float32 f[21];		
 	};
 	_dram* dram;
 };
@@ -51,43 +51,43 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 correction;
-	Float64 accumulatorSample;
-	Float64 velocity;
-	Float64 trim = GetParameter( kParam_One );
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 correction;
+	Float32 accumulatorSample;
+	Float32 velocity;
+	Float32 trim = GetParameter( kParam_One );
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
-	Float64 overallscale = trim * 10.0;
-	Float64 gain = overallscale + (pow(wet,3) * 0.187859642462067);
-	trim *= (1.0 - (pow(wet,3) * 0.187859642462067));
-	double inputSample;
-	Float64 drySample;
+	Float32 overallscale = trim * 10.0f;
+	Float32 gain = overallscale + (pow(wet,3) * 0.187859642462067f);
+	trim *= (1.0f - (pow(wet,3) * 0.187859642462067f));
+	float inputSample;
+	Float32 drySample;
 	
-	if (gain < 1.0) gain = 1.0;
-	if (gain > 1.0) {dram->f[0] = 1.0; gain -= 1.0;} else {dram->f[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[1] = 1.0; gain -= 1.0;} else {dram->f[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[2] = 1.0; gain -= 1.0;} else {dram->f[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[3] = 1.0; gain -= 1.0;} else {dram->f[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[4] = 1.0; gain -= 1.0;} else {dram->f[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[5] = 1.0; gain -= 1.0;} else {dram->f[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[6] = 1.0; gain -= 1.0;} else {dram->f[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[7] = 1.0; gain -= 1.0;} else {dram->f[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[8] = 1.0; gain -= 1.0;} else {dram->f[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[9] = 1.0; gain -= 1.0;} else {dram->f[9] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[10] = 1.0; gain -= 1.0;} else {dram->f[10] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[11] = 1.0; gain -= 1.0;} else {dram->f[11] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[12] = 1.0; gain -= 1.0;} else {dram->f[12] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[13] = 1.0; gain -= 1.0;} else {dram->f[13] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[14] = 1.0; gain -= 1.0;} else {dram->f[14] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[15] = 1.0; gain -= 1.0;} else {dram->f[15] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[16] = 1.0; gain -= 1.0;} else {dram->f[16] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[17] = 1.0; gain -= 1.0;} else {dram->f[17] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[18] = 1.0; gain -= 1.0;} else {dram->f[18] = gain; gain = 0.0;}
-	if (gain > 1.0) {dram->f[19] = 1.0; gain -= 1.0;} else {dram->f[19] = gain; gain = 0.0;}
+	if (gain < 1.0f) gain = 1.0f;
+	if (gain > 1.0f) {dram->f[0] = 1.0f; gain -= 1.0f;} else {dram->f[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[1] = 1.0f; gain -= 1.0f;} else {dram->f[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[2] = 1.0f; gain -= 1.0f;} else {dram->f[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[3] = 1.0f; gain -= 1.0f;} else {dram->f[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[4] = 1.0f; gain -= 1.0f;} else {dram->f[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[5] = 1.0f; gain -= 1.0f;} else {dram->f[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[6] = 1.0f; gain -= 1.0f;} else {dram->f[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[7] = 1.0f; gain -= 1.0f;} else {dram->f[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[8] = 1.0f; gain -= 1.0f;} else {dram->f[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[9] = 1.0f; gain -= 1.0f;} else {dram->f[9] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[10] = 1.0f; gain -= 1.0f;} else {dram->f[10] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[11] = 1.0f; gain -= 1.0f;} else {dram->f[11] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[12] = 1.0f; gain -= 1.0f;} else {dram->f[12] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[13] = 1.0f; gain -= 1.0f;} else {dram->f[13] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[14] = 1.0f; gain -= 1.0f;} else {dram->f[14] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[15] = 1.0f; gain -= 1.0f;} else {dram->f[15] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[16] = 1.0f; gain -= 1.0f;} else {dram->f[16] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[17] = 1.0f; gain -= 1.0f;} else {dram->f[17] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[18] = 1.0f; gain -= 1.0f;} else {dram->f[18] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {dram->f[19] = 1.0f; gain -= 1.0f;} else {dram->f[19] = gain; gain = 0.0f;}
 	
 	//there, now we have a neat little moving average with remainders
 	
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	dram->f[0] /= overallscale;
 	dram->f[1] /= overallscale;
 	dram->f[2] /= overallscale;
@@ -112,7 +112,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		velocity = lastSample - inputSample;
@@ -154,14 +154,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		lastSample = inputSample;
 		previousVelocity = -velocity * pow(trim,2);
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 						
 		*destP = inputSample;

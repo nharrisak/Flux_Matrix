@@ -52,34 +52,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	int depth = (int)(17.0*overallscale);
+	int depth = (int)(17.0f*overallscale);
 	if (depth < 3) depth = 3;
 	if (depth > 98) depth = 98;
 	
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	while (nSampleFrames-- > 0) {
 		Float32 inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 
 		inputSample *= scaleFactor;
 		//0-1 is now one bit, now we dither
 		
 		int quantA = floor(inputSample);
-		int quantB = floor(inputSample+1.0);
+		int quantB = floor(inputSample+1.0f);
 		//to do this style of dither, we quantize in either direction and then
 		//do a reconstruction of what the result will be for each choice.
 		//We then evaluate which one we like, and keep a history of what we previously had

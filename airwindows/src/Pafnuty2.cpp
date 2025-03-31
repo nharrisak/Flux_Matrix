@@ -63,44 +63,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double chebyshev;
-	double effect;
-	double inP2;
-	double inP3;
-	double inP4;
-	double inP5;
-	double inP6;
-	double inP7;
-	double inP8;
-	double inP9;
-	double inP10;
-	double second = (GetParameter( kParam_One )*1.0);
+	float chebyshev;
+	float effect;
+	float inP2;
+	float inP3;
+	float inP4;
+	float inP5;
+	float inP6;
+	float inP7;
+	float inP8;
+	float inP9;
+	float inP10;
+	float second = (GetParameter( kParam_One )*1.0f);
 	second = second * fabs(second);
-	double third = -(GetParameter( kParam_Two )*0.60);
+	float third = -(GetParameter( kParam_Two )*0.60f);
 	third = third * fabs(third);
-	double fourth = -(GetParameter( kParam_Three )*0.60);
+	float fourth = -(GetParameter( kParam_Three )*0.60f);
 	fourth = fourth * fabs(fourth);
-	double fifth = (GetParameter( kParam_Four )*0.45);
+	float fifth = (GetParameter( kParam_Four )*0.45f);
 	fifth = fifth * fabs(fifth);
-	double sixth = (GetParameter( kParam_Five )*0.45);
+	float sixth = (GetParameter( kParam_Five )*0.45f);
 	sixth = sixth * fabs(sixth);
-	double seventh = -(GetParameter( kParam_Six )*0.38);
+	float seventh = -(GetParameter( kParam_Six )*0.38f);
 	seventh = seventh * fabs(seventh);
-	double eighth = -(GetParameter( kParam_Seven )*0.38);
+	float eighth = -(GetParameter( kParam_Seven )*0.38f);
 	eighth = eighth * fabs(eighth);
-	double ninth = (GetParameter( kParam_Eight )*0.35);
+	float ninth = (GetParameter( kParam_Eight )*0.35f);
 	ninth = ninth * fabs(ninth);
-	double tenth = (GetParameter( kParam_Nine )*0.35);
+	float tenth = (GetParameter( kParam_Nine )*0.35f);
 	tenth = tenth * fabs(tenth);
-	double amount = GetParameter( kParam_Ten );
+	float amount = GetParameter( kParam_Ten );
 	amount = amount * fabs(amount);
 	//setting up 
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		effect = 0.0;
+		effect = 0.0f;
 		inP2 = inputSample * inputSample;
 		inP3 = inP2 * inputSample;
 		inP4 = inP3 * inputSample;
@@ -111,47 +111,47 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inP9 = inP8 * inputSample;
 		inP10 = inP9 * inputSample;
 		//let's do the powers ahead of time and see how we do.
-		if (second != 0.0)
+		if (second != 0.0f)
 		{
 			chebyshev = (2 * inP2);
 			effect += (chebyshev * second);
 		}
-		if (third != 0.0)
+		if (third != 0.0f)
 		{
 			chebyshev = (4 * inP3) - (3*inputSample);
 			effect += (chebyshev * third);
 		}
-		if (fourth != 0.0)
+		if (fourth != 0.0f)
 		{
 			chebyshev = (8 * inP4) - (8 * inP2);
 			effect += (chebyshev * fourth);
 		}
-		if (fifth != 0.0)
+		if (fifth != 0.0f)
 		{
 			chebyshev = (16 * inP5) - (20 * inP3) + (5*inputSample);
 			effect += (chebyshev * fifth);
 		}
-		if (sixth != 0.0)
+		if (sixth != 0.0f)
 		{
 			chebyshev = (32 * inP6) - (48 * inP4) + (18 * inP2);
 			effect += (chebyshev * sixth);
 		}
-		if (seventh != 0.0)
+		if (seventh != 0.0f)
 		{
 			chebyshev = (64 * inP7) - (112 * inP5) + (56 * inP3) - (7*inputSample);
 			effect += (chebyshev * seventh);
 		}
-		if (eighth != 0.0)
+		if (eighth != 0.0f)
 		{
 			chebyshev = (128 * inP8) - (256 * inP6) + (160 * inP4) - (32 * inP2);
 			effect += (chebyshev * eighth);
 		}
-		if (ninth != 0.0)
+		if (ninth != 0.0f)
 		{
 			chebyshev = (256 * inP9) - (576 * inP7) + (432 * inP5) - (120 * inP3) + (9*inputSample);
 			effect += (chebyshev * ninth);
 		}
-		if (tenth != 0.0)
+		if (tenth != 0.0f)
 		{
 			chebyshev = (512 * inP10) - (1280 * inP8) + (1120 * inP6) - (400 * inP4) + (50 * inP2);
 			effect += (chebyshev * tenth);
@@ -163,7 +163,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

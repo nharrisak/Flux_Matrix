@@ -29,8 +29,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double iirA;
-		double iirB;
+		float iirA;
+		float iirB;
 		bool hsr;
 		enum {
 			fix_freq,
@@ -46,13 +46,13 @@ struct _kernel {
 			fix_sR2,
 			fix_total
 		}; //fixed frequency biquad filter for ultrasonics, stereo
-		double soft[11];
+		float soft[11];
 		int cycleEnd;
 		//from undersampling code, used as a way to space out HF taps
 
-		double inTrimA;
-		double inTrimB;
-		double lastSample;
+		float inTrimA;
+		float inTrimB;
+		float lastSample;
 		bool wasPosClip;
 		bool wasNegClip;
 		int spacing; //ClipOnly2
@@ -60,9 +60,9 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double fix[fix_total];
-		double fixB[fix_total];
-		double intermediate[18];
+			float fix[fix_total];
+		float fixB[fix_total];
+		float intermediate[18];
 	};
 	_dram* dram;
 };
@@ -77,62 +77,62 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double iirAmountA = 12.66/GetSampleRate();
+	float iirAmountA = 12.66f/GetSampleRate();
 	//this is our distributed unusual highpass, which is
 	//adding subtle harmonics to the really deep stuff to define it
-	if (fabs(iirA)<1.18e-37) iirA = 0.0;
-	if (fabs(iirB)<1.18e-37) iirB = 0.0;
+	if (fabs(iirA)<1.18e-37f) iirA = 0.0f;
+	if (fabs(iirB)<1.18e-37f) iirB = 0.0f;
 	//catch denormals early and only check once per buffer
-	if (GetSampleRate() > 49000.0) hsr = true;
+	if (GetSampleRate() > 49000.0f) hsr = true;
 	else hsr = false;
-	dram->fix[fix_freq] = 24000.0 / GetSampleRate();
-    dram->fix[fix_reso] = 0.55495813;
-	double K = tan(M_PI * dram->fix[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / dram->fix[fix_reso] + K * K);
+	dram->fix[fix_freq] = 24000.0f / GetSampleRate();
+    dram->fix[fix_reso] = 0.55495813f;
+	float K = tan(M_PI * dram->fix[fix_freq]); //lowpass
+	float norm = 1.0f / (1.0f + K / dram->fix[fix_reso] + K * K);
 	dram->fix[fix_a0] = K * K * norm;
-	dram->fix[fix_a1] = 2.0 * dram->fix[fix_a0];
+	dram->fix[fix_a1] = 2.0f * dram->fix[fix_a0];
 	dram->fix[fix_a2] = dram->fix[fix_a0];
-	dram->fix[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fix[fix_b2] = (1.0 - K / dram->fix[fix_reso] + K * K) * norm;
+	dram->fix[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fix[fix_b2] = (1.0f - K / dram->fix[fix_reso] + K * K) * norm;
 	//this is the fixed biquad distributed anti-aliasing filter
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd == 3) cycleEnd = 4;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 4 for 176 or 192k
 	
 	spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16; //ADClip2
 	
-	inTrimA = inTrimB; inTrimB = GetParameter( kParam_One )*2.0;
-	//0.5 is unity gain, and we can attenuate to silence or boost slightly over 12dB
+	inTrimA = inTrimB; inTrimB = GetParameter( kParam_One )*2.0f;
+	//0.5f is unity gain, and we can attenuate to silence or boost slightly over 12dB
 	//into softclip and ADClip in case we need intense loudness bursts on transients.
 
-	dram->fixB[fix_freq] = 24000.0 / GetSampleRate();
-    dram->fixB[fix_reso] = 0.5;
+	dram->fixB[fix_freq] = 24000.0f / GetSampleRate();
+    dram->fixB[fix_reso] = 0.5f;
 	K = tan(M_PI * dram->fixB[fix_freq]); //lowpass
-	norm = 1.0 / (1.0 + K / dram->fixB[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixB[fix_reso] + K * K);
 	dram->fixB[fix_a0] = K * K * norm;
-	dram->fixB[fix_a1] = 2.0 * dram->fixB[fix_a0];
+	dram->fixB[fix_a1] = 2.0f * dram->fixB[fix_a0];
 	dram->fixB[fix_a2] = dram->fixB[fix_a0];
-	dram->fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixB[fix_b2] = (1.0 - K / dram->fixB[fix_reso] + K * K) * norm;
+	dram->fixB[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixB[fix_b2] = (1.0f - K / dram->fixB[fix_reso] + K * K) * norm;
 	//this is the fixed biquad distributed anti-aliasing filter
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double position = (double)nSampleFrames/inFramesToProcess;
-		double inTrim = (inTrimA*position)+(inTrimB*(1.0-position));
+		float position = (float)nSampleFrames/inFramesToProcess;
+		float inTrim = (inTrimA*position)+(inTrimB*(1.0f-position));
 		//presence smoothed to cut out zipper noise
 		
-		iirA = (iirA * (1.0 - iirAmountA)) + (inputSample * iirAmountA);
-		double iirAmountB = fabs(iirA)+0.00001;
-		iirB = (iirB * (1.0 - iirAmountB)) + (iirA * iirAmountB);
+		iirA = (iirA * (1.0f - iirAmountA)) + (inputSample * iirAmountA);
+		float iirAmountB = fabs(iirA)+0.00001f;
+		iirB = (iirB * (1.0f - iirAmountB)) + (iirA * iirAmountB);
 		inputSample -= iirB;
 		//Console8 highpass
 		
@@ -152,26 +152,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			soft[0] = inputSample;
 		}
 		soft[9] = ((soft[0]-soft[4])-(soft[4]-soft[8]));
-		if (soft[9] > 0.56852180) inputSample = soft[4]+(fabs(soft[4])*sin(soft[9]-0.56852180)*0.4314782);
-		if (-soft[9] > 0.56852180) inputSample = soft[4]-(fabs(soft[4])*sin(-soft[9]-0.56852180)*0.4314782);
+		if (soft[9] > 0.56852180f) inputSample = soft[4]+(fabs(soft[4])*sin(soft[9]-0.56852180f)*0.4314782f);
+		if (-soft[9] > 0.56852180f) inputSample = soft[4]-(fabs(soft[4])*sin(-soft[9]-0.56852180f)*0.4314782f);
 		//Console8 slew soften: must be clipped or it can generate NAN out of the full system
 
-		if (inputSample > 1.57079633) inputSample = 1.57079633; if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f; if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		if (hsr){
-			double outSample = (inputSample * dram->fix[fix_a0]) + dram->fix[fix_sL1];
+			float outSample = (inputSample * dram->fix[fix_a0]) + dram->fix[fix_sL1];
 			dram->fix[fix_sL1] = (inputSample * dram->fix[fix_a1]) - (outSample * dram->fix[fix_b1]) + dram->fix[fix_sL2];
 			dram->fix[fix_sL2] = (inputSample * dram->fix[fix_a2]) - (outSample * dram->fix[fix_b2]);
 			inputSample = outSample;
 		} //fixed biquad filtering ultrasonics		
-		if (inputSample > 1.0) inputSample = 1.0; if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
 		inputSample = asin(inputSample); //Console8 decode
 		
 		inputSample *= inTrim;
-		if (inputSample > 1.57079633) inputSample = 1.57079633; if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f; if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		inputSample = sin(inputSample);
-		//Console8 gain stage clips at exactly 1.0 post-sin()
+		//Console8 gain stage clips at exactly 1.0f post-sin()
 		if (hsr){
-			double outSample = (inputSample * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
+			float outSample = (inputSample * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
 			dram->fixB[fix_sL1] = (inputSample * dram->fixB[fix_a1]) - (outSample * dram->fixB[fix_b1]) + dram->fixB[fix_sL2];
 			dram->fixB[fix_sL2] = (inputSample * dram->fixB[fix_a2]) - (outSample * dram->fixB[fix_b2]);
 			inputSample = outSample;
@@ -179,17 +179,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample *= inTrim;
 		//the final output fader, before ClipOnly2
 		
-		if (inputSample > 4.0) inputSample = 4.0; if (inputSample < -4.0) inputSample = -4.0;
+		if (inputSample > 4.0f) inputSample = 4.0f; if (inputSample < -4.0f) inputSample = -4.0f;
 		if (wasPosClip) { //current will be over
-			if (inputSample<lastSample) lastSample=0.7058208+(inputSample*0.2609148);
-			else lastSample = 0.2491717+(lastSample*0.7390851);
+			if (inputSample<lastSample) lastSample=0.7058208f+(inputSample*0.2609148f);
+			else lastSample = 0.2491717f+(lastSample*0.7390851f);
 		} wasPosClip = false;
-		if (inputSample>0.9549925859) {wasPosClip=true;inputSample=0.7058208+(lastSample*0.2609148);}
+		if (inputSample>0.9549925859f) {wasPosClip=true;inputSample=0.7058208f+(lastSample*0.2609148f);}
 		if (wasNegClip) { //current will be -over
-			if (inputSample > lastSample) lastSample=-0.7058208+(inputSample*0.2609148);
-			else lastSample=-0.2491717+(lastSample*0.7390851);
+			if (inputSample > lastSample) lastSample=-0.7058208f+(inputSample*0.2609148f);
+			else lastSample=-0.2491717f+(lastSample*0.7390851f);
 		} wasNegClip = false;
-		if (inputSample<-0.9549925859) {wasNegClip=true;inputSample=-0.7058208+(lastSample*0.2609148);}
+		if (inputSample<-0.9549925859f) {wasNegClip=true;inputSample=-0.7058208f+(lastSample*0.2609148f);}
 		dram->intermediate[spacing] = inputSample;
         inputSample = lastSample; //Latency is however many samples equals one 44.1k sample
 		for (int x = spacing; x > 0; x--) dram->intermediate[x-1] = dram->intermediate[x];
@@ -199,7 +199,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

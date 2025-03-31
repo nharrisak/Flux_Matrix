@@ -27,7 +27,7 @@ kParam0, kParam1, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
 
-	double iirSample;
+	float iirSample;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -39,38 +39,38 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double smooth = pow(GetParameter( kParam_A ),4)*(0.5/overallscale);
-	double channel = GetParameter( kParam_B );
+	float smooth = pow(GetParameter( kParam_A ),4)*(0.5f/overallscale);
+	float channel = GetParameter( kParam_B );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		double carrier = inputSampleL;
-		double modulate = fabs(inputSampleR);
-		if (channel > 0.5) {
+		float carrier = inputSampleL;
+		float modulate = fabs(inputSampleR);
+		if (channel > 0.5f) {
 			carrier = inputSampleR;
 			modulate = fabs(inputSampleL);
 		}
 		if (iirSample < modulate) iirSample = modulate;
-		modulate = (iirSample*smooth)+(modulate*(1.0-smooth));
-		if (carrier > 0.0) carrier = sqrt(carrier/modulate)*modulate;
-		if (carrier < 0.0) carrier = -sqrt(carrier/modulate)*modulate;
+		modulate = (iirSample*smooth)+(modulate*(1.0f-smooth));
+		if (carrier > 0.0f) carrier = sqrt(carrier/modulate)*modulate;
+		if (carrier < 0.0f) carrier = -sqrt(carrier/modulate)*modulate;
 		inputSampleL = inputSampleR = carrier;
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

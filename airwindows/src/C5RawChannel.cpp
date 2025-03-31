@@ -29,8 +29,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastSampleChannel;
-		Float64 lastFXChannel;
+		Float32 lastSampleChannel;
+		Float32 lastFXChannel;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -48,44 +48,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	double centering = GetParameter( kParam_One ) * 0.5;
-	centering = 1.0 - pow(centering,5);
+	float centering = GetParameter( kParam_One ) * 0.5f;
+	centering = 1.0f - pow(centering,5);
 	//we can set our centering force from zero to rather high, but
-	//there's a really intense taper on it forcing it to mostly be almost 1.0.
-	//If it's literally 1.0, we don't even apply it, and you get the original
+	//there's a really intense taper on it forcing it to mostly be almost 1.0f.
+	//If it's literally 1.0f, we don't even apply it, and you get the original
 	//Xmas Morning bugged-out Console5, which is the default setting for Raw Console5.
-	Float64 difference;
+	Float32 difference;
 
-	double inputSample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
 		difference = lastSampleChannel - inputSample;
 		lastSampleChannel = inputSample;
 		//derive slew part off direct sample measurement + from last time
 		
-		if (difference > 1.0) difference = 1.0;
-		if (difference < -1.0) difference = -1.0;
+		if (difference > 1.0f) difference = 1.0f;
+		if (difference < -1.0f) difference = -1.0f;
 		inputSample = lastFXChannel + asin(difference);
 		lastFXChannel = inputSample;
-		if (centering < 1.0) lastFXChannel *= centering;
+		if (centering < 1.0f) lastFXChannel *= centering;
 		//if we're using the crude centering force, it's applied here
-		if (lastFXChannel > 1.0) lastFXChannel = 1.0;
-		if (lastFXChannel < -1.0) lastFXChannel = -1.0;
+		if (lastFXChannel > 1.0f) lastFXChannel = 1.0f;
+		if (lastFXChannel < -1.0f) lastFXChannel = -1.0f;
 		//build new signal off what was present in output last time
 		//slew aspect
 		
-		if (inputSample > 1.57079633) inputSample = 1.57079633;
-		if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+		if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		inputSample = sin(inputSample);
 		//amplitude aspect
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

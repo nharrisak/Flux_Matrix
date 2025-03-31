@@ -37,9 +37,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double iirSampleA;
-		double iirSampleB;
-		double prevSample;
+		float iirSampleA;
+		float iirSampleB;
+		float prevSample;
 		uint32_t fpd;
 		bool flip;
 	
@@ -57,21 +57,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 gain = pow(GetParameter( kParam_One )*2.0,2.0);
-	Float64 iirAmount = pow(GetParameter( kParam_Two ),3.0)/overallscale;
-	Float64 presence = GetParameter( kParam_Three);
-	Float64 output = GetParameter( kParam_Four );
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 gain = pow(GetParameter( kParam_One )*2.0f,2.0f);
+	Float32 iirAmount = pow(GetParameter( kParam_Two ),3.0f)/overallscale;
+	Float32 presence = GetParameter( kParam_Three);
+	Float32 output = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		if (gain != 1.0) {
+		if (gain != 1.0f) {
 			inputSample *= gain;
 			prevSample *= gain;
 		}
@@ -88,18 +88,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		//highpass section
 		
-		double presenceSample = sin(inputSample * fabs(prevSample)) / ((prevSample == 0.0) ?1:fabs(prevSample));
+		float presenceSample = sin(inputSample * fabs(prevSample)) / ((prevSample == 0.0f) ?1:fabs(prevSample));
 		//change from first Spiral: delay of one sample on the scaling factor.
-		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		
-		if (output < 1.0) {
+		if (output < 1.0f) {
 			inputSample *= output;
 			presenceSample *= output;
 		}
-		if (presence > 0.0) inputSample = (inputSample * (1.0-presence)) + (presenceSample * presence);
-		if (wet < 1.0) inputSample = (drySample * (1.0-wet)) + (inputSample * wet);
+		if (presence > 0.0f) inputSample = (inputSample * (1.0f-presence)) + (presenceSample * presence);
+		if (wet < 1.0f) inputSample = (drySample * (1.0f-wet)) + (inputSample * wet);
 		//nice little output stage template: if we have another scale of floating point
-		//number, we really don't want to meaninglessly multiply that by 1.0.
+		//number, we really don't want to meaninglessly multiply that by 1.0f.
 
 		prevSample = drySample;
 		flip = !flip;

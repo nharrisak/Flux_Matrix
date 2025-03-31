@@ -35,8 +35,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -59,23 +59,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 inputSample;
-	Float64 drySample;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 inputSample;
+	Float32 drySample;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 driveone = pow(GetParameter( kParam_One )/50,2);
-	Float64 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
-	Float64 output = GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
-	Float64 dry = 1.0-wet;
-	Float64 glitch = 0.60;
-	Float64 out;
+	Float32 driveone = pow(GetParameter( kParam_One )/50,2);
+	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 output = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
+	Float32 dry = 1.0f-wet;
+	Float32 glitch = 0.60f;
+	Float32 out;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		if (fpFlip)
@@ -90,30 +90,30 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}
 		//highpass section
 		
-		if (inputSample > 1.0) {inputSample = 1.0;}
-		if (inputSample < -1.0) {inputSample = -1.0;}
+		if (inputSample > 1.0f) {inputSample = 1.0f;}
+		if (inputSample < -1.0f) {inputSample = -1.0f;}
 		out = driveone;
 		while (out > glitch)
 			{
 				out -= glitch;
 				inputSample -= (inputSample * (fabs(inputSample) * glitch) * (fabs(inputSample) * glitch) );
-				inputSample *= (1.0+glitch);
+				inputSample *= (1.0f+glitch);
 			}
 		//that's taken care of the really high gain stuff
 		
 		inputSample -= (inputSample * (fabs(inputSample) * out) * (fabs(inputSample) * out) );
-		inputSample *= (1.0+out);
+		inputSample *= (1.0f+out);
 		
-		if (output < 1.0) inputSample *= output;
-		if (wet < 1.0) inputSample = (drySample * dry)+(inputSample*wet);
+		if (output < 1.0f) inputSample *= output;
+		if (wet < 1.0f) inputSample = (drySample * dry)+(inputSample*wet);
 		//nice little output stage template: if we have another scale of floating point
-		//number, we really don't want to meaninglessly multiply that by 1.0.
+		//number, we really don't want to meaninglessly multiply that by 1.0f.
 		fpFlip = !fpFlip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

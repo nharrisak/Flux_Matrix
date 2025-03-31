@@ -35,7 +35,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 postsine;
+		Float32 postsine;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -52,28 +52,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 intensity = pow(GetParameter( kParam_One ),2)*8.0;
-	Float64 triode = intensity;
-	intensity +=0.001;
-	Float64 softcrossover = pow(GetParameter( kParam_Two ),3)/8.0;
-	Float64 hardcrossover = pow(GetParameter( kParam_Three ),7)/8.0;
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 intensity = pow(GetParameter( kParam_One ),2)*8.0f;
+	Float32 triode = intensity;
+	intensity +=0.001f;
+	Float32 softcrossover = pow(GetParameter( kParam_Two ),3)/8.0f;
+	Float32 hardcrossover = pow(GetParameter( kParam_Three ),7)/8.0f;
+	Float32 wet = GetParameter( kParam_Four );
 	//removed unnecessary dry variable
 	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		Float64 drySample = inputSample;
+		Float32 drySample = inputSample;
 		
-		if (triode > 0.0)
+		if (triode > 0.0f)
 			{
 				inputSample *= intensity;
-				inputSample -= 0.5;
-				double bridgerectifier = fabs(inputSample);
-				if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+				inputSample -= 0.5f;
+				float bridgerectifier = fabs(inputSample);
+				if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 				bridgerectifier = sin(bridgerectifier);
 				if (inputSample > 0) inputSample = bridgerectifier;
 				else inputSample = -bridgerectifier;
@@ -81,33 +81,33 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				inputSample /= intensity;
 			}
 		
-		if (softcrossover > 0.0)
+		if (softcrossover > 0.0f)
 			{
-				double bridgerectifier = fabs(inputSample);
-				if (bridgerectifier > 0.0) bridgerectifier -= (softcrossover*(bridgerectifier+sqrt(bridgerectifier)));
-				if (bridgerectifier < 0.0) bridgerectifier = 0;
-				if (inputSample > 0.0) inputSample = bridgerectifier;
+				float bridgerectifier = fabs(inputSample);
+				if (bridgerectifier > 0.0f) bridgerectifier -= (softcrossover*(bridgerectifier+sqrt(bridgerectifier)));
+				if (bridgerectifier < 0.0f) bridgerectifier = 0;
+				if (inputSample > 0.0f) inputSample = bridgerectifier;
 				else inputSample = -bridgerectifier;				
 			}
 		
 		
-		if (hardcrossover > 0.0)
+		if (hardcrossover > 0.0f)
 			{
-				double bridgerectifier = fabs(inputSample);
+				float bridgerectifier = fabs(inputSample);
 				bridgerectifier -= hardcrossover;
-				if (bridgerectifier < 0.0) bridgerectifier = 0.0;
-				if (inputSample > 0.0) inputSample = bridgerectifier;
+				if (bridgerectifier < 0.0f) bridgerectifier = 0.0f;
+				if (inputSample > 0.0f) inputSample = bridgerectifier;
 				else inputSample = -bridgerectifier;				
 			}
 		
-		if (wet < 1.0) {
-			inputSample = (drySample * (1.0-wet))+(inputSample*wet);
+		if (wet < 1.0f) {
+			inputSample = (drySample * (1.0f-wet))+(inputSample*wet);
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

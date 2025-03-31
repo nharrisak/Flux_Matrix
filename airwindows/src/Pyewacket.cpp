@@ -32,9 +32,9 @@ enum { kNumTemplateParameters = 6 };
 
 	uint32_t fpdL;
 	uint32_t fpdR;
-	Float64 chase;
-	Float64 lastrectifierL;
-	Float64 lastrectifierR;
+	Float32 chase;
+	Float32 lastrectifierL;
+	Float32 lastrectifierR;
 	
 
 	struct _dram {
@@ -45,40 +45,40 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	if (overallscale < 0.1) overallscale = 1.0;
+	if (overallscale < 0.1f) overallscale = 1.0f;
 	//insanity check
-	double fpOld = 0.618033988749894848204586; //golden ratio!
-	double fpNew = 1.0 - fpOld;	
-	double inputSampleL;
-	double inputSampleR;
-	double drySampleL;
-	double drySampleR;
-	Float64 bridgerectifier;
-	Float64 temprectifier;
-	Float64 inputSense;
+	float fpOld = 0.618033988749894848204586f; //golden ratio!
+	float fpNew = 1.0f - fpOld;	
+	float inputSampleL;
+	float inputSampleR;
+	float drySampleL;
+	float drySampleR;
+	Float32 bridgerectifier;
+	Float32 temprectifier;
+	Float32 inputSense;
 	
-	Float64 inputGain = pow(10.0,(GetParameter( kParam_One ))/20.0);
-	Float64 attack = ((GetParameter( kParam_Two )+0.5)*0.006)/overallscale;
-	Float64 decay = ((GetParameter( kParam_Two )+0.01)*0.0004)/overallscale;
-	Float64 outputGain = pow(10.0,(GetParameter( kParam_Three ))/20.0);
-	Float64 wet;
-	Float64 maxblur;
-	Float64 blurdry;
-	Float64 out;
-	Float64 dry;
+	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 attack = ((GetParameter( kParam_Two )+0.5f)*0.006f)/overallscale;
+	Float32 decay = ((GetParameter( kParam_Two )+0.01f)*0.0004f)/overallscale;
+	Float32 outputGain = pow(10.0f,(GetParameter( kParam_Three ))/20.0f);
+	Float32 wet;
+	Float32 maxblur;
+	Float32 blurdry;
+	Float32 out;
+	Float32 dry;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		
-		if (inputGain != 1.0) {
+		if (inputGain != 1.0f) {
 			inputSampleL *= inputGain;
 			inputSampleR *= inputGain;
 		}
@@ -90,26 +90,26 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//we will take the greater of either channel and just use that, then apply the result
 		//to both stereo channels.
 		if (chase < inputSense) chase += attack;
-		if (chase > 1.0) chase = 1.0;
+		if (chase > 1.0f) chase = 1.0f;
 		if (chase > inputSense) chase -= decay;
-		if (chase < 0.0) chase = 0.0;
+		if (chase < 0.0f) chase = 0.0f;
 		//chase will be between 0 and ? (if input is super hot)
 		out = wet = chase;
-		if (wet > 1.0) wet = 1.0;
+		if (wet > 1.0f) wet = 1.0f;
 		maxblur = wet * fpNew;
-		blurdry = 1.0 - maxblur;
+		blurdry = 1.0f - maxblur;
 		//scaled back so that blur remains balance of both
 		if (out > fpOld) out = fpOld - (out - fpOld);
-		if (out < 0.0) out = 0.0;
-		dry = 1.0 - wet;
+		if (out < 0.0f) out = 0.0f;
+		dry = 1.0f - wet;
 		
-		if (inputSampleL > 1.57079633) inputSampleL = 1.57079633;
-		if (inputSampleL < -1.57079633) inputSampleL = -1.57079633;
-		if (inputSampleR > 1.57079633) inputSampleR = 1.57079633;
-		if (inputSampleR < -1.57079633) inputSampleR = -1.57079633;
+		if (inputSampleL > 1.57079633f) inputSampleL = 1.57079633f;
+		if (inputSampleL < -1.57079633f) inputSampleL = -1.57079633f;
+		if (inputSampleR > 1.57079633f) inputSampleR = 1.57079633f;
+		if (inputSampleR < -1.57079633f) inputSampleR = -1.57079633f;
 
 		bridgerectifier = fabs(inputSampleL);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		temprectifier = 1-cos(bridgerectifier);
 		bridgerectifier = ((lastrectifierL*maxblur) + (temprectifier*blurdry));
 		lastrectifierL = temprectifier;
@@ -118,7 +118,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		else inputSampleL = (inputSampleL*dry)-(bridgerectifier*out);
 		
 		bridgerectifier = fabs(inputSampleR);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		temprectifier = 1-cos(bridgerectifier);
 		bridgerectifier = ((lastrectifierR*maxblur) + (temprectifier*blurdry));
 		lastrectifierR = temprectifier;
@@ -126,7 +126,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (inputSampleR > 0) inputSampleR = (inputSampleR*dry)+(bridgerectifier*out);
 		else inputSampleR = (inputSampleR*dry)-(bridgerectifier*out);
 		
-		if (outputGain != 1.0) {
+		if (outputGain != 1.0f) {
 			inputSampleL *= outputGain;
 			inputSampleR *= outputGain;
 		}
@@ -134,10 +134,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

@@ -49,8 +49,8 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 b[61];
-		Float64 f[61];
+			Float32 b[61];
+		Float32 f[61];
 	};
 	_dram* dram;
 };
@@ -64,28 +64,28 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 v1 = GetParameter( kParam_One );
-	Float64 v2 = GetParameter( kParam_Two );
-	Float64 v3 = GetParameter( kParam_Three );
-	Float64 v4 = GetParameter( kParam_Four );
-	Float64 v5 = GetParameter( kParam_Five );
-	Float64 v6 = GetParameter( kParam_Six );
-	Float64 v7 = GetParameter( kParam_Seven );
-	Float64 v8 = GetParameter( kParam_Eight );
-	Float64 f1 = pow(v1,2);
-	Float64 f2 = pow(v2,2);
-	Float64 f3 = pow(v3,2);
-	Float64 f4 = pow(v4,2);
-	Float64 f5 = pow(v5,2);
-	Float64 f6 = pow(v6,2);
-	Float64 f7 = pow(v7,2);
-	Float64 f8 = pow(v8,2);
-	Float64 wet = GetParameter( kParam_Nine );
-	Float64 falloff;
-	v1 += 0.2; v2 += 0.2; v3 += 0.2; v4 += 0.2; v5 += 0.2; v6 += 0.2; v7 += 0.2; v8 += 0.2;
+	Float32 v1 = GetParameter( kParam_One );
+	Float32 v2 = GetParameter( kParam_Two );
+	Float32 v3 = GetParameter( kParam_Three );
+	Float32 v4 = GetParameter( kParam_Four );
+	Float32 v5 = GetParameter( kParam_Five );
+	Float32 v6 = GetParameter( kParam_Six );
+	Float32 v7 = GetParameter( kParam_Seven );
+	Float32 v8 = GetParameter( kParam_Eight );
+	Float32 f1 = pow(v1,2);
+	Float32 f2 = pow(v2,2);
+	Float32 f3 = pow(v3,2);
+	Float32 f4 = pow(v4,2);
+	Float32 f5 = pow(v5,2);
+	Float32 f6 = pow(v6,2);
+	Float32 f7 = pow(v7,2);
+	Float32 f8 = pow(v8,2);
+	Float32 wet = GetParameter( kParam_Nine );
+	Float32 falloff;
+	v1 += 0.2f; v2 += 0.2f; v3 += 0.2f; v4 += 0.2f; v5 += 0.2f; v6 += 0.2f; v7 += 0.2f; v8 += 0.2f;
 	v1 /= overallscale;
 	v2 /= overallscale;
 	v3 /= overallscale;
@@ -97,7 +97,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//each process frame we'll update some of the kernel frames. That way we don't have to crunch the whole thing at once,
 	//and we can load a LOT more resonant peaks into the kernel.
 	
-	//amount = 0.005 + (amount * 0.99);
+	//amount = 0.005f + (amount * 0.99f);
 	
 	
 	//mAudioUnit->SetParameter( kParam_Nine, amount );
@@ -115,51 +115,51 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	
 	framenumber += 1; if (framenumber > 59) framenumber = 1;
-	falloff = sin(framenumber / 19.098992);
-	dram->f[framenumber] = 0.0;
-	if ((framenumber * f1) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f1)*2.0) * falloff * v1);
+	falloff = sin(framenumber / 19.098992f);
+	dram->f[framenumber] = 0.0f;
+	if ((framenumber * f1) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f1)*2.0f) * falloff * v1);
 	else dram->f[framenumber]  += (cos(framenumber * f1) * falloff * v1);
-	if ((framenumber * f2) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f2)*2.0) * falloff * v2);
+	if ((framenumber * f2) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f2)*2.0f) * falloff * v2);
 	else dram->f[framenumber]  += (cos(framenumber * f2) * falloff * v2);
-	if ((framenumber * f3) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f3)*2.0) * falloff * v3);
+	if ((framenumber * f3) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f3)*2.0f) * falloff * v3);
 	else dram->f[framenumber]  += (cos(framenumber * f3) * falloff * v3);
-	if ((framenumber * f4) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f4)*2.0) * falloff * v4);
+	if ((framenumber * f4) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f4)*2.0f) * falloff * v4);
 	else dram->f[framenumber]  += (cos(framenumber * f4) * falloff * v4);
-	if ((framenumber * f5) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f5)*2.0) * falloff * v5);
+	if ((framenumber * f5) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f5)*2.0f) * falloff * v5);
 	else dram->f[framenumber]  += (cos(framenumber * f5) * falloff * v5);
-	if ((framenumber * f6) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f6)*2.0) * falloff * v6);
+	if ((framenumber * f6) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f6)*2.0f) * falloff * v6);
 	else dram->f[framenumber]  += (cos(framenumber * f6) * falloff * v6);
-	if ((framenumber * f7) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f7)*2.0) * falloff * v7);
+	if ((framenumber * f7) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f7)*2.0f) * falloff * v7);
 	else dram->f[framenumber]  += (cos(framenumber * f7) * falloff * v7);
-	if ((framenumber * f8) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f8)*2.0) * falloff * v8);
+	if ((framenumber * f8) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f8)*2.0f) * falloff * v8);
 	else dram->f[framenumber]  += (cos(framenumber * f8) * falloff * v8);
 
 	framenumber += 1; if (framenumber > 59) framenumber = 1;
-	falloff = sin(framenumber / 19.098992);
-	dram->f[framenumber] = 0.0;
-	if ((framenumber * f1) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f1)*2.0) * falloff * v1);
+	falloff = sin(framenumber / 19.098992f);
+	dram->f[framenumber] = 0.0f;
+	if ((framenumber * f1) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f1)*2.0f) * falloff * v1);
 	else dram->f[framenumber]  += (cos(framenumber * f1) * falloff * v1);
-	if ((framenumber * f2) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f2)*2.0) * falloff * v2);
+	if ((framenumber * f2) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f2)*2.0f) * falloff * v2);
 	else dram->f[framenumber]  += (cos(framenumber * f2) * falloff * v2);
-	if ((framenumber * f3) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f3)*2.0) * falloff * v3);
+	if ((framenumber * f3) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f3)*2.0f) * falloff * v3);
 	else dram->f[framenumber]  += (cos(framenumber * f3) * falloff * v3);
-	if ((framenumber * f4) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f4)*2.0) * falloff * v4);
+	if ((framenumber * f4) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f4)*2.0f) * falloff * v4);
 	else dram->f[framenumber]  += (cos(framenumber * f4) * falloff * v4);
-	if ((framenumber * f5) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f5)*2.0) * falloff * v5);
+	if ((framenumber * f5) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f5)*2.0f) * falloff * v5);
 	else dram->f[framenumber]  += (cos(framenumber * f5) * falloff * v5);
-	if ((framenumber * f6) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f6)*2.0) * falloff * v6);
+	if ((framenumber * f6) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f6)*2.0f) * falloff * v6);
 	else dram->f[framenumber]  += (cos(framenumber * f6) * falloff * v6);
-	if ((framenumber * f7) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f7)*2.0) * falloff * v7);
+	if ((framenumber * f7) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f7)*2.0f) * falloff * v7);
 	else dram->f[framenumber]  += (cos(framenumber * f7) * falloff * v7);
-	if ((framenumber * f8) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f8)*2.0) * falloff * v8);
+	if ((framenumber * f8) < 1.57079633f) dram->f[framenumber]  += (sin((framenumber * f8)*2.0f) * falloff * v8);
 	else dram->f[framenumber]  += (cos(framenumber * f8) * falloff * v8);
 
 	//done updating the kernel for this go-round
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 dram->b[59] = dram->b[58]; dram->b[58] = dram->b[57]; dram->b[57] = dram->b[56]; dram->b[56] = dram->b[55]; dram->b[55] = dram->b[54]; dram->b[54] = dram->b[53]; dram->b[53] = dram->b[52]; dram->b[52] = dram->b[51]; dram->b[51] = dram->b[50]; dram->b[50] = dram->b[49]; dram->b[49] = dram->b[48];
 dram->b[48] = dram->b[47]; dram->b[47] = dram->b[46]; dram->b[46] = dram->b[45]; dram->b[45] = dram->b[44]; dram->b[44] = dram->b[43]; dram->b[43] = dram->b[42]; dram->b[42] = dram->b[41]; dram->b[41] = dram->b[40]; dram->b[40] = dram->b[39]; dram->b[39] = dram->b[38];
@@ -227,9 +227,9 @@ dram->b[7] = dram->b[6]; dram->b[6] = dram->b[5]; dram->b[5] = dram->b[4]; dram-
 		inputSample += (dram->b[57] * dram->f[57]);
 		inputSample += (dram->b[58] * dram->f[58]);
 		inputSample += (dram->b[59] * dram->f[59]);
-		inputSample /= 12.0;
+		inputSample /= 12.0f;
 		//inlined- this is our little EQ kernel. Longer will give better tightness on bass frequencies.
-		inputSample = (drySample*(1.0-wet))+(inputSample*wet);
+		inputSample = (drySample*(1.0f-wet))+(inputSample*wet);
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);

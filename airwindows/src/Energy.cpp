@@ -45,82 +45,82 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 duoEven;
-		Float64 duoOdd;
-		Float64 duoFactor;
+		Float32 duoEven;
+		Float32 duoOdd;
+		Float32 duoFactor;
 		bool flip;
 				
-		Float64 tripletA;
-		Float64 tripletB;
-		Float64 tripletC;
-		Float64 tripletFactor;
+		Float32 tripletA;
+		Float32 tripletB;
+		Float32 tripletC;
+		Float32 tripletFactor;
 		int countA;
 		
-		Float64 quadA;
-		Float64 quadB;
-		Float64 quadC;
-		Float64 quadD;
-		Float64 quadFactor;
+		Float32 quadA;
+		Float32 quadB;
+		Float32 quadC;
+		Float32 quadD;
+		Float32 quadFactor;
 		int countB;
 				
-		Float64 quintA;
-		Float64 quintB;
-		Float64 quintC;
-		Float64 quintD;
-		Float64 quintE;
-		Float64 quintFactor;
+		Float32 quintA;
+		Float32 quintB;
+		Float32 quintC;
+		Float32 quintD;
+		Float32 quintE;
+		Float32 quintFactor;
 		int countC;
 		
-		Float64 sextA;
-		Float64 sextB;
-		Float64 sextC;
-		Float64 sextD;
-		Float64 sextE;
-		Float64 sextF;
-		Float64 sextFactor;
+		Float32 sextA;
+		Float32 sextB;
+		Float32 sextC;
+		Float32 sextD;
+		Float32 sextE;
+		Float32 sextF;
+		Float32 sextFactor;
 		int countD;
 		
-		Float64 septA;
-		Float64 septB;
-		Float64 septC;
-		Float64 septD;
-		Float64 septE;
-		Float64 septF;
-		Float64 septG;
-		Float64 septFactor;
+		Float32 septA;
+		Float32 septB;
+		Float32 septC;
+		Float32 septD;
+		Float32 septE;
+		Float32 septF;
+		Float32 septG;
+		Float32 septFactor;
 		int countE;
 		
-		Float64 octA;
-		Float64 octB;
-		Float64 octC;
-		Float64 octD;
-		Float64 octE;
-		Float64 octF;
-		Float64 octG;
-		Float64 octH;
-		Float64 octFactor;
+		Float32 octA;
+		Float32 octB;
+		Float32 octC;
+		Float32 octD;
+		Float32 octE;
+		Float32 octF;
+		Float32 octG;
+		Float32 octH;
+		Float32 octFactor;
 		int countF;
 		
-		Float64 nintA;
-		Float64 nintB;
-		Float64 nintC;
-		Float64 nintD;
-		Float64 nintE;
-		Float64 nintF;
-		Float64 nintG;
-		Float64 nintH;
-		Float64 nintI;
-		Float64 nintFactor;
+		Float32 nintA;
+		Float32 nintB;
+		Float32 nintC;
+		Float32 nintD;
+		Float32 nintE;
+		Float32 nintF;
+		Float32 nintG;
+		Float32 nintH;
+		Float32 nintI;
+		Float32 nintFactor;
 		int countG;
 		
-		Float64 PrevH;
-		Float64 PrevG;
-		Float64 PrevF;
-		Float64 PrevE;
-		Float64 PrevD;
-		Float64 PrevC;
-		Float64 PrevB;
-		Float64 PrevA;
+		Float32 PrevH;
+		Float32 PrevG;
+		Float32 PrevF;
+		Float32 PrevE;
+		Float32 PrevD;
+		Float32 PrevC;
+		Float32 PrevB;
+		Float32 PrevA;
 
 		uint32_t fpd;
 
@@ -139,23 +139,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 duoIntensity = -pow(GetParameter( kParam_One ),3);
-	Float64 tripletIntensity = -pow(GetParameter( kParam_Two ),3);
-	Float64 quadIntensity = -pow(GetParameter( kParam_Three ),3);
-	Float64 quintIntensity = -pow(GetParameter( kParam_Four ),3);
-	Float64 sextIntensity = -pow(GetParameter( kParam_Five ),3);
-	Float64 septIntensity = -pow(GetParameter( kParam_Six ),3);
-	Float64 octIntensity = -pow(GetParameter( kParam_Seven ),3);
-	Float64 nintIntensity = -pow(GetParameter( kParam_Eight ),3);
-	Float64 mix = GetParameter( kParam_Nine );
+	Float32 duoIntensity = -pow(GetParameter( kParam_One ),3);
+	Float32 tripletIntensity = -pow(GetParameter( kParam_Two ),3);
+	Float32 quadIntensity = -pow(GetParameter( kParam_Three ),3);
+	Float32 quintIntensity = -pow(GetParameter( kParam_Four ),3);
+	Float32 sextIntensity = -pow(GetParameter( kParam_Five ),3);
+	Float32 septIntensity = -pow(GetParameter( kParam_Six ),3);
+	Float32 octIntensity = -pow(GetParameter( kParam_Seven ),3);
+	Float32 nintIntensity = -pow(GetParameter( kParam_Eight ),3);
+	Float32 mix = GetParameter( kParam_Nine );
 	//all types of air band are running in parallel, not series
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		double correction = 0.0;
+		float correction = 0.0f;
 		
 		duoFactor = PrevA - inputSample;
 		if (flip)
@@ -170,8 +170,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			duoEven -= duoFactor;
 			duoFactor = duoOdd * duoIntensity;
 			}
-		duoOdd = (duoOdd - ((duoOdd - duoEven)/256.0)) / 2.0;
-		duoEven = (duoEven - ((duoEven - duoOdd)/256.0)) / 2.0;
+		duoOdd = (duoOdd - ((duoOdd - duoEven)/256.0f)) / 2.0f;
+		duoEven = (duoEven - ((duoEven - duoOdd)/256.0f)) / 2.0f;
 		correction = correction + duoFactor;
 		flip = !flip;
 		//finished duo section
@@ -199,9 +199,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				tripletFactor = tripletC * tripletIntensity;
 			break;
 		}
-		tripletA /= 2.0;
-		tripletB /= 2.0;
-		tripletC /= 2.0;
+		tripletA /= 2.0f;
+		tripletB /= 2.0f;
+		tripletC /= 2.0f;
 		correction = correction + tripletFactor;
 		countA++;
 		//finished triplet section- 15K
@@ -234,10 +234,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				quadFactor = quadD * quadIntensity;
 			break;
 		}
-		quadA /= 2.0;
-		quadB /= 2.0;
-		quadC /= 2.0;
-		quadD /= 2.0;
+		quadA /= 2.0f;
+		quadB /= 2.0f;
+		quadC /= 2.0f;
+		quadD /= 2.0f;
 		correction = correction + quadFactor;
 		countB++;
 		//finished quad section- 10K
@@ -276,11 +276,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				quintFactor = quintE * quintIntensity;
 			break;
 		}
-		quintA /= 2.0;
-		quintB /= 2.0;
-		quintC /= 2.0;
-		quintD /= 2.0;
-		quintE /= 2.0;
+		quintA /= 2.0f;
+		quintB /= 2.0f;
+		quintC /= 2.0f;
+		quintD /= 2.0f;
+		quintE /= 2.0f;
 		correction = correction + quintFactor;
 		countC++;
 		//finished quint section- 8K
@@ -325,12 +325,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				sextFactor = sextF * sextIntensity;
 			break;
 		}
-		sextA /= 2.0;
-		sextB /= 2.0;
-		sextC /= 2.0;
-		sextD /= 2.0;
-		sextE /= 2.0;
-		sextF /= 2.0;
+		sextA /= 2.0f;
+		sextB /= 2.0f;
+		sextC /= 2.0f;
+		sextD /= 2.0f;
+		sextE /= 2.0f;
+		sextF /= 2.0f;
 		correction = correction + sextFactor;
 		countD++;
 		//finished sext section- 6K
@@ -381,13 +381,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				septFactor = septG * septIntensity;
 			break;
 		}
-		septA /= 2.0;
-		septB /= 2.0;
-		septC /= 2.0;
-		septD /= 2.0;
-		septE /= 2.0;
-		septF /= 2.0;
-		septG /= 2.0;
+		septA /= 2.0f;
+		septB /= 2.0f;
+		septC /= 2.0f;
+		septD /= 2.0f;
+		septE /= 2.0f;
+		septF /= 2.0f;
+		septG /= 2.0f;
 		correction = correction + septFactor;
 		countE++;
 		//finished sept section- 5K
@@ -444,14 +444,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				octFactor = octH * octIntensity;
 			break;
 		}
-		octA /= 2.0;
-		octB /= 2.0;
-		octC /= 2.0;
-		octD /= 2.0;
-		octE /= 2.0;
-		octF /= 2.0;
-		octG /= 2.0;
-		octH /= 2.0;
+		octA /= 2.0f;
+		octB /= 2.0f;
+		octC /= 2.0f;
+		octD /= 2.0f;
+		octE /= 2.0f;
+		octF /= 2.0f;
+		octG /= 2.0f;
+		octH /= 2.0f;
 		correction = correction + octFactor;
 		countF++;
 		//finished oct section- 4K
@@ -514,15 +514,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				nintFactor = nintI * nintIntensity;
 			break;
 		}
-		nintA /= 2.0;
-		nintB /= 2.0;
-		nintC /= 2.0;
-		nintD /= 2.0;
-		nintE /= 2.0;
-		nintF /= 2.0;
-		nintG /= 2.0;
-		nintH /= 2.0;
-		nintI /= 2.0;
+		nintA /= 2.0f;
+		nintB /= 2.0f;
+		nintC /= 2.0f;
+		nintD /= 2.0f;
+		nintE /= 2.0f;
+		nintF /= 2.0f;
+		nintG /= 2.0f;
+		nintH /= 2.0f;
+		nintI /= 2.0f;
 		correction = correction + nintFactor;
 		countG++;
 		//finished nint section- 3K
@@ -543,7 +543,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

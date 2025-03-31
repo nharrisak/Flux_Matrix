@@ -43,61 +43,61 @@ kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, kParam6, kParam7, kParam8,
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 iirDriveSampleAL;
-	Float64 iirDriveSampleBL;
-	Float64 iirDriveSampleCL;
-	Float64 iirDriveSampleDL;
-	Float64 iirDriveSampleEL;
-	Float64 iirDriveSampleFL;
-	Float64 iirDriveSampleAR;
-	Float64 iirDriveSampleBR;
-	Float64 iirDriveSampleCR;
-	Float64 iirDriveSampleDR;
-	Float64 iirDriveSampleER;
-	Float64 iirDriveSampleFR;
+	Float32 iirDriveSampleAL;
+	Float32 iirDriveSampleBL;
+	Float32 iirDriveSampleCL;
+	Float32 iirDriveSampleDL;
+	Float32 iirDriveSampleEL;
+	Float32 iirDriveSampleFL;
+	Float32 iirDriveSampleAR;
+	Float32 iirDriveSampleBR;
+	Float32 iirDriveSampleCR;
+	Float32 iirDriveSampleDR;
+	Float32 iirDriveSampleER;
+	Float32 iirDriveSampleFR;
 	bool flip; //drive things
 	
 	int bflip;
 	bool WasNegative;
 	bool SubOctave;
-	Float64 iirHeadBumpA;
-	Float64 iirHeadBumpB;
-	Float64 iirHeadBumpC;
+	Float32 iirHeadBumpA;
+	Float32 iirHeadBumpB;
+	Float32 iirHeadBumpC;
 	
-	Float64 iirSubBumpA;
-	Float64 iirSubBumpB;
-	Float64 iirSubBumpC;
+	Float32 iirSubBumpA;
+	Float32 iirSubBumpB;
+	Float32 iirSubBumpC;
 	
-	Float64 lastHeadBump;
-	Float64 lastSubBump;
+	Float32 lastHeadBump;
+	Float32 lastSubBump;
 	
-	Float64 iirSampleA;
-	Float64 iirSampleB;
-	Float64 iirSampleC;
-	Float64 iirSampleD;
-	Float64 iirSampleE;
-	Float64 iirSampleF;
-	Float64 iirSampleG;
-	Float64 iirSampleH;
-	Float64 iirSampleI;
-	Float64 iirSampleJ;
-	Float64 iirSampleK;
-	Float64 iirSampleL;
-	Float64 iirSampleM;
-	Float64 iirSampleN;
-	Float64 iirSampleO;
-	Float64 iirSampleP;
-	Float64 iirSampleQ;
-	Float64 iirSampleR;
-	Float64 iirSampleS;
-	Float64 iirSampleT;
-	Float64 iirSampleU;
-	Float64 iirSampleV;
-	Float64 iirSampleW;
-	Float64 iirSampleX;
-	Float64 iirSampleY;
-	Float64 iirSampleZ;		
-	Float64 oscGate;
+	Float32 iirSampleA;
+	Float32 iirSampleB;
+	Float32 iirSampleC;
+	Float32 iirSampleD;
+	Float32 iirSampleE;
+	Float32 iirSampleF;
+	Float32 iirSampleG;
+	Float32 iirSampleH;
+	Float32 iirSampleI;
+	Float32 iirSampleJ;
+	Float32 iirSampleK;
+	Float32 iirSampleL;
+	Float32 iirSampleM;
+	Float32 iirSampleN;
+	Float32 iirSampleO;
+	Float32 iirSampleP;
+	Float32 iirSampleQ;
+	Float32 iirSampleR;
+	Float32 iirSampleS;
+	Float32 iirSampleT;
+	Float32 iirSampleU;
+	Float32 iirSampleV;
+	Float32 iirSampleW;
+	Float32 iirSampleX;
+	Float32 iirSampleY;
+	Float32 iirSampleZ;		
+	Float32 oscGate;
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -110,43 +110,43 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 driveone = pow(GetParameter( kParam_One )*3.0,2);
-	Float64 driveoutput = GetParameter( kParam_Two );
-	Float64 iirAmount = ((GetParameter( kParam_Three )*0.33)+0.1)/overallscale;
-	Float64 ataLowpassL;
-	Float64 ataLowpassR;
-	Float64 ataLowpass;
-	Float64 randy;
-	Float64 invrandy;
-	Float64 HeadBump = 0.0;
-	Float64 BassGain = GetParameter( kParam_Four ) * 0.1;
-	Float64 HeadBumpFreq = ((GetParameter( kParam_Five )*0.1)+0.0001)/overallscale;
-	Float64 iirBmount = HeadBumpFreq/44.1;
-	Float64 altBmount = 1.0 - iirBmount;
-	Float64 BassOutGain = GetParameter( kParam_Six );
-	Float64 SubBump = 0.0;
-	Float64 SubGain = GetParameter( kParam_Seven ) * 0.1;
-	Float64 SubBumpFreq = ((GetParameter( kParam_Eight )*0.1)+0.0001)/overallscale;
-	Float64 iirCmount = SubBumpFreq/44.1;
-	Float64 altCmount = 1.0 - iirCmount;
-	Float64 SubOutGain = GetParameter( kParam_Nine );
-	Float64 clamp = 0.0;
-	Float64 out;
-	Float64 fuzz = 0.111;
-	Float64 wet = GetParameter( kParam_Ten );
-	Float64 glitch = 0.60;
-	Float64 tempSample;
+	Float32 driveone = pow(GetParameter( kParam_One )*3.0f,2);
+	Float32 driveoutput = GetParameter( kParam_Two );
+	Float32 iirAmount = ((GetParameter( kParam_Three )*0.33f)+0.1f)/overallscale;
+	Float32 ataLowpassL;
+	Float32 ataLowpassR;
+	Float32 ataLowpass;
+	Float32 randy;
+	Float32 invrandy;
+	Float32 HeadBump = 0.0f;
+	Float32 BassGain = GetParameter( kParam_Four ) * 0.1f;
+	Float32 HeadBumpFreq = ((GetParameter( kParam_Five )*0.1f)+0.0001f)/overallscale;
+	Float32 iirBmount = HeadBumpFreq/44.1f;
+	Float32 altBmount = 1.0f - iirBmount;
+	Float32 BassOutGain = GetParameter( kParam_Six );
+	Float32 SubBump = 0.0f;
+	Float32 SubGain = GetParameter( kParam_Seven ) * 0.1f;
+	Float32 SubBumpFreq = ((GetParameter( kParam_Eight )*0.1f)+0.0001f)/overallscale;
+	Float32 iirCmount = SubBumpFreq/44.1f;
+	Float32 altCmount = 1.0f - iirCmount;
+	Float32 SubOutGain = GetParameter( kParam_Nine );
+	Float32 clamp = 0.0f;
+	Float32 out;
+	Float32 fuzz = 0.111f;
+	Float32 wet = GetParameter( kParam_Ten );
+	Float32 glitch = 0.60f;
+	Float32 tempSample;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 
 		// here's the plan.
 		// Grind Boost
@@ -160,13 +160,13 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		// Sub Output Level
 		// Dry/Wet
 		
-		oscGate += fabs((inputSampleL + inputSampleR) * 5.0);
-		oscGate -= 0.001;
-		if (oscGate > 1.0) oscGate = 1.0;
+		oscGate += fabs((inputSampleL + inputSampleR) * 5.0f);
+		oscGate -= 0.001f;
+		if (oscGate > 1.0f) oscGate = 1.0f;
 		if (oscGate < 0) oscGate = 0;
 		//got a value that only goes down low when there's silence or near silence on input
-		clamp = 1.0-oscGate;
-		clamp *= 0.00001;
+		clamp = 1.0f-oscGate;
+		clamp *= 0.00001f;
 		//set up the thing to choke off oscillations- belt and suspenders affair
 		
 		
@@ -212,21 +212,21 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		}
 		//highpass section
 		
-		if (inputSampleL > 1.0) {inputSampleL = 1.0;}
-		if (inputSampleL < -1.0) {inputSampleL = -1.0;}
-		if (inputSampleR > 1.0) {inputSampleR = 1.0;}
-		if (inputSampleR < -1.0) {inputSampleR = -1.0;}
+		if (inputSampleL > 1.0f) {inputSampleL = 1.0f;}
+		if (inputSampleL < -1.0f) {inputSampleL = -1.0f;}
+		if (inputSampleR > 1.0f) {inputSampleR = 1.0f;}
+		if (inputSampleR < -1.0f) {inputSampleR = -1.0f;}
 		
 		out = driveone;
 		while (out > glitch)
 		{
 			out -= glitch;
 			inputSampleL -= (inputSampleL * (fabs(inputSampleL) * glitch) * (fabs(inputSampleL) * glitch) );
-			inputSampleL *= (1.0+glitch);
+			inputSampleL *= (1.0f+glitch);
 		}
 		//that's taken care of the really high gain stuff
 		inputSampleL -= (inputSampleL * (fabs(inputSampleL) * out) * (fabs(inputSampleL) * out) );
-		inputSampleL *= (1.0+out);
+		inputSampleL *= (1.0f+out);
 		
 		
 		out = driveone;
@@ -234,21 +234,21 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		{
 			out -= glitch;
 			inputSampleR -= (inputSampleR * (fabs(inputSampleR) * glitch) * (fabs(inputSampleR) * glitch) );
-			inputSampleR *= (1.0+glitch);
+			inputSampleR *= (1.0f+glitch);
 		}
 		//that's taken care of the really high gain stuff
 		inputSampleR -= (inputSampleR * (fabs(inputSampleR) * out) * (fabs(inputSampleR) * out) );
-		inputSampleR *= (1.0+out);
+		inputSampleR *= (1.0f+out);
 		
-		ataLowpass = (ataLowpassL + ataLowpassR) / 2.0;
+		ataLowpass = (ataLowpassL + ataLowpassR) / 2.0f;
 		
 		if (ataLowpass > 0)
 		{if (WasNegative){SubOctave = !SubOctave;} WasNegative = false;}
 		else {WasNegative = true;}
 		//set up polarities for sub-bass version
-		randy = (double(fpdL)/UINT32_MAX)*fuzz; //0 to 1 the noise, may not be needed
-		invrandy = (1.0-randy);
-		randy /= 2.0;
+		randy = (float(fpdL)/UINT32_MAX)*fuzz; //0 to 1 the noise, may not be needed
+		invrandy = (1.0f-randy);
+		randy /= 2.0f;
 		//set up the noise
 		
 		iirSampleA = (iirSampleA * altBmount) + (ataLowpass * iirBmount); ataLowpass -= iirSampleA;
@@ -353,9 +353,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		lastHeadBump = HeadBump;
 		lastSubBump = SubBump;
 		
-		if (wet != 1.0) {
-		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+		if (wet != 1.0f) {
+		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
@@ -366,10 +366,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

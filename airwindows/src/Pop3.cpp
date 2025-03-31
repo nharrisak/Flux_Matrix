@@ -39,9 +39,9 @@ kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, kParam6, kParam7, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double popCompL;
-	double popCompR;
-	double popGate;
+	float popCompL;
+	float popCompR;
+	float popGate;
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -54,56 +54,56 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double compThresh = pow(GetParameter( kParam_A ),4);
-	double compRatio = 1.0-pow(1.0-GetParameter( kParam_B ),2);
-	double compAttack = 1.0/(((pow(GetParameter( kParam_C ),3)*5000.0)+500.0)*overallscale);
-	double compRelease = 1.0/(((pow(GetParameter( kParam_D ),5)*50000.0)+500.0)*overallscale);
+	float compThresh = pow(GetParameter( kParam_A ),4);
+	float compRatio = 1.0f-pow(1.0f-GetParameter( kParam_B ),2);
+	float compAttack = 1.0f/(((pow(GetParameter( kParam_C ),3)*5000.0f)+500.0f)*overallscale);
+	float compRelease = 1.0f/(((pow(GetParameter( kParam_D ),5)*50000.0f)+500.0f)*overallscale);
 	
-	double gateThresh = pow(GetParameter( kParam_E ),4);
-	double gateRatio = 1.0-pow(1.0-GetParameter( kParam_F ),2);
-	double gateSustain = M_PI_2 * pow(GetParameter( kParam_G )+1.0,4.0);
-	double gateRelease = 1.0/(((pow(GetParameter( kParam_H ),5)*500000.0)+500.0)*overallscale);
+	float gateThresh = pow(GetParameter( kParam_E ),4);
+	float gateRatio = 1.0f-pow(1.0f-GetParameter( kParam_F ),2);
+	float gateSustain = M_PI_2 * pow(GetParameter( kParam_G )+1.0f,4.0f);
+	float gateRelease = 1.0f/(((pow(GetParameter( kParam_H ),5)*500000.0f)+500.0f)*overallscale);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		if (fabs(inputSampleL) > compThresh) { //compression L
 			popCompL -= (popCompL * compAttack);
 			popCompL += ((compThresh / fabs(inputSampleL))*compAttack);
-		} else popCompL = (popCompL*(1.0-compRelease))+compRelease;
+		} else popCompL = (popCompL*(1.0f-compRelease))+compRelease;
 		if (fabs(inputSampleR) > compThresh) { //compression R
 			popCompR -= (popCompR * compAttack);
 			popCompR += ((compThresh / fabs(inputSampleR))*compAttack);
-		} else popCompR = (popCompR*(1.0-compRelease))+compRelease;
+		} else popCompR = (popCompR*(1.0f-compRelease))+compRelease;
 		if (popCompL > popCompR) popCompL -= (popCompL * compAttack);
 		if (popCompR > popCompL) popCompR -= (popCompR * compAttack);
 		if (fabs(inputSampleL) > gateThresh) popGate = gateSustain;
 		else if (fabs(inputSampleR) > gateThresh) popGate = gateSustain;
-		else popGate *= (1.0-gateRelease);
-		if (popGate < 0.0) popGate = 0.0;
-		popCompL = fmax(fmin(popCompL,1.0),0.0);
-		popCompR = fmax(fmin(popCompR,1.0),0.0);
-		inputSampleL *= ((1.0-compRatio)+(popCompL*compRatio));
-		inputSampleR *= ((1.0-compRatio)+(popCompR*compRatio));
+		else popGate *= (1.0f-gateRelease);
+		if (popGate < 0.0f) popGate = 0.0f;
+		popCompL = fmax(fmin(popCompL,1.0f),0.0f);
+		popCompR = fmax(fmin(popCompR,1.0f),0.0f);
+		inputSampleL *= ((1.0f-compRatio)+(popCompL*compRatio));
+		inputSampleR *= ((1.0f-compRatio)+(popCompR*compRatio));
 		if (popGate < M_PI_2) {
-			inputSampleL *= ((1.0-gateRatio)+(sin(popGate)*gateRatio));
-			inputSampleR *= ((1.0-gateRatio)+(sin(popGate)*gateRatio));
+			inputSampleL *= ((1.0f-gateRatio)+(sin(popGate)*gateRatio));
+			inputSampleR *= ((1.0f-gateRatio)+(sin(popGate)*gateRatio));
 		}
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

@@ -39,12 +39,12 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample;
+		float lastSample;
 		int gcount;
-		Float64 lows;
-		Float64 iirLowsA;
-		Float64 iirLowsB;
-		double refclip;
+		Float32 lows;
+		Float32 iirLowsA;
+		Float32 iirLowsB;
+		float refclip;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -62,65 +62,65 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 fpOld = 0.618033988749894848204586; //golden ratio!
-	Float64 fpNew = 1.0 - fpOld;
+	Float32 fpOld = 0.618033988749894848204586f; //golden ratio!
+	Float32 fpNew = 1.0f - fpOld;
 	
-	Float64 inputGain = pow(10.0,(GetParameter( kParam_One ))/20.0);
-	Float64 softness = GetParameter( kParam_Two ) * fpNew;
-	Float64 hardness = 1.0 - softness;
-	Float64 highslift = 0.307 * GetParameter( kParam_Three );
-	Float64 adjust = pow(highslift,3) * 0.416;
-	Float64 subslift = 0.796 * GetParameter( kParam_Three );
-	Float64 calibsubs = subslift/53;
-	Float64 invcalibsubs = 1.0 - calibsubs;
-	Float64 subs = 0.81 + (calibsubs*2);
-	double bridgerectifier;
+	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 softness = GetParameter( kParam_Two ) * fpNew;
+	Float32 hardness = 1.0f - softness;
+	Float32 highslift = 0.307f * GetParameter( kParam_Three );
+	Float32 adjust = pow(highslift,3) * 0.416f;
+	Float32 subslift = 0.796f * GetParameter( kParam_Three );
+	Float32 calibsubs = subslift/53;
+	Float32 invcalibsubs = 1.0f - calibsubs;
+	Float32 subs = 0.81f + (calibsubs*2);
+	float bridgerectifier;
 	int mode = (int) GetParameter( kParam_Four );
-	Float64 overshoot;
-	Float64 offsetH1 = 1.84;
+	Float32 overshoot;
+	Float32 offsetH1 = 1.84f;
 	offsetH1 *= overallscale;
-	Float64 offsetH2 = offsetH1 * 1.9;
-	Float64 offsetH3 = offsetH1 * 2.7;
-	Float64 offsetL1 = 612;
+	Float32 offsetH2 = offsetH1 * 1.9f;
+	Float32 offsetH3 = offsetH1 * 2.7f;
+	Float32 offsetL1 = 612;
 	offsetL1 *= overallscale;
-	Float64 offsetL2 = offsetL1 * 2.0;
+	Float32 offsetL2 = offsetL1 * 2.0f;
 	int refH1 = (int)floor(offsetH1);
 	int refH2 = (int)floor(offsetH2);
 	int refH3 = (int)floor(offsetH3);
 	int refL1 = (int)floor(offsetL1);
 	int refL2 = (int)floor(offsetL2);
 	int temp;
-	Float64 fractionH1 = offsetH1 - floor(offsetH1);
-	Float64 fractionH2 = offsetH2 - floor(offsetH2);
-	Float64 fractionH3 = offsetH3 - floor(offsetH3);
-	Float64 minusH1 = 1.0 - fractionH1;
-	Float64 minusH2 = 1.0 - fractionH2;
-	Float64 minusH3 = 1.0 - fractionH3;
-	Float64 highs = 0.0;
+	Float32 fractionH1 = offsetH1 - floor(offsetH1);
+	Float32 fractionH2 = offsetH2 - floor(offsetH2);
+	Float32 fractionH3 = offsetH3 - floor(offsetH3);
+	Float32 minusH1 = 1.0f - fractionH1;
+	Float32 minusH2 = 1.0f - fractionH2;
+	Float32 minusH3 = 1.0f - fractionH3;
+	Float32 highs = 0.0f;
 	int count = 0;
-	double inputSample;
+	float inputSample;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		if (inputGain != 1.0) {
+		if (inputGain != 1.0f) {
 			inputSample *= inputGain;
 		}
 		
 		overshoot = fabs(inputSample) - refclip;
-		if (overshoot < 0.0) overshoot = 0.0;
+		if (overshoot < 0.0f) overshoot = 0.0f;
 				
 		if (gcount < 0 || gcount > 11020) {gcount = 11020;}
 		count = gcount;
 		dram->b[count+11020] = dram->b[count] = overshoot;
 		gcount--;
 		
-		if (highslift > 0.0)
+		if (highslift > 0.0f)
 		{
 			//we have a big pile of dram->b[] which is overshoots
 			temp = count+refH3;
@@ -153,7 +153,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (highs > 0) highs = bridgerectifier;
 		else highs = -bridgerectifier;
 		
-		if (subslift > 0.0) 
+		if (subslift > 0.0f) 
 		{
 			lows *= subs;
 			//going in we'll reel back some of the swing
@@ -246,16 +246,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		iirLowsB = (iirLowsB * invcalibsubs) + (lows * calibsubs);
 		lows = iirLowsB;
-		bridgerectifier = sin(fabs(lows)) * 2.0;
+		bridgerectifier = sin(fabs(lows)) * 2.0f;
 		if (lows > 0) lows = bridgerectifier;
 		else lows = -bridgerectifier;
 		
-		if (highslift > 0.0) inputSample += (highs * (1.0-fabs(inputSample*hardness)));
-		if (subslift > 0.0) inputSample += (lows * (1.0-fabs(inputSample*softness)));
+		if (highslift > 0.0f) inputSample += (highs * (1.0f-fabs(inputSample*hardness)));
+		if (subslift > 0.0f) inputSample += (lows * (1.0f-fabs(inputSample*softness)));
 		
-		if (inputSample > refclip && refclip > 0.9) refclip -= 0.01;
-		if (inputSample < -refclip && refclip > 0.9) refclip -= 0.01;
-		if (refclip < 0.99) refclip += 0.00001;
+		if (inputSample > refclip && refclip > 0.9f) refclip -= 0.01f;
+		if (inputSample < -refclip && refclip > 0.9f) refclip -= 0.01f;
+		if (refclip < 0.99f) refclip += 0.00001f;
 		//adjust clip level on the fly
 		
 		if (lastSample >= refclip)
@@ -298,7 +298,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 				
 		*destP = inputSample;

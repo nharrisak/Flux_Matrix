@@ -37,22 +37,22 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double previousSampleA;
-		double previousTrendA;
-		double previousSampleB;
-		double previousTrendB;
-		double previousSampleC;
-		double previousTrendC;
-		double previousSampleD;
-		double previousTrendD;
-		double previousSampleE;
-		double previousTrendE;
-		double previousSampleF;
-		double previousTrendF;
-		double previousSampleG;
-		double previousTrendG;
-		double previousSampleH;
-		double previousTrendH;
+		float previousSampleA;
+		float previousTrendA;
+		float previousSampleB;
+		float previousTrendB;
+		float previousSampleC;
+		float previousTrendC;
+		float previousSampleD;
+		float previousTrendD;
+		float previousSampleE;
+		float previousTrendE;
+		float previousSampleF;
+		float previousTrendF;
+		float previousSampleG;
+		float previousTrendG;
+		float previousSampleH;
+		float previousTrendH;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -69,130 +69,130 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 alpha = pow(GetParameter( kParam_One ),4)+0.00001;
-	if (alpha > 1.0) alpha = 1.0;
-	Float64 resControl = (GetParameter( kParam_Two )*0.15)+0.12;
-	Float64 beta = (alpha * pow(resControl,2));
-	//0.27 max resonance for full stages on white noise keeping below 0dB
-	//0.12 min resonance for not losing all the level as we go down
-	//as we remove the 'avoid zero' +0.00001 on beta, our subsonic stability improves
+	Float32 alpha = pow(GetParameter( kParam_One ),4)+0.00001f;
+	if (alpha > 1.0f) alpha = 1.0f;
+	Float32 resControl = (GetParameter( kParam_Two )*0.15f)+0.12f;
+	Float32 beta = (alpha * pow(resControl,2));
+	//0.27f max resonance for full stages on white noise keeping below 0dB
+	//0.12f min resonance for not losing all the level as we go down
+	//as we remove the 'avoid zero' +0.00001f on beta, our subsonic stability improves
 	
-	alpha += ((1.0-beta)*pow(GetParameter( kParam_One ),3)); //correct for droop in frequency
-	if (alpha > 1.0) alpha = 1.0;
+	alpha += ((1.0f-beta)*pow(GetParameter( kParam_One ),3)); //correct for droop in frequency
+	if (alpha > 1.0f) alpha = 1.0f;
 	
-	double trend;
-	double forecast; //defining these here because we're copying the routine eight times
+	float trend;
+	float forecast; //defining these here because we're copying the routine eight times
 	
-	Float64 aWet = 0.0;
-	Float64 bWet = 0.0;
-	Float64 cWet = 0.0;
-	Float64 dWet = 0.0;
-	Float64 eWet = 0.0;
-	Float64 fWet = 0.0;
-	Float64 gWet = 0.0;
-	Float64 hWet = GetParameter( kParam_Three );
+	Float32 aWet = 0.0f;
+	Float32 bWet = 0.0f;
+	Float32 cWet = 0.0f;
+	Float32 dWet = 0.0f;
+	Float32 eWet = 0.0f;
+	Float32 fWet = 0.0f;
+	Float32 gWet = 0.0f;
+	Float32 hWet = GetParameter( kParam_Three );
 	//eight-stage wet/dry control using progressive stages that bypass when not engaged
-	if (hWet < 1.0) {aWet = hWet; hWet = 0.0;}
-	else if (hWet < 2.0) {bWet = hWet - 1.0; aWet = 1.0; hWet = 0.0;}
-	else if (hWet < 3.0) {cWet = hWet - 2.0; bWet = aWet = 1.0; hWet = 0.0;}
-	else if (hWet < 4.0) {dWet = hWet - 3.0; cWet = bWet = aWet = 1.0; hWet = 0.0;}
-	else if (hWet < 5.0) {eWet = hWet - 4.0; dWet = cWet = bWet = aWet = 1.0; hWet = 0.0;}
-	else if (hWet < 6.0) {fWet = hWet - 5.0; eWet = dWet = cWet = bWet = aWet = 1.0; hWet = 0.0;}
-	else if (hWet < 7.0) {gWet = hWet - 6.0; fWet = eWet = dWet = cWet = bWet = aWet = 1.0; hWet = 0.0;}
-	else {hWet -= 7.0; gWet = fWet = eWet = dWet = cWet = bWet = aWet = 1.0;}
+	if (hWet < 1.0f) {aWet = hWet; hWet = 0.0f;}
+	else if (hWet < 2.0f) {bWet = hWet - 1.0f; aWet = 1.0f; hWet = 0.0f;}
+	else if (hWet < 3.0f) {cWet = hWet - 2.0f; bWet = aWet = 1.0f; hWet = 0.0f;}
+	else if (hWet < 4.0f) {dWet = hWet - 3.0f; cWet = bWet = aWet = 1.0f; hWet = 0.0f;}
+	else if (hWet < 5.0f) {eWet = hWet - 4.0f; dWet = cWet = bWet = aWet = 1.0f; hWet = 0.0f;}
+	else if (hWet < 6.0f) {fWet = hWet - 5.0f; eWet = dWet = cWet = bWet = aWet = 1.0f; hWet = 0.0f;}
+	else if (hWet < 7.0f) {gWet = hWet - 6.0f; fWet = eWet = dWet = cWet = bWet = aWet = 1.0f; hWet = 0.0f;}
+	else {hWet -= 7.0f; gWet = fWet = eWet = dWet = cWet = bWet = aWet = 1.0f;}
 	//this is one way to make a little set of dry/wet stages that are successively added to the
 	//output as the control is turned up. Each one independently goes from 0-1 and stays at 1
 	//beyond that point: this is a way to progressively add a 'black box' sound processing
 	//which lets you fall through to simpler processing at lower settings.
 	
-	Float64 gain = GetParameter( kParam_Four );	
-	Float64 wet = GetParameter( kParam_Five );	
+	Float32 gain = GetParameter( kParam_Four );	
+	Float32 wet = GetParameter( kParam_Five );	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		if (aWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleA) + ((0.999-beta) * previousTrendA));
+		if (aWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleA) + ((0.999f-beta) * previousTrendA));
 			forecast = previousSampleA + previousTrendA;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleA = inputSample; previousTrendA = trend;
-			inputSample = (inputSample * aWet) + (drySample * (1.0-aWet));
+			inputSample = (inputSample * aWet) + (drySample * (1.0f-aWet));
 		}
 		
-		if (bWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleB) + ((0.999-beta) * previousTrendB));
+		if (bWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleB) + ((0.999f-beta) * previousTrendB));
 			forecast = previousSampleB + previousTrendB;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleB = inputSample; previousTrendB = trend;
-			inputSample = (inputSample * bWet) + (previousSampleA * (1.0-bWet));
+			inputSample = (inputSample * bWet) + (previousSampleA * (1.0f-bWet));
 		}
 		
-		if (cWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleC) + ((0.999-beta) * previousTrendC));
+		if (cWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleC) + ((0.999f-beta) * previousTrendC));
 			forecast = previousSampleC + previousTrendC;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleC = inputSample; previousTrendC = trend;
-			inputSample = (inputSample * cWet) + (previousSampleB * (1.0-cWet));
+			inputSample = (inputSample * cWet) + (previousSampleB * (1.0f-cWet));
 		}
 		
-		if (dWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleD) + ((0.999-beta) * previousTrendD));
+		if (dWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleD) + ((0.999f-beta) * previousTrendD));
 			forecast = previousSampleD + previousTrendD;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleD = inputSample; previousTrendD = trend;
-			inputSample = (inputSample * dWet) + (previousSampleC * (1.0-dWet));
+			inputSample = (inputSample * dWet) + (previousSampleC * (1.0f-dWet));
 		}
 		
-		if (eWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleE) + ((0.999-beta) * previousTrendE));
+		if (eWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleE) + ((0.999f-beta) * previousTrendE));
 			forecast = previousSampleE + previousTrendE;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleE = inputSample; previousTrendE = trend;
-			inputSample = (inputSample * eWet) + (previousSampleD * (1.0-eWet));
+			inputSample = (inputSample * eWet) + (previousSampleD * (1.0f-eWet));
 		}
 		
-		if (fWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleF) + ((0.999-beta) * previousTrendF));
+		if (fWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleF) + ((0.999f-beta) * previousTrendF));
 			forecast = previousSampleF + previousTrendF;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleF = inputSample; previousTrendF = trend;
-			inputSample = (inputSample * fWet) + (previousSampleE * (1.0-fWet));
+			inputSample = (inputSample * fWet) + (previousSampleE * (1.0f-fWet));
 		}
 		
-		if (gWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleG) + ((0.999-beta) * previousTrendG));
+		if (gWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleG) + ((0.999f-beta) * previousTrendG));
 			forecast = previousSampleG + previousTrendG;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleG = inputSample; previousTrendG = trend;
-			inputSample = (inputSample * gWet) + (previousSampleF * (1.0-gWet));
+			inputSample = (inputSample * gWet) + (previousSampleF * (1.0f-gWet));
 		}
 		
-		if (hWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleH) + ((0.999-beta) * previousTrendH));
+		if (hWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleH) + ((0.999f-beta) * previousTrendH));
 			forecast = previousSampleH + previousTrendH;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleH = inputSample; previousTrendH = trend;
-			inputSample = (inputSample * hWet) + (previousSampleG * (1.0-hWet));
+			inputSample = (inputSample * hWet) + (previousSampleG * (1.0f-hWet));
 		}
 		
-		if (gain < 1.0) {
+		if (gain < 1.0f) {
 			inputSample *= gain;
 		}
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample*wet)+(drySample*(1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample*wet)+(drySample*(1.0f-wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

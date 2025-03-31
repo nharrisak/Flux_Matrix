@@ -31,12 +31,12 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 control;
+		Float32 control;
 		int gcount;		
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[16386];
+			Float32 d[16386];
 	};
 	_dram* dram;
 };
@@ -51,15 +51,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float64 depth = pow(GetParameter( kParam_One ),4);
+	Float32 depth = pow(GetParameter( kParam_One ),4);
 	int offset = (int)(depth * 16383) + 1;	
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Two );
 
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		Float64 drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		Float32 drySample = inputSample;
 
 		if (gcount < 0 || gcount > 16384) {gcount = 16384;}		
 		dram->d[gcount] = fabs(inputSample);
@@ -67,21 +67,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		control -= dram->d[gcount+offset-((gcount+offset > 16384)?16384:0)];
 		gcount--;
 		
-		if (control > offset) control = offset; if (control < 0.0) control = 0.0;				
+		if (control > offset) control = offset; if (control < 0.0f) control = 0.0f;				
 		
-		Float64 burst = inputSample * (control / sqrt(offset));
-		Float64 clamp = inputSample / ((burst == 0.0)?1.0:burst);
+		Float32 burst = inputSample * (control / sqrt(offset));
+		Float32 clamp = inputSample / ((burst == 0.0f)?1.0f:burst);
 		
-		if (clamp > 1.0) clamp = 1.0; if (clamp < 0.0) clamp = 0.0;
+		if (clamp > 1.0f) clamp = 1.0f; if (clamp < 0.0f) clamp = 0.0f;
 		inputSample *= clamp;
-		Float64 difference = drySample - inputSample;
-		if (wet < 0.0) drySample *= (wet+1.0);
+		Float32 difference = drySample - inputSample;
+		if (wet < 0.0f) drySample *= (wet+1.0f);
 		inputSample = drySample - (difference * wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

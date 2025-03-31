@@ -31,13 +31,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastclamp;
-		Float64 clamp;
-		Float64 change;
-		Float64 thirdresult;
-		Float64 prevresult;
-		Float64 last;
-		double fpNShape;
+		Float32 lastclamp;
+		Float32 clamp;
+		Float32 change;
+		Float32 thirdresult;
+		Float32 prevresult;
+		Float32 last;
+		float fpNShape;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -59,25 +59,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 softslew = (pow(GetParameter( kParam_One ),3)*12)+.6;
+	Float32 softslew = (pow(GetParameter( kParam_One ),3)*12)+.6;
 	softslew *= overallscale;
-	Float64 filtercorrect = softslew / 2.0;
-	Float64 thirdfilter = softslew / 3.0;
-	Float64 levelcorrect = 1.0 + (softslew / 6.0);
-	Float64 postfilter;
-	Float64 wet = GetParameter( kParam_Two );
-	Float64 dry = 1.0-wet;
-	Float64 bridgerectifier;
-	Float64 inputSample;
-	Float64 drySample;
+	Float32 filtercorrect = softslew / 2.0f;
+	Float32 thirdfilter = softslew / 3.0f;
+	Float32 levelcorrect = 1.0f + (softslew / 6.0f);
+	Float32 postfilter;
+	Float32 wet = GetParameter( kParam_Two );
+	Float32 dry = 1.0f-wet;
+	Float32 bridgerectifier;
+	Float32 inputSample;
+	Float32 drySample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		
@@ -86,27 +86,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		clamp = inputSample - last;
 		postfilter = change = fabs(clamp - lastclamp);
 		postfilter += filtercorrect;
-		if (change > 1.5707963267949) change = 1.5707963267949;
-		bridgerectifier = (1.0-sin(change));
-		if (bridgerectifier < 0.0) bridgerectifier = 0.0;
+		if (change > 1.5707963267949f) change = 1.5707963267949f;
+		bridgerectifier = (1.0f-sin(change));
+		if (bridgerectifier < 0.0f) bridgerectifier = 0.0f;
 		inputSample = last + (clamp * bridgerectifier);
 		last = inputSample;
 		inputSample /= softslew;
 		inputSample += (thirdresult * thirdfilter);
-		inputSample /= (thirdfilter + 1.0);
+		inputSample /= (thirdfilter + 1.0f);
 		inputSample += (prevresult * postfilter);
-		inputSample /= (postfilter + 1.0);
+		inputSample /= (postfilter + 1.0f);
 		//do an IIR like thing to further squish superdistant stuff
 		thirdresult = prevresult;
 		prevresult = inputSample;
 		inputSample *= levelcorrect;
 
-		if (wet < 1.0) inputSample = (drySample * dry)+(inputSample*wet);
+		if (wet < 1.0f) inputSample = (drySample * dry)+(inputSample*wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

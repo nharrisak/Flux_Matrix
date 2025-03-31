@@ -44,28 +44,28 @@ kParam0, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double bynL[13], bynR[13];
-	double noiseShapingL, noiseShapingR;
+	float bynL[13], bynR[13];
+	float noiseShapingL, noiseShapingR;
 	//NJAD
-	Float64 aL[1503], bL[1503], cL[1503], dL[1503];
-	Float64 aR[1503], bR[1503], cR[1503], dR[1503];
+	Float32 aL[1503], bL[1503], cL[1503], dL[1503];
+	Float32 aR[1503], bR[1503], cR[1503], dR[1503];
 	int ax, bx, cx, dx;
 	//PeaksOnly
-	Float64 lastSampleL, lastSampleR;
+	Float32 lastSampleL, lastSampleR;
 	//SlewOnly
-	Float64 iirSampleAL, iirSampleBL, iirSampleCL, iirSampleDL, iirSampleEL, iirSampleFL, iirSampleGL;
-	Float64 iirSampleHL, iirSampleIL, iirSampleJL, iirSampleKL, iirSampleLL, iirSampleML, iirSampleNL, iirSampleOL, iirSamplePL;
-	Float64 iirSampleQL, iirSampleRL, iirSampleSL;
-	Float64 iirSampleTL, iirSampleUL, iirSampleVL;
-	Float64 iirSampleWL, iirSampleXL, iirSampleYL, iirSampleZL;
+	Float32 iirSampleAL, iirSampleBL, iirSampleCL, iirSampleDL, iirSampleEL, iirSampleFL, iirSampleGL;
+	Float32 iirSampleHL, iirSampleIL, iirSampleJL, iirSampleKL, iirSampleLL, iirSampleML, iirSampleNL, iirSampleOL, iirSamplePL;
+	Float32 iirSampleQL, iirSampleRL, iirSampleSL;
+	Float32 iirSampleTL, iirSampleUL, iirSampleVL;
+	Float32 iirSampleWL, iirSampleXL, iirSampleYL, iirSampleZL;
 	
-	Float64 iirSampleAR, iirSampleBR, iirSampleCR, iirSampleDR, iirSampleER, iirSampleFR, iirSampleGR;
-	Float64 iirSampleHR, iirSampleIR, iirSampleJR, iirSampleKR, iirSampleLR, iirSampleMR, iirSampleNR, iirSampleOR, iirSamplePR;
-	Float64 iirSampleQR, iirSampleRR, iirSampleSR;
-	Float64 iirSampleTR, iirSampleUR, iirSampleVR;
-	Float64 iirSampleWR, iirSampleXR, iirSampleYR, iirSampleZR; // o/`
+	Float32 iirSampleAR, iirSampleBR, iirSampleCR, iirSampleDR, iirSampleER, iirSampleFR, iirSampleGR;
+	Float32 iirSampleHR, iirSampleIR, iirSampleJR, iirSampleKR, iirSampleLR, iirSampleMR, iirSampleNR, iirSampleOR, iirSamplePR;
+	Float32 iirSampleQR, iirSampleRR, iirSampleSR;
+	Float32 iirSampleTR, iirSampleUR, iirSampleVR;
+	Float32 iirSampleWR, iirSampleXR, iirSampleYR, iirSampleZR; // o/`
 	//SubsOnly
-	double biquad[11];
+	float biquad[11];
 	//Bandpasses
 
 	uint32_t fpdL;
@@ -79,32 +79,32 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();	
 	int processing = (int) GetParameter( kParam_One );
-	int am = (int)149.0 * overallscale;
-	int bm = (int)179.0 * overallscale;
-	int cm = (int)191.0 * overallscale;
-	int dm = (int)223.0 * overallscale; //these are 'good' primes, spacing out the allpasses
+	int am = (int)149.0f * overallscale;
+	int bm = (int)179.0f * overallscale;
+	int cm = (int)191.0f * overallscale;
+	int dm = (int)223.0f * overallscale; //these are 'good' primes, spacing out the allpasses
 	int allpasstemp;
 	//for PeaksOnly
-	biquad[0] = 0.0375/overallscale; biquad[1] = 0.1575; //define as AURAT, MONORAT, MONOLAT unless overridden
-	if (processing == kVINYL) {biquad[0] = 0.0385/overallscale; biquad[1] = 0.0825;}
-	if (processing == kPHONE) {biquad[0] = 0.1245/overallscale; biquad[1] = 0.46;}	
-	double K = tan(M_PI * biquad[0]);
-	double norm = 1.0 / (1.0 + K / biquad[1] + K * K);
+	biquad[0] = 0.0375f/overallscale; biquad[1] = 0.1575f; //define as AURAT, MONORAT, MONOLAT unless overridden
+	if (processing == kVINYL) {biquad[0] = 0.0385f/overallscale; biquad[1] = 0.0825f;}
+	if (processing == kPHONE) {biquad[0] = 0.1245f/overallscale; biquad[1] = 0.46f;}	
+	float K = tan(M_PI * biquad[0]);
+	float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
 	biquad[2] = K / biquad[1] * norm;
-	biquad[4] = -biquad[2]; //for bandpass, ignore [3] = 0.0
-	biquad[5] = 2.0 * (K * K - 1.0) * norm;
-	biquad[6] = (1.0 - K / biquad[1] + K * K) * norm;
+	biquad[4] = -biquad[2]; //for bandpass, ignore [3] = 0.0f
+	biquad[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquad[6] = (1.0f - K / biquad[1] + K * K) * norm;
 	//for Bandpasses
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		switch (processing)
 		{
@@ -112,242 +112,242 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			case 1:
 				break;
 			case 2:				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0; inputSampleL = asin(inputSampleL);
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0; inputSampleR = asin(inputSampleR);
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f; inputSampleL = asin(inputSampleL);
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f; inputSampleR = asin(inputSampleR);
 				//amplitude aspect
 				allpasstemp = ax - 1; if (allpasstemp < 0 || allpasstemp > am) allpasstemp = am;
-				inputSampleL -= aL[allpasstemp]*0.5; aL[ax] = inputSampleL; inputSampleL *= 0.5;
-				inputSampleR -= aR[allpasstemp]*0.5; aR[ax] = inputSampleR; inputSampleR *= 0.5;
+				inputSampleL -= aL[allpasstemp]*0.5f; aL[ax] = inputSampleL; inputSampleL *= 0.5f;
+				inputSampleR -= aR[allpasstemp]*0.5f; aR[ax] = inputSampleR; inputSampleR *= 0.5f;
 				ax--; if (ax < 0 || ax > am) {ax = am;}
 				inputSampleL += (aL[ax]);
 				inputSampleR += (aR[ax]);
 				//a single Midiverb-style allpass
 				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0; inputSampleL = asin(inputSampleL);
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0; inputSampleR = asin(inputSampleR);
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f; inputSampleL = asin(inputSampleL);
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f; inputSampleR = asin(inputSampleR);
 				//amplitude aspect
 				
 				allpasstemp = bx - 1; if (allpasstemp < 0 || allpasstemp > bm) allpasstemp = bm;
-				inputSampleL -= bL[allpasstemp]*0.5; bL[bx] = inputSampleL; inputSampleL *= 0.5;
-				inputSampleR -= bR[allpasstemp]*0.5; bR[bx] = inputSampleR; inputSampleR *= 0.5;
+				inputSampleL -= bL[allpasstemp]*0.5f; bL[bx] = inputSampleL; inputSampleL *= 0.5f;
+				inputSampleR -= bR[allpasstemp]*0.5f; bR[bx] = inputSampleR; inputSampleR *= 0.5f;
 				bx--; if (bx < 0 || bx > bm) {bx = bm;}
 				inputSampleL += (bL[bx]);
 				inputSampleR += (bR[bx]);
 				//a single Midiverb-style allpass
 				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0; inputSampleL = asin(inputSampleL);
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0; inputSampleR = asin(inputSampleR);
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f; inputSampleL = asin(inputSampleL);
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f; inputSampleR = asin(inputSampleR);
 				//amplitude aspect
 				
 				allpasstemp = cx - 1; if (allpasstemp < 0 || allpasstemp > cm) allpasstemp = cm;
-				inputSampleL -= cL[allpasstemp]*0.5; cL[cx] = inputSampleL; inputSampleL *= 0.5;
-				inputSampleR -= cR[allpasstemp]*0.5; cR[cx] = inputSampleR; inputSampleR *= 0.5;
+				inputSampleL -= cL[allpasstemp]*0.5f; cL[cx] = inputSampleL; inputSampleL *= 0.5f;
+				inputSampleR -= cR[allpasstemp]*0.5f; cR[cx] = inputSampleR; inputSampleR *= 0.5f;
 				cx--; if (cx < 0 || cx > cm) {cx = cm;}
 				inputSampleL += (cL[cx]);
 				inputSampleR += (cR[cx]);
 				//a single Midiverb-style allpass
 				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0; inputSampleL = asin(inputSampleL);
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0; inputSampleR = asin(inputSampleR);
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f; inputSampleL = asin(inputSampleL);
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f; inputSampleR = asin(inputSampleR);
 				//amplitude aspect
 				
 				allpasstemp = dx - 1; if (allpasstemp < 0 || allpasstemp > dm) allpasstemp = dm;
-				inputSampleL -= dL[allpasstemp]*0.5; dL[dx] = inputSampleL; inputSampleL *= 0.5;
-				inputSampleR -= dR[allpasstemp]*0.5; dR[dx] = inputSampleR; inputSampleR *= 0.5;
+				inputSampleL -= dL[allpasstemp]*0.5f; dL[dx] = inputSampleL; inputSampleL *= 0.5f;
+				inputSampleR -= dR[allpasstemp]*0.5f; dR[dx] = inputSampleR; inputSampleR *= 0.5f;
 				dx--; if (dx < 0 || dx > dm) {dx = dm;}
 				inputSampleL += (dL[dx]);
 				inputSampleR += (dR[dx]);
 				//a single Midiverb-style allpass
 				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0; inputSampleL = asin(inputSampleL);
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0; inputSampleR = asin(inputSampleR);
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f; inputSampleL = asin(inputSampleL);
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f; inputSampleR = asin(inputSampleR);
 				//amplitude aspect
 				
-				inputSampleL *= 0.63679; inputSampleR *= 0.63679; //scale it to 0dB output at full blast
+				inputSampleL *= 0.63679f; inputSampleR *= 0.63679f; //scale it to 0dB output at full blast
 				//PeaksOnly
 				break;
 			case 3:
-				Float64 trim;
-				trim = 2.302585092994045684017991; //natural logarithm of 10
-				double slewSample; slewSample = (inputSampleL - lastSampleL)*trim;
+				Float32 trim;
+				trim = 2.302585092994045684017991f; //natural logarithm of 10
+				float slewSample; slewSample = (inputSampleL - lastSampleL)*trim;
 				lastSampleL = inputSampleL;
-				if (slewSample > 1.0) slewSample = 1.0; if (slewSample < -1.0) slewSample = -1.0;
+				if (slewSample > 1.0f) slewSample = 1.0f; if (slewSample < -1.0f) slewSample = -1.0f;
 				inputSampleL = slewSample;
 				slewSample = (inputSampleR - lastSampleR)*trim;
 				lastSampleR = inputSampleR;
-				if (slewSample > 1.0) slewSample = 1.0; if (slewSample < -1.0) slewSample = -1.0;
+				if (slewSample > 1.0f) slewSample = 1.0f; if (slewSample < -1.0f) slewSample = -1.0f;
 				inputSampleR = slewSample;
 				//SlewOnly
 				break;
 			case 4:
-				Float64 iirAmount; iirAmount = (2250/44100.0) / overallscale;
-				Float64 gain; gain = 1.42;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
+				Float32 iirAmount; iirAmount = (2250/44100.0f) / overallscale;
+				Float32 gain; gain = 1.42f;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
 				
-				iirSampleAL = (iirSampleAL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleAL;
-				iirSampleAR = (iirSampleAR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleAR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleAL = (iirSampleAL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleAL;
+				iirSampleAR = (iirSampleAR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleAR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleBL = (iirSampleBL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleBL;
-				iirSampleBR = (iirSampleBR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleBR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleBL = (iirSampleBL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleBL;
+				iirSampleBR = (iirSampleBR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleBR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleCL = (iirSampleCL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleCL;
-				iirSampleCR = (iirSampleCR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleCR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleCL = (iirSampleCL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleCL;
+				iirSampleCR = (iirSampleCR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleCR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleDL = (iirSampleDL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleDL;
-				iirSampleDR = (iirSampleDR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleDR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleDL = (iirSampleDL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleDL;
+				iirSampleDR = (iirSampleDR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleDR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleEL = (iirSampleEL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleEL;
-				iirSampleER = (iirSampleER * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleER;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleEL = (iirSampleEL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleEL;
+				iirSampleER = (iirSampleER * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleER;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleFL = (iirSampleFL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleFL;
-				iirSampleFR = (iirSampleFR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleFR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleFL = (iirSampleFL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleFL;
+				iirSampleFR = (iirSampleFR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleFR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleGL = (iirSampleGL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleGL;
-				iirSampleGR = (iirSampleGR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleGR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleGL = (iirSampleGL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleGL;
+				iirSampleGR = (iirSampleGR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleGR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleHL = (iirSampleHL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleHL;
-				iirSampleHR = (iirSampleHR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleHR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleHL = (iirSampleHL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleHL;
+				iirSampleHR = (iirSampleHR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleHR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleIL = (iirSampleIL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleIL;
-				iirSampleIR = (iirSampleIR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleIR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleIL = (iirSampleIL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleIL;
+				iirSampleIR = (iirSampleIR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleIR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleJL = (iirSampleJL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleJL;
-				iirSampleJR = (iirSampleJR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleJR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleJL = (iirSampleJL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleJL;
+				iirSampleJR = (iirSampleJR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleJR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleKL = (iirSampleKL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleKL;
-				iirSampleKR = (iirSampleKR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleKR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleKL = (iirSampleKL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleKL;
+				iirSampleKR = (iirSampleKR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleKR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleLL = (iirSampleLL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleLL;
-				iirSampleLR = (iirSampleLR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleLR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleLL = (iirSampleLL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleLL;
+				iirSampleLR = (iirSampleLR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleLR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleML = (iirSampleML * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleML;
-				iirSampleMR = (iirSampleMR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleMR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleML = (iirSampleML * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleML;
+				iirSampleMR = (iirSampleMR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleMR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleNL = (iirSampleNL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleNL;
-				iirSampleNR = (iirSampleNR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleNR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleNL = (iirSampleNL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleNL;
+				iirSampleNR = (iirSampleNR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleNR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleOL = (iirSampleOL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleOL;
-				iirSampleOR = (iirSampleOR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleOR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleOL = (iirSampleOL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleOL;
+				iirSampleOR = (iirSampleOR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleOR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSamplePL = (iirSamplePL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSamplePL;
-				iirSamplePR = (iirSamplePR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSamplePR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSamplePL = (iirSamplePL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSamplePL;
+				iirSamplePR = (iirSamplePR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSamplePR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleQL = (iirSampleQL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleQL;
-				iirSampleQR = (iirSampleQR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleQR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleQL = (iirSampleQL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleQL;
+				iirSampleQR = (iirSampleQR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleQR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleRL = (iirSampleRL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleRL;
-				iirSampleRR = (iirSampleRR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleRR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleRL = (iirSampleRL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleRL;
+				iirSampleRR = (iirSampleRR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleRR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleSL = (iirSampleSL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleSL;
-				iirSampleSR = (iirSampleSR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleSR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleSL = (iirSampleSL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleSL;
+				iirSampleSR = (iirSampleSR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleSR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleTL = (iirSampleTL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleTL;
-				iirSampleTR = (iirSampleTR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleTR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleTL = (iirSampleTL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleTL;
+				iirSampleTR = (iirSampleTR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleTR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleUL = (iirSampleUL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleUL;
-				iirSampleUR = (iirSampleUR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleUR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleUL = (iirSampleUL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleUL;
+				iirSampleUR = (iirSampleUR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleUR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleVL = (iirSampleVL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleVL;
-				iirSampleVR = (iirSampleVR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleVR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleVL = (iirSampleVL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleVL;
+				iirSampleVR = (iirSampleVR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleVR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleWL = (iirSampleWL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleWL;
-				iirSampleWR = (iirSampleWR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleWR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleWL = (iirSampleWL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleWL;
+				iirSampleWR = (iirSampleWR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleWR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleXL = (iirSampleXL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleXL;
-				iirSampleXR = (iirSampleXR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleXR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleXL = (iirSampleXL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleXL;
+				iirSampleXR = (iirSampleXR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleXR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleYL = (iirSampleYL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleYL;
-				iirSampleYR = (iirSampleYR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleYR;
-				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75)+1;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				iirSampleYL = (iirSampleYL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleYL;
+				iirSampleYR = (iirSampleYR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleYR;
+				inputSampleL *= gain; inputSampleR *= gain; gain = ((gain-1)*0.75f)+1;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				
-				iirSampleZL = (iirSampleZL * (1.0-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleZL;
-				iirSampleZR = (iirSampleZR * (1.0-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleZR;
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;				
+				iirSampleZL = (iirSampleZL * (1.0f-iirAmount)) + (inputSampleL * iirAmount); inputSampleL = iirSampleZL;
+				iirSampleZR = (iirSampleZR * (1.0f-iirAmount)) + (inputSampleR * iirAmount); inputSampleR = iirSampleZR;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;				
 				//SubsOnly
 				break;
 			case 5:
 			case 6:
-				double mid; mid = inputSampleL + inputSampleR;
-				double side; side = inputSampleL - inputSampleR;
-				if (processing < 6) side = 0.0;
-				else mid = 0.0; //mono monitoring, or side-only monitoring
-				inputSampleL = (mid+side)/2.0;
-				inputSampleR = (mid-side)/2.0; 
+				float mid; mid = inputSampleL + inputSampleR;
+				float side; side = inputSampleL - inputSampleR;
+				if (processing < 6) side = 0.0f;
+				else mid = 0.0f; //mono monitoring, or side-only monitoring
+				inputSampleL = (mid+side)/2.0f;
+				inputSampleR = (mid-side)/2.0f; 
 				break;
 			case 7:
 			case 8:
@@ -357,25 +357,25 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				//Bandpass: changes in EQ are up in the variable defining, not here
 				//7 Vinyl, 8 9 10 Aurat, 11 Phone
 				
-				if (processing == 9) {inputSampleR = (inputSampleL + inputSampleR)*0.5;inputSampleL = 0.0;}
-				if (processing == 10) {inputSampleL = (inputSampleL + inputSampleR)*0.5;inputSampleR = 0.0;}
-				if (processing == 11) {double M; M = (inputSampleL + inputSampleR)*0.5; inputSampleL = M;inputSampleR = M;}
+				if (processing == 9) {inputSampleR = (inputSampleL + inputSampleR)*0.5f;inputSampleL = 0.0f;}
+				if (processing == 10) {inputSampleL = (inputSampleL + inputSampleR)*0.5f;inputSampleR = 0.0f;}
+				if (processing == 11) {float M; M = (inputSampleL + inputSampleR)*0.5f; inputSampleL = M;inputSampleR = M;}
 				
 				inputSampleL = sin(inputSampleL); inputSampleR = sin(inputSampleR);
 				//encode Console5: good cleanness
 				
-				double tempSampleL; tempSampleL = (inputSampleL * biquad[2]) + biquad[7];
+				float tempSampleL; tempSampleL = (inputSampleL * biquad[2]) + biquad[7];
 				biquad[7] = (-tempSampleL * biquad[5]) + biquad[8];
 				biquad[8] = (inputSampleL * biquad[4]) - (tempSampleL * biquad[6]);
 				inputSampleL = tempSampleL; //like mono AU, 7 and 8 store L channel
 				
-				double tempSampleR; tempSampleR = (inputSampleR * biquad[2]) + biquad[9];
+				float tempSampleR; tempSampleR = (inputSampleR * biquad[2]) + biquad[9];
 				biquad[9] = (-tempSampleR * biquad[5]) + biquad[10];
 				biquad[10] = (inputSampleR * biquad[4]) - (tempSampleR * biquad[6]);
 				inputSampleR = tempSampleR; //note: 9 and 10 store the R channel
 				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0;
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0;
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f;
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 				//without this, you can get a NaN condition where it spits out DC offset at full blast!
 				inputSampleL = asin(inputSampleL); inputSampleR = asin(inputSampleR);
 				//amplitude aspect
@@ -384,53 +384,53 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			case 13:
 			case 14:
 			case 15:
-				if (processing == 12) {inputSampleL *= 0.855; inputSampleR *= 0.855;}
-				if (processing == 13) {inputSampleL *= 0.748; inputSampleR *= 0.748;}
-				if (processing == 14) {inputSampleL *= 0.713; inputSampleR *= 0.713;}
-				if (processing == 15) {inputSampleL *= 0.680; inputSampleR *= 0.680;}
+				if (processing == 12) {inputSampleL *= 0.855f; inputSampleR *= 0.855f;}
+				if (processing == 13) {inputSampleL *= 0.748f; inputSampleR *= 0.748f;}
+				if (processing == 14) {inputSampleL *= 0.713f; inputSampleR *= 0.713f;}
+				if (processing == 15) {inputSampleL *= 0.680f; inputSampleR *= 0.680f;}
 				//we do a volume compensation immediately to gain stage stuff cleanly
 				inputSampleL = sin(inputSampleL);
 				inputSampleR = sin(inputSampleR);
-				double drySampleL; drySampleL = inputSampleL;
-				double drySampleR; drySampleR = inputSampleR; //everything runs 'inside' Console
-				double bass; bass = (processing * processing * 0.00001) / overallscale;
+				float drySampleL; drySampleL = inputSampleL;
+				float drySampleR; drySampleR = inputSampleR; //everything runs 'inside' Console
+				float bass; bass = (processing * processing * 0.00001f) / overallscale;
 				//we are using the iir filters from out of SubsOnly
 				
 				mid = inputSampleL + inputSampleR; side = inputSampleL - inputSampleR;
-				iirSampleAL = (iirSampleAL * (1.0 - (bass*0.618))) + (side * bass * 0.618); side = side - iirSampleAL;
-				inputSampleL = (mid+side)/2.0; inputSampleR = (mid-side)/2.0;
+				iirSampleAL = (iirSampleAL * (1.0f - (bass*0.618f))) + (side * bass * 0.618f); side = side - iirSampleAL;
+				inputSampleL = (mid+side)/2.0f; inputSampleR = (mid-side)/2.0f;
 				//bass narrowing filter				
 								
 				allpasstemp = ax - 1; if (allpasstemp < 0 || allpasstemp > am) allpasstemp = am;
-				inputSampleL -= aL[allpasstemp]*0.5; aL[ax] = inputSampleL; inputSampleL *= 0.5;
-				inputSampleR -= aR[allpasstemp]*0.5; aR[ax] = inputSampleR; inputSampleR *= 0.5;
+				inputSampleL -= aL[allpasstemp]*0.5f; aL[ax] = inputSampleL; inputSampleL *= 0.5f;
+				inputSampleR -= aR[allpasstemp]*0.5f; aR[ax] = inputSampleR; inputSampleR *= 0.5f;
 				
 				ax--; if (ax < 0 || ax > am) {ax = am;}
-				inputSampleL += (aL[ax])*0.5; inputSampleR += (aR[ax])*0.5;
-				if (ax == am) {inputSampleL += (aL[0])*0.5; inputSampleR += (aR[0])*0.5;}
-				else {inputSampleL += (aL[ax+1])*0.5; inputSampleR += (aR[ax+1])*0.5;}
+				inputSampleL += (aL[ax])*0.5f; inputSampleR += (aR[ax])*0.5f;
+				if (ax == am) {inputSampleL += (aL[0])*0.5f; inputSampleR += (aR[0])*0.5f;}
+				else {inputSampleL += (aL[ax+1])*0.5f; inputSampleR += (aR[ax+1])*0.5f;}
 				//a darkened Midiverb-style allpass
 				
-				if (processing == 12) {inputSampleL *= 0.125; inputSampleR *= 0.125;}
-				if (processing == 13) {inputSampleL *= 0.25; inputSampleR *= 0.25;}
-				if (processing == 14) {inputSampleL *= 0.30; inputSampleR *= 0.30;}
-				if (processing == 15) {inputSampleL *= 0.35; inputSampleR *= 0.35;}
+				if (processing == 12) {inputSampleL *= 0.125f; inputSampleR *= 0.125f;}
+				if (processing == 13) {inputSampleL *= 0.25f; inputSampleR *= 0.25f;}
+				if (processing == 14) {inputSampleL *= 0.30f; inputSampleR *= 0.30f;}
+				if (processing == 15) {inputSampleL *= 0.35f; inputSampleR *= 0.35f;}
 				//Cans A suppresses the crossfeed more, Cans B makes it louder
 								
 				drySampleL += inputSampleR;
 				drySampleR += inputSampleL; //the crossfeed
 				
 				allpasstemp = dx - 1; if (allpasstemp < 0 || allpasstemp > dm) allpasstemp = dm;
-				inputSampleL -= dL[allpasstemp]*0.5; dL[dx] = inputSampleL; inputSampleL *= 0.5;
-				inputSampleR -= dR[allpasstemp]*0.5; dR[dx] = inputSampleR; inputSampleR *= 0.5;
+				inputSampleL -= dL[allpasstemp]*0.5f; dL[dx] = inputSampleL; inputSampleL *= 0.5f;
+				inputSampleR -= dR[allpasstemp]*0.5f; dR[dx] = inputSampleR; inputSampleR *= 0.5f;
 				
 				dx--; if (dx < 0 || dx > dm) {dx = dm;}
-				inputSampleL += (dL[dx])*0.5; inputSampleR += (dR[dx])*0.5;
-				if (dx == dm) {inputSampleL += (dL[0])*0.5; inputSampleR += (dR[0])*0.5;}
-				else {inputSampleL += (dL[dx+1])*0.5; inputSampleR += (dR[dx+1])*0.5;}
+				inputSampleL += (dL[dx])*0.5f; inputSampleR += (dR[dx])*0.5f;
+				if (dx == dm) {inputSampleL += (dL[0])*0.5f; inputSampleR += (dR[0])*0.5f;}
+				else {inputSampleL += (dL[dx+1])*0.5f; inputSampleR += (dR[dx+1])*0.5f;}
 				//a darkened Midiverb-style allpass, which is stretching the previous one even more
 				
-				inputSampleL *= 0.25; inputSampleR *= 0.25;
+				inputSampleL *= 0.25f; inputSampleR *= 0.25f;
 				//for all versions of Cans the second level of bloom is this far down
 				//and, remains on the opposite speaker rather than crossing again to the original side
 				
@@ -441,16 +441,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				inputSampleR = drySampleR; //and output our can-opened headphone feed
 				
 				mid = inputSampleL + inputSampleR; side = inputSampleL - inputSampleR;
-				iirSampleAR = (iirSampleAR * (1.0 - bass)) + (side * bass); side = side - iirSampleAR;
-				inputSampleL = (mid+side)/2.0; inputSampleR = (mid-side)/2.0;
+				iirSampleAR = (iirSampleAR * (1.0f - bass)) + (side * bass); side = side - iirSampleAR;
+				inputSampleL = (mid+side)/2.0f; inputSampleR = (mid-side)/2.0f;
 				//bass narrowing filter
 				
-				if (inputSampleL > 1.0) inputSampleL = 1.0; if (inputSampleL < -1.0) inputSampleL = -1.0; inputSampleL = asin(inputSampleL);
-				if (inputSampleR > 1.0) inputSampleR = 1.0; if (inputSampleR < -1.0) inputSampleR = -1.0; inputSampleR = asin(inputSampleR);
+				if (inputSampleL > 1.0f) inputSampleL = 1.0f; if (inputSampleL < -1.0f) inputSampleL = -1.0f; inputSampleL = asin(inputSampleL);
+				if (inputSampleR > 1.0f) inputSampleR = 1.0f; if (inputSampleR < -1.0f) inputSampleR = -1.0f; inputSampleR = asin(inputSampleR);
 				//ConsoleBuss processing
 				break;
 			case 16:
-				double inputSample = (inputSampleL + inputSampleR) * 0.5;
+				float inputSample = (inputSampleL + inputSampleR) * 0.5f;
 				inputSampleL = -inputSample;
 				inputSampleR = inputSample;
 				break;
@@ -459,27 +459,27 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		//begin Not Just Another Dither
 		if (processing == 1) {
-			inputSampleL = inputSampleL * 32768.0; //or 16 bit option
-			inputSampleR = inputSampleR * 32768.0; //or 16 bit option
+			inputSampleL = inputSampleL * 32768.0f; //or 16 bit option
+			inputSampleR = inputSampleR * 32768.0f; //or 16 bit option
 		} else {
-			inputSampleL = inputSampleL * 8388608.0; //for literally everything else
-			inputSampleR = inputSampleR * 8388608.0; //we will apply the 24 bit NJAD
+			inputSampleL = inputSampleL * 8388608.0f; //for literally everything else
+			inputSampleR = inputSampleR * 8388608.0f; //we will apply the 24 bit NJAD
 		} //on the not unreasonable assumption that we are very likely playing back on 24 bit DAC
 		//if we're not, then all we did was apply a Benford Realness function at 24 bits down.
 		
 		bool cutbinsL; cutbinsL = false;
 		bool cutbinsR; cutbinsR = false;
-		double drySampleL; drySampleL = inputSampleL;
-		double drySampleR; drySampleR = inputSampleR;
+		float drySampleL; drySampleL = inputSampleL;
+		float drySampleR; drySampleR = inputSampleR;
 		inputSampleL -= noiseShapingL;
 		inputSampleR -= noiseShapingR;
 		//NJAD L
-		double benfordize; benfordize = floor(inputSampleL);
-		while (benfordize >= 1.0) benfordize /= 10;
-		while (benfordize < 1.0 && benfordize > 0.0000001) benfordize *= 10;
+		float benfordize; benfordize = floor(inputSampleL);
+		while (benfordize >= 1.0f) benfordize /= 10;
+		while (benfordize < 1.0f && benfordize > 0.0000001f) benfordize *= 10;
 		int hotbinA; hotbinA = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number floored
-		double totalA; totalA = 0;
+		float totalA; totalA = 0;
 		if ((hotbinA > 0) && (hotbinA < 10))
 		{
 			bynL[hotbinA] += 1; if (bynL[hotbinA] > 982) cutbinsL = true;
@@ -489,11 +489,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		} else hotbinA = 10;
 		//produce total number- smaller is closer to Benford real
 		benfordize = ceil(inputSampleL);
-		while (benfordize >= 1.0) benfordize /= 10;
-		while (benfordize < 1.0 && benfordize > 0.0000001) benfordize *= 10;
+		while (benfordize >= 1.0f) benfordize /= 10;
+		while (benfordize < 1.0f && benfordize > 0.0000001f) benfordize *= 10;
 		int hotbinB; hotbinB = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number ceiled
-		double totalB; totalB = 0;
+		float totalB; totalB = 0;
 		if ((hotbinB > 0) && (hotbinB < 10))
 		{
 			bynL[hotbinB] += 1; if (bynL[hotbinB] > 982) cutbinsL = true;
@@ -502,28 +502,28 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			totalB += (58-bynL[7]); totalB += (51-bynL[8]); totalB += (46-bynL[9]); bynL[hotbinB] -= 1;
 		} else hotbinB = 10;
 		//produce total number- smaller is closer to Benford real
-		double outputSample;
+		float outputSample;
 		if (totalA < totalB) {bynL[hotbinA] += 1; outputSample = floor(inputSampleL);}
 		else {bynL[hotbinB] += 1; outputSample = floor(inputSampleL+1);}
 		//assign the relevant one to the delay line
 		//and floor/ceil signal accordingly
 		if (cutbinsL) {
-			bynL[1] *= 0.99; bynL[2] *= 0.99; bynL[3] *= 0.99; bynL[4] *= 0.99; bynL[5] *= 0.99; 
-			bynL[6] *= 0.99; bynL[7] *= 0.99; bynL[8] *= 0.99; bynL[9] *= 0.99; bynL[10] *= 0.99; 
+			bynL[1] *= 0.99f; bynL[2] *= 0.99f; bynL[3] *= 0.99f; bynL[4] *= 0.99f; bynL[5] *= 0.99f; 
+			bynL[6] *= 0.99f; bynL[7] *= 0.99f; bynL[8] *= 0.99f; bynL[9] *= 0.99f; bynL[10] *= 0.99f; 
 		}
 		noiseShapingL += outputSample - drySampleL;			
 		if (noiseShapingL > fabs(inputSampleL)) noiseShapingL = fabs(inputSampleL);
 		if (noiseShapingL < -fabs(inputSampleL)) noiseShapingL = -fabs(inputSampleL);
-		if (processing == 1) inputSampleL = outputSample / 32768.0;
-		else inputSampleL = outputSample / 8388608.0;
-		if (inputSampleL > 1.0) inputSampleL = 1.0;
-		if (inputSampleL < -1.0) inputSampleL = -1.0;
+		if (processing == 1) inputSampleL = outputSample / 32768.0f;
+		else inputSampleL = outputSample / 8388608.0f;
+		if (inputSampleL > 1.0f) inputSampleL = 1.0f;
+		if (inputSampleL < -1.0f) inputSampleL = -1.0f;
 		//finished NJAD L
 		
 		//NJAD R
 		benfordize = floor(inputSampleR);
-		while (benfordize >= 1.0) benfordize /= 10;
-		while (benfordize < 1.0 && benfordize > 0.0000001) benfordize *= 10;		
+		while (benfordize >= 1.0f) benfordize /= 10;
+		while (benfordize < 1.0f && benfordize > 0.0000001f) benfordize *= 10;		
 		hotbinA = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number floored
 		totalA = 0;
@@ -536,8 +536,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		} else hotbinA = 10;
 		//produce total number- smaller is closer to Benford real
 		benfordize = ceil(inputSampleR);
-		while (benfordize >= 1.0) benfordize /= 10;
-		while (benfordize < 1.0 && benfordize > 0.0000001) benfordize *= 10;		
+		while (benfordize >= 1.0f) benfordize /= 10;
+		while (benfordize < 1.0f && benfordize > 0.0000001f) benfordize *= 10;		
 		hotbinB = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number ceiled
 		totalB = 0;
@@ -554,16 +554,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//assign the relevant one to the delay line
 		//and floor/ceil signal accordingly
 		if (cutbinsR) {
-			bynR[1] *= 0.99; bynR[2] *= 0.99; bynR[3] *= 0.99; bynR[4] *= 0.99; bynR[5] *= 0.99; 
-			bynR[6] *= 0.99; bynR[7] *= 0.99; bynR[8] *= 0.99; bynR[9] *= 0.99; bynR[10] *= 0.99; 
+			bynR[1] *= 0.99f; bynR[2] *= 0.99f; bynR[3] *= 0.99f; bynR[4] *= 0.99f; bynR[5] *= 0.99f; 
+			bynR[6] *= 0.99f; bynR[7] *= 0.99f; bynR[8] *= 0.99f; bynR[9] *= 0.99f; bynR[10] *= 0.99f; 
 		}
 		noiseShapingR += outputSample - drySampleR;			
 		if (noiseShapingR > fabs(inputSampleR)) noiseShapingR = fabs(inputSampleR);
 		if (noiseShapingR < -fabs(inputSampleR)) noiseShapingR = -fabs(inputSampleR);
-		if (processing == 1) inputSampleR = outputSample / 32768.0;
-		else inputSampleR = outputSample / 8388608.0;
-		if (inputSampleR > 1.0) inputSampleR = 1.0;
-		if (inputSampleR < -1.0) inputSampleR = -1.0;
+		if (processing == 1) inputSampleR = outputSample / 32768.0f;
+		else inputSampleR = outputSample / 8388608.0f;
+		if (inputSampleR > 1.0f) inputSampleR = 1.0f;
+		if (inputSampleR < -1.0f) inputSampleR = -1.0f;
 		//finished NJAD R		
 		
 		//does not use 32 bit stereo floating point dither

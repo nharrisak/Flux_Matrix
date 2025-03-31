@@ -31,10 +31,10 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		Float64 controlpos;
-		Float64 controlneg;
-		Float64 targetpos;
-		Float64 targetneg;
+		Float32 controlpos;
+		Float32 controlneg;
+		Float32 targetpos;
+		Float32 targetneg;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -51,52 +51,52 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 2.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 2.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 inputpos;
-	Float64 inputneg;
-	Float64 calcpos;
-	Float64 calcneg;
-	Float64 outputpos;
-	Float64 outputneg;
-	double totalmultiplier;
-	double inputSample;
-	Float64 drySample;
-	Float64 inputgain = pow(10.0,(GetParameter( kParam_One )*14.0)/20.0);
-	Float64 wet = GetParameter( kParam_Two );
+	Float32 inputpos;
+	Float32 inputneg;
+	Float32 calcpos;
+	Float32 calcneg;
+	Float32 outputpos;
+	Float32 outputneg;
+	float totalmultiplier;
+	float inputSample;
+	Float32 drySample;
+	Float32 inputgain = pow(10.0f,(GetParameter( kParam_One )*14.0f)/20.0f);
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
-	Float64 outputgain = inputgain;
-	outputgain -= 1.0;
-	outputgain /= 1.5;
-	outputgain += 1.0;
-	Float64 divisor = 0.012 * (GetParameter( kParam_One ) / 135.0);
+	Float32 outputgain = inputgain;
+	outputgain -= 1.0f;
+	outputgain /= 1.5f;
+	outputgain += 1.0f;
+	Float32 divisor = 0.012f * (GetParameter( kParam_One ) / 135.0f);
 	divisor /= overallscale;
-	Float64 remainder = divisor;
-	divisor = 1.0 - divisor;
+	Float32 remainder = divisor;
+	divisor = 1.0f - divisor;
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		inputSample *= inputgain;		
-		inputpos = inputSample + 1.0;
-		if (inputpos < 0.0) inputpos = 0.0;
-		outputpos = inputpos / 2.0;
-		if (outputpos > 1.0) outputpos = 1.0;		
+		inputpos = inputSample + 1.0f;
+		if (inputpos < 0.0f) inputpos = 0.0f;
+		outputpos = inputpos / 2.0f;
+		if (outputpos > 1.0f) outputpos = 1.0f;		
 		inputpos *= inputpos;
 		targetpos *= divisor;
 		targetpos += (inputpos * remainder);
-		calcpos = pow((1.0/targetpos),2);
+		calcpos = pow((1.0f/targetpos),2);
 
-		inputneg = (-inputSample) + 1.0;
-		if (inputneg < 0.0) inputneg = 0.0;
-		outputneg = inputneg / 2.0;
-		if (outputneg > 1.0) outputneg = 1.0;		
+		inputneg = (-inputSample) + 1.0f;
+		if (inputneg < 0.0f) inputneg = 0.0f;
+		outputneg = inputneg / 2.0f;
+		if (outputneg > 1.0f) outputneg = 1.0f;		
 		inputneg *= inputneg;
 		targetneg *= divisor;
 		targetneg += (inputneg * remainder);
-		calcneg = pow((1.0/targetneg),2);
+		calcneg = pow((1.0f/targetneg),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 
@@ -124,12 +124,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		inputSample *= totalmultiplier;
 		inputSample /= outputgain;
-		if (wet < 1.0) inputSample = (drySample * (1.0-wet))+(inputSample*wet);
+		if (wet < 1.0f) inputSample = (drySample * (1.0f-wet))+(inputSample*wet);
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

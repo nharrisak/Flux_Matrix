@@ -37,22 +37,22 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 presenceInA[7];
-		Float64 presenceOutA[7];
-		Float64 highInA[7];
-		Float64 highOutA[7];
-		Float64 midInA[7];
-		Float64 midOutA[7];
-		Float64 lowInA[7];
-		Float64 lowOutA[7];
-		Float64 presenceInB[7];
-		Float64 presenceOutB[7];
-		Float64 highInB[7];
-		Float64 highOutB[7];
-		Float64 midInB[7];
-		Float64 midOutB[7];
-		Float64 lowInB[7];
-		Float64 lowOutB[7];
+		Float32 presenceInA[7];
+		Float32 presenceOutA[7];
+		Float32 highInA[7];
+		Float32 highOutA[7];
+		Float32 midInA[7];
+		Float32 midOutA[7];
+		Float32 lowInA[7];
+		Float32 lowOutA[7];
+		Float32 presenceInB[7];
+		Float32 presenceOutB[7];
+		Float32 highInB[7];
+		Float32 highOutB[7];
+		Float32 midInB[7];
+		Float32 midOutB[7];
+		Float32 lowInB[7];
+		Float32 lowOutB[7];
 		bool flip;
 		uint32_t fpd;
 	
@@ -70,19 +70,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 sum;
-	Float64 presence = pow(GetParameter( kParam_One ),5) * 8.0;
-	Float64 high = pow(GetParameter( kParam_Two ),3) * 4.0;
-	Float64 mid = pow(GetParameter( kParam_Three ),2);
-	Float64 low = GetParameter( kParam_Four ) / 4.0;
-	Float64 drive = GetParameter( kParam_Five ) * 2.0;
-	Float64 bridgerectifier;
+	Float32 sum;
+	Float32 presence = pow(GetParameter( kParam_One ),5) * 8.0f;
+	Float32 high = pow(GetParameter( kParam_Two ),3) * 4.0f;
+	Float32 mid = pow(GetParameter( kParam_Three ),2);
+	Float32 low = GetParameter( kParam_Four ) / 4.0f;
+	Float32 drive = GetParameter( kParam_Five ) * 2.0f;
+	Float32 bridgerectifier;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		sum = 0.0;
+		sum = 0.0f;
 		
 		
 		if (flip)
@@ -91,66 +91,66 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			presenceInA[3] = presenceInA[4]; presenceInA[4] = presenceInA[5]; presenceInA[5] = presenceInA[6]; 
 			presenceInA[6] = inputSample * presence; presenceOutA[2] = presenceOutA[3];
 			presenceOutA[3] = presenceOutA[4]; presenceOutA[4] = presenceOutA[5]; presenceOutA[5] = presenceOutA[6]; 
-			presenceOutA[6] = (presenceInA[0] + presenceInA[6]) + 1.9152966321 * (presenceInA[1] + presenceInA[5]) 
-			- (presenceInA[2] + presenceInA[4]) - 3.8305932641 * presenceInA[3]
-			+ ( -0.2828214615 * presenceOutA[2]) + (  0.2613069963 * presenceOutA[3])
-			+ ( -0.8628193852 * presenceOutA[4]) + (  0.5387164389 * presenceOutA[5]);
+			presenceOutA[6] = (presenceInA[0] + presenceInA[6]) + 1.9152966321f * (presenceInA[1] + presenceInA[5]) 
+			- (presenceInA[2] + presenceInA[4]) - 3.8305932641f * presenceInA[3]
+			+ ( -0.2828214615f * presenceOutA[2]) + (  0.2613069963f * presenceOutA[3])
+			+ ( -0.8628193852f * presenceOutA[4]) + (  0.5387164389f * presenceOutA[5]);
 			bridgerectifier = fabs(presenceOutA[6]);
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (presenceOutA[6] > 0.0){sum += bridgerectifier;}
+			if (presenceOutA[6] > 0.0f){sum += bridgerectifier;}
 			else {sum -= bridgerectifier;}			
 			//presence section
 			
 			highInA[0] = highInA[1]; highInA[1] = highInA[2]; highInA[2] = highInA[3];
 			highInA[3] = highInA[4]; highInA[4] = highInA[5]; highInA[5] = highInA[6]; 
 			bridgerectifier = fabs(inputSample) * high;
-			if (bridgerectifier > 1.57079633) {bridgerectifier = 1.57079633;}
+			if (bridgerectifier > 1.57079633f) {bridgerectifier = 1.57079633f;}
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) {highInA[6] = bridgerectifier;}
+			if (inputSample > 0.0f) {highInA[6] = bridgerectifier;}
 			else {highInA[6] = -bridgerectifier;}
 			highInA[6] *= high; highOutA[2] = highOutA[3];
 			highOutA[3] = highOutA[4]; highOutA[4] = highOutA[5]; highOutA[5] = highOutA[6]; 
-			highOutA[6] = (highInA[0] + highInA[6]) -   0.5141967433 * (highInA[1] + highInA[5]) 
-			- (highInA[2] + highInA[4]) +   1.0283934866 * highInA[3]
-			+ ( -0.2828214615 * highOutA[2]) + (  1.0195930909 * highOutA[3])
-			+ ( -1.9633013869 * highOutA[4]) + (  2.1020162751 * highOutA[5]);
+			highOutA[6] = (highInA[0] + highInA[6]) -   0.5141967433f * (highInA[1] + highInA[5]) 
+			- (highInA[2] + highInA[4]) +   1.0283934866f * highInA[3]
+			+ ( -0.2828214615f * highOutA[2]) + (  1.0195930909f * highOutA[3])
+			+ ( -1.9633013869f * highOutA[4]) + (  2.1020162751f * highOutA[5]);
 			bridgerectifier = fabs(highOutA[6]);
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (highOutA[6] > 0.0){sum += bridgerectifier;}
+			if (highOutA[6] > 0.0f){sum += bridgerectifier;}
 			else {sum -= bridgerectifier;}			
 			//high section
 			
 			midInA[0] = midInA[1]; midInA[1] = midInA[2]; midInA[2] = midInA[3];
 			midInA[3] = midInA[4]; midInA[4] = midInA[5]; midInA[5] = midInA[6]; 
 			bridgerectifier = fabs(inputSample) * mid;
-			if (bridgerectifier > 1.57079633) {bridgerectifier = 1.57079633;}
+			if (bridgerectifier > 1.57079633f) {bridgerectifier = 1.57079633f;}
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) {midInA[6] = bridgerectifier;}
+			if (inputSample > 0.0f) {midInA[6] = bridgerectifier;}
 			else {midInA[6] = -bridgerectifier;}
 			midInA[6] *= mid; midOutA[2] = midOutA[3];
 			midOutA[3] = midOutA[4]; midOutA[4] = midOutA[5]; midOutA[5] = midOutA[6]; 
-			midOutA[6] = (midInA[0] + midInA[6]) - 1.1790257790 * (midInA[1] + midInA[5]) 
-			- (midInA[2] + midInA[4]) + 2.3580515580 * midInA[3]
-			+ ( -0.6292082828 * midOutA[2]) + (  2.7785843605 * midOutA[3])
-			+ ( -4.6638295236 * midOutA[4]) + (  3.5142515802 * midOutA[5]);
+			midOutA[6] = (midInA[0] + midInA[6]) - 1.1790257790f * (midInA[1] + midInA[5]) 
+			- (midInA[2] + midInA[4]) + 2.3580515580f * midInA[3]
+			+ ( -0.6292082828f * midOutA[2]) + (  2.7785843605f * midOutA[3])
+			+ ( -4.6638295236f * midOutA[4]) + (  3.5142515802f * midOutA[5]);
 			sum += midOutA[6];
 			//mid section
 			
 			lowInA[0] = lowInA[1]; lowInA[1] = lowInA[2]; lowInA[2] = lowInA[3];
 			lowInA[3] = lowInA[4]; lowInA[4] = lowInA[5]; lowInA[5] = lowInA[6]; 
 			bridgerectifier = fabs(inputSample) * low;
-			if (bridgerectifier > 1.57079633) {bridgerectifier = 1.57079633;}
+			if (bridgerectifier > 1.57079633f) {bridgerectifier = 1.57079633f;}
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) {lowInA[6] = bridgerectifier;}
+			if (inputSample > 0.0f) {lowInA[6] = bridgerectifier;}
 			else {lowInA[6] = -bridgerectifier;}
 			lowInA[6] *= low; lowOutA[2] = lowOutA[3];
 			lowOutA[3] = lowOutA[4]; lowOutA[4] = lowOutA[5]; lowOutA[5] = lowOutA[6]; 
-			lowOutA[6] = (lowInA[0] + lowInA[6]) - 1.9193504547 * (lowInA[1] + lowInA[5]) 
-			- (lowInA[2] + lowInA[4]) + 3.8387009093 * lowInA[3]
-			+ ( -0.9195964462 * lowOutA[2]) + (  3.7538173833 * lowOutA[3])
-			+ ( -5.7487775603 * lowOutA[4]) + (  3.9145559258 * lowOutA[5]);
+			lowOutA[6] = (lowInA[0] + lowInA[6]) - 1.9193504547f * (lowInA[1] + lowInA[5]) 
+			- (lowInA[2] + lowInA[4]) + 3.8387009093f * lowInA[3]
+			+ ( -0.9195964462f * lowOutA[2]) + (  3.7538173833f * lowOutA[3])
+			+ ( -5.7487775603f * lowOutA[4]) + (  3.9145559258f * lowOutA[5]);
 			sum += lowOutA[6];
 			//low section
 		}
@@ -160,72 +160,72 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			presenceInB[3] = presenceInB[4]; presenceInB[4] = presenceInB[5]; presenceInB[5] = presenceInB[6]; 
 			presenceInB[6] = inputSample * presence; presenceOutB[2] = presenceOutB[3];
 			presenceOutB[3] = presenceOutB[4]; presenceOutB[4] = presenceOutB[5]; presenceOutB[5] = presenceOutB[6]; 
-			presenceOutB[6] = (presenceInB[0] + presenceInB[6]) + 1.9152966321 * (presenceInB[1] + presenceInB[5]) 
-			- (presenceInB[2] + presenceInB[4]) - 3.8305932641 * presenceInB[3]
-			+ ( -0.2828214615 * presenceOutB[2]) + (  0.2613069963 * presenceOutB[3])
-			+ ( -0.8628193852 * presenceOutB[4]) + (  0.5387164389 * presenceOutB[5]);
+			presenceOutB[6] = (presenceInB[0] + presenceInB[6]) + 1.9152966321f * (presenceInB[1] + presenceInB[5]) 
+			- (presenceInB[2] + presenceInB[4]) - 3.8305932641f * presenceInB[3]
+			+ ( -0.2828214615f * presenceOutB[2]) + (  0.2613069963f * presenceOutB[3])
+			+ ( -0.8628193852f * presenceOutB[4]) + (  0.5387164389f * presenceOutB[5]);
 			bridgerectifier = fabs(presenceOutB[6]);
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (presenceOutB[6] > 0.0){sum += bridgerectifier;}
+			if (presenceOutB[6] > 0.0f){sum += bridgerectifier;}
 			else {sum -= bridgerectifier;}			
 			//presence section
 			
 			highInB[0] = highInB[1]; highInB[1] = highInB[2]; highInB[2] = highInB[3];
 			highInB[3] = highInB[4]; highInB[4] = highInB[5]; highInB[5] = highInB[6]; 
 			bridgerectifier = fabs(inputSample) * high;
-			if (bridgerectifier > 1.57079633) {bridgerectifier = 1.57079633;}
+			if (bridgerectifier > 1.57079633f) {bridgerectifier = 1.57079633f;}
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) {highInB[6] = bridgerectifier;}
+			if (inputSample > 0.0f) {highInB[6] = bridgerectifier;}
 			else {highInB[6] = -bridgerectifier;}
 			highInB[6] *= high; highOutB[2] = highOutB[3];
 			highOutB[3] = highOutB[4]; highOutB[4] = highOutB[5]; highOutB[5] = highOutB[6]; 
-			highOutB[6] = (highInB[0] + highInB[6]) -   0.5141967433 * (highInB[1] + highInB[5]) 
-			- (highInB[2] + highInB[4]) +   1.0283934866 * highInB[3]
-			+ ( -0.2828214615 * highOutB[2]) + (  1.0195930909 * highOutB[3])
-			+ ( -1.9633013869 * highOutB[4]) + (  2.1020162751 * highOutB[5]);
+			highOutB[6] = (highInB[0] + highInB[6]) -   0.5141967433f * (highInB[1] + highInB[5]) 
+			- (highInB[2] + highInB[4]) +   1.0283934866f * highInB[3]
+			+ ( -0.2828214615f * highOutB[2]) + (  1.0195930909f * highOutB[3])
+			+ ( -1.9633013869f * highOutB[4]) + (  2.1020162751f * highOutB[5]);
 			bridgerectifier = fabs(highOutB[6]);
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (highOutB[6] > 0.0){sum += bridgerectifier;}
+			if (highOutB[6] > 0.0f){sum += bridgerectifier;}
 			else {sum -= bridgerectifier;}			
 			//high section
 			
 			midInB[0] = midInB[1]; midInB[1] = midInB[2]; midInB[2] = midInB[3];
 			midInB[3] = midInB[4]; midInB[4] = midInB[5]; midInB[5] = midInB[6]; 
 			bridgerectifier = fabs(inputSample) * mid;
-			if (bridgerectifier > 1.57079633) {bridgerectifier = 1.57079633;}
+			if (bridgerectifier > 1.57079633f) {bridgerectifier = 1.57079633f;}
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) {midInB[6] = bridgerectifier;}
+			if (inputSample > 0.0f) {midInB[6] = bridgerectifier;}
 			else {midInB[6] = -bridgerectifier;}
 			midInB[6] *= mid; midOutB[2] = midOutB[3];
 			midOutB[3] = midOutB[4]; midOutB[4] = midOutB[5]; midOutB[5] = midOutB[6]; 
-			midOutB[6] = (midInB[0] + midInB[6]) - 1.1790257790 * (midInB[1] + midInB[5]) 
-			- (midInB[2] + midInB[4]) + 2.3580515580 * midInB[3]
-			+ ( -0.6292082828 * midOutB[2]) + (  2.7785843605 * midOutB[3])
-			+ ( -4.6638295236 * midOutB[4]) + (  3.5142515802 * midOutB[5]);
+			midOutB[6] = (midInB[0] + midInB[6]) - 1.1790257790f * (midInB[1] + midInB[5]) 
+			- (midInB[2] + midInB[4]) + 2.3580515580f * midInB[3]
+			+ ( -0.6292082828f * midOutB[2]) + (  2.7785843605f * midOutB[3])
+			+ ( -4.6638295236f * midOutB[4]) + (  3.5142515802f * midOutB[5]);
 			sum += midOutB[6];
 			//mid section
 			
 			lowInB[0] = lowInB[1]; lowInB[1] = lowInB[2]; lowInB[2] = lowInB[3];
 			lowInB[3] = lowInB[4]; lowInB[4] = lowInB[5]; lowInB[5] = lowInB[6]; 
 			bridgerectifier = fabs(inputSample) * low;
-			if (bridgerectifier > 1.57079633) {bridgerectifier = 1.57079633;}
+			if (bridgerectifier > 1.57079633f) {bridgerectifier = 1.57079633f;}
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) {lowInB[6] = bridgerectifier;}
+			if (inputSample > 0.0f) {lowInB[6] = bridgerectifier;}
 			else {lowInB[6] = -bridgerectifier;}
 			lowInB[6] *= low; lowOutB[2] = lowOutB[3];
 			lowOutB[3] = lowOutB[4]; lowOutB[4] = lowOutB[5]; lowOutB[5] = lowOutB[6]; 
-			lowOutB[6] = (lowInB[0] + lowInB[6]) - 1.9193504547 * (lowInB[1] + lowInB[5]) 
-			- (lowInB[2] + lowInB[4]) + 3.8387009093 * lowInB[3]
-			+ ( -0.9195964462 * lowOutB[2]) + (  3.7538173833 * lowOutB[3])
-			+ ( -5.7487775603 * lowOutB[4]) + (  3.9145559258 * lowOutB[5]);
+			lowOutB[6] = (lowInB[0] + lowInB[6]) - 1.9193504547f * (lowInB[1] + lowInB[5]) 
+			- (lowInB[2] + lowInB[4]) + 3.8387009093f * lowInB[3]
+			+ ( -0.9195964462f * lowOutB[2]) + (  3.7538173833f * lowOutB[3])
+			+ ( -5.7487775603f * lowOutB[4]) + (  3.9145559258f * lowOutB[5]);
 			sum += lowOutB[6];
 			//low section
 		}
 		
 		inputSample = fabs(sum) * drive;
-		if (inputSample > 1.57079633) {inputSample = 1.57079633;}
+		if (inputSample > 1.57079633f) {inputSample = 1.57079633f;}
 		inputSample = sin(inputSample);
 		if (sum < 0) inputSample = -inputSample;
 		
@@ -234,7 +234,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

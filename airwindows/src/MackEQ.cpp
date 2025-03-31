@@ -38,16 +38,16 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		
-		double iirSampleA;
-		double iirSampleB;
-		double iirSampleC;
-		double iirSampleD;
-		double iirSampleE;
-		double iirSampleF;
-		double biquadA[11];
-		double biquadB[11];
-		double biquadC[11];
-		double biquadD[11];
+		float iirSampleA;
+		float iirSampleB;
+		float iirSampleC;
+		float iirSampleD;
+		float iirSampleE;
+		float iirSampleF;
+		float biquadA[11];
+		float biquadB[11];
+		float biquadC[11];
+		float biquadD[11];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -64,150 +64,150 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double inTrim = GetParameter( kParam_One )*10.0;
+	float inTrim = GetParameter( kParam_One )*10.0f;
 	inTrim *= inTrim;
 	
-	double gainHigh = pow(GetParameter( kParam_Two ),2)*4.0;
-	double outHigh = sqrt(GetParameter( kParam_Two ));
-	double gainBass = pow(GetParameter( kParam_Three ),2)*4.0;
-	double outBass = sqrt(GetParameter( kParam_Three ));
-	double outPad = GetParameter( kParam_Four );
-	double wet = GetParameter( kParam_Five );
+	float gainHigh = pow(GetParameter( kParam_Two ),2)*4.0f;
+	float outHigh = sqrt(GetParameter( kParam_Two ));
+	float gainBass = pow(GetParameter( kParam_Three ),2)*4.0f;
+	float outBass = sqrt(GetParameter( kParam_Three ));
+	float outPad = GetParameter( kParam_Four );
+	float wet = GetParameter( kParam_Five );
 	
-	double iirAmountA = 0.001860867/overallscale;
-	double iirAmountB = 0.000287496/overallscale;
-	double iirBassMid = 0.159/overallscale;
-	double iirMidHigh = 0.236/overallscale;
+	float iirAmountA = 0.001860867f/overallscale;
+	float iirAmountB = 0.000287496f/overallscale;
+	float iirBassMid = 0.159f/overallscale;
+	float iirMidHigh = 0.236f/overallscale;
 	
-	biquadD[0] = biquadC[0] = biquadB[0] = biquadA[0] = 19160.0 / GetSampleRate();
-    biquadA[1] = 0.431684981684982;
-	biquadB[1] = 1.1582298;
-	biquadC[1] = 0.657027382751269;
-	biquadD[1] = 1.076210852946577;
+	biquadD[0] = biquadC[0] = biquadB[0] = biquadA[0] = 19160.0f / GetSampleRate();
+    biquadA[1] = 0.431684981684982f;
+	biquadB[1] = 1.1582298f;
+	biquadC[1] = 0.657027382751269f;
+	biquadD[1] = 1.076210852946577f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadB[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / biquadC[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadC[1] + K * K);
 	biquadC[2] = K * K * norm;
-	biquadC[3] = 2.0 * biquadC[2];
+	biquadC[3] = 2.0f * biquadC[2];
 	biquadC[4] = biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / biquadC[1] + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadD[0]);
-	norm = 1.0 / (1.0 + K / biquadD[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadD[1] + K * K);
 	biquadD[2] = K * K * norm;
-	biquadD[3] = 2.0 * biquadD[2];
+	biquadD[3] = 2.0f * biquadD[2];
 	biquadD[4] = biquadD[2];
-	biquadD[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadD[6] = (1.0 - K / biquadD[1] + K * K) * norm;
+	biquadD[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadD[6] = (1.0f - K / biquadD[1] + K * K) * norm;
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		if (fabs(iirSampleA)<1.18e-37) iirSampleA = 0.0;
-		iirSampleA = (iirSampleA * (1.0 - iirAmountA)) + (inputSample * iirAmountA);
+		if (fabs(iirSampleA)<1.18e-37f) iirSampleA = 0.0f;
+		iirSampleA = (iirSampleA * (1.0f - iirAmountA)) + (inputSample * iirAmountA);
 		inputSample -= iirSampleA;
 		
-		if (inTrim != 1.0) inputSample *= inTrim;
+		if (inTrim != 1.0f) inputSample *= inTrim;
 		
 		//begin Mackity input stage
-		double outSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float outSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = outSample; biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1		
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		inputSample -= pow(inputSample,5)*0.1768;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample -= pow(inputSample,5)*0.1768f;
 		
 		outSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = outSample; biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (fabs(iirSampleB)<1.18e-37) iirSampleB = 0.0;
-		iirSampleB = (iirSampleB * (1.0 - iirAmountB)) + (inputSample * iirAmountB);
+		if (fabs(iirSampleB)<1.18e-37f) iirSampleB = 0.0f;
+		iirSampleB = (iirSampleB * (1.0f - iirAmountB)) + (inputSample * iirAmountB);
 		inputSample -= iirSampleB;
 		//end Mackity input stage
 		
 		//begin EQ section
-		if (fabs(iirSampleC)<1.18e-37) iirSampleC = 0.0;
-		iirSampleC = (iirSampleC * (1.0 - iirBassMid)) + (inputSample * iirBassMid);
+		if (fabs(iirSampleC)<1.18e-37f) iirSampleC = 0.0f;
+		iirSampleC = (iirSampleC * (1.0f - iirBassMid)) + (inputSample * iirBassMid);
 		
-		double bassSample = iirSampleC;
-		double midSample = inputSample - bassSample;
+		float bassSample = iirSampleC;
+		float midSample = inputSample - bassSample;
 
-		if (gainBass != 1.0) bassSample *= gainBass;
-		if (bassSample > 1.0) bassSample = 1.0;
-		if (bassSample < -1.0) bassSample = -1.0;
-		bassSample -= pow(bassSample,5)*0.1768;
+		if (gainBass != 1.0f) bassSample *= gainBass;
+		if (bassSample > 1.0f) bassSample = 1.0f;
+		if (bassSample < -1.0f) bassSample = -1.0f;
+		bassSample -= pow(bassSample,5)*0.1768f;
 		
-		if (fabs(iirSampleD)<1.18e-37) iirSampleD = 0.0;
-		iirSampleD = (iirSampleD * (1.0 - iirBassMid)) + (bassSample * iirBassMid);
+		if (fabs(iirSampleD)<1.18e-37f) iirSampleD = 0.0f;
+		iirSampleD = (iirSampleD * (1.0f - iirBassMid)) + (bassSample * iirBassMid);
 		bassSample = iirSampleD;
 		//we've taken the bass sample, made the mids from it, distorted it
 		//and hit it with another pole of darkening.
 		//mid sample is still normal from undistorted bass
 		
-		if (fabs(iirSampleE)<1.18e-37) iirSampleE = 0.0;
-		iirSampleE = (iirSampleE * (1.0 - iirMidHigh)) + (midSample * iirMidHigh);
-		double highSample = midSample - iirSampleE;
+		if (fabs(iirSampleE)<1.18e-37f) iirSampleE = 0.0f;
+		iirSampleE = (iirSampleE * (1.0f - iirMidHigh)) + (midSample * iirMidHigh);
+		float highSample = midSample - iirSampleE;
 		midSample = iirSampleE;
 		//here is where we make the high sample out of the mid, and take highs
 		//away from the mid.
 		
-		if (fabs(iirSampleF)<1.18e-37) iirSampleF = 0.0;
-		iirSampleF = (iirSampleF * (1.0 - iirMidHigh)) + (highSample * iirMidHigh);
+		if (fabs(iirSampleF)<1.18e-37f) iirSampleF = 0.0f;
+		iirSampleF = (iirSampleF * (1.0f - iirMidHigh)) + (highSample * iirMidHigh);
 		highSample -= iirSampleF;
 		
-		if (gainHigh != 1.0) highSample *= gainHigh;
-		if (highSample > 1.0) highSample = 1.0;
-		if (highSample < -1.0) highSample = -1.0;
-		highSample -= pow(highSample,5)*0.1768;
+		if (gainHigh != 1.0f) highSample *= gainHigh;
+		if (highSample > 1.0f) highSample = 1.0f;
+		if (highSample < -1.0f) highSample = -1.0f;
+		highSample -= pow(highSample,5)*0.1768f;
 		//highpassing HighSample another stage, before distorting it
 		
-		inputSample = ((bassSample*outBass) + midSample + (highSample*outHigh))*4.0;
+		inputSample = ((bassSample*outBass) + midSample + (highSample*outHigh))*4.0f;
 		//end EQ section
 		
 		outSample = biquadC[2]*inputSample+biquadC[3]*biquadC[7]+biquadC[4]*biquadC[8]-biquadC[5]*biquadC[9]-biquadC[6]*biquadC[10];
 		biquadC[8] = biquadC[7]; biquadC[7] = inputSample; inputSample = outSample; biquadC[10] = biquadC[9]; biquadC[9] = inputSample; //DF1
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		inputSample -= pow(inputSample,5)*0.1768;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		inputSample -= pow(inputSample,5)*0.1768f;
 		
 		outSample = biquadD[2]*inputSample+biquadD[3]*biquadD[7]+biquadD[4]*biquadD[8]-biquadD[5]*biquadD[9]-biquadD[6]*biquadD[10];
 		biquadD[8] = biquadD[7]; biquadD[7] = inputSample; inputSample = outSample; biquadD[10] = biquadD[9]; biquadD[9] = inputSample; //DF1
 				
-		if (outPad != 1.0) inputSample *= outPad;
+		if (outPad != 1.0f) inputSample *= outPad;
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

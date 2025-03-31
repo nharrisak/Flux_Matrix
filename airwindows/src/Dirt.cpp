@@ -51,17 +51,17 @@ struct _kernel {
 			fix_sR2,
 			fix_total
 		}; //fixed frequency biquad filter for ultrasonics, stereo
-		double iirSample;
+		float iirSample;
 		uint32_t fpd;
 	
 	struct _dram {
-			double fixA[fix_total];
-		double fixB[fix_total];
-		double fixC[fix_total];
-		double fixD[fix_total];
-		double fixE[fix_total];
-		double fixF[fix_total];
-		double fixG[fix_total];
+			float fixA[fix_total];
+		float fixB[fix_total];
+		float fixC[fix_total];
+		float fixD[fix_total];
+		float fixE[fix_total];
+		float fixF[fix_total];
+		float fixG[fix_total];
 	};
 	_dram* dram;
 };
@@ -75,150 +75,150 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double inTrim = ((1.0-pow(1.0-GetParameter( kParam_One ),2))*1.0)+1.0;
-	double cutoff = (GetParameter( kParam_Two )*25000.0) / GetSampleRate();
-	if (cutoff > 0.49) cutoff = 0.49; //don't crash if run at 44.1k
-	if (cutoff < 0.0001) cutoff = 0.0001; //or if cutoff's too low
-	double iirAmount = pow(GetParameter( kParam_Three ),3)*0.5;
-	if (iirAmount < 0.00000001) iirAmount = 0.00000001; //or if cutoff's too low
+	float inTrim = ((1.0f-pow(1.0f-GetParameter( kParam_One ),2))*1.0f)+1.0f;
+	float cutoff = (GetParameter( kParam_Two )*25000.0f) / GetSampleRate();
+	if (cutoff > 0.49f) cutoff = 0.49f; //don't crash if run at 44.1k
+	if (cutoff < 0.0001f) cutoff = 0.0001f; //or if cutoff's too low
+	float iirAmount = pow(GetParameter( kParam_Three ),3)*0.5f;
+	if (iirAmount < 0.00000001f) iirAmount = 0.00000001f; //or if cutoff's too low
 	iirAmount /= overallscale; //highpass is very gentle
-	double outPad = GetParameter( kParam_Four );
-	double wet = GetParameter( kParam_Five );
+	float outPad = GetParameter( kParam_Four );
+	float wet = GetParameter( kParam_Five );
 	
 	dram->fixG[fix_freq] = dram->fixF[fix_freq] = dram->fixE[fix_freq] = dram->fixD[fix_freq] = dram->fixC[fix_freq] = dram->fixB[fix_freq] = dram->fixA[fix_freq] = cutoff;
 	
-    dram->fixA[fix_reso] = 4.46570214;
-	dram->fixB[fix_reso] = 1.51387132;
-	dram->fixC[fix_reso] = 0.93979296;
-	dram->fixD[fix_reso] = 0.70710678;
-	dram->fixE[fix_reso] = 0.59051105;
-	dram->fixF[fix_reso] = 0.52972649;
-	dram->fixG[fix_reso] = 0.50316379;
+    dram->fixA[fix_reso] = 4.46570214f;
+	dram->fixB[fix_reso] = 1.51387132f;
+	dram->fixC[fix_reso] = 0.93979296f;
+	dram->fixD[fix_reso] = 0.70710678f;
+	dram->fixE[fix_reso] = 0.59051105f;
+	dram->fixF[fix_reso] = 0.52972649f;
+	dram->fixG[fix_reso] = 0.50316379f;
 	
-	double K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	float K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
+	float norm = 1.0f / (1.0f + K / dram->fixA[fix_reso] + K * K);
 	dram->fixA[fix_a0] = K * K * norm;
-	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a1] = 2.0f * dram->fixA[fix_a0];
 	dram->fixA[fix_a2] = dram->fixA[fix_a0];
-	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixA[fix_b2] = (1.0f - K / dram->fixA[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixB[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixB[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixB[fix_reso] + K * K);
 	dram->fixB[fix_a0] = K * K * norm;
-	dram->fixB[fix_a1] = 2.0 * dram->fixB[fix_a0];
+	dram->fixB[fix_a1] = 2.0f * dram->fixB[fix_a0];
 	dram->fixB[fix_a2] = dram->fixB[fix_a0];
-	dram->fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixB[fix_b2] = (1.0 - K / dram->fixB[fix_reso] + K * K) * norm;
+	dram->fixB[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixB[fix_b2] = (1.0f - K / dram->fixB[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixC[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixC[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixC[fix_reso] + K * K);
 	dram->fixC[fix_a0] = K * K * norm;
-	dram->fixC[fix_a1] = 2.0 * dram->fixC[fix_a0];
+	dram->fixC[fix_a1] = 2.0f * dram->fixC[fix_a0];
 	dram->fixC[fix_a2] = dram->fixC[fix_a0];
-	dram->fixC[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixC[fix_b2] = (1.0 - K / dram->fixC[fix_reso] + K * K) * norm;
+	dram->fixC[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixC[fix_b2] = (1.0f - K / dram->fixC[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixD[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixD[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixD[fix_reso] + K * K);
 	dram->fixD[fix_a0] = K * K * norm;
-	dram->fixD[fix_a1] = 2.0 * dram->fixD[fix_a0];
+	dram->fixD[fix_a1] = 2.0f * dram->fixD[fix_a0];
 	dram->fixD[fix_a2] = dram->fixD[fix_a0];
-	dram->fixD[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixD[fix_b2] = (1.0 - K / dram->fixD[fix_reso] + K * K) * norm;
+	dram->fixD[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixD[fix_b2] = (1.0f - K / dram->fixD[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixE[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixE[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixE[fix_reso] + K * K);
 	dram->fixE[fix_a0] = K * K * norm;
-	dram->fixE[fix_a1] = 2.0 * dram->fixE[fix_a0];
+	dram->fixE[fix_a1] = 2.0f * dram->fixE[fix_a0];
 	dram->fixE[fix_a2] = dram->fixE[fix_a0];
-	dram->fixE[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixE[fix_b2] = (1.0 - K / dram->fixE[fix_reso] + K * K) * norm;
+	dram->fixE[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixE[fix_b2] = (1.0f - K / dram->fixE[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixF[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixF[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixF[fix_reso] + K * K);
 	dram->fixF[fix_a0] = K * K * norm;
-	dram->fixF[fix_a1] = 2.0 * dram->fixF[fix_a0];
+	dram->fixF[fix_a1] = 2.0f * dram->fixF[fix_a0];
 	dram->fixF[fix_a2] = dram->fixF[fix_a0];
-	dram->fixF[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixF[fix_b2] = (1.0 - K / dram->fixF[fix_reso] + K * K) * norm;
+	dram->fixF[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixF[fix_b2] = (1.0f - K / dram->fixF[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixG[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixG[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixG[fix_reso] + K * K);
 	dram->fixG[fix_a0] = K * K * norm;
-	dram->fixG[fix_a1] = 2.0 * dram->fixG[fix_a0];
+	dram->fixG[fix_a1] = 2.0f * dram->fixG[fix_a0];
 	dram->fixG[fix_a2] = dram->fixG[fix_a0];
-	dram->fixG[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixG[fix_b2] = (1.0 - K / dram->fixG[fix_reso] + K * K) * norm;
+	dram->fixG[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixG[fix_b2] = (1.0f - K / dram->fixG[fix_reso] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		double drySample = inputSample;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		float drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		if (fabs(iirSample)<1.18e-33) iirSample = 0.0;
-		iirSample = (iirSample * (1.0 - iirAmount)) + (inputSample * iirAmount);
+		if (fabs(iirSample)<1.18e-33f) iirSample = 0.0f;
+		iirSample = (iirSample * (1.0f - iirAmount)) + (inputSample * iirAmount);
 		inputSample = inputSample - iirSample;
 		
-		if (inputSample > 1.0) inputSample = 1.0; if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
 
-		double outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		float outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
 		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
 		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5))*inTrim;
+		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5f))*inTrim;
 		
 		outSample = (inputSample * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
 		dram->fixB[fix_sL1] = (inputSample * dram->fixB[fix_a1]) - (outSample * dram->fixB[fix_b1]) + dram->fixB[fix_sL2];
 		dram->fixB[fix_sL2] = (inputSample * dram->fixB[fix_a2]) - (outSample * dram->fixB[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5))*inTrim;
+		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5f))*inTrim;
 		
 		outSample = (inputSample * dram->fixC[fix_a0]) + dram->fixC[fix_sL1];
 		dram->fixC[fix_sL1] = (inputSample * dram->fixC[fix_a1]) - (outSample * dram->fixC[fix_b1]) + dram->fixC[fix_sL2];
 		dram->fixC[fix_sL2] = (inputSample * dram->fixC[fix_a2]) - (outSample * dram->fixC[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5))*inTrim;
+		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5f))*inTrim;
 		
 		outSample = (inputSample * dram->fixD[fix_a0]) + dram->fixD[fix_sL1];
 		dram->fixD[fix_sL1] = (inputSample * dram->fixD[fix_a1]) - (outSample * dram->fixD[fix_b1]) + dram->fixD[fix_sL2];
 		dram->fixD[fix_sL2] = (inputSample * dram->fixD[fix_a2]) - (outSample * dram->fixD[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5))*inTrim;
+		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5f))*inTrim;
 		
 		outSample = (inputSample * dram->fixE[fix_a0]) + dram->fixE[fix_sL1];
 		dram->fixE[fix_sL1] = (inputSample * dram->fixE[fix_a1]) - (outSample * dram->fixE[fix_b1]) + dram->fixE[fix_sL2];
 		dram->fixE[fix_sL2] = (inputSample * dram->fixE[fix_a2]) - (outSample * dram->fixE[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5))*inTrim;
+		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5f))*inTrim;
 		
 		outSample = (inputSample * dram->fixF[fix_a0]) + dram->fixF[fix_sL1];
 		dram->fixF[fix_sL1] = (inputSample * dram->fixF[fix_a1]) - (outSample * dram->fixF[fix_b1]) + dram->fixF[fix_sL2];
 		dram->fixF[fix_sL2] = (inputSample * dram->fixF[fix_a2]) - (outSample * dram->fixF[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5))*inTrim;
+		inputSample = (inputSample-(inputSample*fabs(inputSample)*0.5f))*inTrim;
 		
 		outSample = (inputSample * dram->fixG[fix_a0]) + dram->fixG[fix_sL1];
 		dram->fixG[fix_sL1] = (inputSample * dram->fixG[fix_a1]) - (outSample * dram->fixG[fix_b1]) + dram->fixG[fix_sL2];
 		dram->fixG[fix_sL2] = (inputSample * dram->fixG[fix_a2]) - (outSample * dram->fixG[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		inputSample = (inputSample * wet * outPad) + (drySample * (1.0-wet));
+		inputSample = (inputSample * wet * outPad) + (drySample * (1.0f-wet));
 				
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

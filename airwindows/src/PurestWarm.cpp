@@ -50,18 +50,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	int polarity = (int) GetParameter( kParam_One );
-	double inputSample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		if (polarity == 1)
 		{
 			if (inputSample < 0) 
 			{
-				inputSample = -(sin(-inputSample*1.57079634)/1.57079634);
+				inputSample = -(sin(-inputSample*1.57079634f)/1.57079634f);
 				
 				//begin 32 bit floating point dither
 				int expon; frexpf((float)inputSample, &expon);
@@ -72,7 +72,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		} else {
 			if (inputSample > 0)
 			{
-				inputSample = sin(inputSample*1.57079634)/1.57079634;
+				inputSample = sin(inputSample*1.57079634f)/1.57079634f;
 				
 				//begin 32 bit floating point dither
 				int expon; frexpf((float)inputSample, &expon);

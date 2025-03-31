@@ -62,12 +62,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 rate = 1 / (pow(GetParameter( kParam_One ),2) + 0.001);
-	Float64 depthB = (GetParameter( kParam_Two ) * 139.5)+2;
-	Float64 depthA = depthB * (1.0 - GetParameter( kParam_One ));
-	Float64 output = GetParameter( kParam_Three ) * 0.05;
-	Float64 wet = GetParameter( kParam_Four );
-	Float64 dry = 1.0-wet;
+	Float32 rate = 1 / (pow(GetParameter( kParam_One ),2) + 0.001f);
+	Float32 depthB = (GetParameter( kParam_Two ) * 139.5f)+2;
+	Float32 depthA = depthB * (1.0f - GetParameter( kParam_One ));
+	Float32 output = GetParameter( kParam_Three ) * 0.05f;
+	Float32 wet = GetParameter( kParam_Four );
+	Float32 dry = 1.0f-wet;
 	
 	minTap[0] = floor(2 * depthA); maxTap[0] = floor(2 * depthB);
 	minTap[1] = floor(3 * depthA); maxTap[1] = floor(3 * depthB);
@@ -100,12 +100,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	minTap[28] = floor(109 * depthA); maxTap[28] = floor(109 * depthB);
 	minTap[29] = floor(113 * depthA); maxTap[29] = floor(113 * depthB);
 	minTap[30] = floor(117 * depthA); maxTap[30] = floor(117 * depthB);	
-	double drySample;
-	double inputSample;
+	float drySample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		if (gcount < 0 || gcount > 16000) {gcount = 16000;}
@@ -125,8 +125,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				stepTap[stepCount] = -1;
 			}
 		}
-		scalefactor *= 0.9999;
-		scalefactor += (100.0 - fabs(combine)) * 0.000001;
+		scalefactor *= 0.9999f;
+		scalefactor += (100.0f - fabs(combine)) * 0.000001f;
 		
 		combine *= scalefactor;
 		combine -= (dram->d[gcount+position[29]]);
@@ -193,15 +193,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = combine;
 		
-		if (output < 1.0) inputSample *= output;
-		if (wet < 1.0) inputSample = (drySample * dry)+(inputSample*wet);
+		if (output < 1.0f) inputSample *= output;
+		if (wet < 1.0f) inputSample = (drySample * dry)+(inputSample*wet);
 		//nice little output stage template: if we have another scale of floating point
-		//number, we really don't want to meaninglessly multiply that by 1.0.
+		//number, we really don't want to meaninglessly multiply that by 1.0f.
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

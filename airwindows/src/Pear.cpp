@@ -78,7 +78,7 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdR;
 
 	struct _dram {
-		double pear[pear_total]; //probably worth just using a number here
+		float pear[pear_total]; //probably worth just using a number here
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -86,49 +86,49 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 3) cycleEnd = 3;
-	cycleEnd--; //this is going to be 0 for 44.1 or 48k, 1 for 88.2 or 96k, 2 for 176 or 192k.
+	cycleEnd--; //this is going to be 0 for 44.1f or 48k, 1 for 88.2f or 96k, 2 for 176 or 192k.
 	//DIFFERENT! Offsetting the bt shift
 	
-	int bitshiftFreq = (10-(GetParameter( kParam_One )*10.0))+cycleEnd;
-	double freq = 1.0;
+	int bitshiftFreq = (10-(GetParameter( kParam_One )*10.0f))+cycleEnd;
+	float freq = 1.0f;
 	switch (bitshiftFreq)
 	{
-		case 16: freq = 0.0000152587890625; break;
-		case 15: freq = 0.000030517578125; break;
-		case 14: freq = 0.00006103515625; break;
-		case 13: freq = 0.0001220703125; break;
-		case 12: freq = 0.000244140625; break;
-		case 11: freq = 0.00048828125; break;
-		case 10: freq = 0.0009765625; break;
-		case 9: freq = 0.001953125; break;
-		case 8: freq = 0.00390625; break;
-		case 7: freq = 0.0078125; break;
-		case 6: freq = 0.015625; break;
-		case 5: freq = 0.03125; break;
-		case 4: freq = 0.0625; break;
-		case 3: freq = 0.125; break;
-		case 2: freq = 0.25; break;
-		case 1: freq = 0.5; break;
-		case 0: freq = 1.0; break;
+		case 16: freq = 0.0000152587890625f; break;
+		case 15: freq = 0.000030517578125f; break;
+		case 14: freq = 0.00006103515625f; break;
+		case 13: freq = 0.0001220703125f; break;
+		case 12: freq = 0.000244140625f; break;
+		case 11: freq = 0.00048828125f; break;
+		case 10: freq = 0.0009765625f; break;
+		case 9: freq = 0.001953125f; break;
+		case 8: freq = 0.00390625f; break;
+		case 7: freq = 0.0078125f; break;
+		case 6: freq = 0.015625f; break;
+		case 5: freq = 0.03125f; break;
+		case 4: freq = 0.0625f; break;
+		case 3: freq = 0.125f; break;
+		case 2: freq = 0.25f; break;
+		case 1: freq = 0.5f; break;
+		case 0: freq = 1.0f; break;
 	}
-	double maxPoles = GetParameter( kParam_Two )*pear_total;
-	double wet = (GetParameter( kParam_Three )*2.0)-1.0; //inv-dry-wet for highpass
-	double dry = 2.0-(GetParameter( kParam_Three )*2.0);
-	if (dry > 1.0) dry = 1.0; //full dry for use with inv, to 0.0 at full wet
+	float maxPoles = GetParameter( kParam_Two )*pear_total;
+	float wet = (GetParameter( kParam_Three )*2.0f)-1.0f; //inv-dry-wet for highpass
+	float dry = 2.0f-(GetParameter( kParam_Three )*2.0f);
+	if (dry > 1.0f) dry = 1.0f; //full dry for use with inv, to 0.0f at full wet
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
 		//Pear is a variation on a Holt filter, made to act like my biquad filters:
 		//its variables (L and R prevSample and prevSlew) contained in arrays for easier handling.
@@ -138,11 +138,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//lettered suffixes like iirA through iirZ. The use of an array will make this a lot tidier.
 		
 		for (int x = 0; x < maxPoles; x += 4) {
-			double slew = ((inputSampleL - dram->pear[x]) + dram->pear[x+1])*freq*0.5;
-			dram->pear[x] = inputSampleL = (freq * inputSampleL) + ((1.0-freq) * (dram->pear[x] + dram->pear[x+1]));
+			float slew = ((inputSampleL - dram->pear[x]) + dram->pear[x+1])*freq*0.5f;
+			dram->pear[x] = inputSampleL = (freq * inputSampleL) + ((1.0f-freq) * (dram->pear[x] + dram->pear[x+1]));
 			dram->pear[x+1] = slew;
-			slew = ((inputSampleR - dram->pear[x+2]) + dram->pear[x+3])*freq*0.5;
-			dram->pear[x+2] = inputSampleR = (freq * inputSampleR) + ((1.0-freq) * (dram->pear[x+2] + dram->pear[x+3]));
+			slew = ((inputSampleR - dram->pear[x+2]) + dram->pear[x+3])*freq*0.5f;
+			dram->pear[x+2] = inputSampleR = (freq * inputSampleR) + ((1.0f-freq) * (dram->pear[x+2] + dram->pear[x+3]));
 			dram->pear[x+3] = slew;
 		}
 		
@@ -156,10 +156,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

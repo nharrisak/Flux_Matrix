@@ -46,16 +46,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 		
-	double inputSampleL;
-	double inputSampleR;
-	double mid;
-	double side;
+	float inputSampleL;
+	float inputSampleR;
+	float mid;
+	float side;
 	
-	Float64 leftgain = pow(10.0,GetParameter( kParam_One )/20.0);
-	Float64 rightgain = pow(10.0,GetParameter( kParam_Two )/20.0);
-	Float64 midgain = pow(10.0,GetParameter( kParam_Three )/20.0);
-	Float64 sidegain = pow(10.0,GetParameter( kParam_Four )/20.0);
-	Float64 mastergain = pow(10.0,GetParameter( kParam_Five )/20.0) * 0.5;
+	Float32 leftgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 rightgain = pow(10.0f,GetParameter( kParam_Two )/20.0f);
+	Float32 midgain = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 sidegain = pow(10.0f,GetParameter( kParam_Four )/20.0f);
+	Float32 mastergain = pow(10.0f,GetParameter( kParam_Five )/20.0f) * 0.5f;
 	
 	leftgain *= mastergain;
 	rightgain *= mastergain;
@@ -64,8 +64,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
 		//assign working variables
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		mid = inputSampleL + inputSampleR;
 		side = inputSampleL - inputSampleR;
@@ -78,10 +78,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

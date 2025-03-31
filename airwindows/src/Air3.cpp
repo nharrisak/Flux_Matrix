@@ -54,7 +54,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double air[air_total];
+			float air[air_total];
 	};
 	_dram* dram;
 };
@@ -68,18 +68,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double airGain = GetParameter( kParam_One )*2.0;
-	if (airGain > 1.0) airGain = pow(airGain,3.0+sqrt(overallscale));
-	double gndGain = GetParameter( kParam_Two )*2.0;
+	float airGain = GetParameter( kParam_One )*2.0f;
+	if (airGain > 1.0f) airGain = pow(airGain,3.0f+sqrt(overallscale));
+	float gndGain = GetParameter( kParam_Two )*2.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		dram->air[pvSL4] = dram->air[pvAL4] - dram->air[pvAL3];
 		dram->air[pvSL3] = dram->air[pvAL3] - dram->air[pvAL2];
@@ -93,25 +93,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		dram->air[acc2SL2] = dram->air[accSL3] - dram->air[accSL2];
 		dram->air[acc2SL1] = dram->air[accSL2] - dram->air[accSL1];		
 		
-		dram->air[outAL] = -(dram->air[pvAL1] + dram->air[pvSL3] + dram->air[acc2SL2] - ((dram->air[acc2SL2] + dram->air[acc2SL1])*0.5));
+		dram->air[outAL] = -(dram->air[pvAL1] + dram->air[pvSL3] + dram->air[acc2SL2] - ((dram->air[acc2SL2] + dram->air[acc2SL1])*0.5f));
 		
-		dram->air[gainAL] *= 0.5; 
-		dram->air[gainAL] += fabs(drySample-dram->air[outAL])*0.5;
-		if (dram->air[gainAL] > 0.3*sqrt(overallscale)) dram->air[gainAL] = 0.3*sqrt(overallscale);
+		dram->air[gainAL] *= 0.5f; 
+		dram->air[gainAL] += fabs(drySample-dram->air[outAL])*0.5f;
+		if (dram->air[gainAL] > 0.3f*sqrt(overallscale)) dram->air[gainAL] = 0.3f*sqrt(overallscale);
 		dram->air[pvAL4] = dram->air[pvAL3];
 		dram->air[pvAL3] = dram->air[pvAL2];
 		dram->air[pvAL2] = dram->air[pvAL1];		
 		dram->air[pvAL1] = (dram->air[gainAL] * dram->air[outAL]) + drySample;
 		
-		double gnd = drySample - ((dram->air[outAL]*0.5)+(drySample*(0.457-(0.017*overallscale))));
-		double temp = (gnd + dram->air[gndavgL])*0.5; dram->air[gndavgL] = gnd; gnd = temp;
+		float gnd = drySample - ((dram->air[outAL]*0.5f)+(drySample*(0.457f-(0.017f*overallscale))));
+		float temp = (gnd + dram->air[gndavgL])*0.5f; dram->air[gndavgL] = gnd; gnd = temp;
 		
 		inputSample = ((drySample-gnd)*airGain)+(gnd*gndGain);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

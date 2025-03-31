@@ -36,31 +36,31 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		Float64 iirHighpassA;
-		Float64 iirHighpassB;
-		Float64 iirHighpassC;
-		Float64 iirHighpassD;
-		Float64 iirHighpassE;
-		Float64 iirHighpassF;
-		Float64 iirLowpassA;
-		Float64 iirLowpassB;
-		Float64 iirLowpassC;
-		Float64 iirLowpassD;
-		Float64 iirLowpassE;
-		Float64 iirLowpassF;
+		Float32 iirHighpassA;
+		Float32 iirHighpassB;
+		Float32 iirHighpassC;
+		Float32 iirHighpassD;
+		Float32 iirHighpassE;
+		Float32 iirHighpassF;
+		Float32 iirLowpassA;
+		Float32 iirLowpassB;
+		Float32 iirLowpassC;
+		Float32 iirLowpassD;
+		Float32 iirLowpassE;
+		Float32 iirLowpassF;
 		int count;
 		
-		Float64 lowpassChase;
-		Float64 highpassChase;
-		Float64 wetChase;
+		Float32 lowpassChase;
+		Float32 highpassChase;
+		Float32 wetChase;
 		
-		Float64 lowpassBaseAmount;
-		Float64 highpassBaseAmount;
-		Float64 wet;
+		Float32 lowpassBaseAmount;
+		Float32 highpassBaseAmount;
+		Float32 wet;
 		
-		Float64 lastLowpass;
-		Float64 lastHighpass;
-		Float64 lastWet;
+		Float32 lastLowpass;
+		Float32 lastHighpass;
+		Float32 lastWet;
 		
 		uint32_t fpd;
 	
@@ -81,37 +81,37 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	lowpassChase = pow(GetParameter( kParam_One ),2);
 	highpassChase = pow(GetParameter( kParam_Two ),2);
-	Float64 nonLin = 1.0+((1.0-GetParameter( kParam_Three ))*6.0);
-	Float64 nonLinTrim = 1.5/cbrt(nonLin);
+	Float32 nonLin = 1.0f+((1.0f-GetParameter( kParam_Three ))*6.0f);
+	Float32 nonLinTrim = 1.5f/cbrt(nonLin);
 	wetChase = GetParameter( kParam_Four );
 	//should not scale with sample rate, because values reaching 1 are important
 	//to its ability to bypass when set to max
-	Float64 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0);
-	Float64 highpassSpeed = 300 / (fabs( lastHighpass - highpassChase)+1.0);
-	Float64 wetSpeed = 300 / (fabs( lastWet - wetChase)+1.0);
+	Float32 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0f);
+	Float32 highpassSpeed = 300 / (fabs( lastHighpass - highpassChase)+1.0f);
+	Float32 wetSpeed = 300 / (fabs( lastWet - wetChase)+1.0f);
 	lastLowpass = lowpassChase;
 	lastHighpass = highpassChase;
 	lastWet = wetChase;
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		Float64 dielectricScale = fabs(2.0-((inputSample+nonLin)/nonLin));
-		lowpassBaseAmount = (((lowpassBaseAmount*lowpassSpeed)+lowpassChase)/(lowpassSpeed + 1.0));
-		Float64 lowpassAmount = lowpassBaseAmount * dielectricScale;
+		Float32 dielectricScale = fabs(2.0f-((inputSample+nonLin)/nonLin));
+		lowpassBaseAmount = (((lowpassBaseAmount*lowpassSpeed)+lowpassChase)/(lowpassSpeed + 1.0f));
+		Float32 lowpassAmount = lowpassBaseAmount * dielectricScale;
 		//positive voltage will mean lower capacitance when capacitor is barium titanate
 		//on the lowpass, higher pressure means positive swings/smaller cap/larger value for lowpassAmount
-		Float64 invLowpass = 1.0 - lowpassAmount;
+		Float32 invLowpass = 1.0f - lowpassAmount;
 		
-		highpassBaseAmount = (((highpassBaseAmount*highpassSpeed)+highpassChase)/(highpassSpeed + 1.0));
-		Float64 highpassAmount = highpassBaseAmount * dielectricScale;
+		highpassBaseAmount = (((highpassBaseAmount*highpassSpeed)+highpassChase)/(highpassSpeed + 1.0f));
+		Float32 highpassAmount = highpassBaseAmount * dielectricScale;
 		//positive voltage will mean lower capacitance when capacitor is barium titanate
 		//on the highpass, higher pressure means positive swings/smaller cap/larger value for highpassAmount
-		Float64 invHighpass = 1.0 - highpassAmount;
+		Float32 invHighpass = 1.0f - highpassAmount;
 
-		wet = (((wet*wetSpeed)+wetChase)/(wetSpeed+1.0));
+		wet = (((wet*wetSpeed)+wetChase)/(wetSpeed+1.0f));
 		
 		count++; if (count > 5) count = 0; switch (count)
 		{
@@ -167,7 +167,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//Highpass Filter chunk. This is three poles of IIR highpass, with a 'gearbox' that progressively
 		//steepens the filter after minimizing artifacts.
 		
-		inputSample = (drySample * (1.0-wet)) + (inputSample * nonLinTrim * wet);
+		inputSample = (drySample * (1.0f-wet)) + (inputSample * nonLinTrim * wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);

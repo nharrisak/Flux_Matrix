@@ -34,16 +34,16 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
 
 		
-		Float64 lastSampleA;
-		Float64 gainA;
-		Float64 lastSampleB;
-		Float64 gainB;
-		Float64 lastSampleC;
-		Float64 gainC;
-		Float64 lastSampleD;
-		Float64 gainD;
-		Float64 lastSampleE;
-		Float64 gainE;
+		Float32 lastSampleA;
+		Float32 gainA;
+		Float32 lastSampleB;
+		Float32 gainB;
+		Float32 lastSampleC;
+		Float32 gainC;
+		Float32 lastSampleD;
+		Float32 gainD;
+		Float32 lastSampleE;
+		Float32 gainE;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,81 +60,81 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 clamp;
-	Float64 chase = pow(GetParameter( kParam_One ),2);
-	Float64 makeup = (1.0+(chase*1.6)) * GetParameter( kParam_Two );
-	Float64 ratio = chase * 24.0;
+	Float32 clamp;
+	Float32 chase = pow(GetParameter( kParam_One ),2);
+	Float32 makeup = (1.0f+(chase*1.6f)) * GetParameter( kParam_Two );
+	Float32 ratio = chase * 24.0f;
 	chase /= overallscale;
-	chase *= 0.083; // set up the ratio of new val to old
-	Float64 wet = GetParameter( kParam_Three );
+	chase *= 0.083f; // set up the ratio of new val to old
+	Float32 wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		clamp = fabs(inputSample - lastSampleA);
 		clamp = sin(clamp*ratio);
 		lastSampleA = inputSample;
-		gainA *= (1.0 - chase);
-		gainA += ((1.0-clamp) * chase);
-		if (gainA > 1.0) gainA = 1.0;
-		if (gainA < 0.0) gainA = 0.0;
-		if (gainA != 1.0) inputSample *= gainA;
+		gainA *= (1.0f - chase);
+		gainA += ((1.0f-clamp) * chase);
+		if (gainA > 1.0f) gainA = 1.0f;
+		if (gainA < 0.0f) gainA = 0.0f;
+		if (gainA != 1.0f) inputSample *= gainA;
 		
 		clamp = fabs(inputSample - lastSampleB);
 		clamp = sin(clamp*ratio);
 		lastSampleB = inputSample;
-		gainB *= (1.0 - chase);
-		gainB += ((1.0-clamp) * chase);
-		if (gainB > 1.0) gainB = 1.0;
-		if (gainB < 0.0) gainB = 0.0;
-		if (gainB != 1.0) inputSample *= gainB;
+		gainB *= (1.0f - chase);
+		gainB += ((1.0f-clamp) * chase);
+		if (gainB > 1.0f) gainB = 1.0f;
+		if (gainB < 0.0f) gainB = 0.0f;
+		if (gainB != 1.0f) inputSample *= gainB;
 		
 		clamp = fabs(inputSample - lastSampleC);
 		clamp = sin(clamp*ratio);
 		lastSampleC = inputSample;
-		gainC *= (1.0 - chase);
-		gainC += ((1.0-clamp) * chase);
-		if (gainC > 1.0) gainC = 1.0;
-		if (gainC < 0.0) gainC = 0.0;
-		if (gainC != 1.0) inputSample *= gainC;
+		gainC *= (1.0f - chase);
+		gainC += ((1.0f-clamp) * chase);
+		if (gainC > 1.0f) gainC = 1.0f;
+		if (gainC < 0.0f) gainC = 0.0f;
+		if (gainC != 1.0f) inputSample *= gainC;
 		
 		clamp = fabs(inputSample - lastSampleD);
 		clamp = sin(clamp*ratio);
 		lastSampleD = inputSample;
-		gainD *= (1.0 - chase);
-		gainD += ((1.0-clamp) * chase);
-		if (gainD > 1.0) gainD = 1.0;
-		if (gainD < 0.0) gainD = 0.0;
-		if (gainD != 1.0) inputSample *= gainD;
+		gainD *= (1.0f - chase);
+		gainD += ((1.0f-clamp) * chase);
+		if (gainD > 1.0f) gainD = 1.0f;
+		if (gainD < 0.0f) gainD = 0.0f;
+		if (gainD != 1.0f) inputSample *= gainD;
 		
 		clamp = fabs(inputSample - lastSampleE);
 		clamp = sin(clamp*ratio);
 		lastSampleE = inputSample;
-		gainE *= (1.0 - chase);
-		gainE += ((1.0-clamp) * chase);
-		if (gainE > 1.0) gainE = 1.0;
-		if (gainE < 0.0) gainE = 0.0;
-		if (gainE != 1.0) inputSample *= gainE;
+		gainE *= (1.0f - chase);
+		gainE += ((1.0f-clamp) * chase);
+		if (gainE > 1.0f) gainE = 1.0f;
+		if (gainE < 0.0f) gainE = 0.0f;
+		if (gainE != 1.0f) inputSample *= gainE;
 		
-		if (makeup !=1.0) {
+		if (makeup !=1.0f) {
 			inputSample *= makeup;
 		}
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

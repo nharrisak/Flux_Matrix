@@ -37,14 +37,14 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double previousSampleA;
-		double previousTrendA;
-		double previousSampleB;
-		double previousTrendB;
-		double previousSampleC;
-		double previousTrendC;
-		double previousSampleD;
-		double previousTrendD;
+		float previousSampleA;
+		float previousTrendA;
+		float previousSampleB;
+		float previousTrendB;
+		float previousSampleC;
+		float previousTrendC;
+		float previousSampleD;
+		float previousTrendD;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -62,81 +62,81 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float64 alpha = pow(GetParameter( kParam_One ),4)+0.00001;
-	if (alpha > 1.0) alpha = 1.0;
-	Float64 beta = (alpha * pow(GetParameter( kParam_Two ),2))+0.00001;
-	alpha += ((1.0-beta)*pow(GetParameter( kParam_One ),3)); //correct for droop in frequency
-	if (alpha > 1.0) alpha = 1.0;
+	Float32 alpha = pow(GetParameter( kParam_One ),4)+0.00001f;
+	if (alpha > 1.0f) alpha = 1.0f;
+	Float32 beta = (alpha * pow(GetParameter( kParam_Two ),2))+0.00001f;
+	alpha += ((1.0f-beta)*pow(GetParameter( kParam_One ),3)); //correct for droop in frequency
+	if (alpha > 1.0f) alpha = 1.0f;
 	
-	double trend;
-	double forecast; //defining these here because we're copying the routine four times
+	float trend;
+	float forecast; //defining these here because we're copying the routine four times
 	
-	Float64 aWet = 1.0;
-	Float64 bWet = 1.0;
-	Float64 cWet = 1.0;
-	Float64 dWet = GetParameter( kParam_Three );
+	Float32 aWet = 1.0f;
+	Float32 bWet = 1.0f;
+	Float32 cWet = 1.0f;
+	Float32 dWet = GetParameter( kParam_Three );
 	//four-stage wet/dry control using progressive stages that bypass when not engaged
-	if (dWet < 1.0) {aWet = dWet; bWet = 0.0; cWet = 0.0; dWet = 0.0;}
-	else if (dWet < 2.0) {bWet = dWet - 1.0; cWet = 0.0; dWet = 0.0;}
-	else if (dWet < 3.0) {cWet = dWet - 2.0; dWet = 0.0;}
-	else {dWet -= 3.0;}
+	if (dWet < 1.0f) {aWet = dWet; bWet = 0.0f; cWet = 0.0f; dWet = 0.0f;}
+	else if (dWet < 2.0f) {bWet = dWet - 1.0f; cWet = 0.0f; dWet = 0.0f;}
+	else if (dWet < 3.0f) {cWet = dWet - 2.0f; dWet = 0.0f;}
+	else {dWet -= 3.0f;}
 	//this is one way to make a little set of dry/wet stages that are successively added to the
 	//output as the control is turned up. Each one independently goes from 0-1 and stays at 1
 	//beyond that point: this is a way to progressively add a 'black box' sound processing
 	//which lets you fall through to simpler processing at lower settings.
 	
-	Float64 gain = GetParameter( kParam_Four );	
-	Float64 wet = GetParameter( kParam_Five );	
+	Float32 gain = GetParameter( kParam_Four );	
+	Float32 wet = GetParameter( kParam_Five );	
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		if (aWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleA) + ((0.999-beta) * previousTrendA));
+		if (aWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleA) + ((0.999f-beta) * previousTrendA));
 			forecast = previousSampleA + previousTrendA;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleA = inputSample; previousTrendA = trend;
-			inputSample = (inputSample * aWet) + (drySample * (1.0-aWet));
+			inputSample = (inputSample * aWet) + (drySample * (1.0f-aWet));
 		}
 		
-		if (bWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleB) + ((0.999-beta) * previousTrendB));
+		if (bWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleB) + ((0.999f-beta) * previousTrendB));
 			forecast = previousSampleB + previousTrendB;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleB = inputSample; previousTrendB = trend;
-			inputSample = (inputSample * bWet) + (previousSampleA * (1.0-bWet));
+			inputSample = (inputSample * bWet) + (previousSampleA * (1.0f-bWet));
 		}
 		
-		if (cWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleC) + ((0.999-beta) * previousTrendC));
+		if (cWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleC) + ((0.999f-beta) * previousTrendC));
 			forecast = previousSampleC + previousTrendC;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleC = inputSample; previousTrendC = trend;
-			inputSample = (inputSample * cWet) + (previousSampleB * (1.0-cWet));
+			inputSample = (inputSample * cWet) + (previousSampleB * (1.0f-cWet));
 		}
 		
-		if (dWet > 0.0) {
-			trend = (beta * (inputSample - previousSampleD) + ((0.999-beta) * previousTrendD));
+		if (dWet > 0.0f) {
+			trend = (beta * (inputSample - previousSampleD) + ((0.999f-beta) * previousTrendD));
 			forecast = previousSampleD + previousTrendD;
-			inputSample = (alpha * inputSample) + ((0.999-alpha) * forecast);
+			inputSample = (alpha * inputSample) + ((0.999f-alpha) * forecast);
 			previousSampleD = inputSample; previousTrendD = trend;
-			inputSample = (inputSample * dWet) + (previousSampleC * (1.0-dWet));
+			inputSample = (inputSample * dWet) + (previousSampleC * (1.0f-dWet));
 		}
 		
-		if (gain < 1.0) {
+		if (gain < 1.0f) {
 			inputSample *= gain;
 		}
 		
-		//clip to 1.2533141373155 to reach maximum output
-		if (inputSample > 1.2533141373155) inputSample = 1.2533141373155;
-		if (inputSample < -1.2533141373155) inputSample = -1.2533141373155;
-		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+		//clip to 1.2533141373155f to reach maximum output
+		if (inputSample > 1.2533141373155f) inputSample = 1.2533141373155f;
+		if (inputSample < -1.2533141373155f) inputSample = -1.2533141373155f;
+		inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample*wet)+(drySample*(1.0-wet));
+		if (wet < 1.0f) {
+			inputSample = (inputSample*wet)+(drySample*(1.0f-wet));
 		}
 		
 		

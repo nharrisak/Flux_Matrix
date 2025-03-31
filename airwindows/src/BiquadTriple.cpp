@@ -35,9 +35,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double biquadA[9];
-		double biquadB[9];
-		double biquadC[9];
+		float biquadA[9];
+		float biquadB[9];
+		float biquadC[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -54,23 +54,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int type = GetParameter( kParam_One);
 	
-	biquadA[0] = GetParameter( kParam_Two )*0.499;
-	if (biquadA[0] < 0.0001) biquadA[0] = 0.0001;
+	biquadA[0] = GetParameter( kParam_Two )*0.499f;
+	if (biquadA[0] < 0.0001f) biquadA[0] = 0.0001f;
 	
     biquadA[1] = GetParameter( kParam_Three );
-	if (biquadA[1] < 0.0001) biquadA[1] = 0.0001;
+	if (biquadA[1] < 0.0001f) biquadA[1] = 0.0001f;
 	
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Four );
 	
 	//biquad contains these values:
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
 	//[2] is a0 but you need distinct ones for additional biquad instances so it's here
 	//[3] is a1 but you need distinct ones for additional biquad instances so it's here
 	//[4] is a2 but you need distinct ones for additional biquad instances so it's here
@@ -85,57 +85,57 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//or in 'reset' if the freq and res are absolutely fixed (use GetSampleRate to define freq)
 	
 	if (type == 1) { //lowpass
-		double K = tan(M_PI * biquadA[0]);
-		double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+		float K = tan(M_PI * biquadA[0]);
+		float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 		biquadA[2] = K * K * norm;
-		biquadA[3] = 2.0 * biquadA[2];
+		biquadA[3] = 2.0f * biquadA[2];
 		biquadA[4] = biquadA[2];
-		biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-		biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+		biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+		biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	}
 	
 	if (type == 2) { //highpass
-		double K = tan(M_PI * biquadA[0]);
-		double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+		float K = tan(M_PI * biquadA[0]);
+		float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 		biquadA[2] = norm;
-		biquadA[3] = -2.0 * biquadA[2];
+		biquadA[3] = -2.0f * biquadA[2];
 		biquadA[4] = biquadA[2];
-		biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-		biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+		biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+		biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	}
 	
 	if (type == 3) { //bandpass
-		double K = tan(M_PI * biquadA[0]);
-		double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+		float K = tan(M_PI * biquadA[0]);
+		float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 		biquadA[2] = K / biquadA[1] * norm;
-		biquadA[3] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+		biquadA[3] = 0.0f; //bandpass can simplify the biquad kernel: leave out this multiply
 		biquadA[4] = -biquadA[2];
-		biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-		biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+		biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+		biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	}
 	
 	if (type == 4) { //notch
-		double K = tan(M_PI * biquadA[0]);
-		double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
-		biquadA[2] = (1.0 + K * K) * norm;
-		biquadA[3] = 2.0 * (K * K - 1) * norm;
+		float K = tan(M_PI * biquadA[0]);
+		float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
+		biquadA[2] = (1.0f + K * K) * norm;
+		biquadA[3] = 2.0f * (K * K - 1) * norm;
 		biquadA[4] = biquadA[2];
 		biquadA[5] = biquadA[3];
-		biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+		biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	}
 
 	for (int x = 0; x < 7; x++) {biquadC[x] = biquadB[x] = biquadA[x];}
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = *sourceP;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = *sourceP;
 		
 		
 		inputSample = sin(inputSample);
 		//encode Console5: good cleanness
 		
-		double tempSample = (inputSample * biquadA[2]) + biquadA[7];
+		float tempSample = (inputSample * biquadA[2]) + biquadA[7];
 		biquadA[7] = (inputSample * biquadA[3]) - (tempSample * biquadA[5]) + biquadA[8];
 		biquadA[8] = (inputSample * biquadA[4]) - (tempSample * biquadA[6]);
 		inputSample = tempSample;
@@ -150,21 +150,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		biquadC[8] = (inputSample * biquadC[4]) - (tempSample * biquadC[6]);
 		inputSample = tempSample;
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		inputSample = asin(inputSample);
 		//amplitude aspect
 		
-		if (wet < 1.0) {
-			inputSample = (inputSample*wet) + (drySample*(1.0-fabs(wet)));
+		if (wet < 1.0f) {
+			inputSample = (inputSample*wet) + (drySample*(1.0f-fabs(wet)));
 			//inv/dry/wet lets us turn LP into HP and band into notch
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

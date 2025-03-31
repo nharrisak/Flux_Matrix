@@ -135,18 +135,18 @@ enum { kNumTemplateParameters = 6 };
 		kalGainR, kalOutR,
 		kal_total
 	};
-	double fireCompL;
-	double fireCompR;
-	double fireGate;
-	double stoneCompL;
-	double stoneCompR;
-	double stoneGate;
-	double airGainA;
-	double airGainB;
-	double fireGainA;
-	double fireGainB;
-	double stoneGainA;
-	double stoneGainB;
+	float fireCompL;
+	float fireCompR;
+	float fireGate;
+	float stoneCompL;
+	float stoneCompR;
+	float stoneGate;
+	float airGainA;
+	float airGainB;
+	float fireGainA;
+	float fireGainB;
+	float stoneGainA;
+	float stoneGainB;
 	
 	enum { 
 		biqs_freq, biqs_reso, biqs_level,
@@ -160,30 +160,30 @@ enum { kNumTemplateParameters = 6 };
 		biqs_outL, biqs_outR, biqs_total
 	};
 	
-	double dBaPosL;
-	double dBaPosR;
+	float dBaPosL;
+	float dBaPosR;
 	int dBaXL;
 	int dBaXR;
 	
-	double panA;
-	double panB;
-	double inTrimA;
-	double inTrimB;
+	float panA;
+	float panB;
+	float inTrimA;
+	float inTrimB;
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
 
 	struct _dram {
-		double highpass[hilp_total];
-	double lowpass[hilp_total];
-	double air[air_total];
-	double kal[kal_total];
-	double high[biqs_total];
-	double hmid[biqs_total];
-	double lmid[biqs_total];
-	double bass[biqs_total];
-	double dBaL[dscBuf+5];
-	double dBaR[dscBuf+5];
+		float highpass[hilp_total];
+	float lowpass[hilp_total];
+	float air[air_total];
+	float kal[kal_total];
+	float high[biqs_total];
+	float hmid[biqs_total];
+	float lmid[biqs_total];
+	float bass[biqs_total];
+	float dBaL[dscBuf+5];
+	float dBaR[dscBuf+5];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -191,169 +191,169 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	dram->highpass[hilp_freq] = ((GetParameter( kParam_HIP )*330.0)+20.0)/GetSampleRate();
-	bool highpassEngage = true; if (GetParameter( kParam_HIP ) == 0.0) highpassEngage = false;
+	dram->highpass[hilp_freq] = ((GetParameter( kParam_HIP )*330.0f)+20.0f)/GetSampleRate();
+	bool highpassEngage = true; if (GetParameter( kParam_HIP ) == 0.0f) highpassEngage = false;
 	
-	dram->lowpass[hilp_freq] = ((pow(1.0-GetParameter( kParam_LOP ),2)*17000.0)+3000.0)/GetSampleRate();
-	bool lowpassEngage = true; if (GetParameter( kParam_LOP ) == 0.0) lowpassEngage = false;
+	dram->lowpass[hilp_freq] = ((pow(1.0f-GetParameter( kParam_LOP ),2)*17000.0f)+3000.0f)/GetSampleRate();
+	bool lowpassEngage = true; if (GetParameter( kParam_LOP ) == 0.0f) lowpassEngage = false;
 	
-	double K = tan(M_PI * dram->highpass[hilp_freq]); //highpass
-	double norm = 1.0 / (1.0 + K / 1.93185165 + K * K);
+	float K = tan(M_PI * dram->highpass[hilp_freq]); //highpass
+	float norm = 1.0f / (1.0f + K / 1.93185165f + K * K);
 	dram->highpass[hilp_a0] = norm;
-	dram->highpass[hilp_a1] = -2.0 * dram->highpass[hilp_a0];
-	dram->highpass[hilp_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->highpass[hilp_b2] = (1.0 - K / 1.93185165 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.70710678 + K * K);
+	dram->highpass[hilp_a1] = -2.0f * dram->highpass[hilp_a0];
+	dram->highpass[hilp_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->highpass[hilp_b2] = (1.0f - K / 1.93185165f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.70710678f + K * K);
 	dram->highpass[hilp_c0] = norm;
-	dram->highpass[hilp_c1] = -2.0 * dram->highpass[hilp_c0];
-	dram->highpass[hilp_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->highpass[hilp_d2] = (1.0 - K / 0.70710678 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.51763809 + K * K);
+	dram->highpass[hilp_c1] = -2.0f * dram->highpass[hilp_c0];
+	dram->highpass[hilp_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->highpass[hilp_d2] = (1.0f - K / 0.70710678f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.51763809f + K * K);
 	dram->highpass[hilp_e0] = norm;
-	dram->highpass[hilp_e1] = -2.0 * dram->highpass[hilp_e0];
-	dram->highpass[hilp_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->highpass[hilp_f2] = (1.0 - K / 0.51763809 + K * K) * norm;
+	dram->highpass[hilp_e1] = -2.0f * dram->highpass[hilp_e0];
+	dram->highpass[hilp_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->highpass[hilp_f2] = (1.0f - K / 0.51763809f + K * K) * norm;
 	
 	K = tan(M_PI * dram->lowpass[hilp_freq]); //lowpass
-	norm = 1.0 / (1.0 + K / 1.93185165 + K * K);
+	norm = 1.0f / (1.0f + K / 1.93185165f + K * K);
 	dram->lowpass[hilp_a0] = K * K * norm;
-	dram->lowpass[hilp_a1] = 2.0 * dram->lowpass[hilp_a0];
-	dram->lowpass[hilp_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lowpass[hilp_b2] = (1.0 - K / 1.93185165 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.70710678 + K * K);
+	dram->lowpass[hilp_a1] = 2.0f * dram->lowpass[hilp_a0];
+	dram->lowpass[hilp_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lowpass[hilp_b2] = (1.0f - K / 1.93185165f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.70710678f + K * K);
 	dram->lowpass[hilp_c0] = K * K * norm;
-	dram->lowpass[hilp_c1] = 2.0 * dram->lowpass[hilp_c0];
-	dram->lowpass[hilp_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lowpass[hilp_d2] = (1.0 - K / 0.70710678 + K * K) * norm;
-	norm = 1.0 / (1.0 + K / 0.51763809 + K * K);
+	dram->lowpass[hilp_c1] = 2.0f * dram->lowpass[hilp_c0];
+	dram->lowpass[hilp_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lowpass[hilp_d2] = (1.0f - K / 0.70710678f + K * K) * norm;
+	norm = 1.0f / (1.0f + K / 0.51763809f + K * K);
 	dram->lowpass[hilp_e0] = K * K * norm;
-	dram->lowpass[hilp_e1] = 2.0 * dram->lowpass[hilp_e0];
-	dram->lowpass[hilp_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lowpass[hilp_f2] = (1.0 - K / 0.51763809 + K * K) * norm;
+	dram->lowpass[hilp_e1] = 2.0f * dram->lowpass[hilp_e0];
+	dram->lowpass[hilp_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lowpass[hilp_f2] = (1.0f - K / 0.51763809f + K * K) * norm;
 	
-	airGainA = airGainB; airGainB = GetParameter( kParam_AIR )*2.0;
-	fireGainA = fireGainB; fireGainB = GetParameter( kParam_FIR )*2.0;
-	stoneGainA = stoneGainB; stoneGainB = GetParameter( kParam_STO )*2.0;
+	airGainA = airGainB; airGainB = GetParameter( kParam_AIR )*2.0f;
+	fireGainA = fireGainB; fireGainB = GetParameter( kParam_FIR )*2.0f;
+	stoneGainA = stoneGainB; stoneGainB = GetParameter( kParam_STO )*2.0f;
 	//simple three band to adjust
-	double kalmanRange = 1.0-(pow(GetParameter( kParam_RNG ),2)/overallscale);
+	float kalmanRange = 1.0f-(pow(GetParameter( kParam_RNG ),2)/overallscale);
 	//crossover frequency between mid/bass
 	
-	double compFThresh = pow(GetParameter( kParam_FCT ),4);
-	double compSThresh = pow(GetParameter( kParam_SCT ),4);
-	double compFRatio = 1.0-pow(1.0-GetParameter( kParam_FCR ),2);
-	double compSRatio = 1.0-pow(1.0-GetParameter( kParam_SCR ),2);
-	double compFAttack = 1.0/(((pow(GetParameter( kParam_FCA ),3)*5000.0)+500.0)*overallscale);
-	double compSAttack = 1.0/(((pow(GetParameter( kParam_SCA ),3)*5000.0)+500.0)*overallscale);
-	double compFRelease = 1.0/(((pow(GetParameter( kParam_FCL ),5)*50000.0)+500.0)*overallscale);
-	double compSRelease = 1.0/(((pow(GetParameter( kParam_SCL ),5)*50000.0)+500.0)*overallscale);
-	double gateFThresh = pow(GetParameter( kParam_FGT ),4);
-	double gateSThresh = pow(GetParameter( kParam_SGT ),4);
-	double gateFRatio = 1.0-pow(1.0-GetParameter( kParam_FGR ),2);
-	double gateSRatio = 1.0-pow(1.0-GetParameter( kParam_SGR ),2);
-	double gateFSustain = M_PI_2 * pow(GetParameter( kParam_FGS )+1.0,4.0);
-	double gateSSustain = M_PI_2 * pow(GetParameter( kParam_SGS )+1.0,4.0);
-	double gateFRelease = 1.0/(((pow(GetParameter( kParam_FGL ),5)*500000.0)+500.0)*overallscale);
-	double gateSRelease = 1.0/(((pow(GetParameter( kParam_SGL ),5)*500000.0)+500.0)*overallscale);
+	float compFThresh = pow(GetParameter( kParam_FCT ),4);
+	float compSThresh = pow(GetParameter( kParam_SCT ),4);
+	float compFRatio = 1.0f-pow(1.0f-GetParameter( kParam_FCR ),2);
+	float compSRatio = 1.0f-pow(1.0f-GetParameter( kParam_SCR ),2);
+	float compFAttack = 1.0f/(((pow(GetParameter( kParam_FCA ),3)*5000.0f)+500.0f)*overallscale);
+	float compSAttack = 1.0f/(((pow(GetParameter( kParam_SCA ),3)*5000.0f)+500.0f)*overallscale);
+	float compFRelease = 1.0f/(((pow(GetParameter( kParam_FCL ),5)*50000.0f)+500.0f)*overallscale);
+	float compSRelease = 1.0f/(((pow(GetParameter( kParam_SCL ),5)*50000.0f)+500.0f)*overallscale);
+	float gateFThresh = pow(GetParameter( kParam_FGT ),4);
+	float gateSThresh = pow(GetParameter( kParam_SGT ),4);
+	float gateFRatio = 1.0f-pow(1.0f-GetParameter( kParam_FGR ),2);
+	float gateSRatio = 1.0f-pow(1.0f-GetParameter( kParam_SGR ),2);
+	float gateFSustain = M_PI_2 * pow(GetParameter( kParam_FGS )+1.0f,4.0f);
+	float gateSSustain = M_PI_2 * pow(GetParameter( kParam_SGS )+1.0f,4.0f);
+	float gateFRelease = 1.0f/(((pow(GetParameter( kParam_FGL ),5)*500000.0f)+500.0f)*overallscale);
+	float gateSRelease = 1.0f/(((pow(GetParameter( kParam_SGL ),5)*500000.0f)+500.0f)*overallscale);
 	
-	dram->high[biqs_freq] = (((pow(GetParameter( kParam_TRF ),3)*14500.0)+1500.0)/GetSampleRate());
-	if (dram->high[biqs_freq] < 0.0001) dram->high[biqs_freq] = 0.0001;
+	dram->high[biqs_freq] = (((pow(GetParameter( kParam_TRF ),3)*14500.0f)+1500.0f)/GetSampleRate());
+	if (dram->high[biqs_freq] < 0.0001f) dram->high[biqs_freq] = 0.0001f;
 	dram->high[biqs_nonlin] = GetParameter( kParam_TRG );
-	dram->high[biqs_level] = (dram->high[biqs_nonlin]*2.0)-1.0;
-	if (dram->high[biqs_level] > 0.0) dram->high[biqs_level] *= 2.0;
-	dram->high[biqs_reso] = ((0.5+(dram->high[biqs_nonlin]*0.5)+sqrt(dram->high[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_TRR ),2.0)))+0.5+(dram->high[biqs_nonlin]*0.5);
+	dram->high[biqs_level] = (dram->high[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->high[biqs_level] > 0.0f) dram->high[biqs_level] *= 2.0f;
+	dram->high[biqs_reso] = ((0.5f+(dram->high[biqs_nonlin]*0.5f)+sqrt(dram->high[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_TRR ),2.0f)))+0.5f+(dram->high[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->high[biqs_freq]);
-	norm = 1.0 / (1.0 + K / (dram->high[biqs_reso]*1.93185165) + K * K);
-	dram->high[biqs_a0] = K / (dram->high[biqs_reso]*1.93185165) * norm;
-	dram->high[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->high[biqs_b2] = (1.0 - K / (dram->high[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->high[biqs_reso]*0.70710678) + K * K);
-	dram->high[biqs_c0] = K / (dram->high[biqs_reso]*0.70710678) * norm;
-	dram->high[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->high[biqs_d2] = (1.0 - K / (dram->high[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->high[biqs_reso]*0.51763809) + K * K);
-	dram->high[biqs_e0] = K / (dram->high[biqs_reso]*0.51763809) * norm;
-	dram->high[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->high[biqs_f2] = (1.0 - K / (dram->high[biqs_reso]*0.51763809) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*1.93185165f) + K * K);
+	dram->high[biqs_a0] = K / (dram->high[biqs_reso]*1.93185165f) * norm;
+	dram->high[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->high[biqs_b2] = (1.0f - K / (dram->high[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*0.70710678f) + K * K);
+	dram->high[biqs_c0] = K / (dram->high[biqs_reso]*0.70710678f) * norm;
+	dram->high[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->high[biqs_d2] = (1.0f - K / (dram->high[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*0.51763809f) + K * K);
+	dram->high[biqs_e0] = K / (dram->high[biqs_reso]*0.51763809f) * norm;
+	dram->high[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->high[biqs_f2] = (1.0f - K / (dram->high[biqs_reso]*0.51763809f) + K * K) * norm;
 	//high
 	
-	dram->hmid[biqs_freq] = (((pow(GetParameter( kParam_HMF ),3)*6400.0)+600.0)/GetSampleRate());
-	if (dram->hmid[biqs_freq] < 0.0001) dram->hmid[biqs_freq] = 0.0001;
+	dram->hmid[biqs_freq] = (((pow(GetParameter( kParam_HMF ),3)*6400.0f)+600.0f)/GetSampleRate());
+	if (dram->hmid[biqs_freq] < 0.0001f) dram->hmid[biqs_freq] = 0.0001f;
 	dram->hmid[biqs_nonlin] = GetParameter( kParam_HMG );
-	dram->hmid[biqs_level] = (dram->hmid[biqs_nonlin]*2.0)-1.0;
-	if (dram->hmid[biqs_level] > 0.0) dram->hmid[biqs_level] *= 2.0;
-	dram->hmid[biqs_reso] = ((0.5+(dram->hmid[biqs_nonlin]*0.5)+sqrt(dram->hmid[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_HMR ),2.0)))+0.5+(dram->hmid[biqs_nonlin]*0.5);
+	dram->hmid[biqs_level] = (dram->hmid[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->hmid[biqs_level] > 0.0f) dram->hmid[biqs_level] *= 2.0f;
+	dram->hmid[biqs_reso] = ((0.5f+(dram->hmid[biqs_nonlin]*0.5f)+sqrt(dram->hmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_HMR ),2.0f)))+0.5f+(dram->hmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->hmid[biqs_freq]);
-	norm = 1.0 / (1.0 + K / (dram->hmid[biqs_reso]*1.93185165) + K * K);
-	dram->hmid[biqs_a0] = K / (dram->hmid[biqs_reso]*1.93185165) * norm;
-	dram->hmid[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hmid[biqs_b2] = (1.0 - K / (dram->hmid[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->hmid[biqs_reso]*0.70710678) + K * K);
-	dram->hmid[biqs_c0] = K / (dram->hmid[biqs_reso]*0.70710678) * norm;
-	dram->hmid[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hmid[biqs_d2] = (1.0 - K / (dram->hmid[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->hmid[biqs_reso]*0.51763809) + K * K);
-	dram->hmid[biqs_e0] = K / (dram->hmid[biqs_reso]*0.51763809) * norm;
-	dram->hmid[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->hmid[biqs_f2] = (1.0 - K / (dram->hmid[biqs_reso]*0.51763809) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*1.93185165f) + K * K);
+	dram->hmid[biqs_a0] = K / (dram->hmid[biqs_reso]*1.93185165f) * norm;
+	dram->hmid[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hmid[biqs_b2] = (1.0f - K / (dram->hmid[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*0.70710678f) + K * K);
+	dram->hmid[biqs_c0] = K / (dram->hmid[biqs_reso]*0.70710678f) * norm;
+	dram->hmid[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hmid[biqs_d2] = (1.0f - K / (dram->hmid[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*0.51763809f) + K * K);
+	dram->hmid[biqs_e0] = K / (dram->hmid[biqs_reso]*0.51763809f) * norm;
+	dram->hmid[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->hmid[biqs_f2] = (1.0f - K / (dram->hmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//hmid
 	
-	dram->lmid[biqs_freq] = (((pow(GetParameter( kParam_LMF ),3)*2200.0)+200.0)/GetSampleRate());
-	if (dram->lmid[biqs_freq] < 0.0001) dram->lmid[biqs_freq] = 0.0001;
+	dram->lmid[biqs_freq] = (((pow(GetParameter( kParam_LMF ),3)*2200.0f)+200.0f)/GetSampleRate());
+	if (dram->lmid[biqs_freq] < 0.0001f) dram->lmid[biqs_freq] = 0.0001f;
 	dram->lmid[biqs_nonlin] = GetParameter( kParam_LMG );
-	dram->lmid[biqs_level] = (dram->lmid[biqs_nonlin]*2.0)-1.0;
-	if (dram->lmid[biqs_level] > 0.0) dram->lmid[biqs_level] *= 2.0;
-	dram->lmid[biqs_reso] = ((0.5+(dram->lmid[biqs_nonlin]*0.5)+sqrt(dram->lmid[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_LMR ),2.0)))+0.5+(dram->lmid[biqs_nonlin]*0.5);
+	dram->lmid[biqs_level] = (dram->lmid[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->lmid[biqs_level] > 0.0f) dram->lmid[biqs_level] *= 2.0f;
+	dram->lmid[biqs_reso] = ((0.5f+(dram->lmid[biqs_nonlin]*0.5f)+sqrt(dram->lmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_LMR ),2.0f)))+0.5f+(dram->lmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->lmid[biqs_freq]);
-	norm = 1.0 / (1.0 + K / (dram->lmid[biqs_reso]*1.93185165) + K * K);
-	dram->lmid[biqs_a0] = K / (dram->lmid[biqs_reso]*1.93185165) * norm;
-	dram->lmid[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lmid[biqs_b2] = (1.0 - K / (dram->lmid[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->lmid[biqs_reso]*0.70710678) + K * K);
-	dram->lmid[biqs_c0] = K / (dram->lmid[biqs_reso]*0.70710678) * norm;
-	dram->lmid[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lmid[biqs_d2] = (1.0 - K / (dram->lmid[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->lmid[biqs_reso]*0.51763809) + K * K);
-	dram->lmid[biqs_e0] = K / (dram->lmid[biqs_reso]*0.51763809) * norm;
-	dram->lmid[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->lmid[biqs_f2] = (1.0 - K / (dram->lmid[biqs_reso]*0.51763809) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*1.93185165f) + K * K);
+	dram->lmid[biqs_a0] = K / (dram->lmid[biqs_reso]*1.93185165f) * norm;
+	dram->lmid[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lmid[biqs_b2] = (1.0f - K / (dram->lmid[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*0.70710678f) + K * K);
+	dram->lmid[biqs_c0] = K / (dram->lmid[biqs_reso]*0.70710678f) * norm;
+	dram->lmid[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lmid[biqs_d2] = (1.0f - K / (dram->lmid[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*0.51763809f) + K * K);
+	dram->lmid[biqs_e0] = K / (dram->lmid[biqs_reso]*0.51763809f) * norm;
+	dram->lmid[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->lmid[biqs_f2] = (1.0f - K / (dram->lmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//lmid
 	
-	dram->bass[biqs_freq] = (((pow(GetParameter( kParam_BSF ),3)*570.0)+30.0)/GetSampleRate());
-	if (dram->bass[biqs_freq] < 0.0001) dram->bass[biqs_freq] = 0.0001;
+	dram->bass[biqs_freq] = (((pow(GetParameter( kParam_BSF ),3)*570.0f)+30.0f)/GetSampleRate());
+	if (dram->bass[biqs_freq] < 0.0001f) dram->bass[biqs_freq] = 0.0001f;
 	dram->bass[biqs_nonlin] = GetParameter( kParam_BSG );
-	dram->bass[biqs_level] = (dram->bass[biqs_nonlin]*2.0)-1.0;
-	if (dram->bass[biqs_level] > 0.0) dram->bass[biqs_level] *= 2.0;
-	dram->bass[biqs_reso] = ((0.5+(dram->bass[biqs_nonlin]*0.5)+sqrt(dram->bass[biqs_freq]))-(1.0-pow(1.0-GetParameter( kParam_BSR ),2.0)))+0.5+(dram->bass[biqs_nonlin]*0.5);
+	dram->bass[biqs_level] = (dram->bass[biqs_nonlin]*2.0f)-1.0f;
+	if (dram->bass[biqs_level] > 0.0f) dram->bass[biqs_level] *= 2.0f;
+	dram->bass[biqs_reso] = ((0.5f+(dram->bass[biqs_nonlin]*0.5f)+sqrt(dram->bass[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_BSR ),2.0f)))+0.5f+(dram->bass[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->bass[biqs_freq]);
-	norm = 1.0 / (1.0 + K / (dram->bass[biqs_reso]*1.93185165) + K * K);
-	dram->bass[biqs_a0] = K / (dram->bass[biqs_reso]*1.93185165) * norm;
-	dram->bass[biqs_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->bass[biqs_b2] = (1.0 - K / (dram->bass[biqs_reso]*1.93185165) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->bass[biqs_reso]*0.70710678) + K * K);
-	dram->bass[biqs_c0] = K / (dram->bass[biqs_reso]*0.70710678) * norm;
-	dram->bass[biqs_d1] = 2.0 * (K * K - 1.0) * norm;
-	dram->bass[biqs_d2] = (1.0 - K / (dram->bass[biqs_reso]*0.70710678) + K * K) * norm;
-	norm = 1.0 / (1.0 + K / (dram->bass[biqs_reso]*0.51763809) + K * K);
-	dram->bass[biqs_e0] = K / (dram->bass[biqs_reso]*0.51763809) * norm;
-	dram->bass[biqs_f1] = 2.0 * (K * K - 1.0) * norm;
-	dram->bass[biqs_f2] = (1.0 - K / (dram->bass[biqs_reso]*0.51763809) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->bass[biqs_reso]*1.93185165f) + K * K);
+	dram->bass[biqs_a0] = K / (dram->bass[biqs_reso]*1.93185165f) * norm;
+	dram->bass[biqs_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->bass[biqs_b2] = (1.0f - K / (dram->bass[biqs_reso]*1.93185165f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->bass[biqs_reso]*0.70710678f) + K * K);
+	dram->bass[biqs_c0] = K / (dram->bass[biqs_reso]*0.70710678f) * norm;
+	dram->bass[biqs_d1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->bass[biqs_d2] = (1.0f - K / (dram->bass[biqs_reso]*0.70710678f) + K * K) * norm;
+	norm = 1.0f / (1.0f + K / (dram->bass[biqs_reso]*0.51763809f) + K * K);
+	dram->bass[biqs_e0] = K / (dram->bass[biqs_reso]*0.51763809f) * norm;
+	dram->bass[biqs_f1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->bass[biqs_f2] = (1.0f - K / (dram->bass[biqs_reso]*0.51763809f) + K * K) * norm;
 	//bass
 	
-	double refdB = GetParameter( kParam_DSC );
-	double topdB = 0.000000075 * pow(10.0,refdB/20.0) * overallscale;
+	float refdB = GetParameter( kParam_DSC );
+	float topdB = 0.000000075f * pow(10.0f,refdB/20.0f) * overallscale;
 	
-	panA = panB; panB = GetParameter( kParam_PAN )*1.57079633;
-	inTrimA = inTrimB; inTrimB = GetParameter( kParam_FAD )*2.0;
+	panA = panB; panB = GetParameter( kParam_PAN )*1.57079633f;
+	inTrimA = inTrimB; inTrimB = GetParameter( kParam_FAD )*2.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		if (highpassEngage) { //distributed Highpass
 			dram->highpass[hilp_temp] = (inputSampleL*dram->highpass[hilp_a0])+dram->highpass[hilp_aL1];
@@ -362,7 +362,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->highpass[hilp_temp] = (inputSampleR*dram->highpass[hilp_a0])+dram->highpass[hilp_aR1];
 			dram->highpass[hilp_aR1] = (inputSampleR*dram->highpass[hilp_a1])-(dram->highpass[hilp_temp]*dram->highpass[hilp_b1])+dram->highpass[hilp_aR2];
 			dram->highpass[hilp_aR2] = (inputSampleR*dram->highpass[hilp_a0])-(dram->highpass[hilp_temp]*dram->highpass[hilp_b2]); inputSampleR = dram->highpass[hilp_temp];
-		} else dram->highpass[hilp_aR1] = dram->highpass[hilp_aR2] = dram->highpass[hilp_aL1] = dram->highpass[hilp_aL2] = 0.0;
+		} else dram->highpass[hilp_aR1] = dram->highpass[hilp_aR2] = dram->highpass[hilp_aL1] = dram->highpass[hilp_aL2] = 0.0f;
 		if (lowpassEngage) { //distributed Lowpass
 			dram->lowpass[hilp_temp] = (inputSampleL*dram->lowpass[hilp_a0])+dram->lowpass[hilp_aL1];
 			dram->lowpass[hilp_aL1] = (inputSampleL*dram->lowpass[hilp_a1])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_b1])+dram->lowpass[hilp_aL2];
@@ -370,322 +370,322 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->lowpass[hilp_temp] = (inputSampleR*dram->lowpass[hilp_a0])+dram->lowpass[hilp_aR1];
 			dram->lowpass[hilp_aR1] = (inputSampleR*dram->lowpass[hilp_a1])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_b1])+dram->lowpass[hilp_aR2];
 			dram->lowpass[hilp_aR2] = (inputSampleR*dram->lowpass[hilp_a0])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_b2]); inputSampleR = dram->lowpass[hilp_temp];
-		} else dram->lowpass[hilp_aR1] = dram->lowpass[hilp_aR2] = dram->lowpass[hilp_aL1] = dram->lowpass[hilp_aL2] = 0.0;
+		} else dram->lowpass[hilp_aR1] = dram->lowpass[hilp_aR2] = dram->lowpass[hilp_aL1] = dram->lowpass[hilp_aL2] = 0.0f;
 		//first Highpass/Lowpass blocks aliasing before the nonlinearity of Parametric
 		
 		//get all Parametric bands before any other processing is done
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->high[biqs_outL] = inputSampleL * fabs(dram->high[biqs_level]);
-		dram->high[biqs_dis] = fabs(dram->high[biqs_a0] * (1.0+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_a0] * (1.0f+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outL] * dram->high[biqs_dis]) + dram->high[biqs_aL1];
 		dram->high[biqs_aL1] = dram->high[biqs_aL2] - (dram->high[biqs_temp]*dram->high[biqs_b1]);
 		dram->high[biqs_aL2] = (dram->high[biqs_outL] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_b2]);
 		dram->high[biqs_outL] = dram->high[biqs_temp];
-		dram->high[biqs_dis] = fabs(dram->high[biqs_c0] * (1.0+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_c0] * (1.0f+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outL] * dram->high[biqs_dis]) + dram->high[biqs_cL1];
 		dram->high[biqs_cL1] = dram->high[biqs_cL2] - (dram->high[biqs_temp]*dram->high[biqs_d1]);
 		dram->high[biqs_cL2] = (dram->high[biqs_outL] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_d2]);
 		dram->high[biqs_outL] = dram->high[biqs_temp];
-		dram->high[biqs_dis] = fabs(dram->high[biqs_e0] * (1.0+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_e0] * (1.0f+(dram->high[biqs_outL]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outL] * dram->high[biqs_dis]) + dram->high[biqs_eL1];
 		dram->high[biqs_eL1] = dram->high[biqs_eL2] - (dram->high[biqs_temp]*dram->high[biqs_f1]);
 		dram->high[biqs_eL2] = (dram->high[biqs_outL] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_f2]);
 		dram->high[biqs_outL] = dram->high[biqs_temp]; dram->high[biqs_outL] *= dram->high[biqs_level];
-		if (dram->high[biqs_level] > 1.0) dram->high[biqs_outL] *= dram->high[biqs_level];
+		if (dram->high[biqs_level] > 1.0f) dram->high[biqs_outL] *= dram->high[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->hmid[biqs_outL] = inputSampleL * fabs(dram->hmid[biqs_level]);
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_a0] * (1.0+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_a0] * (1.0f+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outL] * dram->hmid[biqs_dis]) + dram->hmid[biqs_aL1];
 		dram->hmid[biqs_aL1] = dram->hmid[biqs_aL2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_b1]);
 		dram->hmid[biqs_aL2] = (dram->hmid[biqs_outL] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_b2]);
 		dram->hmid[biqs_outL] = dram->hmid[biqs_temp];
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_c0] * (1.0+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_c0] * (1.0f+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outL] * dram->hmid[biqs_dis]) + dram->hmid[biqs_cL1];
 		dram->hmid[biqs_cL1] = dram->hmid[biqs_cL2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_d1]);
 		dram->hmid[biqs_cL2] = (dram->hmid[biqs_outL] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_d2]);
 		dram->hmid[biqs_outL] = dram->hmid[biqs_temp];
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_e0] * (1.0+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_e0] * (1.0f+(dram->hmid[biqs_outL]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outL] * dram->hmid[biqs_dis]) + dram->hmid[biqs_eL1];
 		dram->hmid[biqs_eL1] = dram->hmid[biqs_eL2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_f1]);
 		dram->hmid[biqs_eL2] = (dram->hmid[biqs_outL] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_f2]);
 		dram->hmid[biqs_outL] = dram->hmid[biqs_temp]; dram->hmid[biqs_outL] *= dram->hmid[biqs_level];
-		if (dram->hmid[biqs_level] > 1.0) dram->hmid[biqs_outL] *= dram->hmid[biqs_level];
+		if (dram->hmid[biqs_level] > 1.0f) dram->hmid[biqs_outL] *= dram->hmid[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->lmid[biqs_outL] = inputSampleL * fabs(dram->lmid[biqs_level]);
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_a0] * (1.0+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_a0] * (1.0f+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outL] * dram->lmid[biqs_dis]) + dram->lmid[biqs_aL1];
 		dram->lmid[biqs_aL1] = dram->lmid[biqs_aL2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_b1]);
 		dram->lmid[biqs_aL2] = (dram->lmid[biqs_outL] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_b2]);
 		dram->lmid[biqs_outL] = dram->lmid[biqs_temp];
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_c0] * (1.0+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_c0] * (1.0f+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outL] * dram->lmid[biqs_dis]) + dram->lmid[biqs_cL1];
 		dram->lmid[biqs_cL1] = dram->lmid[biqs_cL2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_d1]);
 		dram->lmid[biqs_cL2] = (dram->lmid[biqs_outL] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_d2]);
 		dram->lmid[biqs_outL] = dram->lmid[biqs_temp];
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_e0] * (1.0+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_e0] * (1.0f+(dram->lmid[biqs_outL]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outL] * dram->lmid[biqs_dis]) + dram->lmid[biqs_eL1];
 		dram->lmid[biqs_eL1] = dram->lmid[biqs_eL2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_f1]);
 		dram->lmid[biqs_eL2] = (dram->lmid[biqs_outL] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_f2]);
 		dram->lmid[biqs_outL] = dram->lmid[biqs_temp]; dram->lmid[biqs_outL] *= dram->lmid[biqs_level];
-		if (dram->lmid[biqs_level] > 1.0) dram->lmid[biqs_outL] *= dram->lmid[biqs_level];
+		if (dram->lmid[biqs_level] > 1.0f) dram->lmid[biqs_outL] *= dram->lmid[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		//begin Stacked Biquad With Reversed Neutron Flow L
 		dram->bass[biqs_outL] = inputSampleL * fabs(dram->bass[biqs_level]);
-		dram->bass[biqs_dis] = fabs(dram->bass[biqs_a0] * (1.0+(dram->bass[biqs_outL]*dram->bass[biqs_nonlin])));
-		if (dram->bass[biqs_dis] > 1.0) dram->bass[biqs_dis] = 1.0;
+		dram->bass[biqs_dis] = fabs(dram->bass[biqs_a0] * (1.0f+(dram->bass[biqs_outL]*dram->bass[biqs_nonlin])));
+		if (dram->bass[biqs_dis] > 1.0f) dram->bass[biqs_dis] = 1.0f;
 		dram->bass[biqs_temp] = (dram->bass[biqs_outL] * dram->bass[biqs_dis]) + dram->bass[biqs_aL1];
 		dram->bass[biqs_aL1] = dram->bass[biqs_aL2] - (dram->bass[biqs_temp]*dram->bass[biqs_b1]);
 		dram->bass[biqs_aL2] = (dram->bass[biqs_outL] * -dram->bass[biqs_dis]) - (dram->bass[biqs_temp]*dram->bass[biqs_b2]);
 		dram->bass[biqs_outL] = dram->bass[biqs_temp];
-		dram->bass[biqs_dis] = fabs(dram->bass[biqs_c0] * (1.0+(dram->bass[biqs_outL]*dram->bass[biqs_nonlin])));
-		if (dram->bass[biqs_dis] > 1.0) dram->bass[biqs_dis] = 1.0;
+		dram->bass[biqs_dis] = fabs(dram->bass[biqs_c0] * (1.0f+(dram->bass[biqs_outL]*dram->bass[biqs_nonlin])));
+		if (dram->bass[biqs_dis] > 1.0f) dram->bass[biqs_dis] = 1.0f;
 		dram->bass[biqs_temp] = (dram->bass[biqs_outL] * dram->bass[biqs_dis]) + dram->bass[biqs_cL1];
 		dram->bass[biqs_cL1] = dram->bass[biqs_cL2] - (dram->bass[biqs_temp]*dram->bass[biqs_d1]);
 		dram->bass[biqs_cL2] = (dram->bass[biqs_outL] * -dram->bass[biqs_dis]) - (dram->bass[biqs_temp]*dram->bass[biqs_d2]);
 		dram->bass[biqs_outL] = dram->bass[biqs_temp];
-		dram->bass[biqs_dis] = fabs(dram->bass[biqs_e0] * (1.0+(dram->bass[biqs_outL]*dram->bass[biqs_nonlin])));
-		if (dram->bass[biqs_dis] > 1.0) dram->bass[biqs_dis] = 1.0;
+		dram->bass[biqs_dis] = fabs(dram->bass[biqs_e0] * (1.0f+(dram->bass[biqs_outL]*dram->bass[biqs_nonlin])));
+		if (dram->bass[biqs_dis] > 1.0f) dram->bass[biqs_dis] = 1.0f;
 		dram->bass[biqs_temp] = (dram->bass[biqs_outL] * dram->bass[biqs_dis]) + dram->bass[biqs_eL1];
 		dram->bass[biqs_eL1] = dram->bass[biqs_eL2] - (dram->bass[biqs_temp]*dram->bass[biqs_f1]);
 		dram->bass[biqs_eL2] = (dram->bass[biqs_outL] * -dram->bass[biqs_dis]) - (dram->bass[biqs_temp]*dram->bass[biqs_f2]);
 		dram->bass[biqs_outL] = dram->bass[biqs_temp]; dram->bass[biqs_outL] *= dram->bass[biqs_level];
-		if (dram->bass[biqs_level] > 1.0) dram->bass[biqs_outL] *= dram->bass[biqs_level];
+		if (dram->bass[biqs_level] > 1.0f) dram->bass[biqs_outL] *= dram->bass[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow L
 		
 		//begin Stacked Biquad With Reversed Neutron Flow R
 		dram->high[biqs_outR] = inputSampleR * fabs(dram->high[biqs_level]);
-		dram->high[biqs_dis] = fabs(dram->high[biqs_a0] * (1.0+(dram->high[biqs_outR]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_a0] * (1.0f+(dram->high[biqs_outR]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outR] * dram->high[biqs_dis]) + dram->high[biqs_aR1];
 		dram->high[biqs_aR1] = dram->high[biqs_aR2] - (dram->high[biqs_temp]*dram->high[biqs_b1]);
 		dram->high[biqs_aR2] = (dram->high[biqs_outR] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_b2]);
 		dram->high[biqs_outR] = dram->high[biqs_temp];
-		dram->high[biqs_dis] = fabs(dram->high[biqs_c0] * (1.0+(dram->high[biqs_outR]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_c0] * (1.0f+(dram->high[biqs_outR]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outR] * dram->high[biqs_dis]) + dram->high[biqs_cR1];
 		dram->high[biqs_cR1] = dram->high[biqs_cR2] - (dram->high[biqs_temp]*dram->high[biqs_d1]);
 		dram->high[biqs_cR2] = (dram->high[biqs_outR] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_d2]);
 		dram->high[biqs_outR] = dram->high[biqs_temp];
-		dram->high[biqs_dis] = fabs(dram->high[biqs_e0] * (1.0+(dram->high[biqs_outR]*dram->high[biqs_nonlin])));
-		if (dram->high[biqs_dis] > 1.0) dram->high[biqs_dis] = 1.0;
+		dram->high[biqs_dis] = fabs(dram->high[biqs_e0] * (1.0f+(dram->high[biqs_outR]*dram->high[biqs_nonlin])));
+		if (dram->high[biqs_dis] > 1.0f) dram->high[biqs_dis] = 1.0f;
 		dram->high[biqs_temp] = (dram->high[biqs_outR] * dram->high[biqs_dis]) + dram->high[biqs_eR1];
 		dram->high[biqs_eR1] = dram->high[biqs_eR2] - (dram->high[biqs_temp]*dram->high[biqs_f1]);
 		dram->high[biqs_eR2] = (dram->high[biqs_outR] * -dram->high[biqs_dis]) - (dram->high[biqs_temp]*dram->high[biqs_f2]);
 		dram->high[biqs_outR] = dram->high[biqs_temp]; dram->high[biqs_outR] *= dram->high[biqs_level];
-		if (dram->high[biqs_level] > 1.0) dram->high[biqs_outR] *= dram->high[biqs_level];
+		if (dram->high[biqs_level] > 1.0f) dram->high[biqs_outR] *= dram->high[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow R
 		
 		//begin Stacked Biquad With Reversed Neutron Flow R
 		dram->hmid[biqs_outR] = inputSampleR * fabs(dram->hmid[biqs_level]);
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_a0] * (1.0+(dram->hmid[biqs_outR]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_a0] * (1.0f+(dram->hmid[biqs_outR]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outR] * dram->hmid[biqs_dis]) + dram->hmid[biqs_aR1];
 		dram->hmid[biqs_aR1] = dram->hmid[biqs_aR2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_b1]);
 		dram->hmid[biqs_aR2] = (dram->hmid[biqs_outR] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_b2]);
 		dram->hmid[biqs_outR] = dram->hmid[biqs_temp];
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_c0] * (1.0+(dram->hmid[biqs_outR]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_c0] * (1.0f+(dram->hmid[biqs_outR]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outR] * dram->hmid[biqs_dis]) + dram->hmid[biqs_cR1];
 		dram->hmid[biqs_cR1] = dram->hmid[biqs_cR2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_d1]);
 		dram->hmid[biqs_cR2] = (dram->hmid[biqs_outR] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_d2]);
 		dram->hmid[biqs_outR] = dram->hmid[biqs_temp];
-		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_e0] * (1.0+(dram->hmid[biqs_outR]*dram->hmid[biqs_nonlin])));
-		if (dram->hmid[biqs_dis] > 1.0) dram->hmid[biqs_dis] = 1.0;
+		dram->hmid[biqs_dis] = fabs(dram->hmid[biqs_e0] * (1.0f+(dram->hmid[biqs_outR]*dram->hmid[biqs_nonlin])));
+		if (dram->hmid[biqs_dis] > 1.0f) dram->hmid[biqs_dis] = 1.0f;
 		dram->hmid[biqs_temp] = (dram->hmid[biqs_outR] * dram->hmid[biqs_dis]) + dram->hmid[biqs_eR1];
 		dram->hmid[biqs_eR1] = dram->hmid[biqs_eR2] - (dram->hmid[biqs_temp]*dram->hmid[biqs_f1]);
 		dram->hmid[biqs_eR2] = (dram->hmid[biqs_outR] * -dram->hmid[biqs_dis]) - (dram->hmid[biqs_temp]*dram->hmid[biqs_f2]);
 		dram->hmid[biqs_outR] = dram->hmid[biqs_temp]; dram->hmid[biqs_outR] *= dram->hmid[biqs_level];
-		if (dram->hmid[biqs_level] > 1.0) dram->hmid[biqs_outR] *= dram->hmid[biqs_level];
+		if (dram->hmid[biqs_level] > 1.0f) dram->hmid[biqs_outR] *= dram->hmid[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow R
 		
 		//begin Stacked Biquad With Reversed Neutron Flow R
 		dram->lmid[biqs_outR] = inputSampleR * fabs(dram->lmid[biqs_level]);
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_a0] * (1.0+(dram->lmid[biqs_outR]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_a0] * (1.0f+(dram->lmid[biqs_outR]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outR] * dram->lmid[biqs_dis]) + dram->lmid[biqs_aR1];
 		dram->lmid[biqs_aR1] = dram->lmid[biqs_aR2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_b1]);
 		dram->lmid[biqs_aR2] = (dram->lmid[biqs_outR] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_b2]);
 		dram->lmid[biqs_outR] = dram->lmid[biqs_temp];
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_c0] * (1.0+(dram->lmid[biqs_outR]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_c0] * (1.0f+(dram->lmid[biqs_outR]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outR] * dram->lmid[biqs_dis]) + dram->lmid[biqs_cR1];
 		dram->lmid[biqs_cR1] = dram->lmid[biqs_cR2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_d1]);
 		dram->lmid[biqs_cR2] = (dram->lmid[biqs_outR] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_d2]);
 		dram->lmid[biqs_outR] = dram->lmid[biqs_temp];
-		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_e0] * (1.0+(dram->lmid[biqs_outR]*dram->lmid[biqs_nonlin])));
-		if (dram->lmid[biqs_dis] > 1.0) dram->lmid[biqs_dis] = 1.0;
+		dram->lmid[biqs_dis] = fabs(dram->lmid[biqs_e0] * (1.0f+(dram->lmid[biqs_outR]*dram->lmid[biqs_nonlin])));
+		if (dram->lmid[biqs_dis] > 1.0f) dram->lmid[biqs_dis] = 1.0f;
 		dram->lmid[biqs_temp] = (dram->lmid[biqs_outR] * dram->lmid[biqs_dis]) + dram->lmid[biqs_eR1];
 		dram->lmid[biqs_eR1] = dram->lmid[biqs_eR2] - (dram->lmid[biqs_temp]*dram->lmid[biqs_f1]);
 		dram->lmid[biqs_eR2] = (dram->lmid[biqs_outR] * -dram->lmid[biqs_dis]) - (dram->lmid[biqs_temp]*dram->lmid[biqs_f2]);
 		dram->lmid[biqs_outR] = dram->lmid[biqs_temp]; dram->lmid[biqs_outR] *= dram->lmid[biqs_level];
-		if (dram->lmid[biqs_level] > 1.0) dram->lmid[biqs_outR] *= dram->lmid[biqs_level];
+		if (dram->lmid[biqs_level] > 1.0f) dram->lmid[biqs_outR] *= dram->lmid[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow R
 		
 		//begin Stacked Biquad With Reversed Neutron Flow R
 		dram->bass[biqs_outR] = inputSampleR * fabs(dram->bass[biqs_level]);
-		dram->bass[biqs_dis] = fabs(dram->bass[biqs_a0] * (1.0+(dram->bass[biqs_outR]*dram->bass[biqs_nonlin])));
-		if (dram->bass[biqs_dis] > 1.0) dram->bass[biqs_dis] = 1.0;
+		dram->bass[biqs_dis] = fabs(dram->bass[biqs_a0] * (1.0f+(dram->bass[biqs_outR]*dram->bass[biqs_nonlin])));
+		if (dram->bass[biqs_dis] > 1.0f) dram->bass[biqs_dis] = 1.0f;
 		dram->bass[biqs_temp] = (dram->bass[biqs_outR] * dram->bass[biqs_dis]) + dram->bass[biqs_aR1];
 		dram->bass[biqs_aR1] = dram->bass[biqs_aR2] - (dram->bass[biqs_temp]*dram->bass[biqs_b1]);
 		dram->bass[biqs_aR2] = (dram->bass[biqs_outR] * -dram->bass[biqs_dis]) - (dram->bass[biqs_temp]*dram->bass[biqs_b2]);
 		dram->bass[biqs_outR] = dram->bass[biqs_temp];
-		dram->bass[biqs_dis] = fabs(dram->bass[biqs_c0] * (1.0+(dram->bass[biqs_outR]*dram->bass[biqs_nonlin])));
-		if (dram->bass[biqs_dis] > 1.0) dram->bass[biqs_dis] = 1.0;
+		dram->bass[biqs_dis] = fabs(dram->bass[biqs_c0] * (1.0f+(dram->bass[biqs_outR]*dram->bass[biqs_nonlin])));
+		if (dram->bass[biqs_dis] > 1.0f) dram->bass[biqs_dis] = 1.0f;
 		dram->bass[biqs_temp] = (dram->bass[biqs_outR] * dram->bass[biqs_dis]) + dram->bass[biqs_cR1];
 		dram->bass[biqs_cR1] = dram->bass[biqs_cR2] - (dram->bass[biqs_temp]*dram->bass[biqs_d1]);
 		dram->bass[biqs_cR2] = (dram->bass[biqs_outR] * -dram->bass[biqs_dis]) - (dram->bass[biqs_temp]*dram->bass[biqs_d2]);
 		dram->bass[biqs_outR] = dram->bass[biqs_temp];
-		dram->bass[biqs_dis] = fabs(dram->bass[biqs_e0] * (1.0+(dram->bass[biqs_outR]*dram->bass[biqs_nonlin])));
-		if (dram->bass[biqs_dis] > 1.0) dram->bass[biqs_dis] = 1.0;
+		dram->bass[biqs_dis] = fabs(dram->bass[biqs_e0] * (1.0f+(dram->bass[biqs_outR]*dram->bass[biqs_nonlin])));
+		if (dram->bass[biqs_dis] > 1.0f) dram->bass[biqs_dis] = 1.0f;
 		dram->bass[biqs_temp] = (dram->bass[biqs_outR] * dram->bass[biqs_dis]) + dram->bass[biqs_eR1];
 		dram->bass[biqs_eR1] = dram->bass[biqs_eR2] - (dram->bass[biqs_temp]*dram->bass[biqs_f1]);
 		dram->bass[biqs_eR2] = (dram->bass[biqs_outR] * -dram->bass[biqs_dis]) - (dram->bass[biqs_temp]*dram->bass[biqs_f2]);
 		dram->bass[biqs_outR] = dram->bass[biqs_temp]; dram->bass[biqs_outR] *= dram->bass[biqs_level];
-		if (dram->bass[biqs_level] > 1.0) dram->bass[biqs_outR] *= dram->bass[biqs_level];
+		if (dram->bass[biqs_level] > 1.0f) dram->bass[biqs_outR] *= dram->bass[biqs_level];
 		//end Stacked Biquad With Reversed Neutron Flow R
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;		
-		double gainR = (panA*temp)+(panB*(1.0-temp));
-		double gainL = 1.57079633-gainR;
+		float temp = (float)nSampleFrames/inFramesToProcess;		
+		float gainR = (panA*temp)+(panB*(1.0f-temp));
+		float gainL = 1.57079633f-gainR;
 		gainR = sin(gainR); gainL = sin(gainL);
-		double gain = (inTrimA*temp)+(inTrimB*(1.0-temp));
-		if (gain > 1.0) gain *= gain; else gain = 1.0-pow(1.0-gain,2);
-		gain *= 0.763932022500211;
-		double airGain = (airGainA*temp)+(airGainB*(1.0-temp));
-		if (airGain > 1.0) airGain *= airGain; else airGain = 1.0-pow(1.0-airGain,2);
-		double fireGain = (fireGainA*temp)+(fireGainB*(1.0-temp));
-		if (fireGain > 1.0) fireGain *= fireGain; else fireGain = 1.0-pow(1.0-fireGain,2);
-		double firePad = fireGain; if (firePad > 1.0) firePad = 1.0;
-		double stoneGain = (stoneGainA*temp)+(stoneGainB*(1.0-temp));
-		if (stoneGain > 1.0) stoneGain *= stoneGain; else stoneGain = 1.0-pow(1.0-stoneGain,2);
-		double stonePad = stoneGain; if (stonePad > 1.0) stonePad = 1.0;
+		float gain = (inTrimA*temp)+(inTrimB*(1.0f-temp));
+		if (gain > 1.0f) gain *= gain; else gain = 1.0f-pow(1.0f-gain,2);
+		gain *= 0.763932022500211f;
+		float airGain = (airGainA*temp)+(airGainB*(1.0f-temp));
+		if (airGain > 1.0f) airGain *= airGain; else airGain = 1.0f-pow(1.0f-airGain,2);
+		float fireGain = (fireGainA*temp)+(fireGainB*(1.0f-temp));
+		if (fireGain > 1.0f) fireGain *= fireGain; else fireGain = 1.0f-pow(1.0f-fireGain,2);
+		float firePad = fireGain; if (firePad > 1.0f) firePad = 1.0f;
+		float stoneGain = (stoneGainA*temp)+(stoneGainB*(1.0f-temp));
+		if (stoneGain > 1.0f) stoneGain *= stoneGain; else stoneGain = 1.0f-pow(1.0f-stoneGain,2);
+		float stonePad = stoneGain; if (stonePad > 1.0f) stonePad = 1.0f;
 		//set up smoothed gain controls
 		
 		//begin Air3L
-		double drySampleL = inputSampleL;
+		float drySampleL = inputSampleL;
 		dram->air[pvSL4] = dram->air[pvAL4] - dram->air[pvAL3]; dram->air[pvSL3] = dram->air[pvAL3] - dram->air[pvAL2];
 		dram->air[pvSL2] = dram->air[pvAL2] - dram->air[pvAL1]; dram->air[pvSL1] = dram->air[pvAL1] - inputSampleL;
 		dram->air[accSL3] = dram->air[pvSL4] - dram->air[pvSL3]; dram->air[accSL2] = dram->air[pvSL3] - dram->air[pvSL2];
 		dram->air[accSL1] = dram->air[pvSL2] - dram->air[pvSL1];
 		dram->air[acc2SL2] = dram->air[accSL3] - dram->air[accSL2]; dram->air[acc2SL1] = dram->air[accSL2] - dram->air[accSL1];		
-		dram->air[outAL] = -(dram->air[pvAL1] + dram->air[pvSL3] + dram->air[acc2SL2] - ((dram->air[acc2SL2] + dram->air[acc2SL1])*0.5));
-		dram->air[gainAL] *= 0.5; dram->air[gainAL] += fabs(drySampleL-dram->air[outAL])*0.5;
-		if (dram->air[gainAL] > 0.3*sqrt(overallscale)) dram->air[gainAL] = 0.3*sqrt(overallscale);
+		dram->air[outAL] = -(dram->air[pvAL1] + dram->air[pvSL3] + dram->air[acc2SL2] - ((dram->air[acc2SL2] + dram->air[acc2SL1])*0.5f));
+		dram->air[gainAL] *= 0.5f; dram->air[gainAL] += fabs(drySampleL-dram->air[outAL])*0.5f;
+		if (dram->air[gainAL] > 0.3f*sqrt(overallscale)) dram->air[gainAL] = 0.3f*sqrt(overallscale);
 		dram->air[pvAL4] = dram->air[pvAL3]; dram->air[pvAL3] = dram->air[pvAL2];
 		dram->air[pvAL2] = dram->air[pvAL1]; dram->air[pvAL1] = (dram->air[gainAL] * dram->air[outAL]) + drySampleL;
-		double fireL = drySampleL - ((dram->air[outAL]*0.5)+(drySampleL*(0.457-(0.017*overallscale))));
-		temp = (fireL + dram->air[gndavgL])*0.5; dram->air[gndavgL] = fireL; fireL = temp;
-		double airL = (drySampleL-fireL)*airGain;
+		float fireL = drySampleL - ((dram->air[outAL]*0.5f)+(drySampleL*(0.457f-(0.017f*overallscale))));
+		temp = (fireL + dram->air[gndavgL])*0.5f; dram->air[gndavgL] = fireL; fireL = temp;
+		float airL = (drySampleL-fireL)*airGain;
 		inputSampleL = fireL;
 		//end Air3L
 		//begin Air3R
-		double drySampleR = inputSampleR;
+		float drySampleR = inputSampleR;
 		dram->air[pvSR4] = dram->air[pvAR4] - dram->air[pvAR3]; dram->air[pvSR3] = dram->air[pvAR3] - dram->air[pvAR2];
 		dram->air[pvSR2] = dram->air[pvAR2] - dram->air[pvAR1]; dram->air[pvSR1] = dram->air[pvAR1] - inputSampleR;
 		dram->air[accSR3] = dram->air[pvSR4] - dram->air[pvSR3]; dram->air[accSR2] = dram->air[pvSR3] - dram->air[pvSR2];
 		dram->air[accSR1] = dram->air[pvSR2] - dram->air[pvSR1];
 		dram->air[acc2SR2] = dram->air[accSR3] - dram->air[accSR2]; dram->air[acc2SR1] = dram->air[accSR2] - dram->air[accSR1];		
-		dram->air[outAR] = -(dram->air[pvAR1] + dram->air[pvSR3] + dram->air[acc2SR2] - ((dram->air[acc2SR2] + dram->air[acc2SR1])*0.5));
-		dram->air[gainAR] *= 0.5; dram->air[gainAR] += fabs(drySampleR-dram->air[outAR])*0.5;
-		if (dram->air[gainAR] > 0.3*sqrt(overallscale)) dram->air[gainAR] = 0.3*sqrt(overallscale);
+		dram->air[outAR] = -(dram->air[pvAR1] + dram->air[pvSR3] + dram->air[acc2SR2] - ((dram->air[acc2SR2] + dram->air[acc2SR1])*0.5f));
+		dram->air[gainAR] *= 0.5f; dram->air[gainAR] += fabs(drySampleR-dram->air[outAR])*0.5f;
+		if (dram->air[gainAR] > 0.3f*sqrt(overallscale)) dram->air[gainAR] = 0.3f*sqrt(overallscale);
 		dram->air[pvAR4] = dram->air[pvAR3]; dram->air[pvAR3] = dram->air[pvAR2];
 		dram->air[pvAR2] = dram->air[pvAR1]; dram->air[pvAR1] = (dram->air[gainAR] * dram->air[outAR]) + drySampleR;
-		double fireR = drySampleR - ((dram->air[outAR]*0.5)+(drySampleR*(0.457-(0.017*overallscale))));
-		temp = (fireR + dram->air[gndavgR])*0.5; dram->air[gndavgR] = fireR; fireR = temp;
-		double airR = (drySampleR-fireR)*airGain;
+		float fireR = drySampleR - ((dram->air[outAR]*0.5f)+(drySampleR*(0.457f-(0.017f*overallscale))));
+		temp = (fireR + dram->air[gndavgR])*0.5f; dram->air[gndavgR] = fireR; fireR = temp;
+		float airR = (drySampleR-fireR)*airGain;
 		inputSampleR = fireR;
 		//end Air3R
 		//begin KalmanL
-		temp = inputSampleL = inputSampleL*(1.0-kalmanRange)*0.777;
-		inputSampleL *= (1.0-kalmanRange);
+		temp = inputSampleL = inputSampleL*(1.0f-kalmanRange)*0.777f;
+		inputSampleL *= (1.0f-kalmanRange);
 		//set up gain levels to control the beast
-		dram->kal[prevSlewL3] += dram->kal[prevSampL3] - dram->kal[prevSampL2]; dram->kal[prevSlewL3] *= 0.5;
-		dram->kal[prevSlewL2] += dram->kal[prevSampL2] - dram->kal[prevSampL1]; dram->kal[prevSlewL2] *= 0.5;
-		dram->kal[prevSlewL1] += dram->kal[prevSampL1] - inputSampleL; dram->kal[prevSlewL1] *= 0.5;
+		dram->kal[prevSlewL3] += dram->kal[prevSampL3] - dram->kal[prevSampL2]; dram->kal[prevSlewL3] *= 0.5f;
+		dram->kal[prevSlewL2] += dram->kal[prevSampL2] - dram->kal[prevSampL1]; dram->kal[prevSlewL2] *= 0.5f;
+		dram->kal[prevSlewL1] += dram->kal[prevSampL1] - inputSampleL; dram->kal[prevSlewL1] *= 0.5f;
 		//make slews from each set of samples used
-		dram->kal[accSlewL2] += dram->kal[prevSlewL3] - dram->kal[prevSlewL2]; dram->kal[accSlewL2] *= 0.5;
-		dram->kal[accSlewL1] += dram->kal[prevSlewL2] - dram->kal[prevSlewL1]; dram->kal[accSlewL1] *= 0.5;
+		dram->kal[accSlewL2] += dram->kal[prevSlewL3] - dram->kal[prevSlewL2]; dram->kal[accSlewL2] *= 0.5f;
+		dram->kal[accSlewL1] += dram->kal[prevSlewL2] - dram->kal[prevSlewL1]; dram->kal[accSlewL1] *= 0.5f;
 		//differences between slews: rate of change of rate of change
-		dram->kal[accSlewL3] += (dram->kal[accSlewL2] - dram->kal[accSlewL1]); dram->kal[accSlewL3] *= 0.5;
+		dram->kal[accSlewL3] += (dram->kal[accSlewL2] - dram->kal[accSlewL1]); dram->kal[accSlewL3] *= 0.5f;
 		//entering the abyss, what even is this
-		dram->kal[kalOutL] += dram->kal[prevSampL1] + dram->kal[prevSlewL2] + dram->kal[accSlewL3]; dram->kal[kalOutL] *= 0.5;
+		dram->kal[kalOutL] += dram->kal[prevSampL1] + dram->kal[prevSlewL2] + dram->kal[accSlewL3]; dram->kal[kalOutL] *= 0.5f;
 		//resynthesizing predicted result (all iir smoothed)
-		dram->kal[kalGainL] += fabs(temp-dram->kal[kalOutL])*kalmanRange*8.0; dram->kal[kalGainL] *= 0.5;
+		dram->kal[kalGainL] += fabs(temp-dram->kal[kalOutL])*kalmanRange*8.0f; dram->kal[kalGainL] *= 0.5f;
 		//madness takes its toll. Kalman Gain: how much dry to retain
-		if (dram->kal[kalGainL] > kalmanRange*0.5) dram->kal[kalGainL] = kalmanRange*0.5;
+		if (dram->kal[kalGainL] > kalmanRange*0.5f) dram->kal[kalGainL] = kalmanRange*0.5f;
 		//attempts to avoid explosions
-		dram->kal[kalOutL] += (temp*(1.0-(0.68+(kalmanRange*0.157))));	
+		dram->kal[kalOutL] += (temp*(1.0f-(0.68f+(kalmanRange*0.157f))));	
 		//this is for tuning a really complete cancellation up around Nyquist
 		dram->kal[prevSampL3] = dram->kal[prevSampL2]; dram->kal[prevSampL2] = dram->kal[prevSampL1];
-		dram->kal[prevSampL1] = (dram->kal[kalGainL] * dram->kal[kalOutL]) + ((1.0-dram->kal[kalGainL])*temp);
+		dram->kal[prevSampL1] = (dram->kal[kalGainL] * dram->kal[kalOutL]) + ((1.0f-dram->kal[kalGainL])*temp);
 		//feed the chain of previous samples
-		if (dram->kal[prevSampL1] > 1.0) dram->kal[prevSampL1] = 1.0; if (dram->kal[prevSampL1] < -1.0) dram->kal[prevSampL1] = -1.0;
-		double stoneL = dram->kal[kalOutL]*0.777;
+		if (dram->kal[prevSampL1] > 1.0f) dram->kal[prevSampL1] = 1.0f; if (dram->kal[prevSampL1] < -1.0f) dram->kal[prevSampL1] = -1.0f;
+		float stoneL = dram->kal[kalOutL]*0.777f;
 		fireL -= stoneL;
 		//end KalmanL
 		//begin KalmanR
-		temp = inputSampleR = inputSampleR*(1.0-kalmanRange)*0.777;
-		inputSampleR *= (1.0-kalmanRange);
+		temp = inputSampleR = inputSampleR*(1.0f-kalmanRange)*0.777f;
+		inputSampleR *= (1.0f-kalmanRange);
 		//set up gain levels to control the beast
-		dram->kal[prevSlewR3] += dram->kal[prevSampR3] - dram->kal[prevSampR2]; dram->kal[prevSlewR3] *= 0.5;
-		dram->kal[prevSlewR2] += dram->kal[prevSampR2] - dram->kal[prevSampR1]; dram->kal[prevSlewR2] *= 0.5;
-		dram->kal[prevSlewR1] += dram->kal[prevSampR1] - inputSampleR; dram->kal[prevSlewR1] *= 0.5;
+		dram->kal[prevSlewR3] += dram->kal[prevSampR3] - dram->kal[prevSampR2]; dram->kal[prevSlewR3] *= 0.5f;
+		dram->kal[prevSlewR2] += dram->kal[prevSampR2] - dram->kal[prevSampR1]; dram->kal[prevSlewR2] *= 0.5f;
+		dram->kal[prevSlewR1] += dram->kal[prevSampR1] - inputSampleR; dram->kal[prevSlewR1] *= 0.5f;
 		//make slews from each set of samples used
-		dram->kal[accSlewR2] += dram->kal[prevSlewR3] - dram->kal[prevSlewR2]; dram->kal[accSlewR2] *= 0.5;
-		dram->kal[accSlewR1] += dram->kal[prevSlewR2] - dram->kal[prevSlewR1]; dram->kal[accSlewR1] *= 0.5;
+		dram->kal[accSlewR2] += dram->kal[prevSlewR3] - dram->kal[prevSlewR2]; dram->kal[accSlewR2] *= 0.5f;
+		dram->kal[accSlewR1] += dram->kal[prevSlewR2] - dram->kal[prevSlewR1]; dram->kal[accSlewR1] *= 0.5f;
 		//differences between slews: rate of change of rate of change
-		dram->kal[accSlewR3] += (dram->kal[accSlewR2] - dram->kal[accSlewR1]); dram->kal[accSlewR3] *= 0.5;
+		dram->kal[accSlewR3] += (dram->kal[accSlewR2] - dram->kal[accSlewR1]); dram->kal[accSlewR3] *= 0.5f;
 		//entering the abyss, what even is this
-		dram->kal[kalOutR] += dram->kal[prevSampR1] + dram->kal[prevSlewR2] + dram->kal[accSlewR3]; dram->kal[kalOutR] *= 0.5;
+		dram->kal[kalOutR] += dram->kal[prevSampR1] + dram->kal[prevSlewR2] + dram->kal[accSlewR3]; dram->kal[kalOutR] *= 0.5f;
 		//resynthesizing predicted result (all iir smoothed)
-		dram->kal[kalGainR] += fabs(temp-dram->kal[kalOutR])*kalmanRange*8.0; dram->kal[kalGainR] *= 0.5;
+		dram->kal[kalGainR] += fabs(temp-dram->kal[kalOutR])*kalmanRange*8.0f; dram->kal[kalGainR] *= 0.5f;
 		//madness takes its toll. Kalman Gain: how much dry to retain
-		if (dram->kal[kalGainR] > kalmanRange*0.5) dram->kal[kalGainR] = kalmanRange*0.5;
+		if (dram->kal[kalGainR] > kalmanRange*0.5f) dram->kal[kalGainR] = kalmanRange*0.5f;
 		//attempts to avoid explosions
-		dram->kal[kalOutR] += (temp*(1.0-(0.68+(kalmanRange*0.157))));	
+		dram->kal[kalOutR] += (temp*(1.0f-(0.68f+(kalmanRange*0.157f))));	
 		//this is for tuning a really complete cancellation up around Nyquist
 		dram->kal[prevSampR3] = dram->kal[prevSampR2]; dram->kal[prevSampR2] = dram->kal[prevSampR1];
-		dram->kal[prevSampR1] = (dram->kal[kalGainR] * dram->kal[kalOutR]) + ((1.0-dram->kal[kalGainR])*temp);
+		dram->kal[prevSampR1] = (dram->kal[kalGainR] * dram->kal[kalOutR]) + ((1.0f-dram->kal[kalGainR])*temp);
 		//feed the chain of previous samples
-		if (dram->kal[prevSampR1] > 1.0) dram->kal[prevSampR1] = 1.0; if (dram->kal[prevSampR1] < -1.0) dram->kal[prevSampR1] = -1.0;
-		double stoneR = dram->kal[kalOutR]*0.777;
+		if (dram->kal[prevSampR1] > 1.0f) dram->kal[prevSampR1] = 1.0f; if (dram->kal[prevSampR1] < -1.0f) dram->kal[prevSampR1] = -1.0f;
+		float stoneR = dram->kal[kalOutR]*0.777f;
 		fireR -= stoneR;
 		//end KalmanR
 		//fire dynamics
 		if (fabs(fireL) > compFThresh) { //compression L
 			fireCompL -= (fireCompL * compFAttack);
 			fireCompL += ((compFThresh / fabs(fireL))*compFAttack);
-		} else fireCompL = (fireCompL*(1.0-compFRelease))+compFRelease;
+		} else fireCompL = (fireCompL*(1.0f-compFRelease))+compFRelease;
 		if (fabs(fireR) > compFThresh) { //compression R
 			fireCompR -= (fireCompR * compFAttack);
 			fireCompR += ((compFThresh / fabs(fireR))*compFAttack);
-		} else fireCompR = (fireCompR*(1.0-compFRelease))+compFRelease;
+		} else fireCompR = (fireCompR*(1.0f-compFRelease))+compFRelease;
 		if (fireCompL > fireCompR) fireCompL -= (fireCompL * compFAttack);
 		if (fireCompR > fireCompL) fireCompR -= (fireCompR * compFAttack);
 		if (fabs(fireL) > gateFThresh) fireGate = gateFSustain;
 		else if (fabs(fireR) > gateFThresh) fireGate = gateFSustain;
-		else fireGate *= (1.0-gateFRelease);
-		if (fireGate < 0.0) fireGate = 0.0;
-		fireCompL = fmax(fmin(fireCompL,1.0),0.0);
-		fireCompR = fmax(fmin(fireCompR,1.0),0.0);
-		fireL *= (((1.0-compFRatio)*firePad)+(fireCompL*compFRatio*fireGain));
-		fireR *= (((1.0-compFRatio)*firePad)+(fireCompR*compFRatio*fireGain));
+		else fireGate *= (1.0f-gateFRelease);
+		if (fireGate < 0.0f) fireGate = 0.0f;
+		fireCompL = fmax(fmin(fireCompL,1.0f),0.0f);
+		fireCompR = fmax(fmin(fireCompR,1.0f),0.0f);
+		fireL *= (((1.0f-compFRatio)*firePad)+(fireCompL*compFRatio*fireGain));
+		fireR *= (((1.0f-compFRatio)*firePad)+(fireCompR*compFRatio*fireGain));
 		if (fireGate < M_PI_2) {
-			temp = ((1.0-gateFRatio)+(sin(fireGate)*gateFRatio));
+			temp = ((1.0f-gateFRatio)+(sin(fireGate)*gateFRatio));
 			airL *= temp;
 			airR *= temp;
 			fireL *= temp;
@@ -699,23 +699,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (fabs(stoneL) > compSThresh) { //compression L
 			stoneCompL -= (stoneCompL * compSAttack);
 			stoneCompL += ((compSThresh / fabs(stoneL))*compSAttack);
-		} else stoneCompL = (stoneCompL*(1.0-compSRelease))+compSRelease;
+		} else stoneCompL = (stoneCompL*(1.0f-compSRelease))+compSRelease;
 		if (fabs(stoneR) > compSThresh) { //compression R
 			stoneCompR -= (stoneCompR * compSAttack);
 			stoneCompR += ((compSThresh / fabs(stoneR))*compSAttack);
-		} else stoneCompR = (stoneCompR*(1.0-compSRelease))+compSRelease;
+		} else stoneCompR = (stoneCompR*(1.0f-compSRelease))+compSRelease;
 		if (stoneCompL > stoneCompR) stoneCompL -= (stoneCompL * compSAttack);
 		if (stoneCompR > stoneCompL) stoneCompR -= (stoneCompR * compSAttack);
 		if (fabs(stoneL) > gateSThresh) stoneGate = gateSSustain;
 		else if (fabs(stoneR) > gateSThresh) stoneGate = gateSSustain;
-		else stoneGate *= (1.0-gateSRelease);
-		if (stoneGate < 0.0) stoneGate = 0.0;
-		stoneCompL = fmax(fmin(stoneCompL,1.0),0.0);
-		stoneCompR = fmax(fmin(stoneCompR,1.0),0.0);
-		stoneL *= (((1.0-compSRatio)*stonePad)+(stoneCompL*compSRatio*stoneGain));
-		stoneR *= (((1.0-compSRatio)*stonePad)+(stoneCompR*compSRatio*stoneGain));
+		else stoneGate *= (1.0f-gateSRelease);
+		if (stoneGate < 0.0f) stoneGate = 0.0f;
+		stoneCompL = fmax(fmin(stoneCompL,1.0f),0.0f);
+		stoneCompR = fmax(fmin(stoneCompR,1.0f),0.0f);
+		stoneL *= (((1.0f-compSRatio)*stonePad)+(stoneCompL*compSRatio*stoneGain));
+		stoneR *= (((1.0f-compSRatio)*stonePad)+(stoneCompR*compSRatio*stoneGain));
 		if (stoneGate < M_PI_2) {
-			temp = ((1.0-gateSRatio)+(sin(stoneGate)*gateSRatio));
+			temp = ((1.0f-gateSRatio)+(sin(stoneGate)*gateSRatio));
 			stoneL *= temp;
 			stoneR *= temp;
 			dram->lmid[biqs_outL] *= temp;
@@ -734,7 +734,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->highpass[hilp_temp] = (inputSampleR*dram->highpass[hilp_c0])+dram->highpass[hilp_cR1];
 			dram->highpass[hilp_cR1] = (inputSampleR*dram->highpass[hilp_c1])-(dram->highpass[hilp_temp]*dram->highpass[hilp_d1])+dram->highpass[hilp_cR2];
 			dram->highpass[hilp_cR2] = (inputSampleR*dram->highpass[hilp_c0])-(dram->highpass[hilp_temp]*dram->highpass[hilp_d2]); inputSampleR = dram->highpass[hilp_temp];
-		} else dram->highpass[hilp_cR1] = dram->highpass[hilp_cR2] = dram->highpass[hilp_cL1] = dram->highpass[hilp_cL2] = 0.0;
+		} else dram->highpass[hilp_cR1] = dram->highpass[hilp_cR2] = dram->highpass[hilp_cL1] = dram->highpass[hilp_cL2] = 0.0f;
 		if (lowpassEngage) { //distributed Lowpass
 			dram->lowpass[hilp_temp] = (inputSampleL*dram->lowpass[hilp_c0])+dram->lowpass[hilp_cL1];
 			dram->lowpass[hilp_cL1] = (inputSampleL*dram->lowpass[hilp_c1])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_d1])+dram->lowpass[hilp_cL2];
@@ -742,7 +742,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->lowpass[hilp_temp] = (inputSampleR*dram->lowpass[hilp_c0])+dram->lowpass[hilp_cR1];
 			dram->lowpass[hilp_cR1] = (inputSampleR*dram->lowpass[hilp_c1])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_d1])+dram->lowpass[hilp_cR2];
 			dram->lowpass[hilp_cR2] = (inputSampleR*dram->lowpass[hilp_c0])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_d2]); inputSampleR = dram->lowpass[hilp_temp];
-		} else dram->lowpass[hilp_cR1] = dram->lowpass[hilp_cR2] = dram->lowpass[hilp_cL1] = dram->lowpass[hilp_cL2] = 0.0;
+		} else dram->lowpass[hilp_cR1] = dram->lowpass[hilp_cR2] = dram->lowpass[hilp_cL1] = dram->lowpass[hilp_cL2] = 0.0f;
 		//another stage of Highpass/Lowpass before bringing in the parametric bands
 		
 		inputSampleL += (dram->high[biqs_outL] + dram->hmid[biqs_outL] + dram->lmid[biqs_outL] + dram->bass[biqs_outL]);
@@ -754,20 +754,20 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//applies pan section, and smoothed fader gain
 		
 		inputSampleL *= topdB;
-		if (inputSampleL < -0.222) inputSampleL = -0.222; if (inputSampleL > 0.222) inputSampleL = 0.222;
-		dram->dBaL[dBaXL] = inputSampleL; dBaPosL *= 0.5; dBaPosL += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*0.5);
+		if (inputSampleL < -0.222f) inputSampleL = -0.222f; if (inputSampleL > 0.222f) inputSampleL = 0.222f;
+		dram->dBaL[dBaXL] = inputSampleL; dBaPosL *= 0.5f; dBaPosL += fabs((inputSampleL*((inputSampleL*0.25f)-0.5f))*0.5f);
 		int dBdly = floor(dBaPosL*dscBuf);
-		double dBi = (dBaPosL*dscBuf)-dBdly;
-		inputSampleL = dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		float dBi = (dBaPosL*dscBuf)-dBdly;
+		inputSampleL = dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*(1.0f-dBi);
 		dBdly++; inputSampleL += dram->dBaL[dBaXL-dBdly +((dBaXL-dBdly < 0)?dscBuf:0)]*dBi;
 		dBaXL++; if (dBaXL < 0 || dBaXL >= dscBuf) dBaXL = 0;
 		inputSampleL /= topdB;		
 		inputSampleR *= topdB;
-		if (inputSampleR < -0.222) inputSampleR = -0.222; if (inputSampleR > 0.222) inputSampleR = 0.222;
-		dram->dBaR[dBaXR] = inputSampleR; dBaPosR *= 0.5; dBaPosR += fabs((inputSampleR*((inputSampleR*0.25)-0.5))*0.5);
+		if (inputSampleR < -0.222f) inputSampleR = -0.222f; if (inputSampleR > 0.222f) inputSampleR = 0.222f;
+		dram->dBaR[dBaXR] = inputSampleR; dBaPosR *= 0.5f; dBaPosR += fabs((inputSampleR*((inputSampleR*0.25f)-0.5f))*0.5f);
 		dBdly = floor(dBaPosR*dscBuf);
 		dBi = (dBaPosR*dscBuf)-dBdly;
-		inputSampleR = dram->dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*(1.0-dBi);
+		inputSampleR = dram->dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*(1.0f-dBi);
 		dBdly++; inputSampleR += dram->dBaR[dBaXR-dBdly +((dBaXR-dBdly < 0)?dscBuf:0)]*dBi;
 		dBaXR++; if (dBaXR < 0 || dBaXR >= dscBuf) dBaXR = 0;
 		inputSampleR /= topdB;		
@@ -780,7 +780,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->highpass[hilp_temp] = (inputSampleR*dram->highpass[hilp_e0])+dram->highpass[hilp_eR1];
 			dram->highpass[hilp_eR1] = (inputSampleR*dram->highpass[hilp_e1])-(dram->highpass[hilp_temp]*dram->highpass[hilp_f1])+dram->highpass[hilp_eR2];
 			dram->highpass[hilp_eR2] = (inputSampleR*dram->highpass[hilp_e0])-(dram->highpass[hilp_temp]*dram->highpass[hilp_f2]); inputSampleR = dram->highpass[hilp_temp];
-		} else dram->highpass[hilp_eR1] = dram->highpass[hilp_eR2] = dram->highpass[hilp_eL1] = dram->highpass[hilp_eL2] = 0.0;
+		} else dram->highpass[hilp_eR1] = dram->highpass[hilp_eR2] = dram->highpass[hilp_eL1] = dram->highpass[hilp_eL2] = 0.0f;
 		if (lowpassEngage) { //distributed Lowpass
 			dram->lowpass[hilp_temp] = (inputSampleL*dram->lowpass[hilp_e0])+dram->lowpass[hilp_eL1];
 			dram->lowpass[hilp_eL1] = (inputSampleL*dram->lowpass[hilp_e1])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_f1])+dram->lowpass[hilp_eL2];
@@ -788,17 +788,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->lowpass[hilp_temp] = (inputSampleR*dram->lowpass[hilp_e0])+dram->lowpass[hilp_eR1];
 			dram->lowpass[hilp_eR1] = (inputSampleR*dram->lowpass[hilp_e1])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_f1])+dram->lowpass[hilp_eR2];
 			dram->lowpass[hilp_eR2] = (inputSampleR*dram->lowpass[hilp_e0])-(dram->lowpass[hilp_temp]*dram->lowpass[hilp_f2]); inputSampleR = dram->lowpass[hilp_temp];
-		} else dram->lowpass[hilp_eR1] = dram->lowpass[hilp_eR2] = dram->lowpass[hilp_eL1] = dram->lowpass[hilp_eL2] = 0.0;		
+		} else dram->lowpass[hilp_eR1] = dram->lowpass[hilp_eR2] = dram->lowpass[hilp_eL1] = dram->lowpass[hilp_eL2] = 0.0f;		
 		//final Highpass/Lowpass continues to address aliasing
 		//final stacked biquad section is the softest Q for smoothness
 		
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

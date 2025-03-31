@@ -45,16 +45,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		inputSample += ((pow(inputSample,5)/128.0) + (pow(inputSample,9)/262144.0)) - ((pow(inputSample,3)/8.0) + (pow(inputSample,7)/4096.0));
+		inputSample += ((pow(inputSample,5)/128.0f) + (pow(inputSample,9)/262144.0f)) - ((pow(inputSample,3)/8.0f) + (pow(inputSample,7)/4096.0f));
 		//crude sine. Note that because modern processors love math more than extra variables, this is optimized
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

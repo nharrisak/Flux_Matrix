@@ -40,24 +40,24 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		int gcount;		
-		Float64 rateof;
-		Float64 sweep;
-		Float64 nextmax;
-		Float64 iirMidRollerA;
-		Float64 iirMidRollerB;
-		Float64 iirHeadBumpA;
-		Float64 iirHeadBumpB;
-		double biquadA[9];
-		double biquadB[9];
-		double biquadC[9];
-		double biquadD[9];
+		Float32 rateof;
+		Float32 sweep;
+		Float32 nextmax;
+		Float32 iirMidRollerA;
+		Float32 iirMidRollerB;
+		Float32 iirHeadBumpA;
+		Float32 iirHeadBumpB;
+		float biquadA[9];
+		float biquadB[9];
+		float biquadC[9];
+		float biquadD[9];
 		bool flip;
-		double lastSample;
+		float lastSample;
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d[502];
+			Float32 d[502];
 	};
 	_dram* dram;
 };
@@ -71,98 +71,98 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 inputgain = pow(10.0,GetParameter( kParam_One )/20.0);
-	Float64 SoftenControl = pow(GetParameter( kParam_Two ),2);
-	Float64 RollAmount = (1.0-(SoftenControl * 0.45))/overallscale;
-	Float64 HeadBumpControl = GetParameter( kParam_Three ) * 0.25 * inputgain;
-	Float64 HeadBumpFreq = 0.12/overallscale;
-	//[0] is frequency: 0.000001 to 0.499999 is near-zero to near-Nyquist
-	//[1] is resonance, 0.7071 is Butterworth. Also can't be zero
-	biquadA[0] = biquadB[0] = 0.007/overallscale;
-	biquadA[1] = biquadB[1] = 0.0009;
-	double K = tan(M_PI * biquadB[0]);
-	double norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 SoftenControl = pow(GetParameter( kParam_Two ),2);
+	Float32 RollAmount = (1.0f-(SoftenControl * 0.45f))/overallscale;
+	Float32 HeadBumpControl = GetParameter( kParam_Three ) * 0.25f * inputgain;
+	Float32 HeadBumpFreq = 0.12f/overallscale;
+	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
+	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
+	biquadA[0] = biquadB[0] = 0.007f/overallscale;
+	biquadA[1] = biquadB[1] = 0.0009f;
+	float K = tan(M_PI * biquadB[0]);
+	float norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadA[2] = biquadB[2] = K / biquadB[1] * norm;
 	biquadA[4] = biquadB[4] = -biquadB[2];
-	biquadA[5] = biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadA[5] = biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
-	biquadC[0] = biquadD[0] = 0.032/overallscale;
-	biquadC[1] = biquadD[1] = 0.0007;
+	biquadC[0] = biquadD[0] = 0.032f/overallscale;
+	biquadC[1] = biquadD[1] = 0.0007f;
 	K = tan(M_PI * biquadD[0]);
-	norm = 1.0 / (1.0 + K / biquadD[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadD[1] + K * K);
 	biquadC[2] = biquadD[2] = K / biquadD[1] * norm;
 	biquadC[4] = biquadD[4] = -biquadD[2];
-	biquadC[5] = biquadD[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = biquadD[6] = (1.0 - K / biquadD[1] + K * K) * norm;
+	biquadC[5] = biquadD[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = biquadD[6] = (1.0f - K / biquadD[1] + K * K) * norm;
 	
-	Float64 depth = pow(GetParameter( kParam_Four ),2)*overallscale*70;
-	Float64 fluttertrim = (0.0024*pow(GetParameter( kParam_Four ),2))/overallscale;
-	Float64 outputgain = pow(10.0,GetParameter( kParam_Five )/20.0);
+	Float32 depth = pow(GetParameter( kParam_Four ),2)*overallscale*70;
+	Float32 fluttertrim = (0.0024f*pow(GetParameter( kParam_Four ),2))/overallscale;
+	Float32 outputgain = pow(10.0f,GetParameter( kParam_Five )/20.0f);
 	
-	Float64 refclip = 0.99;
-	Float64 softness = 0.618033988749894848204586;
+	Float32 refclip = 0.99f;
+	Float32 softness = 0.618033988749894848204586f;
 	
-	Float64 wet = GetParameter( kParam_Six );
+	Float32 wet = GetParameter( kParam_Six );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		if (inputgain < 1.0) {
+		if (inputgain < 1.0f) {
 			inputSample *= inputgain;
 		} //gain cut before plugin
 		
 
-		Float64 flutterrandy = fpd / (double)UINT32_MAX;
+		Float32 flutterrandy = fpd / (float)UINT32_MAX;
 		//now we've got a random flutter, so we're messing with the pitch before tape effects go on
 		if (gcount < 0 || gcount > 499) {gcount = 499;}
 		dram->d[gcount] = inputSample;
 		int count = gcount;
-		if (depth != 0.0) {
+		if (depth != 0.0f) {
 			
-			double offset = depth + (depth * pow(rateof,2) * sin(sweep));
+			float offset = depth + (depth * pow(rateof,2) * sin(sweep));
 			
 			count += (int)floor(offset);
 			inputSample = (dram->d[count-((count > 499)?500:0)] * (1-(offset-floor(offset))) );
 			inputSample += (dram->d[count+1-((count+1 > 499)?500:0)] * (offset-floor(offset)) );
 			
-			rateof = (rateof * (1.0-fluttertrim)) + (nextmax * fluttertrim);
+			rateof = (rateof * (1.0f-fluttertrim)) + (nextmax * fluttertrim);
 			sweep += rateof * fluttertrim;
 			
-			if (sweep >= (pi*2.0)) {
+			if (sweep >= (pi*2.0f)) {
 				sweep -= pi;
-				nextmax = 0.24 + (flutterrandy * 0.74);
+				nextmax = 0.24f + (flutterrandy * 0.74f);
 			}
 			//apply to input signal only when flutter is present, interpolate samples
 		}
 		gcount--;
 
-		double vibDrySample = inputSample;
-		double HighsSample = 0.0;
-		double NonHighsSample = 0.0;
-		double tempSample;
+		float vibDrySample = inputSample;
+		float HighsSample = 0.0f;
+		float NonHighsSample = 0.0f;
+		float tempSample;
 		
 		if (flip)
 		{
-			iirMidRollerA = (iirMidRollerA * (1.0 - RollAmount)) + (inputSample * RollAmount);
+			iirMidRollerA = (iirMidRollerA * (1.0f - RollAmount)) + (inputSample * RollAmount);
 			HighsSample = inputSample - iirMidRollerA;
 			NonHighsSample = iirMidRollerA;
 			
-			iirHeadBumpA += (inputSample * 0.05);
+			iirHeadBumpA += (inputSample * 0.05f);
 			iirHeadBumpA -= (iirHeadBumpA * iirHeadBumpA * iirHeadBumpA * HeadBumpFreq);
 			iirHeadBumpA = sin(iirHeadBumpA);
 			tempSample = (iirHeadBumpA * biquadA[2]) + biquadA[7];
 			biquadA[7] = (iirHeadBumpA * biquadA[3]) - (tempSample * biquadA[5]) + biquadA[8];
 			biquadA[8] = (iirHeadBumpA * biquadA[4]) - (tempSample * biquadA[6]);
 			iirHeadBumpA = tempSample; //interleaved biquad
-			if (iirHeadBumpA > 1.0) iirHeadBumpA = 1.0;
-			if (iirHeadBumpA < -1.0) iirHeadBumpA = -1.0;
+			if (iirHeadBumpA > 1.0f) iirHeadBumpA = 1.0f;
+			if (iirHeadBumpA < -1.0f) iirHeadBumpA = -1.0f;
 			iirHeadBumpA = asin(iirHeadBumpA);
 		
 			inputSample = sin(inputSample);
@@ -170,23 +170,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			biquadC[7] = (inputSample * biquadC[3]) - (tempSample * biquadC[5]) + biquadC[8];
 			biquadC[8] = (inputSample * biquadC[4]) - (tempSample * biquadC[6]);
 			inputSample = tempSample; //interleaved biquad
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			inputSample = asin(inputSample);
 		} else {
-			iirMidRollerB = (iirMidRollerB * (1.0 - RollAmount)) + (inputSample * RollAmount);
+			iirMidRollerB = (iirMidRollerB * (1.0f - RollAmount)) + (inputSample * RollAmount);
 			HighsSample = inputSample - iirMidRollerB;
 			NonHighsSample = iirMidRollerB;
 			
-			iirHeadBumpB += (inputSample * 0.05);
+			iirHeadBumpB += (inputSample * 0.05f);
 			iirHeadBumpB -= (iirHeadBumpB * iirHeadBumpB * iirHeadBumpB * HeadBumpFreq);
 			iirHeadBumpB = sin(iirHeadBumpB);
 			tempSample = (iirHeadBumpB * biquadB[2]) + biquadB[7];
 			biquadB[7] = (iirHeadBumpB * biquadB[3]) - (tempSample * biquadB[5]) + biquadB[8];
 			biquadB[8] = (iirHeadBumpB * biquadB[4]) - (tempSample * biquadB[6]);
 			iirHeadBumpB = tempSample; //interleaved biquad
-			if (iirHeadBumpB > 1.0) iirHeadBumpB = 1.0;
-			if (iirHeadBumpB < -1.0) iirHeadBumpB = -1.0;
+			if (iirHeadBumpB > 1.0f) iirHeadBumpB = 1.0f;
+			if (iirHeadBumpB < -1.0f) iirHeadBumpB = -1.0f;
 			iirHeadBumpB = asin(iirHeadBumpB);
 		
 			inputSample = sin(inputSample);
@@ -194,26 +194,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			biquadD[7] = (inputSample * biquadD[3]) - (tempSample * biquadD[5]) + biquadD[8];
 			biquadD[8] = (inputSample * biquadD[4]) - (tempSample * biquadD[6]);
 			inputSample = tempSample; //interleaved biquad
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			inputSample = asin(inputSample);
 		}
 		flip = !flip;
 
-		double groundSample = vibDrySample - inputSample; //set up UnBox on fluttered audio
+		float groundSample = vibDrySample - inputSample; //set up UnBox on fluttered audio
 		
-		if (inputgain > 1.0) {
+		if (inputgain > 1.0f) {
 			inputSample *= inputgain;
 		} //gain boost inside UnBox/Mojo
 		
-		double applySoften = fabs(HighsSample)*1.57079633;
-		if (applySoften > 1.57079633) applySoften = 1.57079633;
+		float applySoften = fabs(HighsSample)*1.57079633f;
+		if (applySoften > 1.57079633f) applySoften = 1.57079633f;
 		applySoften = 1-cos(applySoften);
 		if (HighsSample > 0) inputSample -= applySoften;
 		if (HighsSample < 0) inputSample += applySoften;
 		//apply Soften depending on polarity
 		
-		Float64 suppress = (1.0-fabs(inputSample)) * 0.00013;
+		Float32 suppress = (1.0f-fabs(inputSample)) * 0.00013f;
 		if (iirHeadBumpA > suppress) iirHeadBumpA -= suppress;
 		if (iirHeadBumpA < -suppress) iirHeadBumpA += suppress;
 		if (iirHeadBumpB > suppress) iirHeadBumpB -= suppress;
@@ -223,40 +223,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += ((iirHeadBumpA + iirHeadBumpB) * HeadBumpControl);
 		//apply Fatten.
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
-		double mojo; mojo = pow(fabs(inputSample),0.25);
-		if (mojo > 0.0) inputSample = (sin(inputSample * mojo * M_PI * 0.5) / mojo);
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		float mojo; mojo = pow(fabs(inputSample),0.25f);
+		if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo);
 		//mojo is the one that flattens WAAAAY out very softly before wavefolding		
 		
 		inputSample += groundSample; //apply UnBox processing
 
-		if (outputgain != 1.0) {
+		if (outputgain != 1.0f) {
 			inputSample *= outputgain;
 		}
 		
 		
 		if (lastSample >= refclip)
 		{
-			if (inputSample < refclip) lastSample = ((refclip*softness) + (inputSample * (1.0-softness)));
+			if (inputSample < refclip) lastSample = ((refclip*softness) + (inputSample * (1.0f-softness)));
 			else lastSample = refclip;
 		}
 		
 		if (lastSample <= -refclip)
 		{
-			if (inputSample > -refclip) lastSample = ((-refclip*softness) + (inputSample * (1.0-softness)));
+			if (inputSample > -refclip) lastSample = ((-refclip*softness) + (inputSample * (1.0f-softness)));
 			else lastSample = -refclip;
 		}
 		
 		if (inputSample > refclip)
 		{
-			if (lastSample < refclip) inputSample = ((refclip*softness) + (lastSample * (1.0-softness)));
+			if (lastSample < refclip) inputSample = ((refclip*softness) + (lastSample * (1.0f-softness)));
 			else inputSample = refclip;
 		}
 		
 		if (inputSample < -refclip)
 		{
-			if (lastSample > -refclip) inputSample = ((-refclip*softness) + (lastSample * (1.0-softness)));
+			if (lastSample > -refclip) inputSample = ((-refclip*softness) + (lastSample * (1.0f-softness)));
 			else inputSample = -refclip;
 		}
 		lastSample = inputSample;
@@ -265,14 +265,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (inputSample < -refclip) inputSample = -refclip;
 		//final iron bar
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0 - wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f - wet));
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

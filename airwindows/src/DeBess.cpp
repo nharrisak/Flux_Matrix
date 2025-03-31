@@ -37,11 +37,11 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double s[41], m[41], c[41];		
-		Float64 ratioA;
-		Float64 ratioB;
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		float s[41], m[41], c[41];		
+		Float32 ratioA;
+		Float32 ratioB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		bool flip;
 		
 		uint32_t fpd;
@@ -60,21 +60,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float64 intensity = pow(GetParameter( kParam_One ),5)*(8192/overallscale);
-	Float64 sharpness = GetParameter( kParam_Two )*40.0;
+	Float32 intensity = pow(GetParameter( kParam_One ),5)*(8192/overallscale);
+	Float32 sharpness = GetParameter( kParam_Two )*40.0f;
 	if (sharpness < 2) sharpness = 2;
-	Float64 speed = 0.1 / sharpness;
-	Float64 depth = 1.0 / (GetParameter( kParam_Three )+0.0001);
-	Float64 iirAmount = GetParameter( kParam_Four );
+	Float32 speed = 0.1f / sharpness;
+	Float32 depth = 1.0f / (GetParameter( kParam_Three )+0.0001f);
+	Float32 iirAmount = GetParameter( kParam_Four );
 	int monitoring = GetParameter( kParam_Five );
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-37) inputSample = fpd * 1.18e-37;		
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-37f) inputSample = fpd * 1.18e-37f;		
 		
 		s[0] = inputSample; //set up so both [0] and [1] will be input sample
 		//we only use the [1] so this is just where samples come in
@@ -82,32 +82,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			s[x] = s[x-1];
 		} //building up a set of slews
 		
-		m[1] = (s[1]-s[2])*((s[1]-s[2])/1.3);
+		m[1] = (s[1]-s[2])*((s[1]-s[2])/1.3f);
 		for (int x = sharpness-1; x > 1; x--) {
-			m[x] = (s[x]-s[x+1])*((s[x-1]-s[x])/1.3);
+			m[x] = (s[x]-s[x+1])*((s[x-1]-s[x])/1.3f);
 		} //building up a set of slews of slews
 		
 		
-		double sense = fabs(m[1] - m[2]) * sharpness * sharpness;
+		float sense = fabs(m[1] - m[2]) * sharpness * sharpness;
 		for (int x = sharpness-1; x > 0; x--) {
-			double mult = fabs(m[x] - m[x+1]) * sharpness * sharpness;
-			if (mult < 1.0) sense *= mult;
+			float mult = fabs(m[x] - m[x+1]) * sharpness * sharpness;
+			if (mult < 1.0f) sense *= mult;
 		} //sense is slews of slews times each other
 				
-		sense = 1.0+(intensity*intensity*sense);
+		sense = 1.0f+(intensity*intensity*sense);
 		if (sense > intensity) {sense = intensity;}
 				
 		if (flip) {
 			iirSampleA = (iirSampleA * (1 - iirAmount)) + (inputSample * iirAmount);
-			ratioA = (ratioA * (1.0-speed))+(sense * speed);
+			ratioA = (ratioA * (1.0f-speed))+(sense * speed);
 			if (ratioA > depth) ratioA = depth;
-			if (ratioA > 1.0) inputSample = iirSampleA+((inputSample-iirSampleA)/ratioA);
+			if (ratioA > 1.0f) inputSample = iirSampleA+((inputSample-iirSampleA)/ratioA);
 		}
 		else {
 			iirSampleB = (iirSampleB * (1 - iirAmount)) + (inputSample * iirAmount);	
-			ratioB = (ratioB * (1.0-speed))+(sense * speed);			
+			ratioB = (ratioB * (1.0f-speed))+(sense * speed);			
 			if (ratioB > depth) ratioB = depth;
-			if (ratioA > 1.0) inputSample = iirSampleB+((inputSample-iirSampleB)/ratioB);
+			if (ratioA > 1.0f) inputSample = iirSampleB+((inputSample-iirSampleB)/ratioB);
 		}
 		flip = !flip;
 		
@@ -117,7 +117,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

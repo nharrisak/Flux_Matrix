@@ -42,8 +42,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double previousIn[9];
-		double previousOut[9];
+		float previousIn[9];
+		float previousOut[9];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,23 +60,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	int stages = (int)floor(GetSampleRate()/25000.0);
+	int stages = (int)floor(GetSampleRate()/25000.0f);
 	if (stages > 8) stages = 8;
-	Float64 input = pow(10.0,GetParameter( kParam_One )/20.0);
+	Float32 input = pow(10.0f,GetParameter( kParam_One )/20.0f);
 	int mode = (int) GetParameter( kParam_Two );
-	Float64 output = pow(10.0,GetParameter( kParam_Three )/20.0);
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 output = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		inputSample *= input;
 		
 		for (int x = 0; x < stages; x++) {
-			double temp;
-			temp = (inputSample+previousIn[x])*0.5;
+			float temp;
+			temp = (inputSample+previousIn[x])*0.5f;
 			previousIn[x] = inputSample;
 			inputSample = temp;
 		}
@@ -84,55 +84,55 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		switch (mode)
 		{
 			case 0: //Density
-				if (inputSample > 1.570796326794897) inputSample = 1.570796326794897;
-				if (inputSample < -1.570796326794897) inputSample = -1.570796326794897;
-				//clip to 1.570796326794897 to reach maximum output
+				if (inputSample > 1.570796326794897f) inputSample = 1.570796326794897f;
+				if (inputSample < -1.570796326794897f) inputSample = -1.570796326794897f;
+				//clip to 1.570796326794897f to reach maximum output
 				inputSample = sin(inputSample);
 				break;
 			case 1: //Drive				
-				if (inputSample > 1.0) inputSample = 1.0;
-				if (inputSample < -1.0) inputSample = -1.0;
-				inputSample -= (inputSample * (fabs(inputSample) * 0.6) * (fabs(inputSample) * 0.6));
-				inputSample *= 1.5;
+				if (inputSample > 1.0f) inputSample = 1.0f;
+				if (inputSample < -1.0f) inputSample = -1.0f;
+				inputSample -= (inputSample * (fabs(inputSample) * 0.6f) * (fabs(inputSample) * 0.6f));
+				inputSample *= 1.5f;
 				break;
 			case 2: //Spiral
-				if (inputSample > 1.2533141373155) inputSample = 1.2533141373155;
-				if (inputSample < -1.2533141373155) inputSample = -1.2533141373155;
-				//clip to 1.2533141373155 to reach maximum output
-				inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0) ?1:fabs(inputSample));
+				if (inputSample > 1.2533141373155f) inputSample = 1.2533141373155f;
+				if (inputSample < -1.2533141373155f) inputSample = -1.2533141373155f;
+				//clip to 1.2533141373155f to reach maximum output
+				inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 				break;
 			case 3: //Mojo
-				double mojo; mojo = pow(fabs(inputSample),0.25);
-				if (mojo > 0.0) inputSample = (sin(inputSample * mojo * M_PI * 0.5) / mojo) * 0.987654321;
+				float mojo; mojo = pow(fabs(inputSample),0.25f);
+				if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 				//mojo is the one that flattens WAAAAY out very softly before wavefolding				
 				break;
 			case 4: //Dyno
-				double dyno; dyno = pow(fabs(inputSample),4);
-				if (dyno > 0.0) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321;
+				float dyno; dyno = pow(fabs(inputSample),4);
+				if (dyno > 0.0f) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321f;
 				//dyno is the one that tries to raise peak energy				
 				break;
 		}
 		
 		for (int x = 1; x < (stages/2); x++) {
-			double temp;
-			temp = (inputSample+previousOut[x])*0.5;
+			float temp;
+			temp = (inputSample+previousOut[x])*0.5f;
 			previousOut[x] = inputSample;
 			inputSample = temp;
 		}		
 		
-		if (output != 1.0) {
+		if (output != 1.0f) {
 			inputSample *= output;
 		}
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

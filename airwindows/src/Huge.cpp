@@ -31,19 +31,19 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double prev3;
-		double prev5;
-		double prev7;
-		double prev9;
-		double prev11;
-		double prev13;
-		double prevOut;
-		double limit3;
-		double limit5;
-		double limit7;
-		double limit9;
-		double limit11;
-		double limit13;
+		float prev3;
+		float prev5;
+		float prev7;
+		float prev9;
+		float prev11;
+		float prev13;
+		float prevOut;
+		float limit3;
+		float limit5;
+		float limit7;
+		float limit9;
+		float limit11;
+		float limit13;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,40 +60,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double huge = GetParameter( kParam_One );
-	double threshold = (GetParameter( kParam_Two ) * 0.05) + 0.05;
-	double attack = (threshold * 8.0) / overallscale;
-	double release = (threshold * 8.0) / overallscale;
+	float huge = GetParameter( kParam_One );
+	float threshold = (GetParameter( kParam_Two ) * 0.05f) + 0.05f;
+	float attack = (threshold * 8.0f) / overallscale;
+	float release = (threshold * 8.0f) / overallscale;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
 		inputSample *= huge;
 		
-		double inP3 = inputSample * inputSample * inputSample;
-		double outP3 = ((4.0*inP3)-(3.0*inputSample))*-0.36;
-		double inP5 = inP3 * inputSample * inputSample;
-		double outP5 = ((16.0*inP5)-(20.0*inP3)+(5.0*inputSample))*0.2025;
-		double inP7 = inP5 * inputSample * inputSample;
-		double outP7 = ((64.0*inP7)-(112.0*inP5)+(56.0*inP3)-(7.0*inputSample))*-0.1444;
-		double inP9 = inP7 * inputSample * inputSample;
-		double outP9 = ((256.0*inP9)-(576.0*inP7)+(432.0*inP5)-(120.0*inP3)+(9.0*inputSample))*0.1225;
-		double inP11 = inP9 * inputSample * inputSample;
-		double outP11 = ((1024.0*inP11)-(2816.0*inP9)+(2816.0*inP7)-(1232.0*inP5)+(220.0*inP3)-(11.0*inputSample))*-0.1024;
-		double inP13 = inP11 * inputSample * inputSample;
-		double outP13 = ((4096.0*inP13)-(13312.0*inP11)+(16640.0*inP9)-(9984.0*inP7)+(2912.0*inP5)-(364.0*inP3)+(13.0*inputSample))*0.09;
+		float inP3 = inputSample * inputSample * inputSample;
+		float outP3 = ((4.0f*inP3)-(3.0f*inputSample))*-0.36f;
+		float inP5 = inP3 * inputSample * inputSample;
+		float outP5 = ((16.0f*inP5)-(20.0f*inP3)+(5.0f*inputSample))*0.2025f;
+		float inP7 = inP5 * inputSample * inputSample;
+		float outP7 = ((64.0f*inP7)-(112.0f*inP5)+(56.0f*inP3)-(7.0f*inputSample))*-0.1444f;
+		float inP9 = inP7 * inputSample * inputSample;
+		float outP9 = ((256.0f*inP9)-(576.0f*inP7)+(432.0f*inP5)-(120.0f*inP3)+(9.0f*inputSample))*0.1225f;
+		float inP11 = inP9 * inputSample * inputSample;
+		float outP11 = ((1024.0f*inP11)-(2816.0f*inP9)+(2816.0f*inP7)-(1232.0f*inP5)+(220.0f*inP3)-(11.0f*inputSample))*-0.1024f;
+		float inP13 = inP11 * inputSample * inputSample;
+		float outP13 = ((4096.0f*inP13)-(13312.0f*inP11)+(16640.0f*inP9)-(9984.0f*inP7)+(2912.0f*inP5)-(364.0f*inP3)+(13.0f*inputSample))*0.09f;
 
-		double slew3 = fabs(outP3 - prev3); prev3 = outP3;
-		double slew5 = fabs(outP5 - prev5); prev5 = outP5;
-		double slew7 = fabs(outP7 - prev7); prev7 = outP7;
-		double slew9 = fabs(outP9 - prev9); prev9 = outP9;
-		double slew11 = fabs(outP11 - prev11); prev11 = outP11;
-		double slew13 = fabs(outP13 - prev13); prev13 = outP13;
+		float slew3 = fabs(outP3 - prev3); prev3 = outP3;
+		float slew5 = fabs(outP5 - prev5); prev5 = outP5;
+		float slew7 = fabs(outP7 - prev7); prev7 = outP7;
+		float slew9 = fabs(outP9 - prev9); prev9 = outP9;
+		float slew11 = fabs(outP11 - prev11); prev11 = outP11;
+		float slew13 = fabs(outP13 - prev13); prev13 = outP13;
 		
 		if (slew3 < threshold) limit3 += release;
 		else limit3 -= attack;
@@ -108,32 +108,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (slew13 < threshold) limit13 += release;
 		else limit13 -= attack;
 		
-		if (limit3 > 1.0)  {limit3 = 1.0;}
-		if (limit5 > 1.0)  {limit3 = 1.0; limit5 = 1.0;}
-		if (limit7 > 1.0)  {limit3 = 1.0; limit5 = 1.0; limit7 = 1.0;}
-		if (limit9 > 1.0)  {limit3 = 1.0; limit5 = 1.0; limit7 = 1.0; limit9 = 1.0;}
-		if (limit11 > 1.0) {limit3 = 1.0; limit5 = 1.0; limit7 = 1.0; limit9 = 1.0; limit11 = 1.0;}
-		if (limit13 > 1.0) {limit3 = 1.0; limit5 = 1.0; limit7 = 1.0; limit9 = 1.0; limit11 = 1.0; limit13 = 1.0;}
-		if (limit3 < 0.0) {limit3 = 0.0; limit5 = 0.0; limit7 = 0.0; limit9 = 0.0; limit11 = 0.0; limit13 = 0.0;}
-		if (limit5 < 0.0) {limit5 = 0.0; limit7 = 0.0; limit9 = 0.0; limit11 = 0.0; limit13 = 0.0;}
-		if (limit7 < 0.0) {limit7 = 0.0; limit9 = 0.0; limit11 = 0.0; limit13 = 0.0;}
-		if (limit9 < 0.0) {limit9 = 0.0; limit11 = 0.0; limit13 = 0.0;}
-		if (limit11 < 0.0) {limit11 = 0.0; limit13 = 0.0;}
-		if (limit13 < 0.0) {limit13 = 0.0;}
+		if (limit3 > 1.0f)  {limit3 = 1.0f;}
+		if (limit5 > 1.0f)  {limit3 = 1.0f; limit5 = 1.0f;}
+		if (limit7 > 1.0f)  {limit3 = 1.0f; limit5 = 1.0f; limit7 = 1.0f;}
+		if (limit9 > 1.0f)  {limit3 = 1.0f; limit5 = 1.0f; limit7 = 1.0f; limit9 = 1.0f;}
+		if (limit11 > 1.0f) {limit3 = 1.0f; limit5 = 1.0f; limit7 = 1.0f; limit9 = 1.0f; limit11 = 1.0f;}
+		if (limit13 > 1.0f) {limit3 = 1.0f; limit5 = 1.0f; limit7 = 1.0f; limit9 = 1.0f; limit11 = 1.0f; limit13 = 1.0f;}
+		if (limit3 < 0.0f) {limit3 = 0.0f; limit5 = 0.0f; limit7 = 0.0f; limit9 = 0.0f; limit11 = 0.0f; limit13 = 0.0f;}
+		if (limit5 < 0.0f) {limit5 = 0.0f; limit7 = 0.0f; limit9 = 0.0f; limit11 = 0.0f; limit13 = 0.0f;}
+		if (limit7 < 0.0f) {limit7 = 0.0f; limit9 = 0.0f; limit11 = 0.0f; limit13 = 0.0f;}
+		if (limit9 < 0.0f) {limit9 = 0.0f; limit11 = 0.0f; limit13 = 0.0f;}
+		if (limit11 < 0.0f) {limit11 = 0.0f; limit13 = 0.0f;}
+		if (limit13 < 0.0f) {limit13 = 0.0f;}
 		
-		double chebyshev = (outP3 * limit3);
+		float chebyshev = (outP3 * limit3);
 		chebyshev += (outP5 * limit5);
 		chebyshev += (outP7 * limit7);
 		chebyshev += (outP9 * limit9);
 		chebyshev += (outP11 * limit11);
 		chebyshev += (outP13 * limit13);
-		inputSample += ((chebyshev+prevOut)*0.5);
+		inputSample += ((chebyshev+prevOut)*0.5f);
 		prevOut = chebyshev;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

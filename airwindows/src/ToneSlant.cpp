@@ -34,8 +34,8 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 b[102];
-		Float64 f[102];		
+			Float32 b[102];
+		Float32 f[102];		
 	};
 	_dram* dram;
 };
@@ -49,22 +49,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 inputSample;
-	Float64 correctionSample;
-	Float64 accumulatorSample;
-	Float64 drySample;
-	Float64 overallscale = GetParameter( kParam_One );
-	if (overallscale < 1.0) overallscale = 1.0;
-	Float64 applySlant = GetParameter( kParam_Two );
+	Float32 inputSample;
+	Float32 correctionSample;
+	Float32 accumulatorSample;
+	Float32 drySample;
+	Float32 overallscale = GetParameter( kParam_One );
+	if (overallscale < 1.0f) overallscale = 1.0f;
+	Float32 applySlant = GetParameter( kParam_Two );
 	
-	dram->f[0] = 1.0 / overallscale;
+	dram->f[0] = 1.0f / overallscale;
 	//count to f(gain) which will be 0. f(0) is x1
 	for (int count = 1; count < 102; count++) {
 		if (count <= overallscale) {
-			dram->f[count] = (1.0 - (count / overallscale)) / overallscale;
+			dram->f[count] = (1.0f - (count / overallscale)) / overallscale;
 			//recalc the filter and don't change the buffer it'll apply to
 		} else {
-			dram->b[count] = 0.0; //blank the unused buffer so when we return to it, no pops
+			dram->b[count] = 0.0f; //blank the unused buffer so when we return to it, no pops
 		}
 	}
 
@@ -72,14 +72,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		for (int count = overallscale; count >= 0; count--) dram->b[count+1] = dram->b[count];
 		
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		dram->b[0] = accumulatorSample = drySample = inputSample;
 		
 		accumulatorSample *= dram->f[0];
 		for (int count = 1; count < overallscale; count++) accumulatorSample += (dram->b[count] * dram->f[count]);
 		
-		correctionSample = inputSample - (accumulatorSample*2.0);
+		correctionSample = inputSample - (accumulatorSample*2.0f);
 		//we're gonna apply the total effect of all these calculations as a single subtract
 		
 		inputSample += (correctionSample * applySlant);
@@ -88,7 +88,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

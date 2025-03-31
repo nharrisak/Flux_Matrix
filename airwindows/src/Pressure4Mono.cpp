@@ -35,13 +35,13 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 muVary;
-		Float64 muAttack;
-		Float64 muNewSpeed;
-		Float64 muSpeedA;
-		Float64 muSpeedB;
-		Float64 muCoefficientA;
-		Float64 muCoefficientB;
+		Float32 muVary;
+		Float32 muAttack;
+		Float32 muNewSpeed;
+		Float32 muSpeedA;
+		Float32 muSpeedB;
+		Float32 muCoefficientA;
+		Float32 muCoefficientB;
 		uint32_t fpd;
 		bool flip;
 		
@@ -59,40 +59,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 {
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	Float32 *destP = inDestP;
-	Float64 threshold = 1.0 - (GetParameter( kParam_One ) * 0.95);
-	Float64 muMakeupGain = 1.0 / threshold;
+	Float32 threshold = 1.0f - (GetParameter( kParam_One ) * 0.95f);
+	Float32 muMakeupGain = 1.0f / threshold;
 	//gain settings around threshold
-	Float64 release = pow((1.28-GetParameter( kParam_Two )),5)*32768.0;
+	Float32 release = pow((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
 	release /= overallscale;
-	Float64 fastest = sqrt(release);
+	Float32 fastest = sqrt(release);
 	//speed settings around release
-	double bridgerectifier;
-	Float64 coefficient;
-	Float64 mewiness = GetParameter( kParam_Three );
-	Float64 outputGain = GetParameter( kParam_Four );
-	Float64 unmewiness;
+	float bridgerectifier;
+	Float32 coefficient;
+	Float32 mewiness = GetParameter( kParam_Three );
+	Float32 outputGain = GetParameter( kParam_Four );
+	Float32 unmewiness;
 	bool positivemu;
 	if (mewiness >= 0)
 	{
 		positivemu = true;
-		unmewiness = 1.0-mewiness;
+		unmewiness = 1.0f-mewiness;
 	}
 	else
 	{
 		positivemu = false;
 		mewiness = -mewiness;
-		unmewiness = 1.0-mewiness;
+		unmewiness = 1.0f-mewiness;
 	}
 	// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
-	double inputSample;
+	float inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
 		sourceP += inNumChannels;	// advance to next frame (e.g. if stereo, we're advancing 2 samples);
@@ -104,7 +104,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			{
 				muVary = threshold / fabs(inputSample);
 				muAttack = sqrt(fabs(muSpeedA));
-				muCoefficientA = muCoefficientA * (muAttack-1.0);
+				muCoefficientA = muCoefficientA * (muAttack-1.0f);
 				if (muVary < threshold)
 				{
 					muCoefficientA = muCoefficientA + threshold;
@@ -117,8 +117,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}
 			else
 			{
-				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0);
-				muCoefficientA = muCoefficientA + 1.0;
+				muCoefficientA = muCoefficientA * ((muSpeedA * muSpeedA)-1.0f);
+				muCoefficientA = muCoefficientA + 1.0f;
 				muCoefficientA = muCoefficientA / (muSpeedA * muSpeedA);
 			}
 			muNewSpeed = muSpeedA * (muSpeedA-1);
@@ -144,8 +144,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}
 			else
 			{
-				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0);
-				muCoefficientB = muCoefficientB + 1.0;
+				muCoefficientB = muCoefficientB * ((muSpeedB * muSpeedB)-1.0f);
+				muCoefficientB = muCoefficientB + 1.0f;
 				muCoefficientB = muCoefficientB / (muSpeedB * muSpeedB);
 			}
 			muNewSpeed = muSpeedB * (muSpeedB-1);
@@ -171,12 +171,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//applied compression with vari-vari-µ-µ-µ-µ-µ-µ-is-the-kitten-song o/~
 		//applied gain correction to control output level- tends to constrain sound rather than inflate it
 		
-		if (outputGain != 1.0) {
+		if (outputGain != 1.0f) {
 			inputSample *= outputGain;
 		}
 		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.0;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.0f;
 		else bridgerectifier = sin(bridgerectifier);
 		if (inputSample > 0){inputSample = bridgerectifier;}
 		else {inputSample = -bridgerectifier;}
@@ -186,7 +186,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 
 		*destP = inputSample;

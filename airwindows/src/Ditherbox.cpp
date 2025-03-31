@@ -56,44 +56,44 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double byn[13];
-		double noiseShaping;
-		double contingentErr;
-		double currentDither;
-		double NSOdd;
-		double NSEven;
-		double prev;
-		double ns[16];
+		float byn[13];
+		float noiseShaping;
+		float contingentErr;
+		float currentDither;
+		float NSOdd;
+		float NSEven;
+		float prev;
+		float ns[16];
 		int Position;
 		bool flip;
-		double lastSample;
-		double outSample;
-		double iirSampleA;
-		double iirSampleB;
-		double iirSampleC;
-		double iirSampleD;
-		double iirSampleE;
-		double iirSampleF;
-		double iirSampleG;
-		double iirSampleH;
-		double iirSampleI;
-		double iirSampleJ;
-		double iirSampleK;
-		double iirSampleL;
-		double iirSampleM;
-		double iirSampleN;
-		double iirSampleO;
-		double iirSampleP;
-		double iirSampleQ;
-		double iirSampleR;
-		double iirSampleS;
-		double iirSampleT;
-		double iirSampleU;
-		double iirSampleV;
-		double iirSampleW;
-		double iirSampleX;
-		double iirSampleY;
-		double iirSampleZ;
+		float lastSample;
+		float outSample;
+		float iirSampleA;
+		float iirSampleB;
+		float iirSampleC;
+		float iirSampleD;
+		float iirSampleE;
+		float iirSampleF;
+		float iirSampleG;
+		float iirSampleH;
+		float iirSampleI;
+		float iirSampleJ;
+		float iirSampleK;
+		float iirSampleL;
+		float iirSampleM;
+		float iirSampleN;
+		float iirSampleO;
+		float iirSampleP;
+		float iirSampleQ;
+		float iirSampleR;
+		float iirSampleS;
+		float iirSampleT;
+		float iirSampleU;
+		float iirSampleV;
+		float iirSampleW;
+		float iirSampleX;
+		float iirSampleY;
+		float iirSampleZ;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -112,31 +112,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double contingentRnd;
-	double absSample;
-	double contingent;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float contingentRnd;
+	float absSample;
+	float contingent;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	double iirAmount = 2250/44100.0;
-	double gaintarget = 1.42;
-	double gain;
+	float iirAmount = 2250/44100.0f;
+	float gaintarget = 1.42f;
+	float gain;
 	iirAmount /= overallscale;
-	double altAmount = 1.0 - iirAmount;
-	double inputSample;
-	double outputSample;
-	double silhouette;
-	double smoother;
-	double bridgerectifier;
-	double benfordize;
+	float altAmount = 1.0f - iirAmount;
+	float inputSample;
+	float outputSample;
+	float silhouette;
+	float smoother;
+	float bridgerectifier;
+	float benfordize;
 	int hotbinA;
 	int hotbinB;
-	double totalA;
-	double totalB;
-	double randyConstant = 1.61803398874989484820458683436563811772030917980576;
-	double omegaConstant = 0.56714329040978387299996866221035554975381578718651;
-	double expConstant = 0.06598803584531253707679018759684642493857704825279;
-	double trim = 2.302585092994045684017991; //natural logarithm of 10
+	float totalA;
+	float totalB;
+	float randyConstant = 1.61803398874989484820458683436563811772030917980576f;
+	float omegaConstant = 0.56714329040978387299996866221035554975381578718651f;
+	float expConstant = 0.06598803584531253707679018759684642493857704825279f;
+	float trim = 2.302585092994045684017991f; //natural logarithm of 10
 	int dtype = (int) GetParameter( kParam_One ); // +1 for Reaper bug workaround
 	bool highRes = false;
 	bool dithering = true;
@@ -150,16 +150,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		sourceP += inNumChannels;
 		
 		if (dtype == 8) inputSample -= noiseShaping;
 		
-		if (dithering) inputSample *= 32768.0;
+		if (dithering) inputSample *= 32768.0f;
 		//denormalizing as way of controlling insane detail boosting
-		if (highRes) inputSample *= 256.0; //256 for 16/24 version
+		if (highRes) inputSample *= 256.0f; //256 for 16/24 version
 		
 		switch (dtype)
 		{
@@ -169,23 +169,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		break;
 		
 		case 2: 
-		inputSample += (double(fpd)/UINT32_MAX);
-		inputSample -= 0.5;
+		inputSample += (float(fpd)/UINT32_MAX);
+		inputSample -= 0.5f;
 		inputSample = floor(inputSample);
 		//flat dither
 		break;
 		
 			case 3:
-				inputSample += (double(fpd)/UINT32_MAX);
+				inputSample += (float(fpd)/UINT32_MAX);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-				inputSample += (double(fpd)/UINT32_MAX);
-				inputSample -= 1.0;
+				inputSample += (float(fpd)/UINT32_MAX);
+				inputSample -= 1.0f;
 				inputSample = floor(inputSample);
 				//TPDF dither
 				break;
 				
 			case 4:
-				currentDither = (double(fpd)/UINT32_MAX);
+				currentDither = (float(fpd)/UINT32_MAX);
 				inputSample += currentDither;
 				inputSample -= lastSample;
 				inputSample = floor(inputSample);
@@ -196,15 +196,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 5:
 				ns[9] = ns[8]; ns[8] = ns[7]; ns[7] = ns[6]; ns[6] = ns[5];
 				ns[5] = ns[4]; ns[4] = ns[3]; ns[3] = ns[2]; ns[2] = ns[1];
-				ns[1] = ns[0]; ns[0] = (double(fpd)/UINT32_MAX);
+				ns[1] = ns[0]; ns[0] = (float(fpd)/UINT32_MAX);
 				
-				currentDither  = (ns[0] * 0.061);
-				currentDither -= (ns[1] * 0.11);
-				currentDither += (ns[8] * 0.126);
-				currentDither -= (ns[7] * 0.23);
-				currentDither += (ns[2] * 0.25);
-				currentDither -= (ns[3] * 0.43);
-				currentDither += (ns[6] * 0.5);
+				currentDither  = (ns[0] * 0.061f);
+				currentDither -= (ns[1] * 0.11f);
+				currentDither += (ns[8] * 0.126f);
+				currentDither -= (ns[7] * 0.23f);
+				currentDither += (ns[2] * 0.25f);
+				currentDither -= (ns[3] * 0.43f);
+				currentDither += (ns[6] * 0.5f);
 				currentDither -= ns[5];
 				currentDither += ns[4];
 				//this sounds different from doing it in order of sample position
@@ -219,7 +219,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				break;
 				
 			case 6:
-				currentDither = (double(fpd)/UINT32_MAX);
+				currentDither = (float(fpd)/UINT32_MAX);
 				inputSample += currentDither;
 				inputSample -= ns[4];
 				inputSample = floor(inputSample);
@@ -244,7 +244,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		hotbinA = hotbinA % 173; //% is C++ mod operator
 		hotbinA *= hotbinA;
 		hotbinA = hotbinA % 17;
-		hotbinA *= 0.0635;
+		hotbinA *= 0.0635f;
 		if (flip) hotbinA = -hotbinA;
 		inputSample += hotbinA;
 		inputSample = floor(inputSample);
@@ -252,106 +252,106 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		break;
 
 		case 8:
-		absSample = ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample = ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[0] += absSample; ns[0] /= 2; absSample -= ns[0];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[1] += absSample; ns[1] /= 2; absSample -= ns[1];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[2] += absSample; ns[2] /= 2; absSample -= ns[2];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[3] += absSample; ns[3] /= 2; absSample -= ns[3];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[4] += absSample; ns[4] /= 2; absSample -= ns[4];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[5] += absSample; ns[5] /= 2; absSample -= ns[5];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[6] += absSample; ns[6] /= 2; absSample -= ns[6];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[7] += absSample; ns[7] /= 2; absSample -= ns[7];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[8] += absSample; ns[8] /= 2; absSample -= ns[8];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[9] += absSample; ns[9] /= 2; absSample -= ns[9];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[10] += absSample; ns[10] /= 2; absSample -= ns[10];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[11] += absSample; ns[11] /= 2; absSample -= ns[11];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[12] += absSample; ns[12] /= 2; absSample -= ns[12];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[13] += absSample; ns[13] /= 2; absSample -= ns[13];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[14] += absSample; ns[14] /= 2; absSample -= ns[14];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[15] += absSample; ns[15] /= 2; absSample -= ns[15];
 		//install noise and then shape it
 		absSample += inputSample;
 		
-		//NSOdd /= 1.0001; //NSDensity
+		//NSOdd /= 1.0001f; //NSDensity
 		
-		if (NSOdd > 0) NSOdd -= 0.97;
-		if (NSOdd < 0) NSOdd += 0.97;
+		if (NSOdd > 0) NSOdd -= 0.97f;
+		if (NSOdd < 0) NSOdd += 0.97f;
 		
-		NSOdd -= (NSOdd * NSOdd * NSOdd * 0.475);
+		NSOdd -= (NSOdd * NSOdd * NSOdd * 0.475f);
 
 		NSOdd += prev;
-		absSample += (NSOdd*0.475);
+		absSample += (NSOdd*0.475f);
 		prev = floor(absSample) - inputSample;
 		inputSample = floor(absSample);
 		//TenNines dither
 		break;
 		
 			case 9: 
-				if (inputSample > 0) inputSample += 0.383;
-				if (inputSample < 0) inputSample -= 0.383;
+				if (inputSample > 0) inputSample += 0.383f;
+				if (inputSample < 0) inputSample -= 0.383f;
 				//adjusting to permit more information drug outta the noisefloor
-				contingentRnd = (double(fpd)/UINT32_MAX);
+				contingentRnd = (float(fpd)/UINT32_MAX);
 				fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-				contingentRnd += ((double(fpd)/UINT32_MAX)-1.0); 
+				contingentRnd += ((float(fpd)/UINT32_MAX)-1.0f); 
 				contingentRnd *= randyConstant; //produce TPDF dist, scale
 				contingentRnd -= contingentErr*omegaConstant; //include err
 				absSample = fabs(inputSample);
 				contingentErr = absSample - floor(absSample); //get next err
-				contingent = contingentErr * 2.0; //scale of quantization levels
-				if (contingent > 1.0) contingent = ((-contingent+2.0)*omegaConstant) + expConstant;
+				contingent = contingentErr * 2.0f; //scale of quantization levels
+				if (contingent > 1.0f) contingent = ((-contingent+2.0f)*omegaConstant) + expConstant;
 				else contingent = (contingent * omegaConstant) + expConstant;
 				//zero is next to a quantization level, one is exactly between them
-				if (flip) contingentRnd = (contingentRnd * (1.0-contingent)) + contingent + 0.5;
-				else contingentRnd = (contingentRnd * (1.0-contingent)) - contingent + 0.5;
+				if (flip) contingentRnd = (contingentRnd * (1.0f-contingent)) + contingent + 0.5f;
+				else contingentRnd = (contingentRnd * (1.0f-contingent)) - contingent + 0.5f;
 				inputSample += (contingentRnd * contingent);
 				//Contingent Dither
 				inputSample = floor(inputSample);
 				//note: this does not dither for values exactly the same as 16 bit values-
-				//which forces the dither to gate at 0.0. It goes to digital black,
+				//which forces the dither to gate at 0.0f. It goes to digital black,
 				//and does a teeny parallel-compression thing when almost at digital black.
 				break;
 				
 			case 10:
-				if (inputSample > 0) inputSample += (0.3333333333);
-				if (inputSample < 0) inputSample -= (0.3333333333);
+				if (inputSample > 0) inputSample += (0.3333333333f);
+				if (inputSample < 0) inputSample -= (0.3333333333f);
 				
-				inputSample += (double(fpd)/UINT32_MAX)*0.6666666666;
+				inputSample += (float(fpd)/UINT32_MAX)*0.6666666666f;
 				
 				benfordize = floor(inputSample);
-				while (benfordize >= 1.0) {benfordize /= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
+				while (benfordize >= 1.0f) {benfordize /= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
 				hotbinA = floor(benfordize);
 				//hotbin becomes the Benford bin value for this number floored
 				totalA = 0;
@@ -372,9 +372,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				//produce total number- smaller is closer to Benford real
 				
 				benfordize = ceil(inputSample);
-				while (benfordize >= 1.0) {benfordize /= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
+				while (benfordize >= 1.0f) {benfordize /= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
 				hotbinB = floor(benfordize);
 				//hotbin becomes the Benford bin value for this number ceiled
 				totalB = 0;
@@ -425,12 +425,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 11: //this one is the Not Just Another Dither
 				
 				benfordize = floor(inputSample);
-				while (benfordize >= 1.0) {benfordize /= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
+				while (benfordize >= 1.0f) {benfordize /= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
 				hotbinA = floor(benfordize);
 				//hotbin becomes the Benford bin value for this number floored
 				totalA = 0;
@@ -451,12 +451,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				//produce total number- smaller is closer to Benford real
 				
 				benfordize = ceil(inputSample);
-				while (benfordize >= 1.0) {benfordize /= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
-				if (benfordize < 1.0) {benfordize *= 10;}
+				while (benfordize >= 1.0f) {benfordize /= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
+				if (benfordize < 1.0f) {benfordize *= 10;}
 				hotbinB = floor(benfordize);
 				//hotbin becomes the Benford bin value for this number ceiled
 				totalB = 0;
@@ -508,157 +508,157 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//slew only
 			outputSample = (inputSample - lastSample)*trim;
 			lastSample = inputSample;
-			if (outputSample > 1.0) outputSample = 1.0;
-			if (outputSample < -1.0) outputSample = -1.0;
+			if (outputSample > 1.0f) outputSample = 1.0f;
+			if (outputSample < -1.0f) outputSample = -1.0f;
 			inputSample = outputSample;
 		break;
 				
 		case 13: 
 			//subs only
 			gain = gaintarget;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
 			iirSampleA = (iirSampleA * altAmount) + (inputSample * iirAmount); inputSample = iirSampleA;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleB = (iirSampleB * altAmount) + (inputSample * iirAmount); inputSample = iirSampleB;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleC = (iirSampleC * altAmount) + (inputSample * iirAmount); inputSample = iirSampleC;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleD = (iirSampleD * altAmount) + (inputSample * iirAmount); inputSample = iirSampleD;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleE = (iirSampleE * altAmount) + (inputSample * iirAmount); inputSample = iirSampleE;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleF = (iirSampleF * altAmount) + (inputSample * iirAmount); inputSample = iirSampleF;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleG = (iirSampleG * altAmount) + (inputSample * iirAmount); inputSample = iirSampleG;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleH = (iirSampleH * altAmount) + (inputSample * iirAmount); inputSample = iirSampleH;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleI = (iirSampleI * altAmount) + (inputSample * iirAmount); inputSample = iirSampleI;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleJ = (iirSampleJ * altAmount) + (inputSample * iirAmount); inputSample = iirSampleJ;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleK = (iirSampleK * altAmount) + (inputSample * iirAmount); inputSample = iirSampleK;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleL = (iirSampleL * altAmount) + (inputSample * iirAmount); inputSample = iirSampleL;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleM = (iirSampleM * altAmount) + (inputSample * iirAmount); inputSample = iirSampleM;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleN = (iirSampleN * altAmount) + (inputSample * iirAmount); inputSample = iirSampleN;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleO = (iirSampleO * altAmount) + (inputSample * iirAmount); inputSample = iirSampleO;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleP = (iirSampleP * altAmount) + (inputSample * iirAmount); inputSample = iirSampleP;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleQ = (iirSampleQ * altAmount) + (inputSample * iirAmount); inputSample = iirSampleQ;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleR = (iirSampleR * altAmount) + (inputSample * iirAmount); inputSample = iirSampleR;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleS = (iirSampleS * altAmount) + (inputSample * iirAmount); inputSample = iirSampleS;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleT = (iirSampleT * altAmount) + (inputSample * iirAmount); inputSample = iirSampleT;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleU = (iirSampleU * altAmount) + (inputSample * iirAmount); inputSample = iirSampleU;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleV = (iirSampleV * altAmount) + (inputSample * iirAmount); inputSample = iirSampleV;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleW = (iirSampleW * altAmount) + (inputSample * iirAmount); inputSample = iirSampleW;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleX = (iirSampleX * altAmount) + (inputSample * iirAmount); inputSample = iirSampleX;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleY = (iirSampleY * altAmount) + (inputSample * iirAmount); inputSample = iirSampleY;
-			inputSample *= gain; gain = ((gain-1)*0.75)+1;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;
+			inputSample *= gain; gain = ((gain-1)*0.75f)+1;
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;
 			iirSampleZ = (iirSampleZ * altAmount) + (inputSample * iirAmount); inputSample = iirSampleZ;
-			if (inputSample > 1.0) inputSample = 1.0;
-			if (inputSample < -1.0) inputSample = -1.0;				
+			if (inputSample > 1.0f) inputSample = 1.0f;
+			if (inputSample < -1.0f) inputSample = -1.0f;				
 		break;
 				
 		case 14: 
 			//silhouette
-			bridgerectifier = fabs(inputSample)*1.57079633;
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-			bridgerectifier = 1.0-cos(bridgerectifier);
-			if (inputSample > 0.0) inputSample = bridgerectifier;
+			bridgerectifier = fabs(inputSample)*1.57079633f;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+			bridgerectifier = 1.0f-cos(bridgerectifier);
+			if (inputSample > 0.0f) inputSample = bridgerectifier;
 			else inputSample = -bridgerectifier;
 			
-			silhouette = (double(fpd)/UINT32_MAX);
+			silhouette = (float(fpd)/UINT32_MAX);
 			fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-			silhouette -= 0.5;
-			silhouette *= 2.0;
+			silhouette -= 0.5f;
+			silhouette *= 2.0f;
 			silhouette *= fabs(inputSample);
 			
-			smoother = (double(fpd)/UINT32_MAX);
-			smoother -= 0.5;
-			smoother *= 2.0;
+			smoother = (float(fpd)/UINT32_MAX);
+			smoother -= 0.5f;
+			smoother *= 2.0f;
 			smoother *= fabs(lastSample);
 			lastSample = inputSample;
 			
 			silhouette += smoother;
 			
-			bridgerectifier = fabs(silhouette)*1.57079633;
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+			bridgerectifier = fabs(silhouette)*1.57079633f;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (silhouette > 0.0) silhouette = bridgerectifier;
+			if (silhouette > 0.0f) silhouette = bridgerectifier;
 			else silhouette = -bridgerectifier;
 			
-			inputSample = (silhouette + outSample) / 2.0;
+			inputSample = (silhouette + outSample) / 2.0f;
 			outSample = silhouette;
 		break;
 		}
 		
 		flip = !flip;
 		//several dithers use this
-		if (highRes) inputSample /= 256.0; //256 for 16/24 version
-		if (dithering) inputSample /= 32768.0;
+		if (highRes) inputSample /= 256.0f; //256 for 16/24 version
+		if (dithering) inputSample /= 32768.0f;
 		
 		if (dtype == 8) noiseShaping += inputSample - drySample;
 

@@ -41,9 +41,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
 
-		double biquadA[11];
-		double biquadB[11];
-		double biquadC[11];
+		float biquadA[11];
+		float biquadB[11];
+		float biquadC[11];
 		
 		
 		int countA, delayA;
@@ -60,31 +60,31 @@ struct _kernel {
 		int countL, delayL;
 		int countM, delayM;
 		
-		Float64 feedbackA, vibA, depthA;
-		Float64 feedbackB, vibB, depthB;
-		Float64 feedbackC, vibC, depthC;
-		Float64 feedbackD, vibD, depthD;
-		Float64 feedbackE, vibE, depthE;
-		Float64 feedbackF, vibF, depthF;
-		Float64 feedbackG, vibG, depthG;
-		Float64 feedbackH, vibH, depthH;
+		Float32 feedbackA, vibA, depthA;
+		Float32 feedbackB, vibB, depthB;
+		Float32 feedbackC, vibC, depthC;
+		Float32 feedbackD, vibD, depthD;
+		Float32 feedbackE, vibE, depthE;
+		Float32 feedbackF, vibF, depthF;
+		Float32 feedbackG, vibG, depthG;
+		Float32 feedbackH, vibH, depthH;
 		
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 aA[8111];
-		Float64 aB[7511];
-		Float64 aC[7311];
-		Float64 aD[6911];		
-		Float64 aE[6311];
-		Float64 aF[6111];
-		Float64 aG[5511];
-		Float64 aH[4911];
-		Float64 aI[4511];
-		Float64 aJ[4311];
-		Float64 aK[3911];
-		Float64 aL[3311];
-		Float64 aM[3111];
+			Float32 aA[8111];
+		Float32 aB[7511];
+		Float32 aC[7311];
+		Float32 aD[6911];		
+		Float32 aE[6311];
+		Float32 aF[6111];
+		Float32 aG[5511];
+		Float32 aH[4911];
+		Float32 aI[4511];
+		Float32 aJ[4311];
+		Float32 aK[3911];
+		Float32 aL[3311];
+		Float32 aM[3111];
 	};
 	_dram* dram;
 };
@@ -98,48 +98,48 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	biquadC[0] = biquadB[0] = biquadA[0] = ((GetParameter( kParam_One )*9000.0)+1000.0) / GetSampleRate();
-	biquadA[1] = 1.618033988749894848204586;
-	biquadB[1] = 0.618033988749894848204586;
-    biquadC[1] = 0.5;
+	biquadC[0] = biquadB[0] = biquadA[0] = ((GetParameter( kParam_One )*9000.0f)+1000.0f) / GetSampleRate();
+	biquadA[1] = 1.618033988749894848204586f;
+	biquadB[1] = 0.618033988749894848204586f;
+    biquadC[1] = 0.5f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadA[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadC[0]);
-	norm = 1.0 / (1.0 + K / biquadC[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadC[1] + K * K);
 	biquadC[2] = K * K * norm;
-	biquadC[3] = 2.0 * biquadC[2];
+	biquadC[3] = 2.0f * biquadC[2];
 	biquadC[4] = biquadC[2];
-	biquadC[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[6] = (1.0 - K / biquadC[1] + K * K) * norm;
+	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
-	Float64 vibSpeed = 0.06+GetParameter( kParam_Three );
-	Float64 vibDepth = (0.027+pow(GetParameter( kParam_Four ),3))*100.0;
-	Float64 size = (pow(GetParameter( kParam_Five ),2)*90.0)+10.0;
-	Float64 depthFactor = 1.0-pow((1.0-(0.82-((GetParameter( kParam_Two )*0.5)+(size*0.002)))),4);
-	Float64 blend = 0.955-(size*0.007);
-	Float64 crossmod = (GetParameter( kParam_Six )-0.5)*2.0;
-	crossmod = pow(crossmod,3)*0.5;
-	Float64 regen = depthFactor * (0.5 - (fabs(crossmod)*0.031));
-	Float64 wet = GetParameter( kParam_Seven );
+	Float32 vibSpeed = 0.06f+GetParameter( kParam_Three );
+	Float32 vibDepth = (0.027f+pow(GetParameter( kParam_Four ),3))*100.0f;
+	Float32 size = (pow(GetParameter( kParam_Five ),2)*90.0f)+10.0f;
+	Float32 depthFactor = 1.0f-pow((1.0f-(0.82f-((GetParameter( kParam_Two )*0.5f)+(size*0.002f)))),4);
+	Float32 blend = 0.955f-(size*0.007f);
+	Float32 crossmod = (GetParameter( kParam_Six )-0.5f)*2.0f;
+	crossmod = pow(crossmod,3)*0.5f;
+	Float32 regen = depthFactor * (0.5f - (fabs(crossmod)*0.031f));
+	Float32 wet = GetParameter( kParam_Seven );
 	
 	
 	delayA = 79*size;
@@ -160,16 +160,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//predelay for natural spaces, gets cut back for heavily artificial spaces
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		dram->aM[countM] = inputSample;
 		countM++; if (countM < 0 || countM > delayM) {countM = 0;}
 		inputSample = dram->aM[countM];
 		//predelay
 
-		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample; inputSample = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = inputSample; //DF1
 		
@@ -178,41 +178,41 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = sin(inputSample);
 		
-		double allpassI = inputSample;
-		double allpassJ = inputSample;
-		double allpassK = inputSample;
-		double allpassL = inputSample;
+		float allpassI = inputSample;
+		float allpassJ = inputSample;
+		float allpassK = inputSample;
+		float allpassL = inputSample;
 		
 		
 		int allpasstemp = countI + 1;
 		if (allpasstemp < 0 || allpasstemp > delayI) {allpasstemp = 0;}
-		allpassI -= dram->aI[allpasstemp]*0.5;
+		allpassI -= dram->aI[allpasstemp]*0.5f;
 		dram->aI[countI] = allpassI;
-		allpassI *= 0.5;
+		allpassI *= 0.5f;
 		countI++; if (countI < 0 || countI > delayI) {countI = 0;}		
 		allpassI += (dram->aI[countI]);
 		
 		allpasstemp = countJ + 1;
 		if (allpasstemp < 0 || allpasstemp > delayJ) {allpasstemp = 0;}
-		allpassJ -= dram->aJ[allpasstemp]*0.5;
+		allpassJ -= dram->aJ[allpasstemp]*0.5f;
 		dram->aJ[countJ] = allpassJ;
-		allpassJ *= 0.5;
+		allpassJ *= 0.5f;
 		countJ++; if (countJ < 0 || countJ > delayJ) {countJ = 0;}		
 		allpassJ += (dram->aJ[countJ]);
 		
 		allpasstemp = countK + 1;
 		if (allpasstemp < 0 || allpasstemp > delayK) {allpasstemp = 0;}
-		allpassK -= dram->aK[allpasstemp]*0.5;
+		allpassK -= dram->aK[allpasstemp]*0.5f;
 		dram->aK[countK] = allpassK;
-		allpassK *= 0.5;
+		allpassK *= 0.5f;
 		countK++; if (countK < 0 || countK > delayK) {countK = 0;}		
 		allpassK += (dram->aK[countK]);
 		
 		allpasstemp = countL + 1;
 		if (allpasstemp < 0 || allpasstemp > delayL) {allpasstemp = 0;}
-		allpassL -= dram->aL[allpasstemp]*0.5;
+		allpassL -= dram->aL[allpasstemp]*0.5f;
 		dram->aL[countL] = allpassL;
-		allpassL *= 0.5;
+		allpassL *= 0.5f;
 		countL++; if (countL < 0 || countL > delayL) {countL = 0;}		
 		allpassL += (dram->aL[countL]);		
 		//the big allpass in front of everything
@@ -246,14 +246,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		vibG += (depthG * vibSpeed);
 		vibH += (depthH * vibSpeed);
 		
-		Float64 offsetA = (sin(vibA)+1.0)*vibDepth;
-		Float64 offsetB = (sin(vibB)+1.0)*vibDepth;
-		Float64 offsetC = (sin(vibC)+1.0)*vibDepth;
-		Float64 offsetD = (sin(vibD)+1.0)*vibDepth;
-		Float64 offsetE = (sin(vibE)+1.0)*vibDepth;
-		Float64 offsetF = (sin(vibF)+1.0)*vibDepth;
-		Float64 offsetG = (sin(vibG)+1.0)*vibDepth;
-		Float64 offsetH = (sin(vibH)+1.0)*vibDepth;
+		Float32 offsetA = (sin(vibA)+1.0f)*vibDepth;
+		Float32 offsetB = (sin(vibB)+1.0f)*vibDepth;
+		Float32 offsetC = (sin(vibC)+1.0f)*vibDepth;
+		Float32 offsetD = (sin(vibD)+1.0f)*vibDepth;
+		Float32 offsetE = (sin(vibE)+1.0f)*vibDepth;
+		Float32 offsetF = (sin(vibF)+1.0f)*vibDepth;
+		Float32 offsetG = (sin(vibG)+1.0f)*vibDepth;
+		Float32 offsetH = (sin(vibH)+1.0f)*vibDepth;
 		
 		int workingA = countA + offsetA;
 		int workingB = countB + offsetB;
@@ -264,41 +264,41 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		int workingG = countG + offsetG;
 		int workingH = countH + offsetH;
 		
-		Float64 interpolA = (dram->aA[workingA-((workingA > delayA)?delayA+1:0)] * (1-(offsetA-floor(offsetA))) );
+		Float32 interpolA = (dram->aA[workingA-((workingA > delayA)?delayA+1:0)] * (1-(offsetA-floor(offsetA))) );
 		interpolA += (dram->aA[workingA+1-((workingA+1 > delayA)?delayA+1:0)] * ((offsetA-floor(offsetA))) );
 
-		Float64 interpolB = (dram->aB[workingB-((workingB > delayB)?delayB+1:0)] * (1-(offsetB-floor(offsetB))) );
+		Float32 interpolB = (dram->aB[workingB-((workingB > delayB)?delayB+1:0)] * (1-(offsetB-floor(offsetB))) );
 		interpolB += (dram->aB[workingB+1-((workingB+1 > delayB)?delayB+1:0)] * ((offsetB-floor(offsetB))) );
 
-		Float64 interpolC = (dram->aC[workingC-((workingC > delayC)?delayC+1:0)] * (1-(offsetC-floor(offsetC))) );
+		Float32 interpolC = (dram->aC[workingC-((workingC > delayC)?delayC+1:0)] * (1-(offsetC-floor(offsetC))) );
 		interpolC += (dram->aC[workingC+1-((workingC+1 > delayC)?delayC+1:0)] * ((offsetC-floor(offsetC))) );
 
-		Float64 interpolD = (dram->aD[workingD-((workingD > delayD)?delayD+1:0)] * (1-(offsetD-floor(offsetD))) );
+		Float32 interpolD = (dram->aD[workingD-((workingD > delayD)?delayD+1:0)] * (1-(offsetD-floor(offsetD))) );
 		interpolD += (dram->aD[workingD+1-((workingD+1 > delayD)?delayD+1:0)] * ((offsetD-floor(offsetD))) );
 		
-		Float64 interpolE = (dram->aE[workingE-((workingE > delayE)?delayE+1:0)] * (1-(offsetE-floor(offsetE))) );
+		Float32 interpolE = (dram->aE[workingE-((workingE > delayE)?delayE+1:0)] * (1-(offsetE-floor(offsetE))) );
 		interpolE += (dram->aE[workingE+1-((workingE+1 > delayE)?delayE+1:0)] * ((offsetE-floor(offsetE))) );
 		
-		Float64 interpolF = (dram->aF[workingF-((workingF > delayF)?delayF+1:0)] * (1-(offsetF-floor(offsetF))) );
+		Float32 interpolF = (dram->aF[workingF-((workingF > delayF)?delayF+1:0)] * (1-(offsetF-floor(offsetF))) );
 		interpolF += (dram->aF[workingF+1-((workingF+1 > delayF)?delayF+1:0)] * ((offsetF-floor(offsetF))) );
 
-		Float64 interpolG = (dram->aG[workingG-((workingG > delayG)?delayG+1:0)] * (1-(offsetG-floor(offsetG))) );
+		Float32 interpolG = (dram->aG[workingG-((workingG > delayG)?delayG+1:0)] * (1-(offsetG-floor(offsetG))) );
 		interpolG += (dram->aG[workingG+1-((workingG+1 > delayG)?delayG+1:0)] * ((offsetG-floor(offsetG))) );
 
-		Float64 interpolH = (dram->aH[workingH-((workingH > delayH)?delayH+1:0)] * (1-(offsetH-floor(offsetH))) );
+		Float32 interpolH = (dram->aH[workingH-((workingH > delayH)?delayH+1:0)] * (1-(offsetH-floor(offsetH))) );
 		interpolH += (dram->aH[workingH+1-((workingH+1 > delayH)?delayH+1:0)] * ((offsetH-floor(offsetH))) );
 		
-		interpolA = ((1.0-blend)*interpolA)+(dram->aA[workingA-((workingA > delayA)?delayA+1:0)]*blend);
-		interpolB = ((1.0-blend)*interpolB)+(dram->aB[workingB-((workingB > delayB)?delayB+1:0)]*blend);
-		interpolC = ((1.0-blend)*interpolC)+(dram->aC[workingC-((workingC > delayC)?delayC+1:0)]*blend);
-		interpolD = ((1.0-blend)*interpolD)+(dram->aD[workingD-((workingD > delayD)?delayD+1:0)]*blend);
-		interpolE = ((1.0-blend)*interpolE)+(dram->aE[workingE-((workingE > delayE)?delayE+1:0)]*blend);
-		interpolF = ((1.0-blend)*interpolF)+(dram->aF[workingF-((workingF > delayF)?delayF+1:0)]*blend);
-		interpolG = ((1.0-blend)*interpolG)+(dram->aG[workingG-((workingG > delayG)?delayG+1:0)]*blend);
-		interpolH = ((1.0-blend)*interpolH)+(dram->aH[workingH-((workingH > delayH)?delayH+1:0)]*blend);
+		interpolA = ((1.0f-blend)*interpolA)+(dram->aA[workingA-((workingA > delayA)?delayA+1:0)]*blend);
+		interpolB = ((1.0f-blend)*interpolB)+(dram->aB[workingB-((workingB > delayB)?delayB+1:0)]*blend);
+		interpolC = ((1.0f-blend)*interpolC)+(dram->aC[workingC-((workingC > delayC)?delayC+1:0)]*blend);
+		interpolD = ((1.0f-blend)*interpolD)+(dram->aD[workingD-((workingD > delayD)?delayD+1:0)]*blend);
+		interpolE = ((1.0f-blend)*interpolE)+(dram->aE[workingE-((workingE > delayE)?delayE+1:0)]*blend);
+		interpolF = ((1.0f-blend)*interpolF)+(dram->aF[workingF-((workingF > delayF)?delayF+1:0)]*blend);
+		interpolG = ((1.0f-blend)*interpolG)+(dram->aG[workingG-((workingG > delayG)?delayG+1:0)]*blend);
+		interpolH = ((1.0f-blend)*interpolH)+(dram->aH[workingH-((workingH > delayH)?delayH+1:0)]*blend);
 				
-		interpolA = (interpolA * (1.0-fabs(crossmod))) + (interpolE * crossmod);
-		interpolE = (interpolE * (1.0-fabs(crossmod))) + (interpolA * crossmod);
+		interpolA = (interpolA * (1.0f-fabs(crossmod))) + (interpolE * crossmod);
+		interpolE = (interpolE * (1.0f-fabs(crossmod))) + (interpolA * crossmod);
 				
 		feedbackA = (interpolA - (interpolB + interpolC + interpolD)) * regen;
 		feedbackB = (interpolB - (interpolA + interpolC + interpolD)) * regen;
@@ -310,14 +310,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		feedbackG = (interpolG - (interpolE + interpolF + interpolH)) * regen;
 		feedbackH = (interpolH - (interpolE + interpolF + interpolG)) * regen;
 				
-		inputSample = (interpolA + interpolB + interpolC + interpolD + interpolE + interpolF + interpolG + interpolH)/8.0;
+		inputSample = (interpolA + interpolB + interpolC + interpolD + interpolE + interpolF + interpolG + interpolH)/8.0f;
 
 		tempSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = tempSample; 
 		biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		//without this, you can get a NaN condition where it spits out DC offset at full blast!
 		
 		inputSample = asin(inputSample);
@@ -326,14 +326,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		biquadC[8] = biquadC[7]; biquadC[7] = inputSample; inputSample = tempSample; 
 		biquadC[10] = biquadC[9]; biquadC[9] = inputSample; //DF1
 		
-		if (wet !=1.0) {
-			inputSample += (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample += (drySample * (1.0f-wet));
 		}
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

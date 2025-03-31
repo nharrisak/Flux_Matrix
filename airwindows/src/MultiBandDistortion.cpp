@@ -45,23 +45,23 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 ataLast3Sample;
-		Float64 ataLast2Sample;
-		Float64 ataLast1Sample;
-		Float64 ataHalfwaySample;
-		Float64 ataHalfDrySample;
-		Float64 ataHalfDiffSample;
-		Float64 ataA;
-		Float64 ataB;
-		Float64 ataC;
-		Float64 ataDecay;
-		Float64 ataUpsampleHighTweak;
-		Float64 ataDrySample;
-		Float64 ataDiffSample;
-		Float64 ataPrevDiffSample;
+		Float32 ataLast3Sample;
+		Float32 ataLast2Sample;
+		Float32 ataLast1Sample;
+		Float32 ataHalfwaySample;
+		Float32 ataHalfDrySample;
+		Float32 ataHalfDiffSample;
+		Float32 ataA;
+		Float32 ataB;
+		Float32 ataC;
+		Float32 ataDecay;
+		Float32 ataUpsampleHighTweak;
+		Float32 ataDrySample;
+		Float32 ataDiffSample;
+		Float32 ataPrevDiffSample;
 		bool ataFlip; //end defining of antialiasing variables
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 	
 	struct _dram {
 		};
@@ -77,44 +77,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
-	Float64 gainH = pow(10.0,GetParameter( kParam_Two )/20);
+	Float32 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
+	Float32 gainH = pow(10.0f,GetParameter( kParam_Two )/20);
 
-	Float64 thresholdH = GetParameter( kParam_Four );
-	Float64 hardnessH;
-	if (thresholdH < 1.0) hardnessH = 1.0 / (1.0-thresholdH);
-	else hardnessH = 999999999999999999999.0;
+	Float32 thresholdH = GetParameter( kParam_Four );
+	Float32 hardnessH;
+	if (thresholdH < 1.0f) hardnessH = 1.0f / (1.0f-thresholdH);
+	else hardnessH = 999999999999999999999.0f;
 
-	Float64 gainL = pow(10.0,GetParameter( kParam_Three )/20);
-	Float64 thresholdL = GetParameter( kParam_Five );
-	Float64 hardnessL;
-	if (thresholdL < 1.0) hardnessL = 1.0 / (1.0-thresholdL);
-	else hardnessL = 999999999999999999999.0;
+	Float32 gainL = pow(10.0f,GetParameter( kParam_Three )/20);
+	Float32 thresholdL = GetParameter( kParam_Five );
+	Float32 hardnessL;
+	if (thresholdL < 1.0f) hardnessL = 1.0f / (1.0f-thresholdL);
+	else hardnessL = 999999999999999999999.0f;
 	
-	Float64 breakup = 1.5707963267949;
-	Float64 bridgerectifier;
+	Float32 breakup = 1.5707963267949f;
+	Float32 bridgerectifier;
 
-	Float64 outputH = GetParameter( kParam_Six );
-	Float64 outputL = GetParameter( kParam_Seven );
-	Float64 outputD = GetParameter( kParam_Eight )*0.597;
-	Float64 outtrim = outputH + outputL + outputD;
+	Float32 outputH = GetParameter( kParam_Six );
+	Float32 outputL = GetParameter( kParam_Seven );
+	Float32 outputD = GetParameter( kParam_Eight )*0.597f;
+	Float32 outtrim = outputH + outputL + outputD;
 	outputH *= outtrim;
 	outputL *= outtrim;
 	outputD *= outtrim;
-	Float64 outputGlobal = pow(10.0,GetParameter( kParam_Nine )/20);
+	Float32 outputGlobal = pow(10.0f,GetParameter( kParam_Nine )/20);
 	
 
-	Float64 inputSample;
-	Float64 tempH;
-	Float64 tempL;
+	Float32 inputSample;
+	Float32 tempH;
+	Float32 tempL;
 	
 	while (nSampleFrames-- > 0) {
 		ataDrySample = inputSample = *sourceP;
-		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + ((-ataLast2Sample + ataLast3Sample) * ataUpsampleHighTweak)) / 2.0;
+		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + ((-ataLast2Sample + ataLast3Sample) * ataUpsampleHighTweak)) / 2.0f;
 		ataLast3Sample = ataLast2Sample; ataLast2Sample = ataLast1Sample; ataLast1Sample = inputSample;
 		//setting up oversampled special antialiasing
 		

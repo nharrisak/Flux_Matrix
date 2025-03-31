@@ -31,93 +31,93 @@ kParam0, kParam1, kParam2, kParam3, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	Float64 ataLastOutL;
-	Float64 ataLastOutR;
+	Float32 ataLastOutL;
+	Float32 ataLastOutR;
 	
-	Float64 s1L;
-	Float64 s2L;
-	Float64 s3L;
-	Float64 o1L;
-	Float64 o2L;
-	Float64 o3L;
-	Float64 m1L;
-	Float64 m2L;
-	Float64 s1R;
-	Float64 s2R;
-	Float64 s3R;
-	Float64 o1R;
-	Float64 o2R;
-	Float64 o3R;
-	Float64 m1R;
-	Float64 m2R;
-	Float64 desL;
-	Float64 desR;
+	Float32 s1L;
+	Float32 s2L;
+	Float32 s3L;
+	Float32 o1L;
+	Float32 o2L;
+	Float32 o3L;
+	Float32 m1L;
+	Float32 m2L;
+	Float32 s1R;
+	Float32 s2R;
+	Float32 s3R;
+	Float32 o1R;
+	Float32 o2R;
+	Float32 o3R;
+	Float32 m1R;
+	Float32 m2R;
+	Float32 desL;
+	Float32 desR;
 	
 	
-	Float64 midSampleA;
-	Float64 midSampleB;
-	Float64 midSampleC;
-	Float64 midSampleD;
-	Float64 midSampleE;
-	Float64 midSampleF;
-	Float64 midSampleG;
-	Float64 midSampleH;
-	Float64 midSampleI;
-	Float64 midSampleJ;
-	Float64 midSampleK;
-	Float64 midSampleL;
-	Float64 midSampleM;
-	Float64 midSampleN;
-	Float64 midSampleO;
-	Float64 midSampleP;
-	Float64 midSampleQ;
-	Float64 midSampleR;
-	Float64 midSampleS;
-	Float64 midSampleT;
-	Float64 midSampleU;
-	Float64 midSampleV;
-	Float64 midSampleW;
-	Float64 midSampleX;
-	Float64 midSampleY;
-	Float64 midSampleZ;
+	Float32 midSampleA;
+	Float32 midSampleB;
+	Float32 midSampleC;
+	Float32 midSampleD;
+	Float32 midSampleE;
+	Float32 midSampleF;
+	Float32 midSampleG;
+	Float32 midSampleH;
+	Float32 midSampleI;
+	Float32 midSampleJ;
+	Float32 midSampleK;
+	Float32 midSampleL;
+	Float32 midSampleM;
+	Float32 midSampleN;
+	Float32 midSampleO;
+	Float32 midSampleP;
+	Float32 midSampleQ;
+	Float32 midSampleR;
+	Float32 midSampleS;
+	Float32 midSampleT;
+	Float32 midSampleU;
+	Float32 midSampleV;
+	Float32 midSampleW;
+	Float32 midSampleX;
+	Float32 midSampleY;
+	Float32 midSampleZ;
 	
-	Float64 sideSampleA;
-	Float64 sideSampleB;
-	Float64 sideSampleC;
-	Float64 sideSampleD;
-	Float64 sideSampleE;
-	Float64 sideSampleF;
-	Float64 sideSampleG;
-	Float64 sideSampleH;
-	Float64 sideSampleI;
-	Float64 sideSampleJ;
-	Float64 sideSampleK;
-	Float64 sideSampleL;
-	Float64 sideSampleM;
-	Float64 sideSampleN;
-	Float64 sideSampleO;
-	Float64 sideSampleP;
-	Float64 sideSampleQ;
-	Float64 sideSampleR;
-	Float64 sideSampleS;
-	Float64 sideSampleT;
-	Float64 sideSampleU;
-	Float64 sideSampleV;
-	Float64 sideSampleW;
-	Float64 sideSampleX;
-	Float64 sideSampleY;
-	Float64 sideSampleZ;
+	Float32 sideSampleA;
+	Float32 sideSampleB;
+	Float32 sideSampleC;
+	Float32 sideSampleD;
+	Float32 sideSampleE;
+	Float32 sideSampleF;
+	Float32 sideSampleG;
+	Float32 sideSampleH;
+	Float32 sideSampleI;
+	Float32 sideSampleJ;
+	Float32 sideSampleK;
+	Float32 sideSampleL;
+	Float32 sideSampleM;
+	Float32 sideSampleN;
+	Float32 sideSampleO;
+	Float32 sideSampleP;
+	Float32 sideSampleQ;
+	Float32 sideSampleR;
+	Float32 sideSampleS;
+	Float32 sideSampleT;
+	Float32 sideSampleU;
+	Float32 sideSampleV;
+	Float32 sideSampleW;
+	Float32 sideSampleX;
+	Float32 sideSampleY;
+	Float32 sideSampleZ;
 	
-	Float64 aMid[11];
-	Float64 bMid[11];
-	Float64 fMid[11];		
-	Float64 aSide[11];
-	Float64 bSide[11];
-	Float64 fSide[11];		
-	Float64 aMidPrev;
-	Float64 aSidePrev;
-	Float64 bMidPrev;
-	Float64 bSidePrev;
+	Float32 aMid[11];
+	Float32 bMid[11];
+	Float32 fMid[11];		
+	Float32 aSide[11];
+	Float32 bSide[11];
+	Float32 fSide[11];		
+	Float32 aMidPrev;
+	Float32 aSidePrev;
+	Float32 bMidPrev;
+	Float32 bSidePrev;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -129,157 +129,157 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();	
-	Float64 fusswithscale = 50000; //corrected
-	Float64 cutofffreq = GetParameter( kParam_One );
-	Float64 resonance = 0.992;
+	Float32 fusswithscale = 50000; //corrected
+	Float32 cutofffreq = GetParameter( kParam_One );
+	Float32 resonance = 0.992f;
 	
-	Float64 midAmount = cutofffreq/fusswithscale;
+	Float32 midAmount = cutofffreq/fusswithscale;
 	midAmount /= overallscale;
 	
-	Float64 midAmountA = midAmount * resonance;
-	Float64 midAmountB = midAmountA * resonance;
-	Float64 midAmountC = midAmountB * resonance;
-	Float64 midAmountD = midAmountC * resonance;
-	Float64 midAmountE = midAmountD * resonance;
-	Float64 midAmountF = midAmountE * resonance;
-	Float64 midAmountG = midAmountF * resonance;
-	Float64 midAmountH = midAmountG * resonance;
-	Float64 midAmountI = midAmountH * resonance;
-	Float64 midAmountJ = midAmountI * resonance;
-	Float64 midAmountK = midAmountJ * resonance;
-	Float64 midAmountL = midAmountK * resonance;
-	Float64 midAmountM = midAmountL * resonance;
-	Float64 midAmountN = midAmountM * resonance;
-	Float64 midAmountO = midAmountN * resonance;
-	Float64 midAmountP = midAmountO * resonance;
-	Float64 midAmountQ = midAmountP * resonance;
-	Float64 midAmountR = midAmountQ * resonance;
-	Float64 midAmountS = midAmountR * resonance;
-	Float64 midAmountT = midAmountS * resonance;
-	Float64 midAmountU = midAmountT * resonance;
-	Float64 midAmountV = midAmountU * resonance;
-	Float64 midAmountW = midAmountV * resonance;
-	Float64 midAmountX = midAmountW * resonance;
-	Float64 midAmountY = midAmountX * resonance;
-	Float64 midAmountZ = midAmountY * resonance;
+	Float32 midAmountA = midAmount * resonance;
+	Float32 midAmountB = midAmountA * resonance;
+	Float32 midAmountC = midAmountB * resonance;
+	Float32 midAmountD = midAmountC * resonance;
+	Float32 midAmountE = midAmountD * resonance;
+	Float32 midAmountF = midAmountE * resonance;
+	Float32 midAmountG = midAmountF * resonance;
+	Float32 midAmountH = midAmountG * resonance;
+	Float32 midAmountI = midAmountH * resonance;
+	Float32 midAmountJ = midAmountI * resonance;
+	Float32 midAmountK = midAmountJ * resonance;
+	Float32 midAmountL = midAmountK * resonance;
+	Float32 midAmountM = midAmountL * resonance;
+	Float32 midAmountN = midAmountM * resonance;
+	Float32 midAmountO = midAmountN * resonance;
+	Float32 midAmountP = midAmountO * resonance;
+	Float32 midAmountQ = midAmountP * resonance;
+	Float32 midAmountR = midAmountQ * resonance;
+	Float32 midAmountS = midAmountR * resonance;
+	Float32 midAmountT = midAmountS * resonance;
+	Float32 midAmountU = midAmountT * resonance;
+	Float32 midAmountV = midAmountU * resonance;
+	Float32 midAmountW = midAmountV * resonance;
+	Float32 midAmountX = midAmountW * resonance;
+	Float32 midAmountY = midAmountX * resonance;
+	Float32 midAmountZ = midAmountY * resonance;
 	
 	
-	Float64 midaltAmountA = 1.0 - midAmountA;
-	Float64 midaltAmountB = 1.0 - midAmountB;
-	Float64 midaltAmountC = 1.0 - midAmountC;
-	Float64 midaltAmountD = 1.0 - midAmountD;
-	Float64 midaltAmountE = 1.0 - midAmountE;
-	Float64 midaltAmountF = 1.0 - midAmountF;
-	Float64 midaltAmountG = 1.0 - midAmountG;
-	Float64 midaltAmountH = 1.0 - midAmountH;
-	Float64 midaltAmountI = 1.0 - midAmountI;
-	Float64 midaltAmountJ = 1.0 - midAmountJ;
-	Float64 midaltAmountK = 1.0 - midAmountK;
-	Float64 midaltAmountL = 1.0 - midAmountL;
-	Float64 midaltAmountM = 1.0 - midAmountM;
-	Float64 midaltAmountN = 1.0 - midAmountN;
-	Float64 midaltAmountO = 1.0 - midAmountO;
-	Float64 midaltAmountP = 1.0 - midAmountP;
-	Float64 midaltAmountQ = 1.0 - midAmountQ;
-	Float64 midaltAmountR = 1.0 - midAmountR;
-	Float64 midaltAmountS = 1.0 - midAmountS;
-	Float64 midaltAmountT = 1.0 - midAmountT;
-	Float64 midaltAmountU = 1.0 - midAmountU;
-	Float64 midaltAmountV = 1.0 - midAmountV;
-	Float64 midaltAmountW = 1.0 - midAmountW;
-	Float64 midaltAmountX = 1.0 - midAmountX;
-	Float64 midaltAmountY = 1.0 - midAmountY;
-	Float64 midaltAmountZ = 1.0 - midAmountZ;	
+	Float32 midaltAmountA = 1.0f - midAmountA;
+	Float32 midaltAmountB = 1.0f - midAmountB;
+	Float32 midaltAmountC = 1.0f - midAmountC;
+	Float32 midaltAmountD = 1.0f - midAmountD;
+	Float32 midaltAmountE = 1.0f - midAmountE;
+	Float32 midaltAmountF = 1.0f - midAmountF;
+	Float32 midaltAmountG = 1.0f - midAmountG;
+	Float32 midaltAmountH = 1.0f - midAmountH;
+	Float32 midaltAmountI = 1.0f - midAmountI;
+	Float32 midaltAmountJ = 1.0f - midAmountJ;
+	Float32 midaltAmountK = 1.0f - midAmountK;
+	Float32 midaltAmountL = 1.0f - midAmountL;
+	Float32 midaltAmountM = 1.0f - midAmountM;
+	Float32 midaltAmountN = 1.0f - midAmountN;
+	Float32 midaltAmountO = 1.0f - midAmountO;
+	Float32 midaltAmountP = 1.0f - midAmountP;
+	Float32 midaltAmountQ = 1.0f - midAmountQ;
+	Float32 midaltAmountR = 1.0f - midAmountR;
+	Float32 midaltAmountS = 1.0f - midAmountS;
+	Float32 midaltAmountT = 1.0f - midAmountT;
+	Float32 midaltAmountU = 1.0f - midAmountU;
+	Float32 midaltAmountV = 1.0f - midAmountV;
+	Float32 midaltAmountW = 1.0f - midAmountW;
+	Float32 midaltAmountX = 1.0f - midAmountX;
+	Float32 midaltAmountY = 1.0f - midAmountY;
+	Float32 midaltAmountZ = 1.0f - midAmountZ;	
 
 	cutofffreq = GetParameter( kParam_Two );
-	Float64 sideAmount = cutofffreq/fusswithscale;
+	Float32 sideAmount = cutofffreq/fusswithscale;
 	sideAmount /= overallscale;
-	Float64 sideAmountA = sideAmount * resonance;
-	Float64 sideAmountB = sideAmountA * resonance;
-	Float64 sideAmountC = sideAmountB * resonance;
-	Float64 sideAmountD = sideAmountC * resonance;
-	Float64 sideAmountE = sideAmountD * resonance;
-	Float64 sideAmountF = sideAmountE * resonance;
-	Float64 sideAmountG = sideAmountF * resonance;
-	Float64 sideAmountH = sideAmountG * resonance;
-	Float64 sideAmountI = sideAmountH * resonance;
-	Float64 sideAmountJ = sideAmountI * resonance;
-	Float64 sideAmountK = sideAmountJ * resonance;
-	Float64 sideAmountL = sideAmountK * resonance;
-	Float64 sideAmountM = sideAmountL * resonance;
-	Float64 sideAmountN = sideAmountM * resonance;
-	Float64 sideAmountO = sideAmountN * resonance;
-	Float64 sideAmountP = sideAmountO * resonance;
-	Float64 sideAmountQ = sideAmountP * resonance;
-	Float64 sideAmountR = sideAmountQ * resonance;
-	Float64 sideAmountS = sideAmountR * resonance;
-	Float64 sideAmountT = sideAmountS * resonance;
-	Float64 sideAmountU = sideAmountT * resonance;
-	Float64 sideAmountV = sideAmountU * resonance;
-	Float64 sideAmountW = sideAmountV * resonance;
-	Float64 sideAmountX = sideAmountW * resonance;
-	Float64 sideAmountY = sideAmountX * resonance;
-	Float64 sideAmountZ = sideAmountY * resonance;
+	Float32 sideAmountA = sideAmount * resonance;
+	Float32 sideAmountB = sideAmountA * resonance;
+	Float32 sideAmountC = sideAmountB * resonance;
+	Float32 sideAmountD = sideAmountC * resonance;
+	Float32 sideAmountE = sideAmountD * resonance;
+	Float32 sideAmountF = sideAmountE * resonance;
+	Float32 sideAmountG = sideAmountF * resonance;
+	Float32 sideAmountH = sideAmountG * resonance;
+	Float32 sideAmountI = sideAmountH * resonance;
+	Float32 sideAmountJ = sideAmountI * resonance;
+	Float32 sideAmountK = sideAmountJ * resonance;
+	Float32 sideAmountL = sideAmountK * resonance;
+	Float32 sideAmountM = sideAmountL * resonance;
+	Float32 sideAmountN = sideAmountM * resonance;
+	Float32 sideAmountO = sideAmountN * resonance;
+	Float32 sideAmountP = sideAmountO * resonance;
+	Float32 sideAmountQ = sideAmountP * resonance;
+	Float32 sideAmountR = sideAmountQ * resonance;
+	Float32 sideAmountS = sideAmountR * resonance;
+	Float32 sideAmountT = sideAmountS * resonance;
+	Float32 sideAmountU = sideAmountT * resonance;
+	Float32 sideAmountV = sideAmountU * resonance;
+	Float32 sideAmountW = sideAmountV * resonance;
+	Float32 sideAmountX = sideAmountW * resonance;
+	Float32 sideAmountY = sideAmountX * resonance;
+	Float32 sideAmountZ = sideAmountY * resonance;
 	
 	
-	Float64 sidealtAmountA = 1.0 - sideAmountA;
-	Float64 sidealtAmountB = 1.0 - sideAmountB;
-	Float64 sidealtAmountC = 1.0 - sideAmountC;
-	Float64 sidealtAmountD = 1.0 - sideAmountD;
-	Float64 sidealtAmountE = 1.0 - sideAmountE;
-	Float64 sidealtAmountF = 1.0 - sideAmountF;
-	Float64 sidealtAmountG = 1.0 - sideAmountG;
-	Float64 sidealtAmountH = 1.0 - sideAmountH;
-	Float64 sidealtAmountI = 1.0 - sideAmountI;
-	Float64 sidealtAmountJ = 1.0 - sideAmountJ;
-	Float64 sidealtAmountK = 1.0 - sideAmountK;
-	Float64 sidealtAmountL = 1.0 - sideAmountL;
-	Float64 sidealtAmountM = 1.0 - sideAmountM;
-	Float64 sidealtAmountN = 1.0 - sideAmountN;
-	Float64 sidealtAmountO = 1.0 - sideAmountO;
-	Float64 sidealtAmountP = 1.0 - sideAmountP;
-	Float64 sidealtAmountQ = 1.0 - sideAmountQ;
-	Float64 sidealtAmountR = 1.0 - sideAmountR;
-	Float64 sidealtAmountS = 1.0 - sideAmountS;
-	Float64 sidealtAmountT = 1.0 - sideAmountT;
-	Float64 sidealtAmountU = 1.0 - sideAmountU;
-	Float64 sidealtAmountV = 1.0 - sideAmountV;
-	Float64 sidealtAmountW = 1.0 - sideAmountW;
-	Float64 sidealtAmountX = 1.0 - sideAmountX;
-	Float64 sidealtAmountY = 1.0 - sideAmountY;
-	Float64 sidealtAmountZ = 1.0 - sideAmountZ;
-	Float64 tempMid;
-	Float64 tempSide;
+	Float32 sidealtAmountA = 1.0f - sideAmountA;
+	Float32 sidealtAmountB = 1.0f - sideAmountB;
+	Float32 sidealtAmountC = 1.0f - sideAmountC;
+	Float32 sidealtAmountD = 1.0f - sideAmountD;
+	Float32 sidealtAmountE = 1.0f - sideAmountE;
+	Float32 sidealtAmountF = 1.0f - sideAmountF;
+	Float32 sidealtAmountG = 1.0f - sideAmountG;
+	Float32 sidealtAmountH = 1.0f - sideAmountH;
+	Float32 sidealtAmountI = 1.0f - sideAmountI;
+	Float32 sidealtAmountJ = 1.0f - sideAmountJ;
+	Float32 sidealtAmountK = 1.0f - sideAmountK;
+	Float32 sidealtAmountL = 1.0f - sideAmountL;
+	Float32 sidealtAmountM = 1.0f - sideAmountM;
+	Float32 sidealtAmountN = 1.0f - sideAmountN;
+	Float32 sidealtAmountO = 1.0f - sideAmountO;
+	Float32 sidealtAmountP = 1.0f - sideAmountP;
+	Float32 sidealtAmountQ = 1.0f - sideAmountQ;
+	Float32 sidealtAmountR = 1.0f - sideAmountR;
+	Float32 sidealtAmountS = 1.0f - sideAmountS;
+	Float32 sidealtAmountT = 1.0f - sideAmountT;
+	Float32 sidealtAmountU = 1.0f - sideAmountU;
+	Float32 sidealtAmountV = 1.0f - sideAmountV;
+	Float32 sidealtAmountW = 1.0f - sideAmountW;
+	Float32 sidealtAmountX = 1.0f - sideAmountX;
+	Float32 sidealtAmountY = 1.0f - sideAmountY;
+	Float32 sidealtAmountZ = 1.0f - sideAmountZ;
+	Float32 tempMid;
+	Float32 tempSide;
 	
-	Float64 intensity = pow(GetParameter( kParam_Three ),3)*(32/overallscale);
-	Float64 inputSampleL;
-	Float64 inputSampleR;
-	Float64 senseL;
-	Float64 senseR;
-	Float64 smoothL;
-	Float64 smoothR;
-	Float64 mid;
-	Float64 side;
+	Float32 intensity = pow(GetParameter( kParam_Three ),3)*(32/overallscale);
+	Float32 inputSampleL;
+	Float32 inputSampleR;
+	Float32 senseL;
+	Float32 senseR;
+	Float32 smoothL;
+	Float32 smoothR;
+	Float32 mid;
+	Float32 side;
 	
-	overallscale = (GetParameter( kParam_Four )*9.0)+1.0;
-	Float64 gain = overallscale;
+	overallscale = (GetParameter( kParam_Four )*9.0f)+1.0f;
+	Float32 gain = overallscale;
 	//mid groove wear
-	if (gain > 1.0) {fMid[0] = 1.0; gain -= 1.0;} else {fMid[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[1] = 1.0; gain -= 1.0;} else {fMid[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[2] = 1.0; gain -= 1.0;} else {fMid[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[3] = 1.0; gain -= 1.0;} else {fMid[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[4] = 1.0; gain -= 1.0;} else {fMid[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[5] = 1.0; gain -= 1.0;} else {fMid[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[6] = 1.0; gain -= 1.0;} else {fMid[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[7] = 1.0; gain -= 1.0;} else {fMid[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[8] = 1.0; gain -= 1.0;} else {fMid[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[9] = 1.0; gain -= 1.0;} else {fMid[9] = gain; gain = 0.0;}
+	if (gain > 1.0f) {fMid[0] = 1.0f; gain -= 1.0f;} else {fMid[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[1] = 1.0f; gain -= 1.0f;} else {fMid[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[2] = 1.0f; gain -= 1.0f;} else {fMid[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[3] = 1.0f; gain -= 1.0f;} else {fMid[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[4] = 1.0f; gain -= 1.0f;} else {fMid[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[5] = 1.0f; gain -= 1.0f;} else {fMid[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[6] = 1.0f; gain -= 1.0f;} else {fMid[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[7] = 1.0f; gain -= 1.0f;} else {fMid[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[8] = 1.0f; gain -= 1.0f;} else {fMid[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fMid[9] = 1.0f; gain -= 1.0f;} else {fMid[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
 	
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	fMid[0] /= overallscale;
 	fMid[1] /= overallscale;
 	fMid[2] /= overallscale;
@@ -292,22 +292,22 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	fMid[9] /= overallscale;
 	//and now it's neatly scaled, too
 
-	overallscale = (GetParameter( kParam_Four )*4.5)+1.0;
+	overallscale = (GetParameter( kParam_Four )*4.5f)+1.0f;
 	gain = overallscale;
 	//side groove wear
-	if (gain > 1.0) {fSide[0] = 1.0; gain -= 1.0;} else {fSide[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[1] = 1.0; gain -= 1.0;} else {fSide[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[2] = 1.0; gain -= 1.0;} else {fSide[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[3] = 1.0; gain -= 1.0;} else {fSide[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[4] = 1.0; gain -= 1.0;} else {fSide[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[5] = 1.0; gain -= 1.0;} else {fSide[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[6] = 1.0; gain -= 1.0;} else {fSide[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[7] = 1.0; gain -= 1.0;} else {fSide[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[8] = 1.0; gain -= 1.0;} else {fSide[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {fSide[9] = 1.0; gain -= 1.0;} else {fSide[9] = gain; gain = 0.0;}
+	if (gain > 1.0f) {fSide[0] = 1.0f; gain -= 1.0f;} else {fSide[0] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[1] = 1.0f; gain -= 1.0f;} else {fSide[1] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[2] = 1.0f; gain -= 1.0f;} else {fSide[2] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[3] = 1.0f; gain -= 1.0f;} else {fSide[3] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[4] = 1.0f; gain -= 1.0f;} else {fSide[4] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[5] = 1.0f; gain -= 1.0f;} else {fSide[5] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[6] = 1.0f; gain -= 1.0f;} else {fSide[6] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[7] = 1.0f; gain -= 1.0f;} else {fSide[7] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[8] = 1.0f; gain -= 1.0f;} else {fSide[8] = gain; gain = 0.0f;}
+	if (gain > 1.0f) {fSide[9] = 1.0f; gain -= 1.0f;} else {fSide[9] = gain; gain = 0.0f;}
 	//there, now we have a neat little moving average with remainders
 	
-	if (overallscale < 1.0) overallscale = 1.0;
+	if (overallscale < 1.0f) overallscale = 1.0f;
 	fSide[0] /= overallscale;
 	fSide[1] /= overallscale;
 	fSide[2] /= overallscale;
@@ -320,24 +320,24 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	fSide[9] /= overallscale;
 	//and now it's neatly scaled, too
 	
-	Float64 tempSample;
-	Float64 accumulatorSample;
-	Float64 midCorrection;
-	Float64 sideCorrection;
-	Float64 correction;
+	Float32 tempSample;
+	Float32 accumulatorSample;
+	Float32 midCorrection;
+	Float32 sideCorrection;
+	Float32 correction;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		s3L = s2L;
 		s2L = s1L;
 		s1L = inputSampleL;
-		smoothL = (s3L + s2L + s1L) / 3.0;
-		m1L = (s1L-s2L)*((s1L-s2L)/1.3);
-		m2L = (s2L-s3L)*((s1L-s2L)/1.3);
+		smoothL = (s3L + s2L + s1L) / 3.0f;
+		m1L = (s1L-s2L)*((s1L-s2L)/1.3f);
+		m2L = (s2L-s3L)*((s1L-s2L)/1.3f);
 		senseL = fabs(m1L-m2L);
 		senseL = (intensity*intensity*senseL);
 		o3L = o2L;
@@ -350,9 +350,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		s3R = s2R;
 		s2R = s1R;
 		s1R = inputSampleR;
-		smoothR = (s3R + s2R + s1R) / 3.0;
-		m1R = (s1R-s2R)*((s1R-s2R)/1.3);
-		m2R = (s2R-s3R)*((s1R-s2R)/1.3);
+		smoothR = (s3R + s2R + s1R) / 3.0f;
+		m1R = (s1R-s2R)*((s1R-s2R)/1.3f);
+		m2R = (s2R-s3R)*((s1R-s2R)/1.3f);
 		senseR = fabs(m1R-m2R);
 		senseR = (intensity*intensity*senseR);
 		o3R = o2R;
@@ -363,11 +363,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//sense on the most intense
 		
 		
-		if (senseL > 1.0) senseL = 1.0;
-		if (senseR > 1.0) senseR = 1.0;
+		if (senseL > 1.0f) senseL = 1.0f;
+		if (senseR > 1.0f) senseR = 1.0f;
 		
-		inputSampleL *= (1.0-senseL);
-		inputSampleR *= (1.0-senseR);
+		inputSampleL *= (1.0f-senseL);
+		inputSampleR *= (1.0f-senseR);
 		
 		inputSampleL += (smoothL*senseL);
 		inputSampleR += (smoothR*senseR);
@@ -521,18 +521,18 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		mid = tempMid - midCorrection;
 		side = tempSide - sideCorrection;
-		inputSampleL = (mid+side)/2.0;
-		inputSampleR = (mid-side)/2.0;
+		inputSampleL = (mid+side)/2.0f;
+		inputSampleR = (mid-side)/2.0f;
 				
-		senseL /= 2.0;
-		senseR /= 2.0;
+		senseL /= 2.0f;
+		senseR /= 2.0f;
 		
 		
-		accumulatorSample = (ataLastOutL*senseL)+(inputSampleL*(1.0-senseL));
+		accumulatorSample = (ataLastOutL*senseL)+(inputSampleL*(1.0f-senseL));
 		ataLastOutL = inputSampleL;
 		inputSampleL = accumulatorSample;
 
-		accumulatorSample = (ataLastOutR*senseR)+(inputSampleR*(1.0-senseR));
+		accumulatorSample = (ataLastOutR*senseR)+(inputSampleR*(1.0f-senseR));
 		ataLastOutR = inputSampleR;
 		inputSampleR = accumulatorSample;
 		//we just re-use accumulatorSample to do this little shuffle
@@ -540,10 +540,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

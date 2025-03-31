@@ -64,24 +64,24 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double half = 0.0;
-	double falf = 0.0;
+	float half = 0.0f;
+	float falf = 0.0f;
 	int console = (int) GetParameter( kParam_One );
-	Float64 inTrim = GetParameter( kParam_Two ); //0-2
-	Float64 outTrim = GetParameter( kParam_Three );
+	Float32 inTrim = GetParameter( kParam_Two ); //0-2
+	Float32 outTrim = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		if (inTrim != 1.0) {
+		if (inTrim != 1.0f) {
 			inputSample *= inTrim;
 		}
 
 		switch (console)
 		{
 			case kRC:
-				half = inputSample * 0.83;
+				half = inputSample * 0.83f;
 				falf = fabs(half);
 				half *= falf;
 				half *= falf;
@@ -89,7 +89,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				break; //original ConsoleChannel, before sin/asin
 				
 			case kRB:
-				half = inputSample * 0.885;
+				half = inputSample * 0.885f;
 				falf = fabs(half);
 				half *= falf;
 				half *= falf;
@@ -104,77 +104,77 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				break; //sin() function ConsoleChannel
 				
 			case kSB:
-				if (inputSample > 1.0) inputSample = 1.0;
-				if (inputSample < -1.0) inputSample = -1.0;
+				if (inputSample > 1.0f) inputSample = 1.0f;
+				if (inputSample < -1.0f) inputSample = -1.0f;
 				//without this, you can get a NaN condition where it spits out DC offset at full blast!
 				inputSample = asin(inputSample);
 				break; //sin() function ConsoleBuss
 				
 			case k6C:
 				//encode/decode courtesy of torridgristle under the MIT license
-				if (inputSample > 1.0) inputSample= 1.0;
-				else if (inputSample > 0.0) inputSample = 1.0 - pow(1.0-inputSample,2.0);
-				if (inputSample < -1.0) inputSample = -1.0;
-				else if (inputSample < 0.0) inputSample = -1.0 + pow(1.0+inputSample,2.0);
-				//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5 for Console6Channel
+				if (inputSample > 1.0f) inputSample= 1.0f;
+				else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,2.0f);
+				if (inputSample < -1.0f) inputSample = -1.0f;
+				else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,2.0f);
+				//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5f for Console6Channel
 				break; //crude sine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case k6B:
 				//encode/decode courtesy of torridgristle under the MIT license
-				if (inputSample > 1.0) inputSample= 1.0;
-				else if (inputSample > 0.0) inputSample = 1.0 - pow(1.0-inputSample,0.5);
-				if (inputSample < -1.0) inputSample = -1.0;
-				else if (inputSample < 0.0) inputSample = -1.0 + pow(1.0+inputSample,0.5);
-				//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5 for Console6Buss
+				if (inputSample > 1.0f) inputSample= 1.0f;
+				else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,0.5f);
+				if (inputSample < -1.0f) inputSample = -1.0f;
+				else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,0.5f);
+				//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5f for Console6Buss
 				break; //crude arcsine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case k7C:
-				if (inputSample > 1.097) inputSample = 1.097;
-				if (inputSample < -1.097) inputSample = -1.097;
-				inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.8)+(sin(inputSample)*0.2);
+				if (inputSample > 1.097f) inputSample = 1.097f;
+				if (inputSample < -1.097f) inputSample = -1.097f;
+				inputSample = ((sin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.8f)+(sin(inputSample)*0.2f);
 				//this is a version of Spiral blended 80/20 with regular Density.
 				//It's blending between two different harmonics in the overtones of the algorithm
 				break; //Console7Channel
 				
 			case k7B:
-				if (inputSample > 1.0) inputSample = 1.0;
-				if (inputSample < -1.0) inputSample = -1.0;
-				inputSample = ((asin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0) ?1:fabs(inputSample)))*0.618033988749894848204586)+(asin(inputSample)*0.381966011250105);
+				if (inputSample > 1.0f) inputSample = 1.0f;
+				if (inputSample < -1.0f) inputSample = -1.0f;
+				inputSample = ((asin(inputSample*fabs(inputSample))/((fabs(inputSample) == 0.0f) ?1:fabs(inputSample)))*0.618033988749894848204586f)+(asin(inputSample)*0.381966011250105f);
 				//this is an asin version of Spiral blended with regular asin ConsoleBuss.
 				//It's blending between two different harmonics in the overtones of the algorithm.
 				break; //Console7Buss
 				
 			case kBC:
-				inputSample += ((pow(inputSample,5)/128.0) + (pow(inputSample,9)/262144.0)) - ((pow(inputSample,3)/8.0) + (pow(inputSample,7)/4096.0));
+				inputSample += ((pow(inputSample,5)/128.0f) + (pow(inputSample,9)/262144.0f)) - ((pow(inputSample,3)/8.0f) + (pow(inputSample,7)/4096.0f));
 				break; //crude sine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case kBB:
-				inputSample += (pow(inputSample,3)/4.0)+(pow(inputSample,5)/8.0)+(pow(inputSample,7)/16.0)+(pow(inputSample,9)/32.0);
+				inputSample += (pow(inputSample,3)/4.0f)+(pow(inputSample,5)/8.0f)+(pow(inputSample,7)/16.0f)+(pow(inputSample,9)/32.0f);
 				break; //crude arcsine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case kZC:
-				if (inputSample > 1.4137166941154) inputSample = 1.4137166941154;
-				if (inputSample < -1.4137166941154) inputSample = -1.4137166941154;
-				if (inputSample > 0.0) inputSample = (inputSample/2.0)*(2.8274333882308-inputSample);
-				else inputSample = -(inputSample/-2.0)*(2.8274333882308+inputSample);
+				if (inputSample > 1.4137166941154f) inputSample = 1.4137166941154f;
+				if (inputSample < -1.4137166941154f) inputSample = -1.4137166941154f;
+				if (inputSample > 0.0f) inputSample = (inputSample/2.0f)*(2.8274333882308f-inputSample);
+				else inputSample = -(inputSample/-2.0f)*(2.8274333882308f+inputSample);
 				break; //ConsoleZeroChannel
 				
 			case kZB:
-				if (inputSample > 2.8) inputSample = 2.8;
-				if (inputSample < -2.8) inputSample = -2.8;
-				if (inputSample > 0.0) inputSample = (inputSample*2.0)/(3.0-inputSample);
-				else inputSample = -(inputSample*-2.0)/(3.0+inputSample);
+				if (inputSample > 2.8f) inputSample = 2.8f;
+				if (inputSample < -2.8f) inputSample = -2.8f;
+				if (inputSample > 0.0f) inputSample = (inputSample*2.0f)/(3.0f-inputSample);
+				else inputSample = -(inputSample*-2.0f)/(3.0f+inputSample);
 				break; //ConsoleZeroBuss
 		}
 		
-		if (outTrim != 1.0) {
+		if (outTrim != 1.0f) {
 			inputSample *= outTrim;
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

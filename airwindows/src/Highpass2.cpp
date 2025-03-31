@@ -35,14 +35,14 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirSampleA;
-		Float64 iirSampleB;
-		Float64 iirSampleC;
-		Float64 iirSampleD;
-		Float64 iirSampleE;
-		Float64 iirSampleF;
-		Float64 iirSampleG;
-		Float64 iirSampleH;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
+		Float32 iirSampleC;
+		Float32 iirSampleD;
+		Float32 iirSampleE;
+		Float32 iirSampleF;
+		Float32 iirSampleG;
+		Float32 iirSampleH;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -60,78 +60,78 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 iirAmount = pow(GetParameter( kParam_One ),4);
-	Float64 tight = GetParameter( kParam_Two );	
-	if (iirAmount < 0.0000001) iirAmount = 0.0000001;
+	Float32 iirAmount = pow(GetParameter( kParam_One ),4);
+	Float32 tight = GetParameter( kParam_Two );	
+	if (iirAmount < 0.0000001f) iirAmount = 0.0000001f;
 	if (iirAmount > 1) iirAmount = 1;
-	if (tight < 0.0) tight *= 0.5;
-	Float64 offset;
-	Float64 aWet = 1.0;
-	Float64 bWet = 1.0;
-	Float64 cWet = 1.0;
-	Float64 dWet = GetParameter( kParam_Three );
+	if (tight < 0.0f) tight *= 0.5f;
+	Float32 offset;
+	Float32 aWet = 1.0f;
+	Float32 bWet = 1.0f;
+	Float32 cWet = 1.0f;
+	Float32 dWet = GetParameter( kParam_Three );
 	//four-stage wet/dry control using progressive stages that bypass when not engaged
-	if (dWet < 1.0) {aWet = dWet; bWet = 0.0; cWet = 0.0; dWet = 0.0;}
-	else if (dWet < 2.0) {bWet = dWet - 1.0; cWet = 0.0; dWet = 0.0;}
-	else if (dWet < 3.0) {cWet = dWet - 2.0; dWet = 0.0;}
-	else {dWet -= 3.0;}
+	if (dWet < 1.0f) {aWet = dWet; bWet = 0.0f; cWet = 0.0f; dWet = 0.0f;}
+	else if (dWet < 2.0f) {bWet = dWet - 1.0f; cWet = 0.0f; dWet = 0.0f;}
+	else if (dWet < 3.0f) {cWet = dWet - 2.0f; dWet = 0.0f;}
+	else {dWet -= 3.0f;}
 	//this is one way to make a little set of dry/wet stages that are successively added to the
 	//output as the control is turned up. Each one independently goes from 0-1 and stays at 1
 	//beyond that point: this is a way to progressively add a 'black box' sound processing
 	//which lets you fall through to simpler processing at lower settings.
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
+		float inputSample = *sourceP;
 		
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 				
 		if (tight > 0) offset = (1 - tight) + (fabs(inputSample)*tight);
 		else offset = (1 + tight) + ((1-fabs(inputSample))*tight);
-		if (offset < 0.0000001) offset = 0.0000001; if (offset > 1) offset = 1;
+		if (offset < 0.0000001f) offset = 0.0000001f; if (offset > 1) offset = 1;
 
 		if (fpFlip)
 		{
-			if (aWet > 0.0) {
+			if (aWet > 0.0f) {
 				iirSampleA = (iirSampleA * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleA) * aWet) + (inputSample * (1.0-aWet));
+				inputSample = ((inputSample-iirSampleA) * aWet) + (inputSample * (1.0f-aWet));
 			}
-			if (bWet > 0.0) {
+			if (bWet > 0.0f) {
 				iirSampleC = (iirSampleC * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleC) * bWet) + (inputSample * (1.0-bWet));
+				inputSample = ((inputSample-iirSampleC) * bWet) + (inputSample * (1.0f-bWet));
 			}
-			if (cWet > 0.0) {
+			if (cWet > 0.0f) {
 				iirSampleE = (iirSampleE * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleE) * cWet) + (inputSample * (1.0-cWet));
+				inputSample = ((inputSample-iirSampleE) * cWet) + (inputSample * (1.0f-cWet));
 			}
-			if (dWet > 0.0) {
+			if (dWet > 0.0f) {
 				iirSampleG = (iirSampleG * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleG) * dWet) + (inputSample * (1.0-dWet));
+				inputSample = ((inputSample-iirSampleG) * dWet) + (inputSample * (1.0f-dWet));
 			}
 		}
 		else
 		{
-			if (aWet > 0.0) {
+			if (aWet > 0.0f) {
 				iirSampleB = (iirSampleB * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleB) * aWet) + (inputSample * (1.0-aWet));
+				inputSample = ((inputSample-iirSampleB) * aWet) + (inputSample * (1.0f-aWet));
 			}
-			if (bWet > 0.0) {
+			if (bWet > 0.0f) {
 				iirSampleD = (iirSampleD * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleD) * bWet) + (inputSample * (1.0-bWet));
+				inputSample = ((inputSample-iirSampleD) * bWet) + (inputSample * (1.0f-bWet));
 			}
-			if (cWet > 0.0) {
+			if (cWet > 0.0f) {
 				iirSampleF = (iirSampleF * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleF) * cWet) + (inputSample * (1.0-cWet));
+				inputSample = ((inputSample-iirSampleF) * cWet) + (inputSample * (1.0f-cWet));
 			}
-			if (dWet > 0.0) {
+			if (dWet > 0.0f) {
 				iirSampleH = (iirSampleH * (1 - (offset * iirAmount))) + (inputSample * (offset * iirAmount));
-				inputSample = ((inputSample-iirSampleH) * dWet) + (inputSample * (1.0-dWet));
+				inputSample = ((inputSample-iirSampleH) * dWet) + (inputSample * (1.0f-dWet));
 			}
 		}
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		fpFlip = !fpFlip;
@@ -139,7 +139,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

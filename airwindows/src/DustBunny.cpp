@@ -61,22 +61,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	unsigned int bunny = (unsigned int)(pow((1.255-GetParameter( kParam_One )),5)*1000);
+	unsigned int bunny = (unsigned int)(pow((1.255f-GetParameter( kParam_One )),5)*1000);
 	bunny = (bunny*bunny);
 	Float32 inputSample;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		ataDrySample = inputSample;
 		
 		
-		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + ((-ataLast2Sample + ataLast3Sample) * ataUpsampleHighTweak)) / 2.0;
+		ataHalfDrySample = ataHalfwaySample = (inputSample + ataLast1Sample + ((-ataLast2Sample + ataLast3Sample) * ataUpsampleHighTweak)) / 2.0f;
 		ataLast3Sample = ataLast2Sample; ataLast2Sample = ataLast1Sample; ataLast1Sample = inputSample;
 		//setting up oversampled special antialiasing
 	//begin first half- change inputSample -> ataHalfwaySample, ataDrySample -> ataHalfDrySample
 
-			if (((*(unsigned int*)&ataHalfwaySample)&bunny)==0) ataHalfwaySample=0.0;
+			if (((*(unsigned int*)&ataHalfwaySample)&bunny)==0) ataHalfwaySample=0.0f;
 
 	//end first half
 		//begin antialiasing section for halfway sample
@@ -87,7 +87,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//end antialiasing section for halfway sample
 	//begin second half- inputSample and ataDrySample handled separately here
 		
-		if (((*(unsigned int*)&inputSample)&bunny)==0) inputSample=0.0;
+		if (((*(unsigned int*)&inputSample)&bunny)==0) inputSample=0.0f;
 
 	//end second half
 		//begin antialiasing section for input sample
@@ -96,14 +96,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else {ataB *= ataDecay; ataA *= ataDecay; ataB += ataC; ataA -= ataC; ataC = ataB;}
 		ataDiffSample = (ataC * ataDecay); ataFlip = !ataFlip;
 		//end antialiasing section for input sample
-		inputSample = ataDrySample; inputSample += ((ataDiffSample + ataHalfDiffSample + ataPrevDiffSample) / 2.5);
-		ataPrevDiffSample = ataDiffSample / 2.0;
+		inputSample = ataDrySample; inputSample += ((ataDiffSample + ataHalfDiffSample + ataPrevDiffSample) / 2.5f);
+		ataPrevDiffSample = ataDiffSample / 2.0f;
 		//apply processing as difference to non-oversampled raw input
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

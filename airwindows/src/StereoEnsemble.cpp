@@ -28,22 +28,22 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 		
-		double levelA;
-		double levelB;
-		double levelC;
-		double levelD;
-		double levelE;
-		double levelF;
+		float levelA;
+		float levelB;
+		float levelC;
+		float levelD;
+		float levelE;
+		float levelF;
 		
-		double levelG;
-		double levelH;
-		double levelI;
-		double levelJ;
-		double levelK;
-		double levelL;
+		float levelG;
+		float levelH;
+		float levelI;
+		float levelJ;
+		float levelK;
+		float levelL;
 		
-		double dryL;
-		double dryR;
+		float dryL;
+		float dryR;
 		
 		int oneA, maxdelayA;
 		int oneB, maxdelayB;
@@ -59,26 +59,26 @@ enum { kNumTemplateParameters = 6 };
 		int oneK, maxdelayK;
 		int oneL, maxdelayL;
 			
-		double lastRefL[7];
-		double lastRefR[7];
+		float lastRefL[7];
+		float lastRefR[7];
 		int cycle;
 	
 		uint32_t fpdL;
 		uint32_t fpdR;
 
 	struct _dram {
-			double dA[7491];
-		double dB[7533];
-		double dC[5789];
-		double dD[5747];		
-		double dE[4841];
-		double dF[4871];
-		double dG[3119];
-		double dH[3089];
-		double dI[2213];
-		double dJ[2223];
-		double dK[1337];
-		double dL[1331];
+			float dA[7491];
+		float dB[7533];
+		float dC[5789];
+		float dD[5747];		
+		float dE[4841];
+		float dF[4871];
+		float dG[3119];
+		float dH[3089];
+		float dI[2213];
+		float dJ[2223];
+		float dK[1337];
+		float dL[1331];
 	};
 	_dram* dram;
 #include "../include/template2.h"
@@ -87,54 +87,54 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	double delayfactor = 0.66 + (GetParameter( kParam_One )/3.0);
+	float delayfactor = 0.66f + (GetParameter( kParam_One )/3.0f);
 	
-	double outlevel = GetParameter( kParam_Two );
+	float outlevel = GetParameter( kParam_Two );
 	
-	dryL = 1.0 - (outlevel * 0.65);
-	dryR = 1.0 - (outlevel * 0.65);
+	dryL = 1.0f - (outlevel * 0.65f);
+	dryR = 1.0f - (outlevel * 0.65f);
 	
-	maxdelayA = (int)(7481.0 * delayfactor);
-	maxdelayB = (int)(7523.0 * delayfactor);
+	maxdelayA = (int)(7481.0f * delayfactor);
+	maxdelayB = (int)(7523.0f * delayfactor);
 
-	maxdelayC = (int)(5779.0 * delayfactor);
-	maxdelayD = (int)(5737.0 * delayfactor);
+	maxdelayC = (int)(5779.0f * delayfactor);
+	maxdelayD = (int)(5737.0f * delayfactor);
 	
-	maxdelayE = (int)(4831.0 * delayfactor);
-	maxdelayF = (int)(4861.0 * delayfactor);
+	maxdelayE = (int)(4831.0f * delayfactor);
+	maxdelayF = (int)(4861.0f * delayfactor);
 	
-	maxdelayG = (int)(3109.0 * delayfactor);
-	maxdelayH = (int)(3079.0 * delayfactor);
+	maxdelayG = (int)(3109.0f * delayfactor);
+	maxdelayH = (int)(3079.0f * delayfactor);
 	
-	maxdelayI = (int)(2203.0 * delayfactor);
-	maxdelayJ = (int)(2213.0 * delayfactor);
+	maxdelayI = (int)(2203.0f * delayfactor);
+	maxdelayJ = (int)(2213.0f * delayfactor);
 	
-	maxdelayK = (int)(1327.0 * delayfactor);
-	maxdelayL = (int)(1321.0 * delayfactor);
+	maxdelayK = (int)(1327.0f * delayfactor);
+	maxdelayL = (int)(1321.0f * delayfactor);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		cycle++;
 		if (cycle == cycleEnd) { //hit the end point and we do a ensemble sample
-			double drySampleL = inputSampleL;
-			double drySampleR = inputSampleR;
-			double outL = 0.0;
-			double outR = 0.0;
-			double temp = 0.0;
+			float drySampleL = inputSampleL;
+			float drySampleR = inputSampleR;
+			float outL = 0.0f;
+			float outR = 0.0f;
+			float temp = 0.0f;
 			
 			dram->dA[oneA] = inputSampleL;
 			oneA--; if (oneA < 0 || oneA > maxdelayA) {oneA = maxdelayA;} temp = dram->dA[oneA];
@@ -234,10 +234,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

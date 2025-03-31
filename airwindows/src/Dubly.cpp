@@ -32,8 +32,8 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		double iirSampleA;
-		double iirSampleB;
+		float iirSampleA;
+		float iirSampleB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -50,26 +50,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double dublyAmount = pow(GetParameter( kParam_One ),3)*0.16;
-	double outlyAmount = pow(GetParameter( kParam_One ),3)*0.160618;
-	double gain = outlyAmount+1.0;
-	double iirAmount = 0.4275/overallscale;
-	double wet = GetParameter( kParam_Two );
+	float dublyAmount = pow(GetParameter( kParam_One ),3)*0.16f;
+	float outlyAmount = pow(GetParameter( kParam_One ),3)*0.160618f;
+	float gain = outlyAmount+1.0f;
+	float iirAmount = 0.4275f/overallscale;
+	float wet = GetParameter( kParam_Two );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		iirSampleA = (iirSampleA * (1.0 - iirAmount)) + (inputSample * iirAmount);
-		double doubly = inputSample - iirSampleA;
-		if (doubly > 1.0) doubly = 1.0; if (doubly < -1.0) doubly = -1.0;
-		if (doubly > 0) doubly = log(1.0+(255*fabs(doubly)))/2.40823996531;
-		if (doubly < 0) doubly = -log(1.0+(255*fabs(doubly)))/2.40823996531;
+		iirSampleA = (iirSampleA * (1.0f - iirAmount)) + (inputSample * iirAmount);
+		float doubly = inputSample - iirSampleA;
+		if (doubly > 1.0f) doubly = 1.0f; if (doubly < -1.0f) doubly = -1.0f;
+		if (doubly > 0) doubly = log(1.0f+(255*fabs(doubly)))/2.40823996531f;
+		if (doubly < 0) doubly = -log(1.0f+(255*fabs(doubly)))/2.40823996531f;
 		inputSample += doubly*dublyAmount;
 		//end Dubly encode
 		
@@ -77,23 +77,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = sin(inputSample);
 		inputSample /= gain;
 		
-		iirSampleB = (iirSampleB * (1.0 - iirAmount)) + (inputSample * iirAmount);
+		iirSampleB = (iirSampleB * (1.0f - iirAmount)) + (inputSample * iirAmount);
 		doubly = inputSample - iirSampleB;
-		if (doubly > 1.0) doubly = 1.0; if (doubly < -1.0) doubly = -1.0;
-		if (doubly > 0) doubly = log(1.0+(255*fabs(doubly)))/2.40823996531;
-		if (doubly < 0) doubly = -log(1.0+(255*fabs(doubly)))/2.40823996531;
+		if (doubly > 1.0f) doubly = 1.0f; if (doubly < -1.0f) doubly = -1.0f;
+		if (doubly > 0) doubly = log(1.0f+(255*fabs(doubly)))/2.40823996531f;
+		if (doubly < 0) doubly = -log(1.0f+(255*fabs(doubly)))/2.40823996531f;
 		inputSample -= doubly*outlyAmount;
 		//end Dubly decode
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

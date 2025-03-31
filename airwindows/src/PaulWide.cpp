@@ -31,8 +31,8 @@ kParam0, kParam1, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		Float64 previousDitherL;
-		Float64 previousDitherR;
+		Float32 previousDitherL;
+		Float32 previousDitherR;
 		uint32_t fpdL;
 		uint32_t fpdR;
 
@@ -48,19 +48,19 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
 		inputSampleL *= scaleFactor;
 		inputSampleR *= scaleFactor;
@@ -73,37 +73,37 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//away from the previous one - this gives you the triangular PDF and the 
 		//filtering in one go :-)
 		
-		double currentDither = (double(fpdL)/UINT32_MAX);
-		double ditherL = currentDither;
+		float currentDither = (float(fpdL)/UINT32_MAX);
+		float ditherL = currentDither;
 		ditherL -= previousDitherL;
 		previousDitherL = currentDither;
 		//TPDF: two 0-1 random noises
 		
-		currentDither = (double(fpdR)/UINT32_MAX);
-		double ditherR = currentDither;
+		currentDither = (float(fpdR)/UINT32_MAX);
+		float ditherR = currentDither;
 		ditherR -= previousDitherR;
 		previousDitherR = currentDither;
 		//TPDF: two 0-1 random noises
 		
-		if (fabs(ditherL-ditherR) < 0.5) {
+		if (fabs(ditherL-ditherR) < 0.5f) {
 			fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-			currentDither = (double(fpdL)/UINT32_MAX);
+			currentDither = (float(fpdL)/UINT32_MAX);
 			ditherL = currentDither;
 			ditherL -= previousDitherL;
 			previousDitherL = currentDither;
 		}
 		
-		if (fabs(ditherL-ditherR) < 0.5) {
+		if (fabs(ditherL-ditherR) < 0.5f) {
 			fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-			currentDither = (double(fpdR)/UINT32_MAX);
+			currentDither = (float(fpdR)/UINT32_MAX);
 			ditherR = currentDither;
 			ditherR -= previousDitherR;
 			previousDitherR = currentDither;
 		}
 		
-		if (fabs(ditherL-ditherR) < 0.5) {
+		if (fabs(ditherL-ditherR) < 0.5f) {
 			fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-			currentDither = (double(fpdL)/UINT32_MAX);
+			currentDither = (float(fpdL)/UINT32_MAX);
 			ditherL = currentDither;
 			ditherL -= previousDitherL;
 			previousDitherL = currentDither;

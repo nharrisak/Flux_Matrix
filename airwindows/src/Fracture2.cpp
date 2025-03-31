@@ -37,14 +37,14 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double densityA;
-		double densityB;
-		double thresholdA;
-		double thresholdB;
-		double outputA;
-		double outputB;
-		double wetA;
-		double wetB;
+		float densityA;
+		float densityB;
+		float thresholdA;
+		float thresholdB;
+		float outputA;
+		float outputB;
+		float wetA;
+		float wetB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 
 	densityA = densityB;
-	densityB = GetParameter( kParam_One )*10.0; //0.0 to 10.0
+	densityB = GetParameter( kParam_One )*10.0f; //0.0f to 10.0f
 	int stages = GetParameter( kParam_Two );
 	thresholdA = thresholdB;
 	thresholdB = GetParameter( kParam_Three );
@@ -73,40 +73,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	wetB = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double density = (densityA*temp)+(densityB*(1.0-temp));
-		double threshold = (thresholdA*temp)+(thresholdB*(1.0-temp));
-		double output = (outputA*temp)+(outputB*(1.0-temp));
-		double wet = (wetA*temp)+(wetB*(1.0-temp));
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float density = (densityA*temp)+(densityB*(1.0f-temp));
+		float threshold = (thresholdA*temp)+(thresholdB*(1.0f-temp));
+		float output = (outputA*temp)+(outputB*(1.0f-temp));
+		float wet = (wetA*temp)+(wetB*(1.0f-temp));
 
 		inputSample *= density;
 	
 		for (int x = 0; x < stages; x++) {
-			inputSample *= (fabs(inputSample)+1.0);
+			inputSample *= (fabs(inputSample)+1.0f);
 		}
 
 		if (inputSample > M_PI_2) {
-			inputSample = (sin(inputSample)*threshold)+(1.0*(1.0-threshold));
+			inputSample = (sin(inputSample)*threshold)+(1.0f*(1.0f-threshold));
 		} else if (inputSample < -M_PI_2) {
-			inputSample = (sin(inputSample)*threshold)+(-1.0*(1.0-threshold));
+			inputSample = (sin(inputSample)*threshold)+(-1.0f*(1.0f-threshold));
 		} else {
 			inputSample = sin(inputSample);
 		}
 		
 		inputSample *= output;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

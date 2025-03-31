@@ -48,26 +48,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double offset = (GetParameter( kParam_One )+1.0)*0.5;
-	double inverter = (offset*2.0)-1.0;
-	double wet = GetParameter( kParam_Two );
+	float offset = (GetParameter( kParam_One )+1.0f)*0.5f;
+	float inverter = (offset*2.0f)-1.0f;
+	float wet = GetParameter( kParam_Two );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 
-		if (inputSample > 1.0) inputSample = 1.0;
-		else if (inputSample > 0.0) inputSample = -expm1((log1p(-inputSample) * (offset+(inputSample*inverter))));
-		if (inputSample < -1.0) inputSample = -1.0;
-		else if (inputSample < 0.0) inputSample = expm1((log1p(inputSample) * (offset-(inputSample*inverter))));
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		else if (inputSample > 0.0f) inputSample = -expm1((log1p(-inputSample) * (offset+(inputSample*inverter))));
+		if (inputSample < -1.0f) inputSample = -1.0f;
+		else if (inputSample < 0.0f) inputSample = expm1((log1p(inputSample) * (offset-(inputSample*inverter))));
 		
-		if (wet < 1.0) inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet < 1.0f) inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

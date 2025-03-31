@@ -39,37 +39,37 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	double inputSampleL;
-	double inputSampleR;
-	double mid;
-	double side;
+	float inputSampleL;
+	float inputSampleR;
+	float mid;
+	float side;
 	
-	Float64 midgain = GetParameter( kParam_One ) * 2.0;
-	Float64 sidegain = 2.0 - midgain;
+	Float32 midgain = GetParameter( kParam_One ) * 2.0f;
+	Float32 sidegain = 2.0f - midgain;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;
 		inputSampleR = *inputR;
 		//assign working variables
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 				
 		inputSampleL *= midgain;
 		inputSampleR *= sidegain;
 		
-		mid = (inputSampleL+inputSampleR)/2.0;
-		side = (inputSampleL-inputSampleR)/2.0;
+		mid = (inputSampleL+inputSampleR)/2.0f;
+		side = (inputSampleL-inputSampleR)/2.0f;
 
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)mid, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		mid += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		mid += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		//begin 32 bit floating point dither
 		frexpf((float)side, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		side += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		side += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		

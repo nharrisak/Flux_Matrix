@@ -38,30 +38,30 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	UInt32 nSampleFrames = inFramesToProcess;
 	
 	int bitshiftGain = GetParameter( kParam_One );
-	double gain = 1.0; //default unity gain
+	float gain = 1.0f; //default unity gain
 	switch (bitshiftGain)
 	{
-		case 0: gain = 0.5; break;
-		case 1: gain = 1.0; break;
-		case 2: gain = 2.0; break;
-		case 3: gain = 4.0; break;
-		case 4: gain = 8.0; break;
-		case 5: gain = 16.0; break;
-		case 6: gain = 32.0; break;
-		case 7: gain = 64.0; break;
-		case 8: gain = 128.0; break;
+		case 0: gain = 0.5f; break;
+		case 1: gain = 1.0f; break;
+		case 2: gain = 2.0f; break;
+		case 3: gain = 4.0f; break;
+		case 4: gain = 8.0f; break;
+		case 5: gain = 16.0f; break;
+		case 6: gain = 32.0f; break;
+		case 7: gain = 64.0f; break;
+		case 8: gain = 128.0f; break;
 	}
 	//we are directly punching in the gain values rather than calculating them
-	//unlike regular BitShiftGain, we default to 0.5 for unity gain, and so on
+	//unlike regular BitShiftGain, we default to 0.5f for unity gain, and so on
 	//because we're combining two channels.
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 		
-		double side = inputSampleL - inputSampleR;
+		float side = inputSampleL - inputSampleR;
 		//tip is left, to add negative ring (right) to combine 'em is the same as subtracting them
 		//end result is, mono output is made up of half of each balanced input combined. Note that we don't just
 		//flip the ring input, because we need to combine them to cancel out interference.
@@ -73,10 +73,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

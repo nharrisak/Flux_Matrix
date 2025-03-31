@@ -34,12 +34,12 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		double rezA;
-		double rezB;
-		double bitA;
-		double bitB;
-		double wetA;
-		double wetB;
+		float rezA;
+		float rezB;
+		float bitA;
+		float bitB;
+		float wetA;
+		float wetB;
 		
 		enum {
 			bez_AL,
@@ -55,7 +55,7 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double bez[bez_total];
+			float bez[bez_total];
 	};
 	_dram* dram;
 };
@@ -69,59 +69,59 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
 	rezA = rezB;
-	rezB = pow(GetParameter( kParam_A ),3.0)/overallscale;
+	rezB = pow(GetParameter( kParam_A ),3.0f)/overallscale;
 	bitA = bitB;
-	bitB = (GetParameter( kParam_B)*15.0)+1.0;
+	bitB = (GetParameter( kParam_B)*15.0f)+1.0f;
 	wetA = wetB;
-	wetB = GetParameter( kParam_C )*2.0;
+	wetB = GetParameter( kParam_C )*2.0f;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *sourceP;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpd * 1.18e-17;
-		double drySampleL = inputSampleL;
+		float inputSampleL = *sourceP;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpd * 1.18e-17f;
+		float drySampleL = inputSampleL;
 		
-		double temp = (double)nSampleFrames/inFramesToProcess;
-		double rez = (rezA*temp)+(rezB*(1.0-temp));
-		double bit = (bitA*temp)+(bitB*(1.0-temp));
-		double wet = (wetA*temp)+(wetB*(1.0-temp));
-		if (rez < 0.0005) rez = 0.0005;
-		double bitFactor = pow(2.0,bit);
-		double dry = 2.0 - wet;
-		if (wet > 1.0) wet = 1.0;
-		if (wet < 0.0) wet = 0.0;
-		if (dry > 1.0) dry = 1.0;
-		if (dry < 0.0) dry = 0.0;
+		float temp = (float)nSampleFrames/inFramesToProcess;
+		float rez = (rezA*temp)+(rezB*(1.0f-temp));
+		float bit = (bitA*temp)+(bitB*(1.0f-temp));
+		float wet = (wetA*temp)+(wetB*(1.0f-temp));
+		if (rez < 0.0005f) rez = 0.0005f;
+		float bitFactor = pow(2.0f,bit);
+		float dry = 2.0f - wet;
+		if (wet > 1.0f) wet = 1.0f;
+		if (wet < 0.0f) wet = 0.0f;
+		if (dry > 1.0f) dry = 1.0f;
+		if (dry < 0.0f) dry = 0.0f;
 		//this bitcrush makes 50% full dry AND full wet, not crossfaded.
 		//that's so it can be on tracks without cutting back dry channel when adjusted
 		
 		inputSampleL *= bitFactor;		
-		inputSampleL = floor(inputSampleL+(0.5/bitFactor));
+		inputSampleL = floor(inputSampleL+(0.5f/bitFactor));
 		inputSampleL /= bitFactor;
 		
 		dram->bez[bez_cycle] += rez;
 		dram->bez[bez_SampL] += (inputSampleL * rez);
-		if (dram->bez[bez_cycle] > 1.0) {
-			dram->bez[bez_cycle] -= 1.0;
+		if (dram->bez[bez_cycle] > 1.0f) {
+			dram->bez[bez_cycle] -= 1.0f;
 			dram->bez[bez_CL] = dram->bez[bez_BL];
 			dram->bez[bez_BL] = dram->bez[bez_AL];
 			dram->bez[bez_AL] = inputSampleL;
-			dram->bez[bez_SampL] = 0.0;
+			dram->bez[bez_SampL] = 0.0f;
 		}
-		double CBL = (dram->bez[bez_CL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
-		double BAL = (dram->bez[bez_BL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
-		double CBAL = (dram->bez[bez_BL]+(CBL*(1.0-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.5;
+		float CBL = (dram->bez[bez_CL]*(1.0f-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
+		float BAL = (dram->bez[bez_BL]*(1.0f-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
+		float CBAL = (dram->bez[bez_BL]+(CBL*(1.0f-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.5f;
 		
 		inputSampleL = (wet*CBAL)+(dry*drySampleL);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSampleL += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSampleL;

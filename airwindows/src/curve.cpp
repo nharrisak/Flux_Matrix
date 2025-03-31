@@ -22,7 +22,7 @@ static const uint8_t page1[] = {
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
 
-	double gain;
+	float gain;
 	uint32_t fpdL;
 	uint32_t fpdR;
 
@@ -36,34 +36,34 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	UInt32 nSampleFrames = inFramesToProcess;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
 		
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
 				
-		inputSampleL *= 0.5;
-		inputSampleR *= 0.5;
+		inputSampleL *= 0.5f;
+		inputSampleR *= 0.5f;
 		
-		if (gain < 0.0078125) gain = 0.0078125; if (gain > 1.0) gain = 1.0;
+		if (gain < 0.0078125f) gain = 0.0078125f; if (gain > 1.0f) gain = 1.0f;
 		//gain of 1,0 gives you a super-clean one, gain of 2 is obviously compressing
 		//smaller number is maximum clamping, if too small it'll take a while to bounce back
 		inputSampleL *= gain; inputSampleR *= gain;
 		
 		gain += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*pow(inputSampleL,4);
 		gain += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*pow(inputSampleR,4);
-		//4.71239 radians sined will turn to -1 which is the maximum gain reduction speed
+		//4.71239f radians sined will turn to -1 which is the maximum gain reduction speed
 		
-		inputSampleL *= 2.0;
-		inputSampleR *= 2.0;
+		inputSampleL *= 2.0f;
+		inputSampleR *= 2.0f;
 				
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

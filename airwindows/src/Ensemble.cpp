@@ -37,16 +37,16 @@ struct _kernel {
  
 		const static int totalsamples = 65540;
 		int gcount;
-		Float64 airPrev;
-		Float64 airEven;
-		Float64 airOdd;
-		Float64 airFactor;
+		Float32 airPrev;
+		Float32 airEven;
+		Float32 airOdd;
+		Float32 airFactor;
 		uint32_t fpd;
 		bool fpFlip;
 	
 	struct _dram {
 			Float32 p[totalsamples];
-		Float64 sweep[49];
+		Float32 sweep[49];
 	};
 	_dram* dram;
 };
@@ -61,29 +61,29 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 spd = pow(0.4+(GetParameter( kParam_Two )/12),10);
+	Float32 spd = pow(0.4f+(GetParameter( kParam_Two )/12),10);
 	spd *= overallscale;
-	Float64 depth = 0.002 / spd;
-	Float64 tupi = 3.141592653589793238 * 2.0;
-	Float64 taps = GetParameter( kParam_One );
-	Float64 brighten = GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 depth = 0.002f / spd;
+	Float32 tupi = 3.141592653589793238f * 2.0f;
+	Float32 taps = GetParameter( kParam_One );
+	Float32 brighten = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
 	//removed unnecessary dry variable
-	Float64 hapi = 3.141592653589793238 / taps;
-	Float64 offset;
-	Float64 floffset;
-	Float64 start[49];
-	Float64 sinoffset[49];	
-	Float64 speed[49];
+	Float32 hapi = 3.141592653589793238f / taps;
+	Float32 offset;
+	Float32 floffset;
+	Float32 start[49];
+	Float32 sinoffset[49];	
+	Float32 speed[49];
 	int count;
 	int ensemble;
-	Float64 temp;
-	double inputSample;
-	Float64 drySample;
+	Float32 temp;
+	float inputSample;
+	Float32 drySample;
 	//now we'll precalculate some stuff that needn't be in every sample
 	
 	for(count = 1; count <= taps; count++)
@@ -96,21 +96,21 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 
 		airFactor = airPrev - inputSample;
 		if (fpFlip) {airEven += airFactor; airOdd -= airFactor; airFactor = airEven;}
 		else {airOdd += airFactor; airEven -= airFactor; airFactor = airOdd;}
-		airOdd = (airOdd - ((airOdd - airEven)/256.0)) / 1.0001;
-		airEven = (airEven - ((airEven - airOdd)/256.0)) / 1.0001;
+		airOdd = (airOdd - ((airOdd - airEven)/256.0f)) / 1.0001f;
+		airEven = (airEven - ((airEven - airOdd)/256.0f)) / 1.0001f;
 		airPrev = inputSample;
 		inputSample += (airFactor*brighten);
 		//air, compensates for loss of highs in flanger's interpolation
 		if (gcount < 1 || gcount > 32767) {gcount = 32767;}
 		count = gcount;
 		dram->p[count+32767] = dram->p[count] = temp = inputSample;
-		//double buffer
+		//float buffer
 
 		for(ensemble = 1; ensemble <= taps; ensemble++)
 			{
@@ -127,18 +127,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		gcount--;
 		//still scrolling through the samples, remember
 		
-		inputSample = temp/(4.0*sqrt(taps));
+		inputSample = temp/(4.0f*sqrt(taps));
 
 
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		fpFlip = !fpFlip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

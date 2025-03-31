@@ -36,8 +36,8 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double b[4005];	
-		double c[105];
+			float b[4005];	
+		float c[105];
 	};
 	_dram* dram;
 };
@@ -51,31 +51,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 96000.0;
+	float overallscale = 1.0f;
+	overallscale /= 96000.0f;
 	overallscale *= GetSampleRate(); //this one's scaled to 96k for the deepest bass
-	if (overallscale > 1.0) overallscale = 1.0; //and if you go for 192k, rather than crash
+	if (overallscale > 1.0f) overallscale = 1.0f; //and if you go for 192k, rather than crash
 	//it just cuts out the maximum (2000) depth of averaging you can get
-	Float64 hullSetting = pow(GetParameter( kParam_One ),3)*overallscale;
-	int limitA = (hullSetting*2000.0)+1.0;
-	double divisorA = 1.0/limitA;
-	int limitB = (hullSetting*1000.0)+1.0;
-	double divisorB = 1.0/limitB;
-	int limitC = sqrt(hullSetting*2000.0)+1.0;
-	double divisorC = 1.0/limitC;
-	Float64 wet = -GetParameter( kParam_Two ); //functions as dark/bright
+	Float32 hullSetting = pow(GetParameter( kParam_One ),3)*overallscale;
+	int limitA = (hullSetting*2000.0f)+1.0f;
+	float divisorA = 1.0f/limitA;
+	int limitB = (hullSetting*1000.0f)+1.0f;
+	float divisorB = 1.0f/limitB;
+	int limitC = sqrt(hullSetting*2000.0f)+1.0f;
+	float divisorC = 1.0f/limitC;
+	Float32 wet = -GetParameter( kParam_Two ); //functions as dark/bright
 		
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
 		bPointer--; if (bPointer < 0) bPointer += 2000;
 		dram->b[bPointer] = dram->b[bPointer+2000] = inputSample;
 
 		int x = bPointer;
-		double longAverage = 0.0;
-		double shortAverage = 0.0;
+		float longAverage = 0.0f;
+		float shortAverage = 0.0f;
 		while (x < bPointer+limitB) {
 			shortAverage += dram->b[x];
 			longAverage += dram->b[x];
@@ -93,23 +93,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		dram->c[cPointer] = dram->c[cPointer+50] = shortAverage+(shortAverage-longAverage);
 		
 		x = cPointer;
-		double shortestAverage = 0.0;
+		float shortestAverage = 0.0f;
 		while (x < cPointer+limitC) {
 			shortestAverage += dram->c[x];
 			x++;
 		}
 		shortestAverage *= divisorC;
 				
-		if (wet > 0.0) {
-			inputSample = (shortestAverage * wet)+(drySample * (1.0-wet)); //dark
+		if (wet > 0.0f) {
+			inputSample = (shortestAverage * wet)+(drySample * (1.0f-wet)); //dark
 		} else {
-			inputSample = ((inputSample-shortestAverage) * fabs(wet))+(drySample * (1.0+wet)); //bright
+			inputSample = ((inputSample-shortestAverage) * fabs(wet))+(drySample * (1.0f+wet)); //bright
 		}		
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

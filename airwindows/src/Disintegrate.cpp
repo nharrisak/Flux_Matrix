@@ -40,15 +40,15 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		
-		double dBaL[dscBufMax+5][layersMax];
+		float dBaL[dscBufMax+5][layersMax];
 		int dBaXL[layersMax];
-		double outFilterL;
+		float outFilterL;
 				
 		uint32_t fpd;
 	
 	struct _dram {
-			double dBaPosL[layersMax];
-		double dBaPosBL[layersMax];
+			float dBaPosL[layersMax];
+		float dBaPosBL[layersMax];
 	};
 	_dram* dram;
 };
@@ -62,47 +62,47 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double refdB = GetParameter( kParam_One );
-	double topdB = 0.000000064 * pow(10.0,refdB/20.0) * overallscale;
-	int dscBuf = (GetParameter( kParam_Two )*(double)(dscBufMax-1))+1;
-	int layers = (GetParameter( kParam_Three )*20.0);
-	double f = pow(GetParameter( kParam_Four ),2);
-	double boost = 1.0 + (f/(layers+1));
-	if (f == 0.0) f = 0.000001;
-	double wet = GetParameter( kParam_Five );
+	float refdB = GetParameter( kParam_One );
+	float topdB = 0.000000064f * pow(10.0f,refdB/20.0f) * overallscale;
+	int dscBuf = (GetParameter( kParam_Two )*(float)(dscBufMax-1))+1;
+	int layers = (GetParameter( kParam_Three )*20.0f);
+	float f = pow(GetParameter( kParam_Four ),2);
+	float boost = 1.0f + (f/(layers+1));
+	if (f == 0.0f) f = 0.000001f;
+	float wet = GetParameter( kParam_Five );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *sourceP;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpd * 1.18e-17;
-		double drySampleL = inputSampleL;
+		float inputSampleL = *sourceP;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpd * 1.18e-17f;
+		float drySampleL = inputSampleL;
 		
 		inputSampleL *= topdB;
 
 		for (int x = 0; x < layers; x++) {
 			inputSampleL *= boost;
-			if (inputSampleL < -0.222) inputSampleL = -0.222;
-			if (inputSampleL > 0.222) inputSampleL = 0.222;
+			if (inputSampleL < -0.222f) inputSampleL = -0.222f;
+			if (inputSampleL > 0.222f) inputSampleL = 0.222f;
 			dBaL[dBaXL[x]][x] = inputSampleL;
-			dram->dBaPosL[x] *= (1.0-f); dram->dBaPosL[x] += (dram->dBaPosBL[x]*f); 
-			dram->dBaPosBL[x] *= (1.0-f); dram->dBaPosBL[x] += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*f);
+			dram->dBaPosL[x] *= (1.0f-f); dram->dBaPosL[x] += (dram->dBaPosBL[x]*f); 
+			dram->dBaPosBL[x] *= (1.0f-f); dram->dBaPosBL[x] += fabs((inputSampleL*((inputSampleL*0.25f)-0.5f))*f);
 			int dBdly = floor(dram->dBaPosL[x]*dscBuf);
-			double dBi = (dram->dBaPosL[x]*dscBuf)-dBdly;
-			inputSampleL  = dBaL[dBaXL[x]-dBdly+((dBaXL[x]-dBdly<0)?dscBuf:0)][x] * (1.0-dBi);
+			float dBi = (dram->dBaPosL[x]*dscBuf)-dBdly;
+			inputSampleL  = dBaL[dBaXL[x]-dBdly+((dBaXL[x]-dBdly<0)?dscBuf:0)][x] * (1.0f-dBi);
 			dBdly++; inputSampleL += dBaL[dBaXL[x]-dBdly+((dBaXL[x]-dBdly<0)?dscBuf:0)][x] * dBi;
 			dBaXL[x]++; if (dBaXL[x] < 0 || dBaXL[x] >= dscBuf) dBaXL[x] = 0;
 		}		
-		outFilterL *= f; outFilterL += (inputSampleL*(1.0-f)); inputSampleL = outFilterL;
+		outFilterL *= f; outFilterL += (inputSampleL*(1.0f-f)); inputSampleL = outFilterL;
 		inputSampleL /= topdB;
-		inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
+		inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSampleL += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSampleL;

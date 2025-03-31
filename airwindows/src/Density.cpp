@@ -35,8 +35,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 iirSampleA;
-		Float64 iirSampleB;
+		Float32 iirSampleA;
+		Float32 iirSampleB;
 		uint32_t fpd;
 		bool fpFlip;
 	
@@ -59,24 +59,24 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 inputSample;
-	Float64 drySample;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 inputSample;
+	Float32 drySample;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 density = GetParameter( kParam_One );
-	Float64 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
-	Float64 output = GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
-	Float64 dry = 1.0-wet;
-	Float64 bridgerectifier;
-	Float64 out = fabs(density);
+	Float32 density = GetParameter( kParam_One );
+	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 output = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
+	Float32 dry = 1.0f-wet;
+	Float32 bridgerectifier;
+	Float32 out = fabs(density);
 	density = density * fabs(density);
-	Float64 count;
+	Float32 count;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
 		if (fpFlip)
@@ -92,20 +92,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//highpass section
 		
 		count = density;
-		while (count > 1.0)
+		while (count > 1.0f)
 			{
-				bridgerectifier = fabs(inputSample)*1.57079633;
-				if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+				bridgerectifier = fabs(inputSample)*1.57079633f;
+				if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 				//max value for sine function
 				bridgerectifier = sin(bridgerectifier);
-				if (inputSample > 0.0) inputSample = bridgerectifier;
+				if (inputSample > 0.0f) inputSample = bridgerectifier;
 				else inputSample = -bridgerectifier;
-				count = count - 1.0;
+				count = count - 1.0f;
 			}
 		//we have now accounted for any really high density settings.
-		while (out > 1.0) out = out - 1.0;
-		bridgerectifier = fabs(inputSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		while (out > 1.0f) out = out - 1.0f;
+		bridgerectifier = fabs(inputSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		//max value for sine function
 		if (density > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier);
@@ -114,16 +114,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else inputSample = (inputSample*(1-out))-(bridgerectifier*out);
 		//blend according to density control
 		
-		if (output < 1.0) inputSample *= output;
-		if (wet < 1.0) inputSample = (drySample * dry)+(inputSample*wet);
+		if (output < 1.0f) inputSample *= output;
+		if (wet < 1.0f) inputSample = (drySample * dry)+(inputSample*wet);
 		//nice little output stage template: if we have another scale of floating point
-		//number, we really don't want to meaninglessly multiply that by 1.0.
+		//number, we really don't want to meaninglessly multiply that by 1.0f.
 		fpFlip = !fpFlip;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -35,9 +35,9 @@ kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		double orbit;
-		double position;
-		double speed;
+		float orbit;
+		float position;
+		float speed;
 		uint32_t fpdL;
 		uint32_t fpdR;
 
@@ -49,38 +49,38 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 drop = 1.0+(GetParameter( kParam_One )*(0.001/overallscale)); //more is briefer bass
-	Float64 zone = GetParameter( kParam_Two )*0.01; //the max exponentiality of the falloff
-	Float64 start = GetParameter( kParam_Three ); //higher attack
-	Float64 envelope = 9.0-((1.0-pow(1.0-GetParameter( kParam_Four ),2))*4.0); //higher is allowing more subs before gate
-	envelope *= ((start*0.4)+0.6);
-	Float64 threshold = pow(GetParameter( kParam_Five ),3); // trigger threshold
-	Float64 wet = GetParameter( kParam_Six )*2.0;
-	Float64 dry = 2.0 - wet;
-	if (wet > 1.0) wet = 1.0;
-	if (dry > 1.0) dry = 1.0;
+	Float32 drop = 1.0f+(GetParameter( kParam_One )*(0.001f/overallscale)); //more is briefer bass
+	Float32 zone = GetParameter( kParam_Two )*0.01f; //the max exponentiality of the falloff
+	Float32 start = GetParameter( kParam_Three ); //higher attack
+	Float32 envelope = 9.0f-((1.0f-pow(1.0f-GetParameter( kParam_Four ),2))*4.0f); //higher is allowing more subs before gate
+	envelope *= ((start*0.4f)+0.6f);
+	Float32 threshold = pow(GetParameter( kParam_Five ),3); // trigger threshold
+	Float32 wet = GetParameter( kParam_Six )*2.0f;
+	Float32 dry = 2.0f - wet;
+	if (wet > 1.0f) wet = 1.0f;
+	if (dry > 1.0f) dry = 1.0f;
 		
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
-		if ((inputSampleL > speed*start*2.0) && (inputSampleL > threshold)) speed = inputSampleL*start;
-		if ((inputSampleR > speed*start*2.0) && (inputSampleR > threshold)) speed = inputSampleR*start;
+		if ((inputSampleL > speed*start*2.0f) && (inputSampleL > threshold)) speed = inputSampleL*start;
+		if ((inputSampleR > speed*start*2.0f) && (inputSampleR > threshold)) speed = inputSampleR*start;
 		position += (speed*start);
 		speed /= (drop+(speed*zone*start));
-		if (position > 31415.92653589793) position -= 31415.92653589793;		
-		orbit += (cos(position)*0.001); orbit *= 0.998272;
-		double applySpeed = cbrt(speed) * envelope;
-		if (applySpeed < 1.0) orbit *= applySpeed;
-		inputSampleL = inputSampleR = orbit * 2.0;
+		if (position > 31415.92653589793f) position -= 31415.92653589793f;		
+		orbit += (cos(position)*0.001f); orbit *= 0.998272f;
+		float applySpeed = cbrt(speed) * envelope;
+		if (applySpeed < 1.0f) orbit *= applySpeed;
+		inputSampleL = inputSampleR = orbit * 2.0f;
 		
 		inputSampleL = (inputSampleL * wet) + (drySampleL * dry);
 		inputSampleR = (inputSampleR * wet) + (drySampleR * dry);
@@ -88,10 +88,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

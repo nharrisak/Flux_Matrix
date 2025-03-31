@@ -27,7 +27,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double gain;
+		float gain;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -46,19 +46,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		inputSample *= 0.5;		
-		if (gain < 0.0078125) gain = 0.0078125; if (gain > 1.0) gain = 1.0;
+		inputSample *= 0.5f;		
+		if (gain < 0.0078125f) gain = 0.0078125f; if (gain > 1.0f) gain = 1.0f;
 		inputSample *= gain;		
 		gain += sin((fabs(inputSample*4)>1)?4:fabs(inputSample*4))*pow(inputSample,4);
-		inputSample *= 2.0;
+		inputSample *= 2.0f;
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

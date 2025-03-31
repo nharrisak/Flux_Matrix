@@ -35,15 +35,15 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double last3Sample;
-		double last2Sample;
-		double last1Sample;
-		double ataA;
-		double ataB;
-		double ataC;
-		double lastDiffSample;
-		double iirSampleA;
-		double iirSampleB;
+		float last3Sample;
+		float last2Sample;
+		float last1Sample;
+		float ataA;
+		float ataB;
+		float ataC;
+		float lastDiffSample;
+		float iirSampleA;
+		float iirSampleB;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -60,84 +60,84 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float64 density = GetParameter( kParam_One );
-	Float64 out = fabs(density);
-	while (out > 1.0) out = out - 1.0;
+	Float32 density = GetParameter( kParam_One );
+	Float32 out = fabs(density);
+	while (out > 1.0f) out = out - 1.0f;
 	density = density * fabs(density);
-	Float64 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
-	Float64 output = GetParameter( kParam_Three );
-	Float64 wet = GetParameter( kParam_Four );
+	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 output = GetParameter( kParam_Three );
+	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
-		double halfwaySample = (inputSample + last1Sample + ((-last2Sample + last3Sample) * 0.0414213562373095048801688)) / 2.0;
-		double halfDrySample = halfwaySample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
+		float halfwaySample = (inputSample + last1Sample + ((-last2Sample + last3Sample) * 0.0414213562373095048801688f)) / 2.0f;
+		float halfDrySample = halfwaySample;
 		
 		last3Sample = last2Sample; last2Sample = last1Sample; last1Sample = inputSample;
 
-		iirSampleB = (iirSampleB * (1.0 - iirAmount)) + (halfwaySample * iirAmount); halfwaySample -= iirSampleB; //highpass section
+		iirSampleB = (iirSampleB * (1.0f - iirAmount)) + (halfwaySample * iirAmount); halfwaySample -= iirSampleB; //highpass section
 		
-		double count = density;
-		double bridgerectifier;
-		while (count > 1.0) {
-			bridgerectifier = fabs(halfwaySample)*1.57079633;
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		float count = density;
+		float bridgerectifier;
+		while (count > 1.0f) {
+			bridgerectifier = fabs(halfwaySample)*1.57079633f;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (halfwaySample > 0.0) halfwaySample = bridgerectifier;
+			if (halfwaySample > 0.0f) halfwaySample = bridgerectifier;
 			else halfwaySample = -bridgerectifier;
-			count = count - 1.0;
+			count = count - 1.0f;
 		}
-		bridgerectifier = fabs(halfwaySample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bridgerectifier = fabs(halfwaySample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		if (density > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier); //produce either boosted or starved version
-		if (halfwaySample > 0) halfwaySample = (halfwaySample*(1.0-out))+(bridgerectifier*out);
-		else halfwaySample = (halfwaySample*(1.0-out))-(bridgerectifier*out); //blend according to density control
+		if (halfwaySample > 0) halfwaySample = (halfwaySample*(1.0f-out))+(bridgerectifier*out);
+		else halfwaySample = (halfwaySample*(1.0f-out))-(bridgerectifier*out); //blend according to density control
 		
 		ataC = halfwaySample - halfDrySample;
-		ataA *= 0.915965594177219015; ataB *= 0.915965594177219015;
+		ataA *= 0.915965594177219015f; ataB *= 0.915965594177219015f;
 		ataB += ataC; ataA -= ataC; ataC = ataB;
-		double halfDiffSample = ataC * 0.915965594177219015;
+		float halfDiffSample = ataC * 0.915965594177219015f;
 		
-		iirSampleA = (iirSampleA * (1.0 - iirAmount)) + (inputSample * iirAmount); inputSample -= iirSampleA; //highpass section
+		iirSampleA = (iirSampleA * (1.0f - iirAmount)) + (inputSample * iirAmount); inputSample -= iirSampleA; //highpass section
 		
 		count = density;
-		while (count > 1.0) {
-			bridgerectifier = fabs(inputSample)*1.57079633;
-			if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		while (count > 1.0f) {
+			bridgerectifier = fabs(inputSample)*1.57079633f;
+			if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 			bridgerectifier = sin(bridgerectifier);
-			if (inputSample > 0.0) inputSample = bridgerectifier;
+			if (inputSample > 0.0f) inputSample = bridgerectifier;
 			else inputSample = -bridgerectifier;
-			count = count - 1.0;
+			count = count - 1.0f;
 		}
-		bridgerectifier = fabs(inputSample)*1.57079633;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		bridgerectifier = fabs(inputSample)*1.57079633f;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		if (density > 0) bridgerectifier = sin(bridgerectifier);
 		else bridgerectifier = 1-cos(bridgerectifier); //produce either boosted or starved version
 		if (inputSample > 0) inputSample = (inputSample*(1-out))+(bridgerectifier*out);
 		else inputSample = (inputSample*(1-out))-(bridgerectifier*out); //blend according to density control
 		
 		ataC = inputSample - drySample;
-		ataA *= 0.915965594177219015; ataB *= 0.915965594177219015;
+		ataA *= 0.915965594177219015f; ataB *= 0.915965594177219015f;
 		ataA += ataC; ataB -= ataC; ataC = ataA;
-		double diffSample = ataC * 0.915965594177219015; 
+		float diffSample = ataC * 0.915965594177219015f; 
 		
-		inputSample = drySample + ((diffSample + halfDiffSample + lastDiffSample) / 1.187);
-		lastDiffSample = diffSample / 2.0;
+		inputSample = drySample + ((diffSample + halfDiffSample + lastDiffSample) / 1.187f);
+		lastDiffSample = diffSample / 2.0f;
 		
 		inputSample *= output;
 		
-		inputSample = (drySample*(1.0-wet))+(inputSample*wet);
+		inputSample = (drySample*(1.0f-wet))+(inputSample*wet);
 				
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

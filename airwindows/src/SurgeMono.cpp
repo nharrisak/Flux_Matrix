@@ -32,11 +32,11 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		uint32_t fpd;
-		double chaseA;
-		double chaseB;
-		double chaseC;
-		double chaseD;
-		double chaseMax;
+		float chaseA;
+		float chaseB;
+		float chaseC;
+		float chaseD;
+		float chaseMax;
 	
 	struct _dram {
 		};
@@ -52,25 +52,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();	
-	double inputSample;
-	double drySample;
-	Float64 chaseMax = 0.0;
-	Float64 intensity = (1.0-(pow((1.0-GetParameter( kParam_One )),2)))*0.7;
-	Float64 attack = ((intensity+0.1)*0.0005)/overallscale;
-	Float64 decay = ((intensity+0.001)*0.00005)/overallscale;
-	Float64 wet = GetParameter( kParam_Two );
+	float inputSample;
+	float drySample;
+	Float32 chaseMax = 0.0f;
+	Float32 intensity = (1.0f-(pow((1.0f-GetParameter( kParam_One )),2)))*0.7f;
+	Float32 attack = ((intensity+0.1f)*0.0005f)/overallscale;
+	Float32 decay = ((intensity+0.001f)*0.00005f)/overallscale;
+	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
-	Float64 inputSense;
+	Float32 inputSense;
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		drySample = inputSample;
 		
-		inputSample *= 8.0;
+		inputSample *= 8.0f;
 		inputSample *= intensity;
 		inputSense = fabs(inputSample);
 		
@@ -89,8 +89,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (chaseC < -attack) chaseC = -attack;
 
 		chaseD += (chaseC/overallscale);
-		if (chaseD > 1.0) chaseD = 1.0;
-		if (chaseD < 0.0) chaseD = 0.0;
+		if (chaseD > 1.0f) chaseD = 1.0f;
+		if (chaseD < 0.0f) chaseD = 0.0f;
 		
 		chaseMax = chaseA;
 		if (chaseMax < chaseB) chaseMax = chaseB;
@@ -99,12 +99,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample *= chaseMax;
 				
 		inputSample = drySample - (inputSample * intensity);
-		inputSample = (drySample * (1.0-wet)) + (inputSample * wet);
+		inputSample = (drySample * (1.0f-wet)) + (inputSample * wet);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

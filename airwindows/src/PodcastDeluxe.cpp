@@ -32,24 +32,24 @@ struct _kernel {
 		int tap1, tap2, tap3, tap4, tap5, maxdelay1, maxdelay2, maxdelay3, maxdelay4, maxdelay5;
 		//the phase rotator
 		
-		Float64 c1;
-		Float64 c2;
-		Float64 c3;
-		Float64 c4;
-		Float64 c5;
+		Float32 c1;
+		Float32 c2;
+		Float32 c3;
+		Float32 c4;
+		Float32 c5;
 		//the compressor
 				
-		Float64 lastSample;
-		Float64 lastOutSample;
+		Float32 lastSample;
+		Float32 lastOutSample;
 
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 d1[503];
-		Float64 d2[503];
-		Float64 d3[503];
-		Float64 d4[503];
-		Float64 d5[503];
+			Float32 d1[503];
+		Float32 d2[503];
+		Float32 d3[503];
+		Float32 d4[503];
+		Float32 d5[503];
 	};
 	_dram* dram;
 };
@@ -63,38 +63,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
 	int allpasstemp;
-	Float64 outallpass = 0.618033988749894848204586;
+	Float32 outallpass = 0.618033988749894848204586f;
 	
-	Float64 compress = 1.0+pow(GetParameter( kParam_One )*0.8,2);
+	Float32 compress = 1.0f+pow(GetParameter( kParam_One )*0.8f,2);
 	
-	Float64 speed1 = 128.0 / pow(compress,2);
+	Float32 speed1 = 128.0f / pow(compress,2);
 	speed1 *= overallscale;
-	Float64 speed2 = speed1 * 1.4;
-	Float64 speed3 = speed2 * 1.5;
-	Float64 speed4 = speed3 * 1.6;
-	Float64 speed5 = speed4 * 1.7;
+	Float32 speed2 = speed1 * 1.4f;
+	Float32 speed3 = speed2 * 1.5f;
+	Float32 speed4 = speed3 * 1.6f;
+	Float32 speed5 = speed4 * 1.7f;
 	
-	maxdelay1 = (int)(23.0*overallscale);
-	maxdelay2 = (int)(19.0*overallscale);
-	maxdelay3 = (int)(17.0*overallscale);
-	maxdelay4 = (int)(13.0*overallscale);
-	maxdelay5 = (int)(11.0*overallscale);
+	maxdelay1 = (int)(23.0f*overallscale);
+	maxdelay2 = (int)(19.0f*overallscale);
+	maxdelay3 = (int)(17.0f*overallscale);
+	maxdelay4 = (int)(13.0f*overallscale);
+	maxdelay5 = (int)(11.0f*overallscale);
 	//set up the prime delays
 	
-	Float64 refclip = 0.999;
-	Float64 softness = 0.435;
-	Float64 invsoft = 0.56;
-	Float64 outsoft = 0.545;
-	Float64 trigger;
+	Float32 refclip = 0.999f;
+	Float32 softness = 0.435f;
+	Float32 invsoft = 0.56f;
+	Float32 outsoft = 0.545f;
+	Float32 trigger;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 								
 		allpasstemp = tap1 - 1;
 		if (allpasstemp < 0 || allpasstemp > maxdelay1) {allpasstemp = maxdelay1;}
@@ -109,11 +109,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//decrement the position for reals
 		
 		inputSample *= c1;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c1 += trigger/speed5;
 		if (c1 > compress) c1 = compress;
 		//compress stage
@@ -131,11 +131,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//decrement the position for reals
 		
 		inputSample *= c2;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c2 += trigger/speed4;
 		if (c2 > compress) c2 = compress;
 		//compress stage
@@ -153,11 +153,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//decrement the position for reals
 		
 		inputSample *= c3;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c3 += trigger/speed3;
 		if (c3 > compress) c3 = compress;
 		//compress stage
@@ -175,11 +175,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//decrement the position for reals
 		
 		inputSample *= c4;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c4 += trigger/speed2;
 		if (c4 > compress) c4 = compress;
 		//compress stage
@@ -197,16 +197,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//decrement the position for reals
 		
 		inputSample *= c5;
-		trigger = fabs(inputSample)*4.7;
-		if (trigger > 4.7) trigger = 4.7;
+		trigger = fabs(inputSample)*4.7f;
+		if (trigger > 4.7f) trigger = 4.7f;
 		trigger = sin(trigger);
-		if (trigger < 0) trigger *= 8.0;
-		if (trigger < -4.2) trigger = -4.2;
+		if (trigger < 0) trigger *= 8.0f;
+		if (trigger < -4.2f) trigger = -4.2f;
 		c5 += trigger/speed1;
 		if (c5 > compress) c5 = compress;
 		//compress stage
 		
-		if (compress > 1.0) inputSample /= compress;
+		if (compress > 1.0f) inputSample /= compress;
 		
 		if (lastSample >= refclip)
 		{
@@ -247,7 +247,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

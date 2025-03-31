@@ -34,8 +34,8 @@ struct _kernel {
 	_airwindowsAlgorithm* owner;
  
 		uint32_t fpd;
-		Float64 chase;
-		Float64 lastrectifier;
+		Float32 chase;
+		Float32 lastrectifier;
 	
 	struct _dram {
 		};
@@ -51,61 +51,61 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 overallscale = 1.0;
-	overallscale /= 44100.0;
+	Float32 overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	if (overallscale < 0.1) overallscale = 1.0;
+	if (overallscale < 0.1f) overallscale = 1.0f;
 	//insanity check
-	double fpOld = 0.618033988749894848204586; //golden ratio!
-	double fpNew = 1.0 - fpOld;
-	double inputSample;
-	double drySample;
-	Float64 bridgerectifier;
-	Float64 temprectifier;
-	Float64 inputSense;
+	float fpOld = 0.618033988749894848204586f; //golden ratio!
+	float fpNew = 1.0f - fpOld;
+	float inputSample;
+	float drySample;
+	Float32 bridgerectifier;
+	Float32 temprectifier;
+	Float32 inputSense;
 	
-	Float64 inputGain = pow(10.0,(GetParameter( kParam_One ))/20.0);
-	Float64 attack = ((GetParameter( kParam_Two )+0.5)*0.006)/overallscale;
-	Float64 decay = ((GetParameter( kParam_Two )+0.01)*0.0004)/overallscale;
-	Float64 outputGain = pow(10.0,(GetParameter( kParam_Three ))/20.0);
-	Float64 wet;
-	Float64 maxblur;
-	Float64 blurdry;
-	Float64 out;
-	Float64 dry;
+	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 attack = ((GetParameter( kParam_Two )+0.5f)*0.006f)/overallscale;
+	Float32 decay = ((GetParameter( kParam_Two )+0.01f)*0.0004f)/overallscale;
+	Float32 outputGain = pow(10.0f,(GetParameter( kParam_Three ))/20.0f);
+	Float32 wet;
+	Float32 maxblur;
+	Float32 blurdry;
+	Float32 out;
+	Float32 dry;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		
 		
-		if (inputGain != 1.0) {
+		if (inputGain != 1.0f) {
 			inputSample *= inputGain;
 		}
 		drySample = inputSample;
 		inputSense = fabs(inputSample);
 		
 		if (chase < inputSense) chase += attack;
-		if (chase > 1.0) chase = 1.0;
+		if (chase > 1.0f) chase = 1.0f;
 		if (chase > inputSense) chase -= decay;
-		if (chase < 0.0) chase = 0.0;
+		if (chase < 0.0f) chase = 0.0f;
 		//chase will be between 0 and ? (if input is super hot)
 		out = wet = chase;
-		if (wet > 1.0) wet = 1.0;
+		if (wet > 1.0f) wet = 1.0f;
 		maxblur = wet * fpNew;
-		blurdry = 1.0 - maxblur;
+		blurdry = 1.0f - maxblur;
 		//scaled back so that blur remains balance of both
 		if (out > fpOld) out = fpOld - (out - fpOld);
-		if (out < 0.0) out = 0.0;
-		dry = 1.0 - wet;
+		if (out < 0.0f) out = 0.0f;
+		dry = 1.0f - wet;
 
-		if (inputSample > 1.57079633) inputSample = 1.57079633;
-		if (inputSample < -1.57079633) inputSample = -1.57079633;
+		if (inputSample > 1.57079633f) inputSample = 1.57079633f;
+		if (inputSample < -1.57079633f) inputSample = -1.57079633f;
 		
 		bridgerectifier = fabs(inputSample);
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
 		temprectifier = 1-cos(bridgerectifier);
 		bridgerectifier = ((lastrectifier*maxblur) + (temprectifier*blurdry));
 		lastrectifier = temprectifier;
@@ -113,14 +113,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (inputSample > 0) inputSample = (inputSample*dry)+(bridgerectifier*out);
 		else inputSample = (inputSample*dry)-(bridgerectifier*out);
 		
-		if (outputGain != 1.0) {
+		if (outputGain != 1.0f) {
 			inputSample *= outputGain;
 		}
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

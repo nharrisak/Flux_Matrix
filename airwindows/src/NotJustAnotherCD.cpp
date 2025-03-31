@@ -27,8 +27,8 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 byn[13];
-		double noiseShaping;
+		Float32 byn[13];
+		float noiseShaping;
 	
 	struct _dram {
 		};
@@ -45,12 +45,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double inputSample;
-	Float64 benfordize;
+	float inputSample;
+	Float32 benfordize;
 	int hotbinA;
 	int hotbinB;
-	Float64 totalA;
-	Float64 totalB;
+	Float32 totalA;
+	Float32 totalB;
 	Float32 drySample;
 	
 	
@@ -61,16 +61,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		inputSample -= noiseShaping;
-		inputSample *= 32768.0;
+		inputSample *= 32768.0f;
 		//0-1 is now one bit, now we dither
 		
 		benfordize = floor(inputSample);
-		while (benfordize >= 1.0) {benfordize /= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
+		while (benfordize >= 1.0f) {benfordize /= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
 		hotbinA = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number floored
 		totalA = 0;
@@ -91,9 +91,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//produce total number- smaller is closer to Benford real
 		
 		benfordize = ceil(inputSample);
-		while (benfordize >= 1.0) {benfordize /= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
-		if (benfordize < 1.0) {benfordize *= 10;}
+		while (benfordize >= 1.0f) {benfordize /= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
+		if (benfordize < 1.0f) {benfordize *= 10;}
 		hotbinB = floor(benfordize);
 		//hotbin becomes the Benford bin value for this number ceiled
 		totalB = 0;
@@ -140,7 +140,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		byn[9] /= totalA;
 		byn[10] /= 2; //catchall for garbage data
 		
-		inputSample /= 32768.0;
+		inputSample /= 32768.0f;
 		
 		noiseShaping += inputSample - drySample;
 		

@@ -31,15 +31,15 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 lastSample;
-		Float64 m1;
-		Float64 m2;
-		double biquadA[11];
-		double biquadB[11];
+		Float32 lastSample;
+		Float32 m1;
+		Float32 m2;
+		float biquadA[11];
+		float biquadB[11];
 		uint32_t fpd;
 	
 	struct _dram {
-			Float64 s[34];
+			Float32 s[34];
 	};
 	_dram* dram;
 };
@@ -53,67 +53,67 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float64 intensity = pow(GetParameter( kParam_One ),3)*32;
-	Float64 wet = GetParameter( kParam_Two );	
-	int spacing = (int)(1.73*overallscale)+1;
+	Float32 intensity = pow(GetParameter( kParam_One ),3)*32;
+	Float32 wet = GetParameter( kParam_Two );	
+	int spacing = (int)(1.73f*overallscale)+1;
 	if (spacing > 16) spacing = 16;
 	
-	biquadA[0] = (20000.0 * (1.0-(GetParameter( kParam_One )*0.618033988749894848204586))) / GetSampleRate();
-	biquadB[0] = 20000.0 / GetSampleRate();
-    biquadA[1] = 0.7071;
-	biquadB[1] = 0.7071;
+	biquadA[0] = (20000.0f * (1.0f-(GetParameter( kParam_One )*0.618033988749894848204586f))) / GetSampleRate();
+	biquadB[0] = 20000.0f / GetSampleRate();
+    biquadA[1] = 0.7071f;
+	biquadB[1] = 0.7071f;
 	
-	double K = tan(M_PI * biquadA[0]); //lowpass
-	double norm = 1.0 / (1.0 + K / biquadA[1] + K * K);
+	float K = tan(M_PI * biquadA[0]); //lowpass
+	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);
 	biquadA[2] = K * K * norm;
-	biquadA[3] = 2.0 * biquadA[2];
+	biquadA[3] = 2.0f * biquadA[2];
 	biquadA[4] = biquadA[2];
-	biquadA[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[6] = (1.0 - K / biquadA[1] + K * K) * norm;
+	biquadA[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadA[6] = (1.0f - K / biquadA[1] + K * K) * norm;
 	
 	K = tan(M_PI * biquadB[0]);
-	norm = 1.0 / (1.0 + K / biquadB[1] + K * K);
+	norm = 1.0f / (1.0f + K / biquadB[1] + K * K);
 	biquadB[2] = K * K * norm;
-	biquadB[3] = 2.0 * biquadB[2];
+	biquadB[3] = 2.0f * biquadB[2];
 	biquadB[4] = biquadB[2];
-	biquadB[5] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[6] = (1.0 - K / biquadB[1] + K * K) * norm;	
+	biquadB[5] = 2.0f * (K * K - 1.0f) * norm;
+	biquadB[6] = (1.0f - K / biquadB[1] + K * K) * norm;	
 
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
+		float tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
 		biquadA[8] = biquadA[7]; biquadA[7] = inputSample;
-		Float64 smooth = tempSample; 
+		Float32 smooth = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = smooth; //DF1
 		
 		for(int count = spacing*2; count >= 0; count--) {dram->s[count+1] = dram->s[count];} dram->s[0] = inputSample;
 		m1 = (dram->s[0]-dram->s[spacing])*(fabs(dram->s[0]-dram->s[spacing]));
 		m2 = (dram->s[spacing]-dram->s[spacing*2])*(fabs(dram->s[spacing]-dram->s[spacing*2]));
 		
-		Float64 sense = (intensity*intensity*fabs(m1-m2));
-		if (sense > 1.0) sense = 1.0;
-		inputSample = (inputSample * (1.0-sense)) + (smooth*sense);
+		Float32 sense = (intensity*intensity*fabs(m1-m2));
+		if (sense > 1.0f) sense = 1.0f;
+		inputSample = (inputSample * (1.0f-sense)) + (smooth*sense);
 		
 		tempSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = tempSample; 
 		biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

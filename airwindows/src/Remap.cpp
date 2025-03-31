@@ -49,35 +49,35 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 drive = GetParameter( kParam_One ) * 0.5;
-	Float64 gain = (drive+0.2)*8;
-	Float64 out = GetParameter( kParam_Two );
-	Float64 wet = GetParameter( kParam_Three );
+	Float32 drive = GetParameter( kParam_One ) * 0.5f;
+	Float32 gain = (drive+0.2f)*8;
+	Float32 out = GetParameter( kParam_Two );
+	Float32 wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		double gaintrim = fabs(inputSample);
-		double bridgerectifier = gaintrim*gain;
-		if (gaintrim > 1.0) gaintrim = 1.0;
+		float gaintrim = fabs(inputSample);
+		float bridgerectifier = gaintrim*gain;
+		if (gaintrim > 1.0f) gaintrim = 1.0f;
 		else gaintrim *= gaintrim;
 		
-		if (inputSample > 1.57079633) bridgerectifier = 1.0-(1.0-sin(bridgerectifier));
+		if (inputSample > 1.57079633f) bridgerectifier = 1.0f-(1.0f-sin(bridgerectifier));
 		else bridgerectifier = sin(bridgerectifier);
 		
 		if (inputSample > 0) inputSample -= (bridgerectifier*gaintrim*drive);
 		else inputSample += (bridgerectifier*gaintrim*drive);
 		
-		if (out < 1.0) inputSample *= out;
+		if (out < 1.0f) inputSample *= out;
 		
-		if (wet < 1.0) inputSample = (drySample * (1.0-wet))+(inputSample*wet);
+		if (wet < 1.0f) inputSample = (drySample * (1.0f-wet))+(inputSample*wet);
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

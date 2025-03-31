@@ -33,16 +33,16 @@ kParam0, kParam1, kParam2, kParam3, kParam4, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		Float64 iirLowpassAR;
-		Float64 iirLowpassBR;
-		Float64 iirHighpassAR;
-		Float64 iirHighpassBR;
-		Float64 iirLowpassAL;
-		Float64 iirLowpassBL;
-		Float64 iirHighpassAL;
-		Float64 iirHighpassBL;
-		Float64 treblefreq;
-		Float64 bassfreq;
+		Float32 iirLowpassAR;
+		Float32 iirLowpassBR;
+		Float32 iirHighpassAR;
+		Float32 iirHighpassBR;
+		Float32 iirLowpassAL;
+		Float32 iirLowpassBL;
+		Float32 iirHighpassAL;
+		Float32 iirHighpassBL;
+		Float32 treblefreq;
+		Float32 bassfreq;
 		bool flip;
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -56,41 +56,41 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	//speed settings around release
-	Float64 threshold = pow(GetParameter( kParam_One ),2);
+	Float32 threshold = pow(GetParameter( kParam_One ),2);
 	//gain settings around threshold
-	Float64 trebledecay = pow(1.0-GetParameter( kParam_Two ),2)/4196.0;
-	Float64 bassdecay =  pow(1.0-GetParameter( kParam_Three ),2)/8192.0;
-	Float64 slowAttack = (pow(GetParameter( kParam_Four ),3)*3)+0.003;
-	Float64 wet = GetParameter( kParam_Five );
+	Float32 trebledecay = pow(1.0f-GetParameter( kParam_Two ),2)/4196.0f;
+	Float32 bassdecay =  pow(1.0f-GetParameter( kParam_Three ),2)/8192.0f;
+	Float32 slowAttack = (pow(GetParameter( kParam_Four ),3)*3)+0.003f;
+	Float32 wet = GetParameter( kParam_Five );
 	slowAttack /= overallscale;
 	trebledecay /= overallscale;
 	bassdecay /= overallscale;
-	trebledecay += 1.0;
-	bassdecay += 1.0;
-	Float64 attackSpeed;
-	Float64 highestSample;
+	trebledecay += 1.0f;
+	bassdecay += 1.0f;
+	Float32 attackSpeed;
+	Float32 highestSample;
 
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
 		if (fabs(inputSampleL) > fabs(inputSampleR)) {
-			attackSpeed = slowAttack - (fabs(inputSampleL)*slowAttack*0.5);
+			attackSpeed = slowAttack - (fabs(inputSampleL)*slowAttack*0.5f);
 			highestSample = fabs(inputSampleL);
 		} else {
-			attackSpeed = slowAttack - (fabs(inputSampleR)*slowAttack*0.5); //we're triggering off the highest amplitude
+			attackSpeed = slowAttack - (fabs(inputSampleR)*slowAttack*0.5f); //we're triggering off the highest amplitude
 			highestSample = fabs(inputSampleR); //and making highestSample the abs() of that amplitude
 		}
 		
-		if (attackSpeed < 0.0) attackSpeed = 0.0;
+		if (attackSpeed < 0.0f) attackSpeed = 0.0f;
 		//softening onset click depending on how hard we're getting it
 		
 		if (flip)
@@ -98,14 +98,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			if (highestSample > threshold)
 			{
 				treblefreq += attackSpeed;
-				if (treblefreq > 2.0) treblefreq = 2.0;
+				if (treblefreq > 2.0f) treblefreq = 2.0f;
 				bassfreq -= attackSpeed;
 				bassfreq -= attackSpeed;
-				if (bassfreq < 0.0) bassfreq = 0.0;
+				if (bassfreq < 0.0f) bassfreq = 0.0f;
 				iirLowpassAL = iirLowpassBL = inputSampleL;
-				iirHighpassAL = iirHighpassBL = 0.0;
+				iirHighpassAL = iirHighpassBL = 0.0f;
 				iirLowpassAR = iirLowpassBR = inputSampleR;
-				iirHighpassAR = iirHighpassBR = 0.0;
+				iirHighpassAR = iirHighpassBR = 0.0f;
 			}
 			else
 			{
@@ -117,30 +117,30 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				bassfreq += treblefreq;
 			}
 			
-			if (treblefreq >= 1.0) {
+			if (treblefreq >= 1.0f) {
 				iirLowpassAL = inputSampleL;
 				iirLowpassAR = inputSampleR;
 			} else {
-				iirLowpassAL = (iirLowpassAL * (1.0 - treblefreq)) + (inputSampleL * treblefreq);
-				iirLowpassAR = (iirLowpassAR * (1.0 - treblefreq)) + (inputSampleR * treblefreq);
+				iirLowpassAL = (iirLowpassAL * (1.0f - treblefreq)) + (inputSampleL * treblefreq);
+				iirLowpassAR = (iirLowpassAR * (1.0f - treblefreq)) + (inputSampleR * treblefreq);
 			}
 			
-			if (bassfreq > 1.0) bassfreq = 1.0;
+			if (bassfreq > 1.0f) bassfreq = 1.0f;
 			
-			if (bassfreq > 0.0) {
-				iirHighpassAL = (iirHighpassAL * (1.0 - bassfreq)) + (inputSampleL * bassfreq);
-				iirHighpassAR = (iirHighpassAR * (1.0 - bassfreq)) + (inputSampleR * bassfreq);
+			if (bassfreq > 0.0f) {
+				iirHighpassAL = (iirHighpassAL * (1.0f - bassfreq)) + (inputSampleL * bassfreq);
+				iirHighpassAR = (iirHighpassAR * (1.0f - bassfreq)) + (inputSampleR * bassfreq);
 			} else {
-				iirHighpassAL = 0.0;
-				iirHighpassAR = 0.0;
+				iirHighpassAL = 0.0f;
+				iirHighpassAR = 0.0f;
 			}
 			
 			if (treblefreq > bassfreq) {
 				inputSampleL = (iirLowpassAL - iirHighpassAL);
 				inputSampleR = (iirLowpassAR - iirHighpassAR);
 			} else {
-				inputSampleL = 0.0;
-				inputSampleR = 0.0;
+				inputSampleL = 0.0f;
+				inputSampleR = 0.0f;
 			}
 		}
 		else
@@ -148,14 +148,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			if (highestSample > threshold)
 			{
 				treblefreq += attackSpeed;
-				if (treblefreq > 2.0) treblefreq = 2.0;
+				if (treblefreq > 2.0f) treblefreq = 2.0f;
 				bassfreq -= attackSpeed;
 				bassfreq -= attackSpeed;
-				if (bassfreq < 0.0) bassfreq = 0.0;
+				if (bassfreq < 0.0f) bassfreq = 0.0f;
 				iirLowpassAL = iirLowpassBL = inputSampleL;
-				iirHighpassAL = iirHighpassBL = 0.0;
+				iirHighpassAL = iirHighpassBL = 0.0f;
 				iirLowpassAR = iirLowpassBR = inputSampleR;
-				iirHighpassAR = iirHighpassBR = 0.0;
+				iirHighpassAR = iirHighpassBR = 0.0f;
 			}
 			else
 			{
@@ -167,30 +167,30 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				bassfreq += treblefreq;
 			}
 			
-			if (treblefreq >= 1.0) {
+			if (treblefreq >= 1.0f) {
 				iirLowpassBL = inputSampleL;
 				iirLowpassBR = inputSampleR;
 			} else {
-				iirLowpassBL = (iirLowpassBL * (1.0 - treblefreq)) + (inputSampleL * treblefreq);
-				iirLowpassBR = (iirLowpassBR * (1.0 - treblefreq)) + (inputSampleR * treblefreq);
+				iirLowpassBL = (iirLowpassBL * (1.0f - treblefreq)) + (inputSampleL * treblefreq);
+				iirLowpassBR = (iirLowpassBR * (1.0f - treblefreq)) + (inputSampleR * treblefreq);
 			}
 			
-			if (bassfreq > 1.0) bassfreq = 1.0;
+			if (bassfreq > 1.0f) bassfreq = 1.0f;
 
-			if (bassfreq > 0.0) {
-				iirHighpassBL = (iirHighpassBL * (1.0 - bassfreq)) + (inputSampleL * bassfreq);
-				iirHighpassBR = (iirHighpassBR * (1.0 - bassfreq)) + (inputSampleR * bassfreq);
+			if (bassfreq > 0.0f) {
+				iirHighpassBL = (iirHighpassBL * (1.0f - bassfreq)) + (inputSampleL * bassfreq);
+				iirHighpassBR = (iirHighpassBR * (1.0f - bassfreq)) + (inputSampleR * bassfreq);
 			} else {
-				iirHighpassBL = 0.0;
-				iirHighpassBR = 0.0;
+				iirHighpassBL = 0.0f;
+				iirHighpassBR = 0.0f;
 			}
 			
 			if (treblefreq > bassfreq) {
 				inputSampleL = (iirLowpassBL - iirHighpassBL);
 				inputSampleR = (iirLowpassBR - iirHighpassBR);
 			} else {
-				inputSampleL = 0.0;
-				inputSampleR = 0.0;
+				inputSampleL = 0.0f;
+				inputSampleR = 0.0f;
 			}			
 		}
 		//done full gated envelope filtered effect
@@ -203,10 +203,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

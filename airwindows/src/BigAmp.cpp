@@ -35,27 +35,27 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double lastSample;
-		double storeSample;
-		double lastSlew;
-		double iirSampleA;
-		double iirSampleB;
-		double iirSampleC;
-		double iirSampleD;
-		double iirSampleE;
-		double iirSampleF;
-		double iirSampleG;
-		double iirSampleH;
-		double iirSampleI;
-		double iirSampleJ;
+		float lastSample;
+		float storeSample;
+		float lastSlew;
+		float iirSampleA;
+		float iirSampleB;
+		float iirSampleC;
+		float iirSampleD;
+		float iirSampleE;
+		float iirSampleF;
+		float iirSampleG;
+		float iirSampleH;
+		float iirSampleI;
+		float iirSampleJ;
 		bool flip;
 		int count; //amp
 		
-		double lastCabSample;
-		double smoothCabA;
-		double smoothCabB; //cab
+		float lastCabSample;
+		float smoothCabA;
+		float smoothCabB; //cab
 		
-		double lastRef[10];
+		float lastRef[10];
 		int cycle;	//undersampling
 		
 		enum {
@@ -75,15 +75,15 @@ struct _kernel {
 		uint32_t fpd;
 	
 	struct _dram {
-			double Odd[257];
-		double Even[257];
-		double b[90];
-		double fixA[fix_total];
-		double fixB[fix_total];
-		double fixC[fix_total];
-		double fixD[fix_total];
-		double fixE[fix_total];
-		double fixF[fix_total]; //filtering
+			float Odd[257];
+		float Even[257];
+		float b[90];
+		float fixA[fix_total];
+		float fixB[fix_total];
+		float fixC[fix_total];
+		float fixD[fix_total];
+		float fixE[fix_total];
+		float fixF[fix_total]; //filtering
 	};
 	_dram* dram;
 };
@@ -98,109 +98,109 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double bassfill = GetParameter( kParam_One );
-	double basstrim = GetParameter( kParam_Two );
-	double outputlevel = GetParameter( kParam_Three );
-	double wet = GetParameter( kParam_Four );
+	float bassfill = GetParameter( kParam_One );
+	float basstrim = GetParameter( kParam_Two );
+	float outputlevel = GetParameter( kParam_Three );
+	float wet = GetParameter( kParam_Four );
 	
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int cycleEnd = floor(overallscale);
 	if (cycleEnd < 1) cycleEnd = 1;
 	if (cycleEnd > 4) cycleEnd = 4;
-	//this is going to be 2 for 88.1 or 96k, 3 for silly people, 4 for 176 or 192k
+	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check		
 	
-	double bleed = outputlevel/16.0;
-	double inputlevel = bassfill*3.0;
+	float bleed = outputlevel/16.0f;
+	float inputlevel = bassfill*3.0f;
 	
-	double samplerate = GetSampleRate();
-	double EQ = (GetParameter( kParam_Two )/ samplerate)*22050.0;
-	double BEQ = (bleed / samplerate)*22050.0;
+	float samplerate = GetSampleRate();
+	float EQ = (GetParameter( kParam_Two )/ samplerate)*22050.0f;
+	float BEQ = (bleed / samplerate)*22050.0f;
 	
-	int diagonal = (int)(0.000861678*samplerate);
+	int diagonal = (int)(0.000861678f*samplerate);
 	if (diagonal > 127) diagonal = 127;
-	int side = (int)(diagonal/1.4142135623730951);
+	int side = (int)(diagonal/1.4142135623730951f);
 	int down = (side + diagonal)/2;
 	//now we've got down, side and diagonal as offsets and we also use three successive samples upfront
 	
-	double cutoff = (15000.0+(GetParameter( kParam_Two )*10000.0)) / GetSampleRate();
-	if (cutoff > 0.49) cutoff = 0.49; //don't crash if run at 44.1k
-	if (cutoff < 0.001) cutoff = 0.001; //or if cutoff's too low
+	float cutoff = (15000.0f+(GetParameter( kParam_Two )*10000.0f)) / GetSampleRate();
+	if (cutoff > 0.49f) cutoff = 0.49f; //don't crash if run at 44.1k
+	if (cutoff < 0.001f) cutoff = 0.001f; //or if cutoff's too low
 	
 	dram->fixF[fix_freq] = dram->fixE[fix_freq] = dram->fixD[fix_freq] = dram->fixC[fix_freq] = dram->fixB[fix_freq] = dram->fixA[fix_freq] = cutoff;
 	
-    dram->fixA[fix_reso] = 4.46570214;
-	dram->fixB[fix_reso] = 1.51387132;
-	dram->fixC[fix_reso] = 0.93979296;
-	dram->fixD[fix_reso] = 0.70710678;
-	dram->fixE[fix_reso] = 0.52972649;
-	dram->fixF[fix_reso] = 0.50316379;
+    dram->fixA[fix_reso] = 4.46570214f;
+	dram->fixB[fix_reso] = 1.51387132f;
+	dram->fixC[fix_reso] = 0.93979296f;
+	dram->fixD[fix_reso] = 0.70710678f;
+	dram->fixE[fix_reso] = 0.52972649f;
+	dram->fixF[fix_reso] = 0.50316379f;
 	
-	double K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	float K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
+	float norm = 1.0f / (1.0f + K / dram->fixA[fix_reso] + K * K);
 	dram->fixA[fix_a0] = K * K * norm;
-	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a1] = 2.0f * dram->fixA[fix_a0];
 	dram->fixA[fix_a2] = dram->fixA[fix_a0];
-	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixA[fix_b2] = (1.0f - K / dram->fixA[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixB[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixB[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixB[fix_reso] + K * K);
 	dram->fixB[fix_a0] = K * K * norm;
-	dram->fixB[fix_a1] = 2.0 * dram->fixB[fix_a0];
+	dram->fixB[fix_a1] = 2.0f * dram->fixB[fix_a0];
 	dram->fixB[fix_a2] = dram->fixB[fix_a0];
-	dram->fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixB[fix_b2] = (1.0 - K / dram->fixB[fix_reso] + K * K) * norm;
+	dram->fixB[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixB[fix_b2] = (1.0f - K / dram->fixB[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixC[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixC[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixC[fix_reso] + K * K);
 	dram->fixC[fix_a0] = K * K * norm;
-	dram->fixC[fix_a1] = 2.0 * dram->fixC[fix_a0];
+	dram->fixC[fix_a1] = 2.0f * dram->fixC[fix_a0];
 	dram->fixC[fix_a2] = dram->fixC[fix_a0];
-	dram->fixC[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixC[fix_b2] = (1.0 - K / dram->fixC[fix_reso] + K * K) * norm;
+	dram->fixC[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixC[fix_b2] = (1.0f - K / dram->fixC[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixD[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixD[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixD[fix_reso] + K * K);
 	dram->fixD[fix_a0] = K * K * norm;
-	dram->fixD[fix_a1] = 2.0 * dram->fixD[fix_a0];
+	dram->fixD[fix_a1] = 2.0f * dram->fixD[fix_a0];
 	dram->fixD[fix_a2] = dram->fixD[fix_a0];
-	dram->fixD[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixD[fix_b2] = (1.0 - K / dram->fixD[fix_reso] + K * K) * norm;
+	dram->fixD[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixD[fix_b2] = (1.0f - K / dram->fixD[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixE[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixE[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixE[fix_reso] + K * K);
 	dram->fixE[fix_a0] = K * K * norm;
-	dram->fixE[fix_a1] = 2.0 * dram->fixE[fix_a0];
+	dram->fixE[fix_a1] = 2.0f * dram->fixE[fix_a0];
 	dram->fixE[fix_a2] = dram->fixE[fix_a0];
-	dram->fixE[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixE[fix_b2] = (1.0 - K / dram->fixE[fix_reso] + K * K) * norm;
+	dram->fixE[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixE[fix_b2] = (1.0f - K / dram->fixE[fix_reso] + K * K) * norm;
 	
 	K = tan(M_PI * dram->fixF[fix_freq]);
-	norm = 1.0 / (1.0 + K / dram->fixF[fix_reso] + K * K);
+	norm = 1.0f / (1.0f + K / dram->fixF[fix_reso] + K * K);
 	dram->fixF[fix_a0] = K * K * norm;
-	dram->fixF[fix_a1] = 2.0 * dram->fixF[fix_a0];
+	dram->fixF[fix_a1] = 2.0f * dram->fixF[fix_a0];
 	dram->fixF[fix_a2] = dram->fixF[fix_a0];
-	dram->fixF[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	dram->fixF[fix_b2] = (1.0 - K / dram->fixF[fix_reso] + K * K) * norm;
+	dram->fixF[fix_b1] = 2.0f * (K * K - 1.0f) * norm;
+	dram->fixF[fix_b2] = (1.0f - K / dram->fixF[fix_reso] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		float drySample = inputSample;
 		
-		double outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		float outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
 		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
 		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
-		double skew = (inputSample - lastSample);
+		float skew = (inputSample - lastSample);
 		lastSample = inputSample;
 		//skew will be direction/angle
-		double bridgerectifier = fabs(skew);
-		if (bridgerectifier > 3.1415926) bridgerectifier = 3.1415926;
+		float bridgerectifier = fabs(skew);
+		if (bridgerectifier > 3.1415926f) bridgerectifier = 3.1415926f;
 		//for skew we want it to go to zero effect again, so we use full range of the sine
 		bridgerectifier = sin(bridgerectifier);
 		if (skew > 0) skew = bridgerectifier;
@@ -208,9 +208,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//skew is now sined and clamped and then re-amplified again
 		
 		skew *= inputSample;
-		skew = (skew+(skew*basstrim))/2.0;
+		skew = (skew+(skew*basstrim))/2.0f;
 		inputSample *= basstrim;
-		double basscut = basstrim;
+		float basscut = basstrim;
 		//we're going to be shifting this as the stages progress
 		
 		outSample = (inputSample * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
@@ -219,23 +219,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
 		inputSample *= inputlevel;
-		double offset = (1.0 - EQ) + (fabs(inputSample)*EQ);
+		float offset = (1.0f - EQ) + (fabs(inputSample)*EQ);
 		if (offset < 0) offset = 0;
 		if (offset > 1) offset = 1;
 		iirSampleA = (iirSampleA * (1 - (offset * EQ))) + (inputSample * (offset * EQ));
 		inputSample = inputSample - (iirSampleA*basscut);
 		//highpass
 		bridgerectifier = fabs(inputSample) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = (sin(bridgerectifier) * 1.57079633) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = sin(bridgerectifier) * 1.57079633;
-		if (inputSample > 0) inputSample = (inputSample*(-0.57079633+skew))+(bridgerectifier*(1.57079633+skew));
-		else inputSample = (inputSample*(-0.57079633+skew))-(bridgerectifier*(1.57079633+skew));
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = (sin(bridgerectifier) * 1.57079633f) + skew;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = sin(bridgerectifier) * 1.57079633f;
+		if (inputSample > 0) inputSample = (inputSample*(-0.57079633f+skew))+(bridgerectifier*(1.57079633f+skew));
+		else inputSample = (inputSample*(-0.57079633f+skew))-(bridgerectifier*(1.57079633f+skew));
 		//overdrive
 		iirSampleB = (iirSampleB * (1 - (offset * EQ))) + (inputSample * (offset * EQ));
 		inputSample = inputSample - (iirSampleB*basscut);
-		basscut /= 2.0;
+		basscut /= 2.0f;
 		//highpass. Use offset from before gain stage
 		//finished first gain stage
 		
@@ -245,19 +245,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
 		inputSample *= inputlevel;
-		skew /= 2.0;
-		offset = (1.0 + offset) / 2.0;
+		skew /= 2.0f;
+		offset = (1.0f + offset) / 2.0f;
 		bridgerectifier = fabs(inputSample) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = (sin(bridgerectifier) * 1.57079633) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = sin(bridgerectifier) * 1.57079633;
-		if (inputSample > 0) inputSample = (inputSample*(-0.57079633+skew))+(bridgerectifier*(1.57079633+skew));
-		else inputSample = (inputSample*(-0.57079633+skew))-(bridgerectifier*(1.57079633+skew));
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = (sin(bridgerectifier) * 1.57079633f) + skew;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = sin(bridgerectifier) * 1.57079633f;
+		if (inputSample > 0) inputSample = (inputSample*(-0.57079633f+skew))+(bridgerectifier*(1.57079633f+skew));
+		else inputSample = (inputSample*(-0.57079633f+skew))-(bridgerectifier*(1.57079633f+skew));
 		//overdrive
 		iirSampleC = (iirSampleC * (1 - (offset * EQ))) + (inputSample * (offset * EQ));
 		inputSample = inputSample - (iirSampleC*basscut);
-		basscut /= 2.0;
+		basscut /= 2.0f;
 		//highpass.
 		iirSampleD = (iirSampleD * (1 - (offset * EQ))) + (inputSample * (offset * EQ));
 		inputSample = iirSampleD;
@@ -269,15 +269,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
 		inputSample *= inputlevel;
-		skew /= 2.0;
-		offset = (1.0 + offset) / 2.0;
+		skew /= 2.0f;
+		offset = (1.0f + offset) / 2.0f;
 		bridgerectifier = fabs(inputSample) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = (sin(bridgerectifier) * 1.57079633) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = sin(bridgerectifier) * 1.57079633;
-		if (inputSample > 0) inputSample = (inputSample*(-0.57079633+skew))+(bridgerectifier*(1.57079633+skew));
-		else inputSample = (inputSample*(-0.57079633+skew))-(bridgerectifier*(1.57079633+skew));
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = (sin(bridgerectifier) * 1.57079633f) + skew;
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = sin(bridgerectifier) * 1.57079633f;
+		if (inputSample > 0) inputSample = (inputSample*(-0.57079633f+skew))+(bridgerectifier*(1.57079633f+skew));
+		else inputSample = (inputSample*(-0.57079633f+skew))-(bridgerectifier*(1.57079633f+skew));
 		//overdrive
 		iirSampleE = (iirSampleE * (1 - (offset * EQ))) + (inputSample * (offset * EQ));
 		inputSample = inputSample - (iirSampleE*basscut);
@@ -293,13 +293,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
 		inputSample *= inputlevel;
-		skew /= 2.0;
-		offset = (1.0 + offset) / 2.0;
+		skew /= 2.0f;
+		offset = (1.0f + offset) / 2.0f;
 		bridgerectifier = fabs(inputSample) + skew;
-		if (bridgerectifier > 1.57079633) bridgerectifier = 1.57079633;
-		bridgerectifier = sin(bridgerectifier) * 1.57079633;
-		if (inputSample > 0) inputSample = (inputSample*(-0.57079633+skew))+(bridgerectifier*(1.57079633+skew));
-		else inputSample = (inputSample*(-0.57079633+skew))-(bridgerectifier*(1.57079633+skew));
+		if (bridgerectifier > 1.57079633f) bridgerectifier = 1.57079633f;
+		bridgerectifier = sin(bridgerectifier) * 1.57079633f;
+		if (inputSample > 0) inputSample = (inputSample*(-0.57079633f+skew))+(bridgerectifier*(1.57079633f+skew));
+		else inputSample = (inputSample*(-0.57079633f+skew))-(bridgerectifier*(1.57079633f+skew));
 		//output stage has less gain, no highpass, straight lowpass
 		iirSampleG = (iirSampleG * (1 - (offset * EQ))) + (inputSample * (offset * EQ));
 		inputSample = iirSampleG;
@@ -308,7 +308,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		iirSampleH = (iirSampleH * (1 - (offset * BEQ))) + (inputSample * (offset * BEQ));
 		//extra lowpass for 4*12" speakers
 		if (count < 0 || count > 128) count = 128;
-		double resultB = 0.0;
+		float resultB = 0.0f;
 		
 		if (flip)
 		{
@@ -329,7 +329,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = sin(inputSample*outputlevel);
 		
-		double randy = ((double(fpd)/UINT32_MAX)*0.04);
+		float randy = ((float(fpd)/UINT32_MAX)*0.04f);
 		inputSample = ((inputSample*(1-randy))+(storeSample*randy))*outputlevel;
 		storeSample = inputSample;
 		
@@ -340,8 +340,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		flip = !flip;
 		
-		if (wet !=1.0) {
-			inputSample = (inputSample * wet) + (drySample * (1.0-wet));
+		if (wet !=1.0f) {
+			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 		//amp
@@ -350,7 +350,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (cycle == cycleEnd) {
 			
 			//drySample = inputSample;
-			double temp = (inputSample + smoothCabA)/3.0;
+			float temp = (inputSample + smoothCabA)/3.0f;
 			smoothCabA = inputSample;
 			inputSample = temp;
 			
@@ -366,95 +366,95 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			dram->b[15] = dram->b[14]; dram->b[14] = dram->b[13]; dram->b[13] = dram->b[12]; dram->b[12] = dram->b[11]; dram->b[11] = dram->b[10]; dram->b[10] = dram->b[9]; dram->b[9] = dram->b[8]; dram->b[8] = dram->b[7]; 
 			dram->b[7] = dram->b[6]; dram->b[6] = dram->b[5]; dram->b[5] = dram->b[4]; dram->b[4] = dram->b[3]; dram->b[3] = dram->b[2]; dram->b[2] = dram->b[1]; dram->b[1] = dram->b[0]; dram->b[0] = inputSample;
 			
-			inputSample += (dram->b[1] * (1.35472031405494242  + (0.00220914099195157*fabs(dram->b[1]))));
-			inputSample += (dram->b[2] * (1.63534207755253003  - (0.11406232654509685*fabs(dram->b[2]))));
-			inputSample += (dram->b[3] * (1.82334575691525869  - (0.42647194712964054*fabs(dram->b[3]))));
-			inputSample += (dram->b[4] * (1.86156386235405868  - (0.76744187887586590*fabs(dram->b[4]))));
-			inputSample += (dram->b[5] * (1.67332739338852599  - (0.95161997324293013*fabs(dram->b[5]))));
-			inputSample += (dram->b[6] * (1.25054130794899021  - (0.98410433514572859*fabs(dram->b[6]))));
-			inputSample += (dram->b[7] * (0.70049121047281737  - (0.87375612110718992*fabs(dram->b[7]))));
-			inputSample += (dram->b[8] * (0.15291791448081560  - (0.61195266024519046*fabs(dram->b[8]))));
-			inputSample -= (dram->b[9] * (0.37301992914152693  + (0.16755422915252094*fabs(dram->b[9]))));
-			inputSample -= (dram->b[10] * (0.76568539228498433  - (0.28554435228965386*fabs(dram->b[10]))));
-			inputSample -= (dram->b[11] * (0.95726568749937369  - (0.61659719162806048*fabs(dram->b[11]))));
-			inputSample -= (dram->b[12] * (1.01273552193911032  - (0.81827288407943954*fabs(dram->b[12]))));
-			inputSample -= (dram->b[13] * (0.93920108117234447  - (0.80077111864205874*fabs(dram->b[13]))));
-			inputSample -= (dram->b[14] * (0.79831898832953974  - (0.65814750339694406*fabs(dram->b[14]))));
-			inputSample -= (dram->b[15] * (0.64200088100452313  - (0.46135833001232618*fabs(dram->b[15]))));
-			inputSample -= (dram->b[16] * (0.48807302802822128  - (0.15506178974799034*fabs(dram->b[16]))));
-			inputSample -= (dram->b[17] * (0.36545171501947982  + (0.16126103769376721*fabs(dram->b[17]))));
-			inputSample -= (dram->b[18] * (0.31469581455759105  + (0.32250870039053953*fabs(dram->b[18]))));
-			inputSample -= (dram->b[19] * (0.36893534817945800  + (0.25409418897237473*fabs(dram->b[19]))));
-			inputSample -= (dram->b[20] * (0.41092557722975687  + (0.13114730488878301*fabs(dram->b[20]))));
-			inputSample -= (dram->b[21] * (0.38584044480710594  + (0.06825323739722661*fabs(dram->b[21]))));
-			inputSample -= (dram->b[22] * (0.33378434007178670  + (0.04144255489164217*fabs(dram->b[22]))));
-			inputSample -= (dram->b[23] * (0.26144203061699706  + (0.06031313105098152*fabs(dram->b[23]))));
-			inputSample -= (dram->b[24] * (0.25818342000920502  + (0.03642289242586355*fabs(dram->b[24]))));
-			inputSample -= (dram->b[25] * (0.28096018498822661  + (0.00976973667327174*fabs(dram->b[25]))));
-			inputSample -= (dram->b[26] * (0.25845682019095384  + (0.02749015358080831*fabs(dram->b[26]))));
-			inputSample -= (dram->b[27] * (0.26655607865953096  - (0.00329839675455690*fabs(dram->b[27]))));
-			inputSample -= (dram->b[28] * (0.30590085026938518  - (0.07375043215328811*fabs(dram->b[28]))));
-			inputSample -= (dram->b[29] * (0.32875683916470899  - (0.12454134857516502*fabs(dram->b[29]))));
-			inputSample -= (dram->b[30] * (0.38166643180506560  - (0.19973911428609989*fabs(dram->b[30]))));
-			inputSample -= (dram->b[31] * (0.49068186937289598  - (0.34785166842136384*fabs(dram->b[31]))));
-			inputSample -= (dram->b[32] * (0.60274753867622777  - (0.48685038872711034*fabs(dram->b[32]))));
-			inputSample -= (dram->b[33] * (0.65944678627090636  - (0.49844657885975518*fabs(dram->b[33]))));
-			inputSample -= (dram->b[34] * (0.64488955808717285  - (0.40514406499806987*fabs(dram->b[34]))));
-			inputSample -= (dram->b[35] * (0.55818730353434354  - (0.28029870614987346*fabs(dram->b[35]))));
-			inputSample -= (dram->b[36] * (0.43110859113387556  - (0.15373504582939335*fabs(dram->b[36]))));
-			inputSample -= (dram->b[37] * (0.37726894966096269  - (0.11570983506028532*fabs(dram->b[37]))));
-			inputSample -= (dram->b[38] * (0.39953242355200935  - (0.17879231130484088*fabs(dram->b[38]))));
-			inputSample -= (dram->b[39] * (0.36726676379100875  - (0.22013553023983223*fabs(dram->b[39]))));
-			inputSample -= (dram->b[40] * (0.27187029469227386  - (0.18461171768478427*fabs(dram->b[40]))));
-			inputSample -= (dram->b[41] * (0.21109334552321635  - (0.14497481318083569*fabs(dram->b[41]))));
-			inputSample -= (dram->b[42] * (0.19808797405293213  - (0.14916579928186940*fabs(dram->b[42]))));
-			inputSample -= (dram->b[43] * (0.16287926785495671  - (0.15146098461120627*fabs(dram->b[43]))));
-			inputSample -= (dram->b[44] * (0.11086621477163359  - (0.13182973443924018*fabs(dram->b[44]))));
-			inputSample -= (dram->b[45] * (0.07531043236890560  - (0.08062172796472888*fabs(dram->b[45]))));
-			inputSample -= (dram->b[46] * (0.01747364473230771  + (0.02201865873632456*fabs(dram->b[46]))));
-			inputSample += (dram->b[47] * (0.03080279125662693  - (0.08721756240972101*fabs(dram->b[47]))));
-			inputSample += (dram->b[48] * (0.02354148659185142  - (0.06376361763053796*fabs(dram->b[48]))));
-			inputSample -= (dram->b[49] * (0.02835772372098715  + (0.00589978513642627*fabs(dram->b[49]))));
-			inputSample -= (dram->b[50] * (0.08983370744565244  - (0.02350960427706536*fabs(dram->b[50]))));
-			inputSample -= (dram->b[51] * (0.14148947620055380  - (0.03329826628693369*fabs(dram->b[51]))));
-			inputSample -= (dram->b[52] * (0.17576502674572581  - (0.06507546651241880*fabs(dram->b[52]))));
-			inputSample -= (dram->b[53] * (0.17168865666573860  - (0.07734801128437317*fabs(dram->b[53]))));
-			inputSample -= (dram->b[54] * (0.14107027738292105  - (0.03136459344220402*fabs(dram->b[54]))));
-			inputSample -= (dram->b[55] * (0.12287163395380074  + (0.01933408169185258*fabs(dram->b[55]))));
-			inputSample -= (dram->b[56] * (0.12276622398112971  + (0.01983508766241737*fabs(dram->b[56]))));
-			inputSample -= (dram->b[57] * (0.12349721440213673  - (0.01111031415304768*fabs(dram->b[57]))));
-			inputSample -= (dram->b[58] * (0.08649454142716655  + (0.02252815645513927*fabs(dram->b[58]))));
-			inputSample -= (dram->b[59] * (0.00953083685474757  + (0.13778878548343007*fabs(dram->b[59]))));
-			inputSample += (dram->b[60] * (0.06045983158868478  - (0.23966318224935096*fabs(dram->b[60]))));
-			inputSample += (dram->b[61] * (0.09053229817093242  - (0.27190119941572544*fabs(dram->b[61]))));
-			inputSample += (dram->b[62] * (0.08112662178843048  - (0.22456862606452327*fabs(dram->b[62]))));
-			inputSample += (dram->b[63] * (0.07503525686243730  - (0.14330154410548213*fabs(dram->b[63]))));
-			inputSample += (dram->b[64] * (0.07372595404399729  - (0.06185193766408734*fabs(dram->b[64]))));
-			inputSample += (dram->b[65] * (0.06073789200080433  + (0.01261857435786178*fabs(dram->b[65]))));
-			inputSample += (dram->b[66] * (0.04616712695742254  + (0.05851771967084609*fabs(dram->b[66]))));
-			inputSample += (dram->b[67] * (0.01036235510345900  + (0.08286534414423796*fabs(dram->b[67]))));
-			inputSample -= (dram->b[68] * (0.03708389413229191  - (0.06695282381039531*fabs(dram->b[68]))));
-			inputSample -= (dram->b[69] * (0.07092204876981217  - (0.01915829199112784*fabs(dram->b[69]))));
-			inputSample -= (dram->b[70] * (0.09443579589460312  + (0.01210082455316246*fabs(dram->b[70]))));
-			inputSample -= (dram->b[71] * (0.07824038577769601  + (0.06121988546065113*fabs(dram->b[71]))));
-			inputSample -= (dram->b[72] * (0.00854730633079399  + (0.14468518752295506*fabs(dram->b[72]))));
-			inputSample += (dram->b[73] * (0.06845589924191028  - (0.18902431382592944*fabs(dram->b[73]))));
-			inputSample += (dram->b[74] * (0.10351569998375465  - (0.13204443060279647*fabs(dram->b[74]))));
-			inputSample += (dram->b[75] * (0.10513368758532179  - (0.02993199294485649*fabs(dram->b[75]))));
-			inputSample += (dram->b[76] * (0.08896978950235003  + (0.04074499273825906*fabs(dram->b[76]))));
-			inputSample += (dram->b[77] * (0.03697537734050980  + (0.09217751130846838*fabs(dram->b[77]))));
-			inputSample -= (dram->b[78] * (0.04014322441280276  - (0.14062297149365666*fabs(dram->b[78]))));
-			inputSample -= (dram->b[79] * (0.10505934581398618  - (0.16988861157275814*fabs(dram->b[79]))));
-			inputSample -= (dram->b[80] * (0.13937661651676272  - (0.15083294570551492*fabs(dram->b[80]))));
-			inputSample -= (dram->b[81] * (0.13183458845108439  - (0.06657454442471208*fabs(dram->b[81]))));
+			inputSample += (dram->b[1] * (1.35472031405494242f  + (0.00220914099195157f*fabs(dram->b[1]))));
+			inputSample += (dram->b[2] * (1.63534207755253003f  - (0.11406232654509685f*fabs(dram->b[2]))));
+			inputSample += (dram->b[3] * (1.82334575691525869f  - (0.42647194712964054f*fabs(dram->b[3]))));
+			inputSample += (dram->b[4] * (1.86156386235405868f  - (0.76744187887586590f*fabs(dram->b[4]))));
+			inputSample += (dram->b[5] * (1.67332739338852599f  - (0.95161997324293013f*fabs(dram->b[5]))));
+			inputSample += (dram->b[6] * (1.25054130794899021f  - (0.98410433514572859f*fabs(dram->b[6]))));
+			inputSample += (dram->b[7] * (0.70049121047281737f  - (0.87375612110718992f*fabs(dram->b[7]))));
+			inputSample += (dram->b[8] * (0.15291791448081560f  - (0.61195266024519046f*fabs(dram->b[8]))));
+			inputSample -= (dram->b[9] * (0.37301992914152693f  + (0.16755422915252094f*fabs(dram->b[9]))));
+			inputSample -= (dram->b[10] * (0.76568539228498433f  - (0.28554435228965386f*fabs(dram->b[10]))));
+			inputSample -= (dram->b[11] * (0.95726568749937369f  - (0.61659719162806048f*fabs(dram->b[11]))));
+			inputSample -= (dram->b[12] * (1.01273552193911032f  - (0.81827288407943954f*fabs(dram->b[12]))));
+			inputSample -= (dram->b[13] * (0.93920108117234447f  - (0.80077111864205874f*fabs(dram->b[13]))));
+			inputSample -= (dram->b[14] * (0.79831898832953974f  - (0.65814750339694406f*fabs(dram->b[14]))));
+			inputSample -= (dram->b[15] * (0.64200088100452313f  - (0.46135833001232618f*fabs(dram->b[15]))));
+			inputSample -= (dram->b[16] * (0.48807302802822128f  - (0.15506178974799034f*fabs(dram->b[16]))));
+			inputSample -= (dram->b[17] * (0.36545171501947982f  + (0.16126103769376721f*fabs(dram->b[17]))));
+			inputSample -= (dram->b[18] * (0.31469581455759105f  + (0.32250870039053953f*fabs(dram->b[18]))));
+			inputSample -= (dram->b[19] * (0.36893534817945800f  + (0.25409418897237473f*fabs(dram->b[19]))));
+			inputSample -= (dram->b[20] * (0.41092557722975687f  + (0.13114730488878301f*fabs(dram->b[20]))));
+			inputSample -= (dram->b[21] * (0.38584044480710594f  + (0.06825323739722661f*fabs(dram->b[21]))));
+			inputSample -= (dram->b[22] * (0.33378434007178670f  + (0.04144255489164217f*fabs(dram->b[22]))));
+			inputSample -= (dram->b[23] * (0.26144203061699706f  + (0.06031313105098152f*fabs(dram->b[23]))));
+			inputSample -= (dram->b[24] * (0.25818342000920502f  + (0.03642289242586355f*fabs(dram->b[24]))));
+			inputSample -= (dram->b[25] * (0.28096018498822661f  + (0.00976973667327174f*fabs(dram->b[25]))));
+			inputSample -= (dram->b[26] * (0.25845682019095384f  + (0.02749015358080831f*fabs(dram->b[26]))));
+			inputSample -= (dram->b[27] * (0.26655607865953096f  - (0.00329839675455690f*fabs(dram->b[27]))));
+			inputSample -= (dram->b[28] * (0.30590085026938518f  - (0.07375043215328811f*fabs(dram->b[28]))));
+			inputSample -= (dram->b[29] * (0.32875683916470899f  - (0.12454134857516502f*fabs(dram->b[29]))));
+			inputSample -= (dram->b[30] * (0.38166643180506560f  - (0.19973911428609989f*fabs(dram->b[30]))));
+			inputSample -= (dram->b[31] * (0.49068186937289598f  - (0.34785166842136384f*fabs(dram->b[31]))));
+			inputSample -= (dram->b[32] * (0.60274753867622777f  - (0.48685038872711034f*fabs(dram->b[32]))));
+			inputSample -= (dram->b[33] * (0.65944678627090636f  - (0.49844657885975518f*fabs(dram->b[33]))));
+			inputSample -= (dram->b[34] * (0.64488955808717285f  - (0.40514406499806987f*fabs(dram->b[34]))));
+			inputSample -= (dram->b[35] * (0.55818730353434354f  - (0.28029870614987346f*fabs(dram->b[35]))));
+			inputSample -= (dram->b[36] * (0.43110859113387556f  - (0.15373504582939335f*fabs(dram->b[36]))));
+			inputSample -= (dram->b[37] * (0.37726894966096269f  - (0.11570983506028532f*fabs(dram->b[37]))));
+			inputSample -= (dram->b[38] * (0.39953242355200935f  - (0.17879231130484088f*fabs(dram->b[38]))));
+			inputSample -= (dram->b[39] * (0.36726676379100875f  - (0.22013553023983223f*fabs(dram->b[39]))));
+			inputSample -= (dram->b[40] * (0.27187029469227386f  - (0.18461171768478427f*fabs(dram->b[40]))));
+			inputSample -= (dram->b[41] * (0.21109334552321635f  - (0.14497481318083569f*fabs(dram->b[41]))));
+			inputSample -= (dram->b[42] * (0.19808797405293213f  - (0.14916579928186940f*fabs(dram->b[42]))));
+			inputSample -= (dram->b[43] * (0.16287926785495671f  - (0.15146098461120627f*fabs(dram->b[43]))));
+			inputSample -= (dram->b[44] * (0.11086621477163359f  - (0.13182973443924018f*fabs(dram->b[44]))));
+			inputSample -= (dram->b[45] * (0.07531043236890560f  - (0.08062172796472888f*fabs(dram->b[45]))));
+			inputSample -= (dram->b[46] * (0.01747364473230771f  + (0.02201865873632456f*fabs(dram->b[46]))));
+			inputSample += (dram->b[47] * (0.03080279125662693f  - (0.08721756240972101f*fabs(dram->b[47]))));
+			inputSample += (dram->b[48] * (0.02354148659185142f  - (0.06376361763053796f*fabs(dram->b[48]))));
+			inputSample -= (dram->b[49] * (0.02835772372098715f  + (0.00589978513642627f*fabs(dram->b[49]))));
+			inputSample -= (dram->b[50] * (0.08983370744565244f  - (0.02350960427706536f*fabs(dram->b[50]))));
+			inputSample -= (dram->b[51] * (0.14148947620055380f  - (0.03329826628693369f*fabs(dram->b[51]))));
+			inputSample -= (dram->b[52] * (0.17576502674572581f  - (0.06507546651241880f*fabs(dram->b[52]))));
+			inputSample -= (dram->b[53] * (0.17168865666573860f  - (0.07734801128437317f*fabs(dram->b[53]))));
+			inputSample -= (dram->b[54] * (0.14107027738292105f  - (0.03136459344220402f*fabs(dram->b[54]))));
+			inputSample -= (dram->b[55] * (0.12287163395380074f  + (0.01933408169185258f*fabs(dram->b[55]))));
+			inputSample -= (dram->b[56] * (0.12276622398112971f  + (0.01983508766241737f*fabs(dram->b[56]))));
+			inputSample -= (dram->b[57] * (0.12349721440213673f  - (0.01111031415304768f*fabs(dram->b[57]))));
+			inputSample -= (dram->b[58] * (0.08649454142716655f  + (0.02252815645513927f*fabs(dram->b[58]))));
+			inputSample -= (dram->b[59] * (0.00953083685474757f  + (0.13778878548343007f*fabs(dram->b[59]))));
+			inputSample += (dram->b[60] * (0.06045983158868478f  - (0.23966318224935096f*fabs(dram->b[60]))));
+			inputSample += (dram->b[61] * (0.09053229817093242f  - (0.27190119941572544f*fabs(dram->b[61]))));
+			inputSample += (dram->b[62] * (0.08112662178843048f  - (0.22456862606452327f*fabs(dram->b[62]))));
+			inputSample += (dram->b[63] * (0.07503525686243730f  - (0.14330154410548213f*fabs(dram->b[63]))));
+			inputSample += (dram->b[64] * (0.07372595404399729f  - (0.06185193766408734f*fabs(dram->b[64]))));
+			inputSample += (dram->b[65] * (0.06073789200080433f  + (0.01261857435786178f*fabs(dram->b[65]))));
+			inputSample += (dram->b[66] * (0.04616712695742254f  + (0.05851771967084609f*fabs(dram->b[66]))));
+			inputSample += (dram->b[67] * (0.01036235510345900f  + (0.08286534414423796f*fabs(dram->b[67]))));
+			inputSample -= (dram->b[68] * (0.03708389413229191f  - (0.06695282381039531f*fabs(dram->b[68]))));
+			inputSample -= (dram->b[69] * (0.07092204876981217f  - (0.01915829199112784f*fabs(dram->b[69]))));
+			inputSample -= (dram->b[70] * (0.09443579589460312f  + (0.01210082455316246f*fabs(dram->b[70]))));
+			inputSample -= (dram->b[71] * (0.07824038577769601f  + (0.06121988546065113f*fabs(dram->b[71]))));
+			inputSample -= (dram->b[72] * (0.00854730633079399f  + (0.14468518752295506f*fabs(dram->b[72]))));
+			inputSample += (dram->b[73] * (0.06845589924191028f  - (0.18902431382592944f*fabs(dram->b[73]))));
+			inputSample += (dram->b[74] * (0.10351569998375465f  - (0.13204443060279647f*fabs(dram->b[74]))));
+			inputSample += (dram->b[75] * (0.10513368758532179f  - (0.02993199294485649f*fabs(dram->b[75]))));
+			inputSample += (dram->b[76] * (0.08896978950235003f  + (0.04074499273825906f*fabs(dram->b[76]))));
+			inputSample += (dram->b[77] * (0.03697537734050980f  + (0.09217751130846838f*fabs(dram->b[77]))));
+			inputSample -= (dram->b[78] * (0.04014322441280276f  - (0.14062297149365666f*fabs(dram->b[78]))));
+			inputSample -= (dram->b[79] * (0.10505934581398618f  - (0.16988861157275814f*fabs(dram->b[79]))));
+			inputSample -= (dram->b[80] * (0.13937661651676272f  - (0.15083294570551492f*fabs(dram->b[80]))));
+			inputSample -= (dram->b[81] * (0.13183458845108439f  - (0.06657454442471208f*fabs(dram->b[81]))));
 			
-			temp = (inputSample + smoothCabB)/3.0;
+			temp = (inputSample + smoothCabB)/3.0f;
 			smoothCabB = inputSample;
-			inputSample = temp/4.0;
+			inputSample = temp/4.0f;
 			
 			
-			randy = ((double(fpd)/UINT32_MAX)*0.05);
-			drySample = ((((inputSample*(1-randy))+(lastCabSample*randy))*wet)+(drySample*(1.0-wet)))*outputlevel;
+			randy = ((float(fpd)/UINT32_MAX)*0.05f);
+			drySample = ((((inputSample*(1-randy))+(lastCabSample*randy))*wet)+(drySample*(1.0f-wet)))*outputlevel;
 			lastCabSample = inputSample;
 			inputSample = drySample; //cab
 			
@@ -487,13 +487,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		switch (cycleEnd) //multi-pole average using lastRef[] variables
 		{
 			case 4:
-				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[7])*0.5;
+				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[7])*0.5f;
 				lastRef[7] = lastRef[8]; //continue, do not break
 			case 3:
-				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[6])*0.5;
+				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[6])*0.5f;
 				lastRef[6] = lastRef[8]; //continue, do not break
 			case 2:
-				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[5])*0.5;
+				lastRef[8] = inputSample; inputSample = (inputSample+lastRef[5])*0.5f;
 				lastRef[5] = lastRef[8]; //continue, do not break
 			case 1:
 				break; //no further averaging
@@ -502,7 +502,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

@@ -31,9 +31,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		double previousSampleA;
-		double previousSampleB;
-		double previousSampleC;
+		float previousSampleA;
+		float previousSampleB;
+		float previousSampleC;
 		uint32_t fpd;
 	
 	struct _dram {
@@ -50,74 +50,74 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double inputPad = GetParameter( kParam_One );
-	double iterations = 1.0-GetParameter( kParam_Two );
-	int powerfactor = (9.0*iterations)+1;
-	double asymPad = (double)powerfactor;
-	double gainscaling = 1.0/(double)(powerfactor+1);
-	double outputscaling = 1.0 + (1.0/(double)(powerfactor));
+	float inputPad = GetParameter( kParam_One );
+	float iterations = 1.0f-GetParameter( kParam_Two );
+	int powerfactor = (9.0f*iterations)+1;
+	float asymPad = (float)powerfactor;
+	float gainscaling = 1.0f/(float)(powerfactor+1);
+	float outputscaling = 1.0f + (1.0f/(float)(powerfactor));
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		if (inputPad < 1.0) inputSample *= inputPad;
+		if (inputPad < 1.0f) inputSample *= inputPad;
 		
-		if (overallscale > 1.9) {
-			double stored = inputSample;
-			inputSample += previousSampleA; previousSampleA = stored; inputSample *= 0.5;
+		if (overallscale > 1.9f) {
+			float stored = inputSample;
+			inputSample += previousSampleA; previousSampleA = stored; inputSample *= 0.5f;
 		} //for high sample rates on this plugin we are going to do a simple average		
 				
-		if (inputSample > 1.0) inputSample = 1.0;
-		if (inputSample < -1.0) inputSample = -1.0;
+		if (inputSample > 1.0f) inputSample = 1.0f;
+		if (inputSample < -1.0f) inputSample = -1.0f;
 		
 		//flatten bottom, point top of sine waveshaper
 		inputSample /= asymPad;
-		double sharpen = -inputSample;
-		if (sharpen > 0.0) sharpen = 1.0+sqrt(sharpen);
-		else sharpen = 1.0-sqrt(-sharpen);
-		inputSample -= inputSample*fabs(inputSample)*sharpen*0.25;
-		//this will take input from exactly -1.0 to 1.0 max
+		float sharpen = -inputSample;
+		if (sharpen > 0.0f) sharpen = 1.0f+sqrt(sharpen);
+		else sharpen = 1.0f-sqrt(-sharpen);
+		inputSample -= inputSample*fabs(inputSample)*sharpen*0.25f;
+		//this will take input from exactly -1.0f to 1.0f max
 		inputSample *= asymPad;
 		//and we are asym clipping more when Tube is cranked, to compensate
 		
 		//original Tube algorithm: powerfactor widens the more linear region of the wave
-		double factor = inputSample;
+		float factor = inputSample;
 		for (int x = 0; x < powerfactor; x++) factor *= inputSample;
-		if ((powerfactor % 2 == 1) && (inputSample != 0.0)) factor = (factor/inputSample)*fabs(inputSample);		
+		if ((powerfactor % 2 == 1) && (inputSample != 0.0f)) factor = (factor/inputSample)*fabs(inputSample);		
 		factor *= gainscaling;
 		inputSample -= factor;
 		inputSample *= outputscaling;
 				
-		if (overallscale > 1.9) {
-			double stored = inputSample;
-			inputSample += previousSampleB; previousSampleB = stored; inputSample *= 0.5;
+		if (overallscale > 1.9f) {
+			float stored = inputSample;
+			inputSample += previousSampleB; previousSampleB = stored; inputSample *= 0.5f;
 		} //for high sample rates on this plugin we are going to do a simple average
 		//end original Tube. Now we have a boosted fat sound peaking at 0dB exactly
 				
 		//hysteresis and spiky fuzz
-		double slew = previousSampleC - inputSample;
-		if (overallscale > 1.9) {
-			double stored = inputSample;
-			inputSample += previousSampleC; previousSampleC = stored; inputSample *= 0.5;
+		float slew = previousSampleC - inputSample;
+		if (overallscale > 1.9f) {
+			float stored = inputSample;
+			inputSample += previousSampleC; previousSampleC = stored; inputSample *= 0.5f;
 		} else previousSampleC = inputSample; //for this, need previousSampleC always
-		if (slew > 0.0) slew = 1.0+(sqrt(slew)*0.5);
-		else slew = 1.0-(sqrt(-slew)*0.5);
+		if (slew > 0.0f) slew = 1.0f+(sqrt(slew)*0.5f);
+		else slew = 1.0f-(sqrt(-slew)*0.5f);
 		inputSample -= inputSample*fabs(inputSample)*slew*gainscaling;
 		//reusing gainscaling that's part of another algorithm
-		if (inputSample > 0.52) inputSample = 0.52;
-		if (inputSample < -0.52) inputSample = -0.52;
-		inputSample *= 1.923076923076923;
+		if (inputSample > 0.52f) inputSample = 0.52f;
+		if (inputSample < -0.52f) inputSample = -0.52f;
+		inputSample *= 1.923076923076923f;
 		//end hysteresis and spiky fuzz section
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSample += ((float(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit floating point dither
 		
 		*destP = inputSample;

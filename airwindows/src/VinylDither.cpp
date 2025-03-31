@@ -35,9 +35,9 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 NSOdd;
-		Float64 prev;
-		Float64 ns[16];
+		Float32 NSOdd;
+		Float32 prev;
+		Float32 ns[16];
 		uint32_t fpd;
 	
 	struct _dram {
@@ -55,91 +55,91 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double inputSample;
-	Float64 absSample;
+	float inputSample;
+	Float32 absSample;
 	
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		
 		
 		inputSample *= scaleFactor;
 		//0-1 is now one bit, now we dither
 		
-		absSample = ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample = ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[0] += absSample; ns[0] /= 2; absSample -= ns[0];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[1] += absSample; ns[1] /= 2; absSample -= ns[1];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[2] += absSample; ns[2] /= 2; absSample -= ns[2];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[3] += absSample; ns[3] /= 2; absSample -= ns[3];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[4] += absSample; ns[4] /= 2; absSample -= ns[4];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[5] += absSample; ns[5] /= 2; absSample -= ns[5];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[6] += absSample; ns[6] /= 2; absSample -= ns[6];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[7] += absSample; ns[7] /= 2; absSample -= ns[7];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[8] += absSample; ns[8] /= 2; absSample -= ns[8];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[9] += absSample; ns[9] /= 2; absSample -= ns[9];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[10] += absSample; ns[10] /= 2; absSample -= ns[10];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[11] += absSample; ns[11] /= 2; absSample -= ns[11];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[12] += absSample; ns[12] /= 2; absSample -= ns[12];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[13] += absSample; ns[13] /= 2; absSample -= ns[13];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[14] += absSample; ns[14] /= 2; absSample -= ns[14];
-		absSample += ((double(fpd)/UINT32_MAX) - 0.5);
+		absSample += ((float(fpd)/UINT32_MAX) - 0.5f);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		ns[15] += absSample; ns[15] /= 2; absSample -= ns[15];
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
 		absSample += inputSample;
 		//install noise and then shape it
 		
-		//NSOdd /= 1.0001; //NSDensity
+		//NSOdd /= 1.0001f; //NSDensity
 		
-		if (NSOdd > 0) NSOdd -= 0.97;
-		if (NSOdd < 0) NSOdd += 0.97;
+		if (NSOdd > 0) NSOdd -= 0.97f;
+		if (NSOdd < 0) NSOdd += 0.97f;
 		
-		NSOdd -= (NSOdd * NSOdd * NSOdd * 0.475);
+		NSOdd -= (NSOdd * NSOdd * NSOdd * 0.475f);
 		
 		NSOdd += prev;
-		absSample += (NSOdd*0.475);
+		absSample += (NSOdd*0.475f);
 		prev = floor(absSample) - inputSample;
 		inputSample = floor(absSample);
 		//TenNines dither

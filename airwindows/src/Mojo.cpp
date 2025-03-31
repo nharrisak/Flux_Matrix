@@ -45,19 +45,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float64 gain = pow(10.0,GetParameter( kParam_One )/20.0);
+	Float32 gain = pow(10.0f,GetParameter( kParam_One )/20.0f);
 	
 	while (nSampleFrames-- > 0) {
-		double inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
-		//double drySample = inputSample;
+		float inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
+		//float drySample = inputSample;
 		
-		if (gain != 1.0) {
+		if (gain != 1.0f) {
 			inputSample *= gain;
 		}
 			
-		double mojo = pow(fabs(inputSample),0.25);
-		if (mojo > 0.0) inputSample = (sin(inputSample * mojo * M_PI * 0.5) / mojo) * 0.987654321;
+		float mojo = pow(fabs(inputSample),0.25f);
+		if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 		//mojo is the one that flattens WAAAAY out very softly before wavefolding
 		
 		//begin 32 bit floating point dither

@@ -32,7 +32,7 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	
-	double rate, oldfpd;
+	float rate, oldfpd;
 
 	uint32_t fpdL;
 	uint32_t fpdR;
@@ -45,56 +45,56 @@ enum { kNumTemplateParameters = 6 };
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
 	UInt32 nSampleFrames = inFramesToProcess;
-	double overallscale = 1.0;
-	overallscale /= 44100.0;
+	float overallscale = 1.0f;
+	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	double drift = (pow(GetParameter( kParam_One ),4)*0.01)/overallscale;
-	double offset = 3.141592653589793 + (GetParameter( kParam_Two )*6.283185307179586);
-	double panlaw = 1.0-pow(GetParameter( kParam_Three ),2);
-	double wet = GetParameter( kParam_Four );
+	float drift = (pow(GetParameter( kParam_One ),4)*0.01f)/overallscale;
+	float offset = 3.141592653589793f + (GetParameter( kParam_Two )*6.283185307179586f);
+	float panlaw = 1.0f-pow(GetParameter( kParam_Three ),2);
+	float wet = GetParameter( kParam_Four );
 		
 	while (nSampleFrames-- > 0) {
-		double inputSampleL = *inputL;
-		double inputSampleR = *inputR;
-		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpdL * 1.18e-17;
-		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
-		double drySampleL = inputSampleL;
-		double drySampleR = inputSampleR;
+		float inputSampleL = *inputL;
+		float inputSampleR = *inputR;
+		if (fabs(inputSampleL)<1.18e-23f) inputSampleL = fpdL * 1.18e-17f;
+		if (fabs(inputSampleR)<1.18e-23f) inputSampleR = fpdR * 1.18e-17f;
+		float drySampleL = inputSampleL;
+		float drySampleR = inputSampleR;
 		
 		rate += (oldfpd*drift);
-		if (rate > 6.283185307179586) {
-			rate = 0.0;
-			oldfpd = 0.4294967295+(fpdL*0.0000000000618);
-		} else if (rate < 0.0) {
-			rate = 6.283185307179586;
-			oldfpd = 0.4294967295+(fpdL*0.0000000000618);
+		if (rate > 6.283185307179586f) {
+			rate = 0.0f;
+			oldfpd = 0.4294967295f+(fpdL*0.0000000000618f);
+		} else if (rate < 0.0f) {
+			rate = 6.283185307179586f;
+			oldfpd = 0.4294967295f+(fpdL*0.0000000000618f);
 		}
 		
-		inputSampleL *= (sin(rate)+1.0);
-		inputSampleR *= (sin(rate+offset)+1.0);
+		inputSampleL *= (sin(rate)+1.0f);
+		inputSampleR *= (sin(rate+offset)+1.0f);
 		
-		double mid = (inputSampleL + inputSampleR)*panlaw;
-		double side = inputSampleL - inputSampleR;
+		float mid = (inputSampleL + inputSampleR)*panlaw;
+		float side = inputSampleL - inputSampleR;
 		//assign mid and side.Between these sections, you can do mid/side processing
 		
-		inputSampleL = (mid+side)/4.0;
-		inputSampleR = (mid-side)/4.0;
+		inputSampleL = (mid+side)/4.0f;
+		inputSampleR = (mid-side)/4.0f;
 		//unassign mid and side, and compensate for the sin()+1 volume boost
 		
-		if (wet != 1.0) {
-		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0-wet));
-		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0-wet));
+		if (wet != 1.0f) {
+		 inputSampleL = (inputSampleL * wet) + (drySampleL * (1.0f-wet));
+		 inputSampleR = (inputSampleR * wet) + (drySampleR * (1.0f-wet));
 		}
 		//Dry/Wet control, defaults to the last slider
 
 		//begin 32 bit stereo floating point dither
 		int expon; frexpf((float)inputSampleL, &expon);
 		fpdL ^= fpdL << 13; fpdL ^= fpdL >> 17; fpdL ^= fpdL << 5;
-		inputSampleL += ((double(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleL += ((float(fpdL)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		frexpf((float)inputSampleR, &expon);
 		fpdR ^= fpdR << 13; fpdR ^= fpdR >> 17; fpdR ^= fpdR << 5;
-		inputSampleR += ((double(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		inputSampleR += ((float(fpdR)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
 		//end 32 bit stereo floating point dither
 		
 		*outputL = inputSampleL;

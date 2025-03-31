@@ -35,7 +35,7 @@ struct _kernel {
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
  
-		Float64 contingentErr;
+		Float32 contingentErr;
 		bool flip;
 		uint32_t fpd;
 	
@@ -54,55 +54,55 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	double inputSample;
-	Float64 contingentRnd;
-	Float64 absSample;
-	Float64 contingent;
-	Float64 randyConstant = 1.61803398874989484820458683436563811772030917980576;
-	Float64 omegaConstant = 0.56714329040978387299996866221035554975381578718651;
-	Float64 expConstant = 0.06598803584531253707679018759684642493857704825279;
+	float inputSample;
+	Float32 contingentRnd;
+	Float32 absSample;
+	Float32 contingent;
+	Float32 randyConstant = 1.61803398874989484820458683436563811772030917980576f;
+	Float32 omegaConstant = 0.56714329040978387299996866221035554975381578718651f;
+	Float32 expConstant = 0.06598803584531253707679018759684642493857704825279f;
 	
 	bool highres = false;
 	if (GetParameter( kParam_One ) == 1) highres = true;
 	Float32 scaleFactor;
-	if (highres) scaleFactor = 8388608.0;
-	else scaleFactor = 32768.0;
+	if (highres) scaleFactor = 8388608.0f;
+	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0) scaleFactor *= pow(1.0-derez,6);
-	if (scaleFactor < 0.0001) scaleFactor = 0.0001;
+	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
-	if (outScale < 8.0) outScale = 8.0;
+	if (outScale < 8.0f) outScale = 8.0f;
 	
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
-		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
 		inputSample *= scaleFactor;
 		//0-1 is now one bit, now we dither
 		
-		if (inputSample > 0) inputSample += 0.383;
-		if (inputSample < 0) inputSample -= 0.383;
+		if (inputSample > 0) inputSample += 0.383f;
+		if (inputSample < 0) inputSample -= 0.383f;
 		//adjusting to permit more information drug outta the noisefloor
-		contingentRnd = (double(fpd)/UINT32_MAX);
+		contingentRnd = (float(fpd)/UINT32_MAX);
 		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
-		contingentRnd += ((double(fpd)/UINT32_MAX)-1.0); 
+		contingentRnd += ((float(fpd)/UINT32_MAX)-1.0f); 
 		contingentRnd *= randyConstant; //produce TPDF dist, scale
         contingentRnd -= contingentErr*omegaConstant; //include err
 		absSample = fabs(inputSample);
 		contingentErr = absSample - floor(absSample); //get next err
-		contingent = contingentErr * 2.0; //scale of quantization levels
-		if (contingent > 1.0) contingent = ((-contingent+2.0)*omegaConstant) + expConstant;
+		contingent = contingentErr * 2.0f; //scale of quantization levels
+		if (contingent > 1.0f) contingent = ((-contingent+2.0f)*omegaConstant) + expConstant;
 		else contingent = (contingent * omegaConstant) + expConstant;
 		//zero is next to a quantization level, one is exactly between them
-		if (flip) contingentRnd = (contingentRnd * (1.0-contingent)) + contingent + 0.5;
-		else contingentRnd = (contingentRnd * (1.0-contingent)) - contingent + 0.5;
+		if (flip) contingentRnd = (contingentRnd * (1.0f-contingent)) + contingent + 0.5f;
+		else contingentRnd = (contingentRnd * (1.0f-contingent)) - contingent + 0.5f;
 		flip = !flip;
 		inputSample += (contingentRnd * contingent);
 		//Contingent Dither
 		inputSample = floor(inputSample);
 		//note: this does not dither for values exactly the same as 16 bit values-
-		//which forces the dither to gate at 0.0. It goes to digital black,
+		//which forces the dither to gate at 0.0f. It goes to digital black,
 		//and does a teeny parallel-compression thing when almost at digital black.
 		
 		inputSample /= outScale;
