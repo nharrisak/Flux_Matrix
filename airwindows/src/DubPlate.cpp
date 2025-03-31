@@ -9,17 +9,20 @@ enum {
 	kNumberOfParameters=0
 };
 enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,
+kParamPrePostGain,
 };
 static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )
 NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 };
 static const uint8_t page1[] = {
 };
-enum { kNumTemplateParameters = 6 };
+enum { kNumTemplateParameters = 7 };
 #include "../include/template1.h"
 
 	float iirA;

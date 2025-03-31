@@ -17,13 +17,16 @@ enum {
 const int earlyA = 97; const int earlyB = 1123; const int earlyC = 379; const int earlyD = 619; const int earlyE = 1187; const int earlyF = 757; const int earlyG = 1151; const int earlyH = 13; const int earlyI = 1093; const int predelay = 24010; //78 ms, 732 seat theater
 const int delayA = 631; const int delayB = 251; const int delayC = 137; const int delayD = 673; const int delayE = 293; const int delayF = 163; const int delayG = 389; const int delayH = 37; const int delayI = 641; const int delayJ = 661; const int delayK = 17; const int delayL = 719; const int delayM = 787; const int delayN = 31; const int delayO = 83; const int delayP = 823; const int delayQ = 127; const int delayR = 653; const int delayS = 3; const int delayT = 613; const int delayU = 857; const int delayV = 431; const int delayW = 53; const int delayX = 607; const int delayY = 193; //86 ms, 883 seat hall. Scarcity, 1 in 34934
 enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,
+kParamPrePostGain,
 kParam0, kParam1, kParam2, kParam3, kParam4, };
 static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )
 NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Input Pad", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Damping", .min = 0, .max = 10000, .def = 5000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Low Cut", .min = 0, .max = 3000, .def = 3000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
@@ -32,7 +35,7 @@ NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
 };
 static const uint8_t page1[] = {
 kParam0, kParam1, kParam2, kParam3, kParam4, };
-enum { kNumTemplateParameters = 6 };
+enum { kNumTemplateParameters = 7 };
 #include "../include/template1.h"
  
 	float iirAL;

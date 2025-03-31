@@ -48,13 +48,16 @@ enum {
 };
 const int dscBuf = 90;
 enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,
+kParamPrePostGain,
 kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, kParam6, kParam7, kParam8, kParam9, kParam10, kParam11, kParam12, kParam13, kParam14, kParam15, kParam16, kParam17, kParam18, kParam19, kParam20, kParam21, kParam22, kParam23, kParam24, kParam25, kParam26, kParam27, kParam28, kParam29, kParam30, kParam31, kParam32, kParam33, kParam34, kParam35, kParam36, };
 static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )
 NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Highpas", .min = 0, .max = 1000, .def = 0, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Lowpass", .min = 0, .max = 1000, .def = 0, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Air", .min = 0, .max = 1000, .def = 500, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
@@ -95,7 +98,7 @@ NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
 };
 static const uint8_t page1[] = {
 kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, kParam6, kParam7, kParam8, kParam9, kParam10, kParam11, kParam12, kParam13, kParam14, kParam15, kParam16, kParam17, kParam18, kParam19, kParam20, kParam21, kParam22, kParam23, kParam24, kParam25, kParam26, kParam27, kParam28, kParam29, kParam30, kParam31, kParam32, kParam33, kParam34, kParam35, kParam36, };
-enum { kNumTemplateParameters = 6 };
+enum { kNumTemplateParameters = 7 };
 #include "../include/template1.h"
 
 	

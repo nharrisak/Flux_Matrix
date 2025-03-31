@@ -19,17 +19,20 @@ static const int kDMCD = 4;
 static const int kNJCD = 5;
 static const int kDefaultValue_ParamOne = kST;
 enum { kParamInput1, kParamOutput1, kParamOutput1mode,
+kParamPrePostGain,
 kParam0, };
 static char const * const enumStrings0[] = { "Studio Tan 24", "Dither Me Timbers 24", "Not Just Another Dither 24", "Studio Tan 16", "Dither Me Timbers 16", "Not Just Another Dither 16", };
 static const uint8_t page2[] = { kParamInput1, kParamOutput1, kParamOutput1mode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Quantizer", .min = 0, .max = 5, .def = 0, .unit = kNT_unitEnum, .scaling = kNT_scalingNone, .enumStrings = enumStrings0 },
 };
 static const uint8_t page1[] = {
 kParam0, };
-enum { kNumTemplateParameters = 3 };
+enum { kNumTemplateParameters = 4 };
 #include "../include/template1.h"
 struct _kernel {
 	void render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess );

@@ -13,18 +13,21 @@ enum {
 const int earlyA = 437; const int earlyB = 284; const int earlyC = 754; const int earlyD = 1538; const int earlyE = 59; const int earlyF = 1829; const int earlyG = 37; const int earlyH = 3304; const int earlyI = 200; const int predelay = 1014; const int vlfpredelay = 3275; //6 to 151 ms, 741 seat theater. Scarcity, 1 in 17259
 const int delayA = 253; const int delayB = 1395; const int delayC = 248; const int delayD = 284; const int delayE = 952; const int delayF = 430; const int delayG = 1253; const int delayH = 889; const int delayI = 798; const int delayJ = 397; const int delayK = 1166; const int delayL = 250; const int delayM = 38; const int delayN = 1389; const int delayO = 1103; const int delayP = 50; const int delayQ = 1317; const int delayR = 40; const int delayS = 1393; const int delayT = 325; const int delayU = 11; const int delayV = 265; const int delayW = 1339; const int delayX = 315; const int delayY = 753; //16 to 153 ms, 860 seat hall. Scarcity, 1 in 60182
 enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,
+kParamPrePostGain,
 kParam0, };
 static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )
 NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Wetness", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 };
 static const uint8_t page1[] = {
 kParam0, };
-enum { kNumTemplateParameters = 6 };
+enum { kNumTemplateParameters = 7 };
 #include "../include/template1.h"
  
 	float gainOutL;

@@ -32,20 +32,61 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	float* temp0 = NT_globals.workBuffer;
 	float* temp1 = temp0 + numFrames;
 	
-	pThis->render( in0, in1, replace0 ? out0 : temp0, replace1 ? out1 : temp1, numFrames );
-	
-	if ( !replace0 )
+	float preGain = 1.0f;
+	int pre = pThis->v[kParamPrePostGain];
+	if ( pre != 0 )
 	{
+		preGain = powf( 10.0f, pre/20.0f );
 		for ( int i=0; i<numFrames; ++i )
 		{
-			out0[i] += temp0[i];
+			float v0 = in0[i] * preGain;
+			float v1 = in1[i] * preGain;
+			temp0[i] = v0;
+			temp1[i] = v1;
+		}
+		in0 = temp0;
+		in1 = temp1;
+		temp0 = NT_globals.workBuffer + 2 * numFrames;
+		temp1 = temp0 + numFrames;
+	}
+	
+	pThis->render( in0, in1, replace0 ? out0 : temp0, replace1 ? out1 : temp1, numFrames );
+
+	if ( pre != 0 )
+	{
+	    float postGain = 1.0f/preGain;
+		if ( !replace0 )
+		{
+			for ( int i=0; i<numFrames; ++i )
+				out0[i] += temp0[i] * postGain;
+		}
+		else
+		{
+			for ( int i=0; i<numFrames; ++i )
+				out0[i] *= postGain;
+		}
+		if ( !replace1 )
+		{
+			for ( int i=0; i<numFrames; ++i )
+				out1[i] += temp1[i] * postGain;
+		}
+		else
+		{
+			for ( int i=0; i<numFrames; ++i )
+				out1[i] *= postGain;
 		}
 	}
-	if ( !replace1 )
-	{
-		for ( int i=0; i<numFrames; ++i )
+	else
+	{	
+		if ( !replace0 )
 		{
-			out1[i] += temp1[i];
+			for ( int i=0; i<numFrames; ++i )
+				out0[i] += temp0[i];
+		}
+		if ( !replace1 )
+		{
+			for ( int i=0; i<numFrames; ++i )
+				out1[i] += temp1[i];
 		}
 	}
 }

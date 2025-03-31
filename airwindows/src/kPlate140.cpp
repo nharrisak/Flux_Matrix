@@ -17,13 +17,16 @@ enum {
 const int predelay = 16000; const int vlfpredelay = 16000;
 const int delayA = 466; const int delayB = 233; const int delayC = 747; const int delayD = 70; const int delayE = 776; const int delayF = 719; const int delayG = 130; const int delayH = 511; const int delayI = 148; const int delayJ = 84; const int delayK = 787; const int delayL = 124; const int delayM = 72; const int delayN = 667; const int delayO = 773; const int delayP = 29; const int delayQ = 710; const int delayR = 309; const int delayS = 773; const int delayT = 487; const int delayU = 11; const int delayV = 73; const int delayW = 756; const int delayX = 627; const int delayY = 328; //6 to 86 ms, 254 seat club  
 enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,
+kParamPrePostGain,
 kParam0, kParam1, kParam2, kParam3, kParam4, };
 static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )
 NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Input Pad", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Regen", .min = 0, .max = 1000, .def = 500, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "DeRez", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
@@ -32,7 +35,7 @@ NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
 };
 static const uint8_t page1[] = {
 kParam0, kParam1, kParam2, kParam3, kParam4, };
-enum { kNumTemplateParameters = 6 };
+enum { kNumTemplateParameters = 7 };
 #include "../include/template1.h"
  
 	float iirAL;

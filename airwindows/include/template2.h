@@ -3,6 +3,7 @@
 
 static const _NT_parameterPage pages[] = {
 	{ .name = "Settings", .numParams = ARRAY_SIZE(page1), .params = page1 },
+	{ .name = "Gain", .numParams = ARRAY_SIZE(page3), .params = page3 },
 	{ .name = "Routing", .numParams = ARRAY_SIZE(page2), .params = page2 },
 };
 

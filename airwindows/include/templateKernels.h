@@ -39,18 +39,48 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	int numChannels = pThis->numChannels;
 	numChannels = std::min( numChannels, 28 + 1 - pThis->v[kParamInput1] );
 	numChannels = std::min( numChannels, 28 + 1 - pThis->v[kParamOutput1] );
+
+	float preGain = 1.0f, postGain = 1.0f;
+	int pre = pThis->v[kParamPrePostGain];
+	if ( pre != 0 )
+	{
+		preGain = powf( 10.0f, pre/20.0f );
+		postGain = 1.0f/preGain;
+	}
 	
 	for ( int i=0; i<numChannels; ++i )
 	{
 		float* temp0 = NT_globals.workBuffer;
+
+		if ( pre != 0 )
+		{
+			for ( int i=0; i<numFrames; ++i )
+				temp0[i] = in0[i] * preGain;
+			in0 = temp0;
+			temp0 = NT_globals.workBuffer + numFrames;
+		}
 		
 		pThis->kernels[i].render( in0, replace0 ? out0 : temp0, numFrames );
 	
-		if ( !replace0 )
+		if ( pre != 0 )
 		{
-			for ( int i=0; i<numFrames; ++i )
+			if ( !replace0 )
 			{
-				out0[i] += temp0[i];
+				for ( int i=0; i<numFrames; ++i )
+					out0[i] += temp0[i] * postGain;
+			}
+			else
+			{
+				for ( int i=0; i<numFrames; ++i )
+					out0[i] *= postGain;
+			}
+		}
+		else
+		{
+			if ( !replace0 )
+			{
+				for ( int i=0; i<numFrames; ++i )
+					out0[i] += temp0[i];
 			}
 		}
 		

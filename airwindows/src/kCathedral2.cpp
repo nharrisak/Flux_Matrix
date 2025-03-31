@@ -14,18 +14,21 @@ const int predelay = 1014; const int vlfpredelay = 11000;
 const int shortA = 78; const int shortB = 760; const int shortC = 982; const int shortD = 528; const int shortE = 445; const int shortF = 1128; const int shortG = 130; const int shortH = 708; const int shortI = 22; const int shortJ = 2144; const int shortK = 354; const int shortL = 1169; const int shortM = 11; const int shortN = 2782; const int shortO = 58; const int shortP = 1515; //5 to 159 ms, 809 seat hall. Scarcity, 1 in 212274
 const int delayA = 871; const int delayB = 1037; const int delayC = 1205; const int delayD = 297; const int delayE = 467; const int delayF = 884; const int delayG = 173; const int delayH = 1456; const int delayI = 799; const int delayJ = 361; const int delayK = 1432; const int delayL = 338; const int delayM = 186; const int delayN = 1408; const int delayO = 1014; const int delayP = 23; const int delayQ = 807; const int delayR = 501; const int delayS = 1468; const int delayT = 1102; const int delayU = 11; const int delayV = 1119; const int delayW = 1315; const int delayX = 94; const int delayY = 1270; //15 to 155 ms, 874 seat hall  
 enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,
+kParamPrePostGain,
 kParam0, };
 static const uint8_t page2[] = { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input L", 1, 1 )
 NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Wetness", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 };
 static const uint8_t page1[] = {
 kParam0, };
-enum { kNumTemplateParameters = 6 };
+enum { kNumTemplateParameters = 7 };
 #include "../include/template1.h"
  
 	float gainOutL;

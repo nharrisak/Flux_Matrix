@@ -38,17 +38,20 @@ static const int kSubsOnly = 24;
 static const int kSilhouette = 25;
 static const int kDefaultValue_ParamOne = 22;
 enum { kParamInput1, kParamOutput1, kParamOutput1mode,
+kParamPrePostGain,
 kParam0, };
 static char const * const enumStrings0[] = { "", "16 Bit Truncation", "16 bit Flat Dither", "16 bit TPDF Dither", "16 bit Paul Dither", "16 bit DoublePaul Dither", "16 bit Tape Dither", "16 bit High Gloss Dither", "16 bit Vinyl Dither", "16 bit Spatialize Dither", "16 bit Naturalize Dither", "16 bit Not Just Another Dither", "24 bit Truncation", "24 bit Flat Dither", "24 bit TPDF Dither", "24 bit Paul Dither", "24 bit DoublePaul Dither", "24 bit Tape Dither", "24 bit High Gloss Dither", "24 bit Vinyl Dither", "24 bit Spatialize Dither", "24 bit Naturalize Dither", "24 bit Not Just Another Dither", "Slew Only Monitoring", "Subs Only Monitoring", "Noise Silhouette Monitoring", };
 static const uint8_t page2[] = { kParamInput1, kParamOutput1, kParamOutput1mode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Dither Type", .min = 1, .max = 25, .def = 22, .unit = kNT_unitEnum, .scaling = kNT_scalingNone, .enumStrings = enumStrings0 },
 };
 static const uint8_t page1[] = {
 kParam0, };
-enum { kNumTemplateParameters = 3 };
+enum { kNumTemplateParameters = 4 };
 #include "../include/template1.h"
 struct _kernel {
 	void render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess );

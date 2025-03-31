@@ -27,19 +27,22 @@ static const int kZC = 11;
 static const int kZB = 12;
 static const int kDefaultValue_ParamOne = kSC;
 enum { kParamInput1, kParamOutput1, kParamOutput1mode,
+kParamPrePostGain,
 kParam0, kParam1, kParam2, };
 static char const * const enumStrings0[] = { "", "Retro Channel", "Retro Buss", "Sin() Channel", "aSin() Buss", "C6 Channel", "C6 Buss", "C7 Channel", "C7 Buss", "BShifty Channel", "BShifty Buss", "CZero Channel", "CZero Buss", };
 static const uint8_t page2[] = { kParamInput1, kParamOutput1, kParamOutput1mode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Console Type", .min = 1, .max = 12, .def = 3, .unit = kNT_unitEnum, .scaling = kNT_scalingNone, .enumStrings = enumStrings0 },
 { .name = "In Trim", .min = 0, .max = 2000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Out Trim", .min = 0, .max = 2000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 };
 static const uint8_t page1[] = {
 kParam0, kParam1, kParam2, };
-enum { kNumTemplateParameters = 3 };
+enum { kNumTemplateParameters = 4 };
 #include "../include/template1.h"
 struct _kernel {
 	void render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess );

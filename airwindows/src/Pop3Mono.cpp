@@ -19,11 +19,14 @@ enum {
 	kNumberOfParameters=8
 };
 enum { kParamInput1, kParamOutput1, kParamOutput1mode,
+kParamPrePostGain,
 kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, kParam6, kParam7, };
 static const uint8_t page2[] = { kParamInput1, kParamOutput1, kParamOutput1mode };
+static const uint8_t page3[] = { kParamPrePostGain };
 static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
+{ .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Thresld", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "C Ratio", .min = 0, .max = 1000, .def = 500, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "C Atk", .min = 0, .max = 1000, .def = 500, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
@@ -35,7 +38,7 @@ NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
 };
 static const uint8_t page1[] = {
 kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, kParam6, kParam7, };
-enum { kNumTemplateParameters = 3 };
+enum { kNumTemplateParameters = 4 };
 #include "../include/template1.h"
 struct _kernel {
 	void render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess );
