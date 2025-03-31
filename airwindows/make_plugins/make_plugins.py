@@ -29,9 +29,22 @@ files = os.listdir( path )
 files = [ f for f in files if os.path.isfile( os.path.join( path, f ) ) and f.endswith( '.txt' ) ]
 files.sort()
 
+descriptions = {}
+with open ( '../airwindows/Airwindopedia.txt', 'r' ) as F:
+	lines = F.readlines()
+	for line in lines:
+		if line.startswith( '############ ' ):
+			bits = line.split( ' ', maxsplit=2 )
+			if len(bits) == 3:
+				d = bits[2].strip()
+				if d.startswith( 'is ' ):
+					d = d[3:]
+				d = d[:1].upper() + d[1:]
+				descriptions[ bits[1] ] = d
+
 srcPath = '../airwindows/plugins/MacAU/'
 
-skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'ConsoleXBuss', 'ConsoleXChannel', 'ConsoleXPre', 'DynamicsMono', 'PocketVerbs' ]
+skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'PocketVerbs' ]
 
 def matchCurly( t ):
 	s = ''
@@ -93,6 +106,10 @@ for f in files:
 			content = G.readlines()
 			content = [ c for c in content if c.startswith( 'const int' ) or c.startswith( 'static const int' ) ]
 			consts = ''.join( content )
+			
+		description = name
+		if name in descriptions:
+			description = descriptions[ name ]
 
 		while len( name ) < 3:
 			name += ' '
@@ -118,6 +135,7 @@ for f in files:
 			with open( os.path.join( '../src', f.replace( '.txt', '.cpp' ) ), 'w' ) as G:
 				G.write( '#include <math.h>\n#include <new>\n#include <distingnt/api.h>\n' )
 				G.write( '#define AIRWINDOWS_NAME "' + name + '"\n' )
+				G.write( '#define AIRWINDOWS_DESCRIPTION "' + description + '"\n' )
 				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
 				G.write( enums )
 				G.write( consts )
@@ -165,6 +183,7 @@ for f in files:
 			with open( os.path.join( '../src', f.replace( '.txt', '.cpp' ) ), 'w' ) as G:
 				G.write( '#include <math.h>\n#include <new>\n#include <distingnt/api.h>\n' )
 				G.write( '#define AIRWINDOWS_NAME "' + name + '"\n' )
+				G.write( '#define AIRWINDOWS_DESCRIPTION "' + description + '"\n' )
 				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
 				G.write( '#define AIRWINDOWS_KERNELS\n' )
 				G.write( enums )

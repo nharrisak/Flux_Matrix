@@ -50,7 +50,7 @@ static const _NT_factory factory =
 {
 	.guid = AIRWINDOWS_GUID,
 	.name = AIRWINDOWS_NAME,
-	.description = AIRWINDOWS_NAME,
+	.description = AIRWINDOWS_DESCRIPTION,
 #ifdef AIRWINDOWS_KERNELS
 	.numSpecifications = 1,
 	.specifications = specifications,
