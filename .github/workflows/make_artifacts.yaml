@@ -40,21 +40,21 @@ jobs:
             find "$DIR" -type f -name "*.o" -exec cp {} release/programs/plug-ins/ \;
           done
 
-      - name: Zip artifacts
+      - name: Zip plug-in artifacts
         run: |
           cd release
           zip -r ../plug-ins.zip programs
           cd ..
 
-      - name: Prepare directory structure for airwindowszip
+      - name: Prepare directory structure for airwindows zip
         run: |
-          mkdir -p release/airwindows/programs/plug-ins
+          mkdir -p release/airwindows/programs/plug-ins/airwindows
           DIRECTORIES=("airwindows")
           for DIR in "${DIRECTORIES[@]}"; do
-            find "$DIR" -type f -name "*.o" -exec cp {} release/airwindows/programs/plug-ins/ \;
+            find "$DIR" -type f -name "*.o" -exec cp {} release/airwindows/programs/plug-ins/airwindows/ \;
           done
 
-      - name: Zip artifacts
+      - name: Zip airwindows artifacts
         run: |
           cd release/airwindows
           zip -r ../airwindows-plugins.zip programs
@@ -63,6 +63,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: plug-ins.zip,airwindows-plugins.zip
+          files: |
+            plug-ins.zip
+            airwindows-plugins.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
