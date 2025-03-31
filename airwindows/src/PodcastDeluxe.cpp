@@ -28,7 +28,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		int tap1, tap2, tap3, tap4, tap5, maxdelay1, maxdelay2, maxdelay3, maxdelay4, maxdelay5;
 		//the phase rotator
@@ -44,17 +43,19 @@ struct _kernel {
 		Float64 lastOutSample;
 
 		uint32_t fpd;
-	};
-_kernel kernels[1];
-
-#include "../include/template2.h"
-struct _dram {
-		Float64 d1[503];
+	
+	struct _dram {
+			Float64 d1[503];
 		Float64 d2[503];
 		Float64 d3[503];
 		Float64 d4[503];
 		Float64 d5[503];
+	};
+	_dram* dram;
 };
+_kernel kernels[1];
+
+#include "../include/template2.h"
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)

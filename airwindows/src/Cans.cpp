@@ -164,13 +164,15 @@ enum { kNumTemplateParameters = 6 };
 		bez_cycle,
 		bez_total
 	}; //the new undersampling. bez signifies the bezier curve reconstruction
-	double bez[bez_total];
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double bez[bez_total];
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -256,12 +258,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		iirInL = (inputSampleL*iirExt)+(iirInL*(1.0-iirExt)); inputSampleL = iirInL;
 		iirInR = (inputSampleR*iirExt)+(iirInR*(1.0-iirExt)); inputSampleR = iirInR;
 		
-		bez[bez_cycle] += derez;
-		bez[bez_SampL] += ((inputSampleL+bez[bez_InL]) * derez);
-		bez[bez_SampR] += ((inputSampleR+bez[bez_InR]) * derez);
-		bez[bez_InL] = inputSampleL; bez[bez_InR] = inputSampleR;
-		if (bez[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
-			bez[bez_cycle] = 0.0;
+		dram->bez[bez_cycle] += derez;
+		dram->bez[bez_SampL] += ((inputSampleL+dram->bez[bez_InL]) * derez);
+		dram->bez[bez_SampR] += ((inputSampleR+dram->bez[bez_InR]) * derez);
+		dram->bez[bez_InL] = inputSampleL; dram->bez[bez_InR] = inputSampleR;
+		if (dram->bez[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
+			dram->bez[bez_cycle] = 0.0;
 			
 			iirFAL = (feedbackAL*iirAmt)+(iirFAL*(1.0-iirAmt)); feedbackAL = iirFAL;
 			iirFAR = (feedbackAR*iirAmt)+(iirFAR*(1.0-iirAmt)); feedbackAR = iirFAR;
@@ -274,15 +276,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			double outAL, outBL, outCL, outDL, outAR, outBR, outCR, outDR;
 			if (diffuse < 4) {
-				aAL[countA] = (bez[bez_SampL]) + (feedbackAL * 0.03125);
-				aAR[countA] = (bez[bez_SampR]) + (feedbackAR * 0.03125);
+				aAL[countA] = (dram->bez[bez_SampL]) + (feedbackAL * 0.03125);
+				aAR[countA] = (dram->bez[bez_SampR]) + (feedbackAR * 0.03125);
 				countA++; if (countA < 0 || countA > shortA) countA = 0;
 				outAL = aAL[countA-((countA > shortA)?shortA+1:0)];
 				outAR = aAR[countA-((countA > shortA)?shortA+1:0)];
 			} else {
-				outAL = (bez[bez_SampL] - (aAL[(countA+1)-((countA+1 > shortA)?shortA+1:0)]*0.618033988749894848204586)) + (feedbackAL * 0.03125);
+				outAL = (dram->bez[bez_SampL] - (aAL[(countA+1)-((countA+1 > shortA)?shortA+1:0)]*0.618033988749894848204586)) + (feedbackAL * 0.03125);
 				aAL[countA] = outAL; outAL *= 0.618033988749894848204586;
-				outAR = (bez[bez_SampR] - (aAR[(countA+1)-((countA+1 > shortA)?shortA+1:0)]*0.618033988749894848204586)) + (feedbackAR * 0.03125);
+				outAR = (dram->bez[bez_SampR] - (aAR[(countA+1)-((countA+1 > shortA)?shortA+1:0)]*0.618033988749894848204586)) + (feedbackAR * 0.03125);
 				aAR[countA] = outAR; outAR *= 0.618033988749894848204586;
 				countA++; if (countA < 0 || countA > shortA) countA = 0;
 				outAL += aAL[countA-((countA > shortA)?shortA+1:0)];
@@ -290,15 +292,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			
 			if (diffuse < 12) {
-				aBL[countB] = (bez[bez_SampL]) + (feedbackBL * 0.03125);
-				aBR[countB] = (bez[bez_SampR]) + (feedbackBR * 0.03125);
+				aBL[countB] = (dram->bez[bez_SampL]) + (feedbackBL * 0.03125);
+				aBR[countB] = (dram->bez[bez_SampR]) + (feedbackBR * 0.03125);
 				countB++; if (countB < 0 || countB > shortB) countB = 0;
 				outBL = aBL[countB-((countB > shortB)?shortB+1:0)];
 				outBR = aBR[countB-((countB > shortB)?shortB+1:0)];
 			} else {
-				outBL = (bez[bez_SampL] - (aBL[(countB+1)-((countB+1 > shortB)?shortB+1:0)]*0.618033988749894848204586)) + (feedbackBL * 0.03125);
+				outBL = (dram->bez[bez_SampL] - (aBL[(countB+1)-((countB+1 > shortB)?shortB+1:0)]*0.618033988749894848204586)) + (feedbackBL * 0.03125);
 				aBL[countB] = outBL; outBL *= 0.618033988749894848204586;
-				outBR = (bez[bez_SampR] - (aBR[(countB+1)-((countB+1 > shortB)?shortB+1:0)]*0.618033988749894848204586)) + (feedbackBR * 0.03125);
+				outBR = (dram->bez[bez_SampR] - (aBR[(countB+1)-((countB+1 > shortB)?shortB+1:0)]*0.618033988749894848204586)) + (feedbackBR * 0.03125);
 				aBR[countB] = outBR; outBR *= 0.618033988749894848204586;
 				countB++; if (countB < 0 || countB > shortB) countB = 0;
 				outBL += aBL[countB-((countB > shortB)?shortB+1:0)];
@@ -306,15 +308,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			
 			if (diffuse < 10) {
-				aCL[countC] = (bez[bez_SampL]) + (feedbackCL * 0.03125);
-				aCR[countC] = (bez[bez_SampR]) + (feedbackCR * 0.03125);
+				aCL[countC] = (dram->bez[bez_SampL]) + (feedbackCL * 0.03125);
+				aCR[countC] = (dram->bez[bez_SampR]) + (feedbackCR * 0.03125);
 				countC++; if (countC < 0 || countC > shortC) countC = 0;
 				outCL = aCL[countC-((countC > shortC)?shortC+1:0)];
 				outCR = aCR[countC-((countC > shortC)?shortC+1:0)];
 			} else {
-				outCL = (bez[bez_SampL] - (aCL[(countC+1)-((countC+1 > shortC)?shortC+1:0)]*0.618033988749894848204586)) + (feedbackCL * 0.03125);
+				outCL = (dram->bez[bez_SampL] - (aCL[(countC+1)-((countC+1 > shortC)?shortC+1:0)]*0.618033988749894848204586)) + (feedbackCL * 0.03125);
 				aCL[countC] = outCL; outCL *= 0.618033988749894848204586;
-				outCR = (bez[bez_SampR] - (aCR[(countC+1)-((countC+1 > shortC)?shortC+1:0)]*0.618033988749894848204586)) + (feedbackCR * 0.03125);
+				outCR = (dram->bez[bez_SampR] - (aCR[(countC+1)-((countC+1 > shortC)?shortC+1:0)]*0.618033988749894848204586)) + (feedbackCR * 0.03125);
 				aCR[countC] = outCR; outCR *= 0.618033988749894848204586;
 				countC++; if (countC < 0 || countC > shortC) countC = 0;
 				outCL += aCL[countC-((countC > shortC)?shortC+1:0)];
@@ -322,15 +324,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			}
 			
 			if (diffuse < 6) {
-				aDL[countD] = (bez[bez_SampL]) + (feedbackDL * 0.03125);
-				aDR[countD] = (bez[bez_SampR]) + (feedbackDR * 0.03125);
+				aDL[countD] = (dram->bez[bez_SampL]) + (feedbackDL * 0.03125);
+				aDR[countD] = (dram->bez[bez_SampR]) + (feedbackDR * 0.03125);
 				countD++; if (countD < 0 || countD > shortD) countD = 0;
 				outDL = aDL[countD-((countD > shortD)?shortD+1:0)];
 				outDR = aDR[countD-((countD > shortD)?shortD+1:0)];
 			} else {
-				outDL = (bez[bez_SampL] - (aDL[(countD+1)-((countD+1 > shortD)?shortD+1:0)]*0.618033988749894848204586)) + (feedbackDL * 0.03125);
+				outDL = (dram->bez[bez_SampL] - (aDL[(countD+1)-((countD+1 > shortD)?shortD+1:0)]*0.618033988749894848204586)) + (feedbackDL * 0.03125);
 				aDL[countD] = outDL; outDL *= 0.618033988749894848204586;
-				outDR = (bez[bez_SampR] - (aDR[(countD+1)-((countD+1 > shortD)?shortD+1:0)]*0.618033988749894848204586)) + (feedbackDR * 0.03125);
+				outDR = (dram->bez[bez_SampR] - (aDR[(countD+1)-((countD+1 > shortD)?shortD+1:0)]*0.618033988749894848204586)) + (feedbackDR * 0.03125);
 				aDR[countD] = outDR; outDR *= 0.618033988749894848204586;
 				countD++; if (countD < 0 || countD > shortD) countD = 0;
 				outDL += aDL[countD-((countD > shortD)?shortD+1:0)];
@@ -557,22 +559,22 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			inputSampleR = (outMR + outNR + outOR + outPR)/16.0;
 			//and take the final combined sum of outputs, corrected for Householder gain and averaging
 			
-			bez[bez_CL] = bez[bez_BL];
-			bez[bez_BL] = bez[bez_AL];
-			bez[bez_AL] = inputSampleL;
-			bez[bez_SampL] = 0.0;
+			dram->bez[bez_CL] = dram->bez[bez_BL];
+			dram->bez[bez_BL] = dram->bez[bez_AL];
+			dram->bez[bez_AL] = inputSampleL;
+			dram->bez[bez_SampL] = 0.0;
 			
-			bez[bez_CR] = bez[bez_BR];
-			bez[bez_BR] = bez[bez_AR];
-			bez[bez_AR] = inputSampleR;
-			bez[bez_SampR] = 0.0;
+			dram->bez[bez_CR] = dram->bez[bez_BR];
+			dram->bez[bez_BR] = dram->bez[bez_AR];
+			dram->bez[bez_AR] = inputSampleR;
+			dram->bez[bez_SampR] = 0.0;
 		}
-		double CBL = (bez[bez_CL]*(1.0-bez[bez_cycle]))+(bez[bez_BL]*bez[bez_cycle]);
-		double CBR = (bez[bez_CR]*(1.0-bez[bez_cycle]))+(bez[bez_BR]*bez[bez_cycle]);
-		double BAL = (bez[bez_BL]*(1.0-bez[bez_cycle]))+(bez[bez_AL]*bez[bez_cycle]);
-		double BAR = (bez[bez_BR]*(1.0-bez[bez_cycle]))+(bez[bez_AR]*bez[bez_cycle]);
-		double CBAL = (bez[bez_BL]+(CBL*(1.0-bez[bez_cycle]))+(BAL*bez[bez_cycle]))*0.125;
-		double CBAR = (bez[bez_BR]+(CBR*(1.0-bez[bez_cycle]))+(BAR*bez[bez_cycle]))*0.125;
+		double CBL = (dram->bez[bez_CL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
+		double CBR = (dram->bez[bez_CR]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BR]*dram->bez[bez_cycle]);
+		double BAL = (dram->bez[bez_BL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
+		double BAR = (dram->bez[bez_BR]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AR]*dram->bez[bez_cycle]);
+		double CBAL = (dram->bez[bez_BL]+(CBL*(1.0-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.125;
+		double CBAR = (dram->bez[bez_BR]+(CBR*(1.0-dram->bez[bez_cycle]))+(BAR*dram->bez[bez_cycle]))*0.125;
 		inputSampleL = CBAL;
 		inputSampleR = CBAR;
 		
@@ -683,8 +685,8 @@ int _airwindowsAlgorithm::reset(void) {
 	shortP = 543;
 	prevclearcoat = -1;
 	
-	for (int x = 0; x < bez_total; x++) bez[x] = 0.0;
-	bez[bez_cycle] = 1.0;
+	for (int x = 0; x < bez_total; x++) dram->bez[x] = 0.0;
+	dram->bez[bez_cycle] = 1.0;
 	
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;
 	fpdR = 1.0; while (fpdR < 16386) fpdR = rand()*UINT32_MAX;

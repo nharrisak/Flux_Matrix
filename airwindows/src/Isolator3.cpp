@@ -30,7 +30,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			biq_freq,
@@ -56,7 +55,16 @@ struct _kernel {
 			biq_sR2,
 			biq_total
 		}; //coefficient interpolating biquad filter, stereo
-		double biquadA[biq_total];
+		
+		double lastSampleL;
+		double intermediateL[16];
+		bool wasPosClipL;
+		bool wasNegClipL;
+		
+		uint32_t fpd;
+	
+	struct _dram {
+			double biquadA[biq_total];
 		double biquadB[biq_total];
 		double biquadC[biq_total];
 		double biquadD[biq_total];
@@ -70,19 +78,12 @@ struct _kernel {
 		double hiquadE[biq_total];
 		double hiquadF[biq_total];
 		double hiquadG[biq_total];
-		
-		double lastSampleL;
-		double intermediateL[16];
-		bool wasPosClipL;
-		bool wasNegClipL;
-		
-		uint32_t fpd;
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -104,219 +105,219 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (isoFreq > 1.0) isoFreq = 1.0;
 	if (hisoFreq < 0.0) hisoFreq = 0.0;
 		
-	biquadA[biq_freq] = pow(isoFreq,(2.0*sqrt(overallscale)))*0.4999;
-	if (biquadA[biq_freq] < 0.00025) biquadA[biq_freq] = 0.00025;
-	biquadG[biq_freq] = biquadF[biq_freq] = biquadE[biq_freq] = biquadD[biq_freq] = biquadC[biq_freq] = biquadB[biq_freq] = biquadA[biq_freq];
+	dram->biquadA[biq_freq] = pow(isoFreq,(2.0*sqrt(overallscale)))*0.4999;
+	if (dram->biquadA[biq_freq] < 0.00025) dram->biquadA[biq_freq] = 0.00025;
+	dram->biquadG[biq_freq] = dram->biquadF[biq_freq] = dram->biquadE[biq_freq] = dram->biquadD[biq_freq] = dram->biquadC[biq_freq] = dram->biquadB[biq_freq] = dram->biquadA[biq_freq];
 
-	hiquadA[biq_freq] = pow(hisoFreq,(2.0*sqrt(overallscale)))*0.4999;
-	if (hiquadA[biq_freq] < 0.00025) hiquadA[biq_freq] = 0.00025;
-	hiquadG[biq_freq] = hiquadF[biq_freq] = hiquadE[biq_freq] = hiquadD[biq_freq] = hiquadC[biq_freq] = hiquadB[biq_freq] = hiquadA[biq_freq];
+	dram->hiquadA[biq_freq] = pow(hisoFreq,(2.0*sqrt(overallscale)))*0.4999;
+	if (dram->hiquadA[biq_freq] < 0.00025) dram->hiquadA[biq_freq] = 0.00025;
+	dram->hiquadG[biq_freq] = dram->hiquadF[biq_freq] = dram->hiquadE[biq_freq] = dram->hiquadD[biq_freq] = dram->hiquadC[biq_freq] = dram->hiquadB[biq_freq] = dram->hiquadA[biq_freq];
 		
-	hiquadA[biq_reso] = biquadA[biq_reso] = 4.46570214;
-	hiquadB[biq_reso] = biquadB[biq_reso] = 1.51387132;
-	hiquadC[biq_reso] = biquadC[biq_reso] = 0.93979296;
-	hiquadD[biq_reso] = biquadD[biq_reso] = 0.70710678;
-	hiquadE[biq_reso] = biquadE[biq_reso] = 0.59051105;
-	hiquadF[biq_reso] = biquadF[biq_reso] = 0.52972649;
-	hiquadG[biq_reso] = biquadG[biq_reso] = 0.50316379;
+	dram->hiquadA[biq_reso] = dram->biquadA[biq_reso] = 4.46570214;
+	dram->hiquadB[biq_reso] = dram->biquadB[biq_reso] = 1.51387132;
+	dram->hiquadC[biq_reso] = dram->biquadC[biq_reso] = 0.93979296;
+	dram->hiquadD[biq_reso] = dram->biquadD[biq_reso] = 0.70710678;
+	dram->hiquadE[biq_reso] = dram->biquadE[biq_reso] = 0.59051105;
+	dram->hiquadF[biq_reso] = dram->biquadF[biq_reso] = 0.52972649;
+	dram->hiquadG[biq_reso] = dram->biquadG[biq_reso] = 0.50316379;
 	
-	biquadA[biq_aA0] = biquadA[biq_aB0];
-	biquadA[biq_aA1] = biquadA[biq_aB1];
-	biquadA[biq_aA2] = biquadA[biq_aB2];
-	biquadA[biq_bA1] = biquadA[biq_bB1];
-	biquadA[biq_bA2] = biquadA[biq_bB2];
+	dram->biquadA[biq_aA0] = dram->biquadA[biq_aB0];
+	dram->biquadA[biq_aA1] = dram->biquadA[biq_aB1];
+	dram->biquadA[biq_aA2] = dram->biquadA[biq_aB2];
+	dram->biquadA[biq_bA1] = dram->biquadA[biq_bB1];
+	dram->biquadA[biq_bA2] = dram->biquadA[biq_bB2];
 	
-	biquadB[biq_aA0] = biquadB[biq_aB0];
-	biquadB[biq_aA1] = biquadB[biq_aB1];
-	biquadB[biq_aA2] = biquadB[biq_aB2];
-	biquadB[biq_bA1] = biquadB[biq_bB1];
-	biquadB[biq_bA2] = biquadB[biq_bB2];
+	dram->biquadB[biq_aA0] = dram->biquadB[biq_aB0];
+	dram->biquadB[biq_aA1] = dram->biquadB[biq_aB1];
+	dram->biquadB[biq_aA2] = dram->biquadB[biq_aB2];
+	dram->biquadB[biq_bA1] = dram->biquadB[biq_bB1];
+	dram->biquadB[biq_bA2] = dram->biquadB[biq_bB2];
 	
-	biquadC[biq_aA0] = biquadC[biq_aB0];
-	biquadC[biq_aA1] = biquadC[biq_aB1];
-	biquadC[biq_aA2] = biquadC[biq_aB2];
-	biquadC[biq_bA1] = biquadC[biq_bB1];
-	biquadC[biq_bA2] = biquadC[biq_bB2];
+	dram->biquadC[biq_aA0] = dram->biquadC[biq_aB0];
+	dram->biquadC[biq_aA1] = dram->biquadC[biq_aB1];
+	dram->biquadC[biq_aA2] = dram->biquadC[biq_aB2];
+	dram->biquadC[biq_bA1] = dram->biquadC[biq_bB1];
+	dram->biquadC[biq_bA2] = dram->biquadC[biq_bB2];
 	
-	biquadD[biq_aA0] = biquadD[biq_aB0];
-	biquadD[biq_aA1] = biquadD[biq_aB1];
-	biquadD[biq_aA2] = biquadD[biq_aB2];
-	biquadD[biq_bA1] = biquadD[biq_bB1];
-	biquadD[biq_bA2] = biquadD[biq_bB2];
+	dram->biquadD[biq_aA0] = dram->biquadD[biq_aB0];
+	dram->biquadD[biq_aA1] = dram->biquadD[biq_aB1];
+	dram->biquadD[biq_aA2] = dram->biquadD[biq_aB2];
+	dram->biquadD[biq_bA1] = dram->biquadD[biq_bB1];
+	dram->biquadD[biq_bA2] = dram->biquadD[biq_bB2];
 	
-	biquadE[biq_aA0] = biquadE[biq_aB0];
-	biquadE[biq_aA1] = biquadE[biq_aB1];
-	biquadE[biq_aA2] = biquadE[biq_aB2];
-	biquadE[biq_bA1] = biquadE[biq_bB1];
-	biquadE[biq_bA2] = biquadE[biq_bB2];
+	dram->biquadE[biq_aA0] = dram->biquadE[biq_aB0];
+	dram->biquadE[biq_aA1] = dram->biquadE[biq_aB1];
+	dram->biquadE[biq_aA2] = dram->biquadE[biq_aB2];
+	dram->biquadE[biq_bA1] = dram->biquadE[biq_bB1];
+	dram->biquadE[biq_bA2] = dram->biquadE[biq_bB2];
 	
-	biquadF[biq_aA0] = biquadF[biq_aB0];
-	biquadF[biq_aA1] = biquadF[biq_aB1];
-	biquadF[biq_aA2] = biquadF[biq_aB2];
-	biquadF[biq_bA1] = biquadF[biq_bB1];
-	biquadF[biq_bA2] = biquadF[biq_bB2];
+	dram->biquadF[biq_aA0] = dram->biquadF[biq_aB0];
+	dram->biquadF[biq_aA1] = dram->biquadF[biq_aB1];
+	dram->biquadF[biq_aA2] = dram->biquadF[biq_aB2];
+	dram->biquadF[biq_bA1] = dram->biquadF[biq_bB1];
+	dram->biquadF[biq_bA2] = dram->biquadF[biq_bB2];
 	
-	biquadG[biq_aA0] = biquadG[biq_aB0];
-	biquadG[biq_aA1] = biquadG[biq_aB1];
-	biquadG[biq_aA2] = biquadG[biq_aB2];
-	biquadG[biq_bA1] = biquadG[biq_bB1];
-	biquadG[biq_bA2] = biquadG[biq_bB2];
+	dram->biquadG[biq_aA0] = dram->biquadG[biq_aB0];
+	dram->biquadG[biq_aA1] = dram->biquadG[biq_aB1];
+	dram->biquadG[biq_aA2] = dram->biquadG[biq_aB2];
+	dram->biquadG[biq_bA1] = dram->biquadG[biq_bB1];
+	dram->biquadG[biq_bA2] = dram->biquadG[biq_bB2];
 	
-	hiquadA[biq_aA0] = hiquadA[biq_aB0];
-	hiquadA[biq_aA1] = hiquadA[biq_aB1];
-	hiquadA[biq_aA2] = hiquadA[biq_aB2];
-	hiquadA[biq_bA1] = hiquadA[biq_bB1];
-	hiquadA[biq_bA2] = hiquadA[biq_bB2];
+	dram->hiquadA[biq_aA0] = dram->hiquadA[biq_aB0];
+	dram->hiquadA[biq_aA1] = dram->hiquadA[biq_aB1];
+	dram->hiquadA[biq_aA2] = dram->hiquadA[biq_aB2];
+	dram->hiquadA[biq_bA1] = dram->hiquadA[biq_bB1];
+	dram->hiquadA[biq_bA2] = dram->hiquadA[biq_bB2];
 	
-	hiquadB[biq_aA0] = hiquadB[biq_aB0];
-	hiquadB[biq_aA1] = hiquadB[biq_aB1];
-	hiquadB[biq_aA2] = hiquadB[biq_aB2];
-	hiquadB[biq_bA1] = hiquadB[biq_bB1];
-	hiquadB[biq_bA2] = hiquadB[biq_bB2];
+	dram->hiquadB[biq_aA0] = dram->hiquadB[biq_aB0];
+	dram->hiquadB[biq_aA1] = dram->hiquadB[biq_aB1];
+	dram->hiquadB[biq_aA2] = dram->hiquadB[biq_aB2];
+	dram->hiquadB[biq_bA1] = dram->hiquadB[biq_bB1];
+	dram->hiquadB[biq_bA2] = dram->hiquadB[biq_bB2];
 	
-	hiquadC[biq_aA0] = hiquadC[biq_aB0];
-	hiquadC[biq_aA1] = hiquadC[biq_aB1];
-	hiquadC[biq_aA2] = hiquadC[biq_aB2];
-	hiquadC[biq_bA1] = hiquadC[biq_bB1];
-	hiquadC[biq_bA2] = hiquadC[biq_bB2];
+	dram->hiquadC[biq_aA0] = dram->hiquadC[biq_aB0];
+	dram->hiquadC[biq_aA1] = dram->hiquadC[biq_aB1];
+	dram->hiquadC[biq_aA2] = dram->hiquadC[biq_aB2];
+	dram->hiquadC[biq_bA1] = dram->hiquadC[biq_bB1];
+	dram->hiquadC[biq_bA2] = dram->hiquadC[biq_bB2];
 	
-	hiquadD[biq_aA0] = hiquadD[biq_aB0];
-	hiquadD[biq_aA1] = hiquadD[biq_aB1];
-	hiquadD[biq_aA2] = hiquadD[biq_aB2];
-	hiquadD[biq_bA1] = hiquadD[biq_bB1];
-	hiquadD[biq_bA2] = hiquadD[biq_bB2];
+	dram->hiquadD[biq_aA0] = dram->hiquadD[biq_aB0];
+	dram->hiquadD[biq_aA1] = dram->hiquadD[biq_aB1];
+	dram->hiquadD[biq_aA2] = dram->hiquadD[biq_aB2];
+	dram->hiquadD[biq_bA1] = dram->hiquadD[biq_bB1];
+	dram->hiquadD[biq_bA2] = dram->hiquadD[biq_bB2];
 	
-	hiquadE[biq_aA0] = hiquadE[biq_aB0];
-	hiquadE[biq_aA1] = hiquadE[biq_aB1];
-	hiquadE[biq_aA2] = hiquadE[biq_aB2];
-	hiquadE[biq_bA1] = hiquadE[biq_bB1];
-	hiquadE[biq_bA2] = hiquadE[biq_bB2];
+	dram->hiquadE[biq_aA0] = dram->hiquadE[biq_aB0];
+	dram->hiquadE[biq_aA1] = dram->hiquadE[biq_aB1];
+	dram->hiquadE[biq_aA2] = dram->hiquadE[biq_aB2];
+	dram->hiquadE[biq_bA1] = dram->hiquadE[biq_bB1];
+	dram->hiquadE[biq_bA2] = dram->hiquadE[biq_bB2];
 	
-	hiquadF[biq_aA0] = hiquadF[biq_aB0];
-	hiquadF[biq_aA1] = hiquadF[biq_aB1];
-	hiquadF[biq_aA2] = hiquadF[biq_aB2];
-	hiquadF[biq_bA1] = hiquadF[biq_bB1];
-	hiquadF[biq_bA2] = hiquadF[biq_bB2];
+	dram->hiquadF[biq_aA0] = dram->hiquadF[biq_aB0];
+	dram->hiquadF[biq_aA1] = dram->hiquadF[biq_aB1];
+	dram->hiquadF[biq_aA2] = dram->hiquadF[biq_aB2];
+	dram->hiquadF[biq_bA1] = dram->hiquadF[biq_bB1];
+	dram->hiquadF[biq_bA2] = dram->hiquadF[biq_bB2];
 	
-	hiquadG[biq_aA0] = hiquadG[biq_aB0];
-	hiquadG[biq_aA1] = hiquadG[biq_aB1];
-	hiquadG[biq_aA2] = hiquadG[biq_aB2];
-	hiquadG[biq_bA1] = hiquadG[biq_bB1];
-	hiquadG[biq_bA2] = hiquadG[biq_bB2];
+	dram->hiquadG[biq_aA0] = dram->hiquadG[biq_aB0];
+	dram->hiquadG[biq_aA1] = dram->hiquadG[biq_aB1];
+	dram->hiquadG[biq_aA2] = dram->hiquadG[biq_aB2];
+	dram->hiquadG[biq_bA1] = dram->hiquadG[biq_bB1];
+	dram->hiquadG[biq_bA2] = dram->hiquadG[biq_bB2];
 	
 	//previous run through the buffer is still in the filter, so we move it
 	//to the A section and now it's the new starting point.	
-	double K = tan(M_PI * biquadA[biq_freq]);
-	double norm = 1.0 / (1.0 + K / biquadA[biq_reso] + K * K);
-	biquadA[biq_aB0] = K * K * norm;
-	biquadA[biq_aB1] = 2.0 * biquadA[biq_aB0];
-	biquadA[biq_aB2] = biquadA[biq_aB0];
-	biquadA[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadA[biq_bB2] = (1.0 - K / biquadA[biq_reso] + K * K) * norm;
+	double K = tan(M_PI * dram->biquadA[biq_freq]);
+	double norm = 1.0 / (1.0 + K / dram->biquadA[biq_reso] + K * K);
+	dram->biquadA[biq_aB0] = K * K * norm;
+	dram->biquadA[biq_aB1] = 2.0 * dram->biquadA[biq_aB0];
+	dram->biquadA[biq_aB2] = dram->biquadA[biq_aB0];
+	dram->biquadA[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadA[biq_bB2] = (1.0 - K / dram->biquadA[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * biquadB[biq_freq]);
-	norm = 1.0 / (1.0 + K / biquadB[biq_reso] + K * K);
-	biquadB[biq_aB0] = K * K * norm;
-	biquadB[biq_aB1] = 2.0 * biquadB[biq_aB0];
-	biquadB[biq_aB2] = biquadB[biq_aB0];
-	biquadB[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadB[biq_bB2] = (1.0 - K / biquadB[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->biquadB[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->biquadB[biq_reso] + K * K);
+	dram->biquadB[biq_aB0] = K * K * norm;
+	dram->biquadB[biq_aB1] = 2.0 * dram->biquadB[biq_aB0];
+	dram->biquadB[biq_aB2] = dram->biquadB[biq_aB0];
+	dram->biquadB[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadB[biq_bB2] = (1.0 - K / dram->biquadB[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * biquadC[biq_freq]);
-	norm = 1.0 / (1.0 + K / biquadC[biq_reso] + K * K);
-	biquadC[biq_aB0] = K * K * norm;
-	biquadC[biq_aB1] = 2.0 * biquadC[biq_aB0];
-	biquadC[biq_aB2] = biquadC[biq_aB0];
-	biquadC[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadC[biq_bB2] = (1.0 - K / biquadC[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->biquadC[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->biquadC[biq_reso] + K * K);
+	dram->biquadC[biq_aB0] = K * K * norm;
+	dram->biquadC[biq_aB1] = 2.0 * dram->biquadC[biq_aB0];
+	dram->biquadC[biq_aB2] = dram->biquadC[biq_aB0];
+	dram->biquadC[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadC[biq_bB2] = (1.0 - K / dram->biquadC[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * biquadD[biq_freq]);
-	norm = 1.0 / (1.0 + K / biquadD[biq_reso] + K * K);
-	biquadD[biq_aB0] = K * K * norm;
-	biquadD[biq_aB1] = 2.0 * biquadD[biq_aB0];
-	biquadD[biq_aB2] = biquadD[biq_aB0];
-	biquadD[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadD[biq_bB2] = (1.0 - K / biquadD[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->biquadD[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->biquadD[biq_reso] + K * K);
+	dram->biquadD[biq_aB0] = K * K * norm;
+	dram->biquadD[biq_aB1] = 2.0 * dram->biquadD[biq_aB0];
+	dram->biquadD[biq_aB2] = dram->biquadD[biq_aB0];
+	dram->biquadD[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadD[biq_bB2] = (1.0 - K / dram->biquadD[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * biquadE[biq_freq]);
-	norm = 1.0 / (1.0 + K / biquadE[biq_reso] + K * K);
-	biquadE[biq_aB0] = K * K * norm;
-	biquadE[biq_aB1] = 2.0 * biquadE[biq_aB0];
-	biquadE[biq_aB2] = biquadE[biq_aB0];
-	biquadE[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadE[biq_bB2] = (1.0 - K / biquadE[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->biquadE[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->biquadE[biq_reso] + K * K);
+	dram->biquadE[biq_aB0] = K * K * norm;
+	dram->biquadE[biq_aB1] = 2.0 * dram->biquadE[biq_aB0];
+	dram->biquadE[biq_aB2] = dram->biquadE[biq_aB0];
+	dram->biquadE[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadE[biq_bB2] = (1.0 - K / dram->biquadE[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * biquadF[biq_freq]);
-	norm = 1.0 / (1.0 + K / biquadF[biq_reso] + K * K);
-	biquadF[biq_aB0] = K * K * norm;
-	biquadF[biq_aB1] = 2.0 * biquadF[biq_aB0];
-	biquadF[biq_aB2] = biquadF[biq_aB0];
-	biquadF[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadF[biq_bB2] = (1.0 - K / biquadF[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->biquadF[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->biquadF[biq_reso] + K * K);
+	dram->biquadF[biq_aB0] = K * K * norm;
+	dram->biquadF[biq_aB1] = 2.0 * dram->biquadF[biq_aB0];
+	dram->biquadF[biq_aB2] = dram->biquadF[biq_aB0];
+	dram->biquadF[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadF[biq_bB2] = (1.0 - K / dram->biquadF[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * biquadG[biq_freq]);
-	norm = 1.0 / (1.0 + K / biquadG[biq_reso] + K * K);
-	biquadG[biq_aB0] = K * K * norm;
-	biquadG[biq_aB1] = 2.0 * biquadG[biq_aB0];
-	biquadG[biq_aB2] = biquadG[biq_aB0];
-	biquadG[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	biquadG[biq_bB2] = (1.0 - K / biquadG[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->biquadG[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->biquadG[biq_reso] + K * K);
+	dram->biquadG[biq_aB0] = K * K * norm;
+	dram->biquadG[biq_aB1] = 2.0 * dram->biquadG[biq_aB0];
+	dram->biquadG[biq_aB2] = dram->biquadG[biq_aB0];
+	dram->biquadG[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquadG[biq_bB2] = (1.0 - K / dram->biquadG[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadA[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadA[biq_reso] + K * K);
-	hiquadA[biq_aB0] = K * K * norm;
-	hiquadA[biq_aB1] = 2.0 * hiquadA[biq_aB0];
-	hiquadA[biq_aB2] = hiquadA[biq_aB0];
-	hiquadA[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadA[biq_bB2] = (1.0 - K / hiquadA[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadA[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadA[biq_reso] + K * K);
+	dram->hiquadA[biq_aB0] = K * K * norm;
+	dram->hiquadA[biq_aB1] = 2.0 * dram->hiquadA[biq_aB0];
+	dram->hiquadA[biq_aB2] = dram->hiquadA[biq_aB0];
+	dram->hiquadA[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadA[biq_bB2] = (1.0 - K / dram->hiquadA[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadB[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadB[biq_reso] + K * K);
-	hiquadB[biq_aB0] = K * K * norm;
-	hiquadB[biq_aB1] = 2.0 * hiquadB[biq_aB0];
-	hiquadB[biq_aB2] = hiquadB[biq_aB0];
-	hiquadB[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadB[biq_bB2] = (1.0 - K / hiquadB[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadB[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadB[biq_reso] + K * K);
+	dram->hiquadB[biq_aB0] = K * K * norm;
+	dram->hiquadB[biq_aB1] = 2.0 * dram->hiquadB[biq_aB0];
+	dram->hiquadB[biq_aB2] = dram->hiquadB[biq_aB0];
+	dram->hiquadB[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadB[biq_bB2] = (1.0 - K / dram->hiquadB[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadC[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadC[biq_reso] + K * K);
-	hiquadC[biq_aB0] = K * K * norm;
-	hiquadC[biq_aB1] = 2.0 * hiquadC[biq_aB0];
-	hiquadC[biq_aB2] = hiquadC[biq_aB0];
-	hiquadC[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadC[biq_bB2] = (1.0 - K / hiquadC[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadC[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadC[biq_reso] + K * K);
+	dram->hiquadC[biq_aB0] = K * K * norm;
+	dram->hiquadC[biq_aB1] = 2.0 * dram->hiquadC[biq_aB0];
+	dram->hiquadC[biq_aB2] = dram->hiquadC[biq_aB0];
+	dram->hiquadC[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadC[biq_bB2] = (1.0 - K / dram->hiquadC[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadD[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadD[biq_reso] + K * K);
-	hiquadD[biq_aB0] = K * K * norm;
-	hiquadD[biq_aB1] = 2.0 * hiquadD[biq_aB0];
-	hiquadD[biq_aB2] = hiquadD[biq_aB0];
-	hiquadD[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadD[biq_bB2] = (1.0 - K / hiquadD[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadD[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadD[biq_reso] + K * K);
+	dram->hiquadD[biq_aB0] = K * K * norm;
+	dram->hiquadD[biq_aB1] = 2.0 * dram->hiquadD[biq_aB0];
+	dram->hiquadD[biq_aB2] = dram->hiquadD[biq_aB0];
+	dram->hiquadD[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadD[biq_bB2] = (1.0 - K / dram->hiquadD[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadE[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadE[biq_reso] + K * K);
-	hiquadE[biq_aB0] = K * K * norm;
-	hiquadE[biq_aB1] = 2.0 * hiquadE[biq_aB0];
-	hiquadE[biq_aB2] = hiquadE[biq_aB0];
-	hiquadE[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadE[biq_bB2] = (1.0 - K / hiquadE[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadE[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadE[biq_reso] + K * K);
+	dram->hiquadE[biq_aB0] = K * K * norm;
+	dram->hiquadE[biq_aB1] = 2.0 * dram->hiquadE[biq_aB0];
+	dram->hiquadE[biq_aB2] = dram->hiquadE[biq_aB0];
+	dram->hiquadE[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadE[biq_bB2] = (1.0 - K / dram->hiquadE[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadF[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadF[biq_reso] + K * K);
-	hiquadF[biq_aB0] = K * K * norm;
-	hiquadF[biq_aB1] = 2.0 * hiquadF[biq_aB0];
-	hiquadF[biq_aB2] = hiquadF[biq_aB0];
-	hiquadF[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadF[biq_bB2] = (1.0 - K / hiquadF[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadF[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadF[biq_reso] + K * K);
+	dram->hiquadF[biq_aB0] = K * K * norm;
+	dram->hiquadF[biq_aB1] = 2.0 * dram->hiquadF[biq_aB0];
+	dram->hiquadF[biq_aB2] = dram->hiquadF[biq_aB0];
+	dram->hiquadF[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadF[biq_bB2] = (1.0 - K / dram->hiquadF[biq_reso] + K * K) * norm;
 	
-	K = tan(M_PI * hiquadG[biq_freq]);
-	norm = 1.0 / (1.0 + K / hiquadG[biq_reso] + K * K);
-	hiquadG[biq_aB0] = K * K * norm;
-	hiquadG[biq_aB1] = 2.0 * hiquadG[biq_aB0];
-	hiquadG[biq_aB2] = hiquadG[biq_aB0];
-	hiquadG[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-	hiquadG[biq_bB2] = (1.0 - K / hiquadG[biq_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hiquadG[biq_freq]);
+	norm = 1.0 / (1.0 + K / dram->hiquadG[biq_reso] + K * K);
+	dram->hiquadG[biq_aB0] = K * K * norm;
+	dram->hiquadG[biq_aB1] = 2.0 * dram->hiquadG[biq_aB0];
+	dram->hiquadG[biq_aB2] = dram->hiquadG[biq_aB0];
+	dram->hiquadG[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hiquadG[biq_bB2] = (1.0 - K / dram->hiquadG[biq_reso] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
 		double inputSample = *sourceP;
@@ -325,162 +326,162 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		double temp = (double)nSampleFrames/inFramesToProcess;
 		
-		hiquadA[biq_a0] = (hiquadA[biq_aA0]*temp)+(hiquadA[biq_aB0]*(1.0-temp));
-		hiquadA[biq_a1] = (hiquadA[biq_aA1]*temp)+(hiquadA[biq_aB1]*(1.0-temp));
-		hiquadA[biq_a2] = (hiquadA[biq_aA2]*temp)+(hiquadA[biq_aB2]*(1.0-temp));
-		hiquadA[biq_b1] = (hiquadA[biq_bA1]*temp)+(hiquadA[biq_bB1]*(1.0-temp));
-		hiquadA[biq_b2] = (hiquadA[biq_bA2]*temp)+(hiquadA[biq_bB2]*(1.0-temp));
+		dram->hiquadA[biq_a0] = (dram->hiquadA[biq_aA0]*temp)+(dram->hiquadA[biq_aB0]*(1.0-temp));
+		dram->hiquadA[biq_a1] = (dram->hiquadA[biq_aA1]*temp)+(dram->hiquadA[biq_aB1]*(1.0-temp));
+		dram->hiquadA[biq_a2] = (dram->hiquadA[biq_aA2]*temp)+(dram->hiquadA[biq_aB2]*(1.0-temp));
+		dram->hiquadA[biq_b1] = (dram->hiquadA[biq_bA1]*temp)+(dram->hiquadA[biq_bB1]*(1.0-temp));
+		dram->hiquadA[biq_b2] = (dram->hiquadA[biq_bA2]*temp)+(dram->hiquadA[biq_bB2]*(1.0-temp));
 		
-		hiquadB[biq_a0] = (hiquadB[biq_aA0]*temp)+(hiquadB[biq_aB0]*(1.0-temp));
-		hiquadB[biq_a1] = (hiquadB[biq_aA1]*temp)+(hiquadB[biq_aB1]*(1.0-temp));
-		hiquadB[biq_a2] = (hiquadB[biq_aA2]*temp)+(hiquadB[biq_aB2]*(1.0-temp));
-		hiquadB[biq_b1] = (hiquadB[biq_bA1]*temp)+(hiquadB[biq_bB1]*(1.0-temp));
-		hiquadB[biq_b2] = (hiquadB[biq_bA2]*temp)+(hiquadB[biq_bB2]*(1.0-temp));
+		dram->hiquadB[biq_a0] = (dram->hiquadB[biq_aA0]*temp)+(dram->hiquadB[biq_aB0]*(1.0-temp));
+		dram->hiquadB[biq_a1] = (dram->hiquadB[biq_aA1]*temp)+(dram->hiquadB[biq_aB1]*(1.0-temp));
+		dram->hiquadB[biq_a2] = (dram->hiquadB[biq_aA2]*temp)+(dram->hiquadB[biq_aB2]*(1.0-temp));
+		dram->hiquadB[biq_b1] = (dram->hiquadB[biq_bA1]*temp)+(dram->hiquadB[biq_bB1]*(1.0-temp));
+		dram->hiquadB[biq_b2] = (dram->hiquadB[biq_bA2]*temp)+(dram->hiquadB[biq_bB2]*(1.0-temp));
 		
-		hiquadC[biq_a0] = (hiquadC[biq_aA0]*temp)+(hiquadC[biq_aB0]*(1.0-temp));
-		hiquadC[biq_a1] = (hiquadC[biq_aA1]*temp)+(hiquadC[biq_aB1]*(1.0-temp));
-		hiquadC[biq_a2] = (hiquadC[biq_aA2]*temp)+(hiquadC[biq_aB2]*(1.0-temp));
-		hiquadC[biq_b1] = (hiquadC[biq_bA1]*temp)+(hiquadC[biq_bB1]*(1.0-temp));
-		hiquadC[biq_b2] = (hiquadC[biq_bA2]*temp)+(hiquadC[biq_bB2]*(1.0-temp));
+		dram->hiquadC[biq_a0] = (dram->hiquadC[biq_aA0]*temp)+(dram->hiquadC[biq_aB0]*(1.0-temp));
+		dram->hiquadC[biq_a1] = (dram->hiquadC[biq_aA1]*temp)+(dram->hiquadC[biq_aB1]*(1.0-temp));
+		dram->hiquadC[biq_a2] = (dram->hiquadC[biq_aA2]*temp)+(dram->hiquadC[biq_aB2]*(1.0-temp));
+		dram->hiquadC[biq_b1] = (dram->hiquadC[biq_bA1]*temp)+(dram->hiquadC[biq_bB1]*(1.0-temp));
+		dram->hiquadC[biq_b2] = (dram->hiquadC[biq_bA2]*temp)+(dram->hiquadC[biq_bB2]*(1.0-temp));
 		
-		hiquadD[biq_a0] = (hiquadD[biq_aA0]*temp)+(hiquadD[biq_aB0]*(1.0-temp));
-		hiquadD[biq_a1] = (hiquadD[biq_aA1]*temp)+(hiquadD[biq_aB1]*(1.0-temp));
-		hiquadD[biq_a2] = (hiquadD[biq_aA2]*temp)+(hiquadD[biq_aB2]*(1.0-temp));
-		hiquadD[biq_b1] = (hiquadD[biq_bA1]*temp)+(hiquadD[biq_bB1]*(1.0-temp));
-		hiquadD[biq_b2] = (hiquadD[biq_bA2]*temp)+(hiquadD[biq_bB2]*(1.0-temp));
+		dram->hiquadD[biq_a0] = (dram->hiquadD[biq_aA0]*temp)+(dram->hiquadD[biq_aB0]*(1.0-temp));
+		dram->hiquadD[biq_a1] = (dram->hiquadD[biq_aA1]*temp)+(dram->hiquadD[biq_aB1]*(1.0-temp));
+		dram->hiquadD[biq_a2] = (dram->hiquadD[biq_aA2]*temp)+(dram->hiquadD[biq_aB2]*(1.0-temp));
+		dram->hiquadD[biq_b1] = (dram->hiquadD[biq_bA1]*temp)+(dram->hiquadD[biq_bB1]*(1.0-temp));
+		dram->hiquadD[biq_b2] = (dram->hiquadD[biq_bA2]*temp)+(dram->hiquadD[biq_bB2]*(1.0-temp));
 		
-		hiquadE[biq_a0] = (hiquadE[biq_aA0]*temp)+(hiquadE[biq_aB0]*(1.0-temp));
-		hiquadE[biq_a1] = (hiquadE[biq_aA1]*temp)+(hiquadE[biq_aB1]*(1.0-temp));
-		hiquadE[biq_a2] = (hiquadE[biq_aA2]*temp)+(hiquadE[biq_aB2]*(1.0-temp));
-		hiquadE[biq_b1] = (hiquadE[biq_bA1]*temp)+(hiquadE[biq_bB1]*(1.0-temp));
-		hiquadE[biq_b2] = (hiquadE[biq_bA2]*temp)+(hiquadE[biq_bB2]*(1.0-temp));
+		dram->hiquadE[biq_a0] = (dram->hiquadE[biq_aA0]*temp)+(dram->hiquadE[biq_aB0]*(1.0-temp));
+		dram->hiquadE[biq_a1] = (dram->hiquadE[biq_aA1]*temp)+(dram->hiquadE[biq_aB1]*(1.0-temp));
+		dram->hiquadE[biq_a2] = (dram->hiquadE[biq_aA2]*temp)+(dram->hiquadE[biq_aB2]*(1.0-temp));
+		dram->hiquadE[biq_b1] = (dram->hiquadE[biq_bA1]*temp)+(dram->hiquadE[biq_bB1]*(1.0-temp));
+		dram->hiquadE[biq_b2] = (dram->hiquadE[biq_bA2]*temp)+(dram->hiquadE[biq_bB2]*(1.0-temp));
 		
-		hiquadF[biq_a0] = (hiquadF[biq_aA0]*temp)+(hiquadF[biq_aB0]*(1.0-temp));
-		hiquadF[biq_a1] = (hiquadF[biq_aA1]*temp)+(hiquadF[biq_aB1]*(1.0-temp));
-		hiquadF[biq_a2] = (hiquadF[biq_aA2]*temp)+(hiquadF[biq_aB2]*(1.0-temp));
-		hiquadF[biq_b1] = (hiquadF[biq_bA1]*temp)+(hiquadF[biq_bB1]*(1.0-temp));
-		hiquadF[biq_b2] = (hiquadF[biq_bA2]*temp)+(hiquadF[biq_bB2]*(1.0-temp));
+		dram->hiquadF[biq_a0] = (dram->hiquadF[biq_aA0]*temp)+(dram->hiquadF[biq_aB0]*(1.0-temp));
+		dram->hiquadF[biq_a1] = (dram->hiquadF[biq_aA1]*temp)+(dram->hiquadF[biq_aB1]*(1.0-temp));
+		dram->hiquadF[biq_a2] = (dram->hiquadF[biq_aA2]*temp)+(dram->hiquadF[biq_aB2]*(1.0-temp));
+		dram->hiquadF[biq_b1] = (dram->hiquadF[biq_bA1]*temp)+(dram->hiquadF[biq_bB1]*(1.0-temp));
+		dram->hiquadF[biq_b2] = (dram->hiquadF[biq_bA2]*temp)+(dram->hiquadF[biq_bB2]*(1.0-temp));
 		
-		hiquadG[biq_a0] = (hiquadG[biq_aA0]*temp)+(hiquadG[biq_aB0]*(1.0-temp));
-		hiquadG[biq_a1] = (hiquadG[biq_aA1]*temp)+(hiquadG[biq_aB1]*(1.0-temp));
-		hiquadG[biq_a2] = (hiquadG[biq_aA2]*temp)+(hiquadG[biq_aB2]*(1.0-temp));
-		hiquadG[biq_b1] = (hiquadG[biq_bA1]*temp)+(hiquadG[biq_bB1]*(1.0-temp));
-		hiquadG[biq_b2] = (hiquadG[biq_bA2]*temp)+(hiquadG[biq_bB2]*(1.0-temp));
+		dram->hiquadG[biq_a0] = (dram->hiquadG[biq_aA0]*temp)+(dram->hiquadG[biq_aB0]*(1.0-temp));
+		dram->hiquadG[biq_a1] = (dram->hiquadG[biq_aA1]*temp)+(dram->hiquadG[biq_aB1]*(1.0-temp));
+		dram->hiquadG[biq_a2] = (dram->hiquadG[biq_aA2]*temp)+(dram->hiquadG[biq_aB2]*(1.0-temp));
+		dram->hiquadG[biq_b1] = (dram->hiquadG[biq_bA1]*temp)+(dram->hiquadG[biq_bB1]*(1.0-temp));
+		dram->hiquadG[biq_b2] = (dram->hiquadG[biq_bA2]*temp)+(dram->hiquadG[biq_bB2]*(1.0-temp));
 		//this is the interpolation code for the hiquad
 		
-		double outSample = (inputSample * hiquadA[biq_a0]) + hiquadA[biq_sL1];
-		hiquadA[biq_sL1] = (inputSample * hiquadA[biq_a1]) - (outSample * hiquadA[biq_b1]) + hiquadA[biq_sL2];
-		hiquadA[biq_sL2] = (inputSample * hiquadA[biq_a2]) - (outSample * hiquadA[biq_b2]);
+		double outSample = (inputSample * dram->hiquadA[biq_a0]) + dram->hiquadA[biq_sL1];
+		dram->hiquadA[biq_sL1] = (inputSample * dram->hiquadA[biq_a1]) - (outSample * dram->hiquadA[biq_b1]) + dram->hiquadA[biq_sL2];
+		dram->hiquadA[biq_sL2] = (inputSample * dram->hiquadA[biq_a2]) - (outSample * dram->hiquadA[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * hiquadB[biq_a0]) + hiquadB[biq_sL1];
-		hiquadB[biq_sL1] = (inputSample * hiquadB[biq_a1]) - (outSample * hiquadB[biq_b1]) + hiquadB[biq_sL2];
-		hiquadB[biq_sL2] = (inputSample * hiquadB[biq_a2]) - (outSample * hiquadB[biq_b2]);
+		outSample = (inputSample * dram->hiquadB[biq_a0]) + dram->hiquadB[biq_sL1];
+		dram->hiquadB[biq_sL1] = (inputSample * dram->hiquadB[biq_a1]) - (outSample * dram->hiquadB[biq_b1]) + dram->hiquadB[biq_sL2];
+		dram->hiquadB[biq_sL2] = (inputSample * dram->hiquadB[biq_a2]) - (outSample * dram->hiquadB[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * hiquadC[biq_a0]) + hiquadC[biq_sL1];
-		hiquadC[biq_sL1] = (inputSample * hiquadC[biq_a1]) - (outSample * hiquadC[biq_b1]) + hiquadC[biq_sL2];
-		hiquadC[biq_sL2] = (inputSample * hiquadC[biq_a2]) - (outSample * hiquadC[biq_b2]);
+		outSample = (inputSample * dram->hiquadC[biq_a0]) + dram->hiquadC[biq_sL1];
+		dram->hiquadC[biq_sL1] = (inputSample * dram->hiquadC[biq_a1]) - (outSample * dram->hiquadC[biq_b1]) + dram->hiquadC[biq_sL2];
+		dram->hiquadC[biq_sL2] = (inputSample * dram->hiquadC[biq_a2]) - (outSample * dram->hiquadC[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * hiquadD[biq_a0]) + hiquadD[biq_sL1];
-		hiquadD[biq_sL1] = (inputSample * hiquadD[biq_a1]) - (outSample * hiquadD[biq_b1]) + hiquadD[biq_sL2];
-		hiquadD[biq_sL2] = (inputSample * hiquadD[biq_a2]) - (outSample * hiquadD[biq_b2]);
+		outSample = (inputSample * dram->hiquadD[biq_a0]) + dram->hiquadD[biq_sL1];
+		dram->hiquadD[biq_sL1] = (inputSample * dram->hiquadD[biq_a1]) - (outSample * dram->hiquadD[biq_b1]) + dram->hiquadD[biq_sL2];
+		dram->hiquadD[biq_sL2] = (inputSample * dram->hiquadD[biq_a2]) - (outSample * dram->hiquadD[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * hiquadE[biq_a0]) + hiquadE[biq_sL1];
-		hiquadE[biq_sL1] = (inputSample * hiquadE[biq_a1]) - (outSample * hiquadE[biq_b1]) + hiquadE[biq_sL2];
-		hiquadE[biq_sL2] = (inputSample * hiquadE[biq_a2]) - (outSample * hiquadE[biq_b2]);
+		outSample = (inputSample * dram->hiquadE[biq_a0]) + dram->hiquadE[biq_sL1];
+		dram->hiquadE[biq_sL1] = (inputSample * dram->hiquadE[biq_a1]) - (outSample * dram->hiquadE[biq_b1]) + dram->hiquadE[biq_sL2];
+		dram->hiquadE[biq_sL2] = (inputSample * dram->hiquadE[biq_a2]) - (outSample * dram->hiquadE[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * hiquadF[biq_a0]) + hiquadF[biq_sL1];
-		hiquadF[biq_sL1] = (inputSample * hiquadF[biq_a1]) - (outSample * hiquadF[biq_b1]) + hiquadF[biq_sL2];
-		hiquadF[biq_sL2] = (inputSample * hiquadF[biq_a2]) - (outSample * hiquadF[biq_b2]);
+		outSample = (inputSample * dram->hiquadF[biq_a0]) + dram->hiquadF[biq_sL1];
+		dram->hiquadF[biq_sL1] = (inputSample * dram->hiquadF[biq_a1]) - (outSample * dram->hiquadF[biq_b1]) + dram->hiquadF[biq_sL2];
+		dram->hiquadF[biq_sL2] = (inputSample * dram->hiquadF[biq_a2]) - (outSample * dram->hiquadF[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * hiquadG[biq_a0]) + hiquadG[biq_sL1];
-		hiquadG[biq_sL1] = (inputSample * hiquadG[biq_a1]) - (outSample * hiquadG[biq_b1]) + hiquadG[biq_sL2];
-		hiquadG[biq_sL2] = (inputSample * hiquadG[biq_a2]) - (outSample * hiquadG[biq_b2]);
+		outSample = (inputSample * dram->hiquadG[biq_a0]) + dram->hiquadG[biq_sL1];
+		dram->hiquadG[biq_sL1] = (inputSample * dram->hiquadG[biq_a1]) - (outSample * dram->hiquadG[biq_b1]) + dram->hiquadG[biq_sL2];
+		dram->hiquadG[biq_sL2] = (inputSample * dram->hiquadG[biq_a2]) - (outSample * dram->hiquadG[biq_b2]);
 		inputSample = outSample;
 		
 		inputSample = (drySample - inputSample);
 		
-		biquadA[biq_a0] = (biquadA[biq_aA0]*temp)+(biquadA[biq_aB0]*(1.0-temp));
-		biquadA[biq_a1] = (biquadA[biq_aA1]*temp)+(biquadA[biq_aB1]*(1.0-temp));
-		biquadA[biq_a2] = (biquadA[biq_aA2]*temp)+(biquadA[biq_aB2]*(1.0-temp));
-		biquadA[biq_b1] = (biquadA[biq_bA1]*temp)+(biquadA[biq_bB1]*(1.0-temp));
-		biquadA[biq_b2] = (biquadA[biq_bA2]*temp)+(biquadA[biq_bB2]*(1.0-temp));
+		dram->biquadA[biq_a0] = (dram->biquadA[biq_aA0]*temp)+(dram->biquadA[biq_aB0]*(1.0-temp));
+		dram->biquadA[biq_a1] = (dram->biquadA[biq_aA1]*temp)+(dram->biquadA[biq_aB1]*(1.0-temp));
+		dram->biquadA[biq_a2] = (dram->biquadA[biq_aA2]*temp)+(dram->biquadA[biq_aB2]*(1.0-temp));
+		dram->biquadA[biq_b1] = (dram->biquadA[biq_bA1]*temp)+(dram->biquadA[biq_bB1]*(1.0-temp));
+		dram->biquadA[biq_b2] = (dram->biquadA[biq_bA2]*temp)+(dram->biquadA[biq_bB2]*(1.0-temp));
 		
-		biquadB[biq_a0] = (biquadB[biq_aA0]*temp)+(biquadB[biq_aB0]*(1.0-temp));
-		biquadB[biq_a1] = (biquadB[biq_aA1]*temp)+(biquadB[biq_aB1]*(1.0-temp));
-		biquadB[biq_a2] = (biquadB[biq_aA2]*temp)+(biquadB[biq_aB2]*(1.0-temp));
-		biquadB[biq_b1] = (biquadB[biq_bA1]*temp)+(biquadB[biq_bB1]*(1.0-temp));
-		biquadB[biq_b2] = (biquadB[biq_bA2]*temp)+(biquadB[biq_bB2]*(1.0-temp));
+		dram->biquadB[biq_a0] = (dram->biquadB[biq_aA0]*temp)+(dram->biquadB[biq_aB0]*(1.0-temp));
+		dram->biquadB[biq_a1] = (dram->biquadB[biq_aA1]*temp)+(dram->biquadB[biq_aB1]*(1.0-temp));
+		dram->biquadB[biq_a2] = (dram->biquadB[biq_aA2]*temp)+(dram->biquadB[biq_aB2]*(1.0-temp));
+		dram->biquadB[biq_b1] = (dram->biquadB[biq_bA1]*temp)+(dram->biquadB[biq_bB1]*(1.0-temp));
+		dram->biquadB[biq_b2] = (dram->biquadB[biq_bA2]*temp)+(dram->biquadB[biq_bB2]*(1.0-temp));
 		
-		biquadC[biq_a0] = (biquadC[biq_aA0]*temp)+(biquadC[biq_aB0]*(1.0-temp));
-		biquadC[biq_a1] = (biquadC[biq_aA1]*temp)+(biquadC[biq_aB1]*(1.0-temp));
-		biquadC[biq_a2] = (biquadC[biq_aA2]*temp)+(biquadC[biq_aB2]*(1.0-temp));
-		biquadC[biq_b1] = (biquadC[biq_bA1]*temp)+(biquadC[biq_bB1]*(1.0-temp));
-		biquadC[biq_b2] = (biquadC[biq_bA2]*temp)+(biquadC[biq_bB2]*(1.0-temp));
+		dram->biquadC[biq_a0] = (dram->biquadC[biq_aA0]*temp)+(dram->biquadC[biq_aB0]*(1.0-temp));
+		dram->biquadC[biq_a1] = (dram->biquadC[biq_aA1]*temp)+(dram->biquadC[biq_aB1]*(1.0-temp));
+		dram->biquadC[biq_a2] = (dram->biquadC[biq_aA2]*temp)+(dram->biquadC[biq_aB2]*(1.0-temp));
+		dram->biquadC[biq_b1] = (dram->biquadC[biq_bA1]*temp)+(dram->biquadC[biq_bB1]*(1.0-temp));
+		dram->biquadC[biq_b2] = (dram->biquadC[biq_bA2]*temp)+(dram->biquadC[biq_bB2]*(1.0-temp));
 		
-		biquadD[biq_a0] = (biquadD[biq_aA0]*temp)+(biquadD[biq_aB0]*(1.0-temp));
-		biquadD[biq_a1] = (biquadD[biq_aA1]*temp)+(biquadD[biq_aB1]*(1.0-temp));
-		biquadD[biq_a2] = (biquadD[biq_aA2]*temp)+(biquadD[biq_aB2]*(1.0-temp));
-		biquadD[biq_b1] = (biquadD[biq_bA1]*temp)+(biquadD[biq_bB1]*(1.0-temp));
-		biquadD[biq_b2] = (biquadD[biq_bA2]*temp)+(biquadD[biq_bB2]*(1.0-temp));
+		dram->biquadD[biq_a0] = (dram->biquadD[biq_aA0]*temp)+(dram->biquadD[biq_aB0]*(1.0-temp));
+		dram->biquadD[biq_a1] = (dram->biquadD[biq_aA1]*temp)+(dram->biquadD[biq_aB1]*(1.0-temp));
+		dram->biquadD[biq_a2] = (dram->biquadD[biq_aA2]*temp)+(dram->biquadD[biq_aB2]*(1.0-temp));
+		dram->biquadD[biq_b1] = (dram->biquadD[biq_bA1]*temp)+(dram->biquadD[biq_bB1]*(1.0-temp));
+		dram->biquadD[biq_b2] = (dram->biquadD[biq_bA2]*temp)+(dram->biquadD[biq_bB2]*(1.0-temp));
 		
-		biquadE[biq_a0] = (biquadE[biq_aA0]*temp)+(biquadE[biq_aB0]*(1.0-temp));
-		biquadE[biq_a1] = (biquadE[biq_aA1]*temp)+(biquadE[biq_aB1]*(1.0-temp));
-		biquadE[biq_a2] = (biquadE[biq_aA2]*temp)+(biquadE[biq_aB2]*(1.0-temp));
-		biquadE[biq_b1] = (biquadE[biq_bA1]*temp)+(biquadE[biq_bB1]*(1.0-temp));
-		biquadE[biq_b2] = (biquadE[biq_bA2]*temp)+(biquadE[biq_bB2]*(1.0-temp));
+		dram->biquadE[biq_a0] = (dram->biquadE[biq_aA0]*temp)+(dram->biquadE[biq_aB0]*(1.0-temp));
+		dram->biquadE[biq_a1] = (dram->biquadE[biq_aA1]*temp)+(dram->biquadE[biq_aB1]*(1.0-temp));
+		dram->biquadE[biq_a2] = (dram->biquadE[biq_aA2]*temp)+(dram->biquadE[biq_aB2]*(1.0-temp));
+		dram->biquadE[biq_b1] = (dram->biquadE[biq_bA1]*temp)+(dram->biquadE[biq_bB1]*(1.0-temp));
+		dram->biquadE[biq_b2] = (dram->biquadE[biq_bA2]*temp)+(dram->biquadE[biq_bB2]*(1.0-temp));
 		
-		biquadF[biq_a0] = (biquadF[biq_aA0]*temp)+(biquadF[biq_aB0]*(1.0-temp));
-		biquadF[biq_a1] = (biquadF[biq_aA1]*temp)+(biquadF[biq_aB1]*(1.0-temp));
-		biquadF[biq_a2] = (biquadF[biq_aA2]*temp)+(biquadF[biq_aB2]*(1.0-temp));
-		biquadF[biq_b1] = (biquadF[biq_bA1]*temp)+(biquadF[biq_bB1]*(1.0-temp));
-		biquadF[biq_b2] = (biquadF[biq_bA2]*temp)+(biquadF[biq_bB2]*(1.0-temp));
+		dram->biquadF[biq_a0] = (dram->biquadF[biq_aA0]*temp)+(dram->biquadF[biq_aB0]*(1.0-temp));
+		dram->biquadF[biq_a1] = (dram->biquadF[biq_aA1]*temp)+(dram->biquadF[biq_aB1]*(1.0-temp));
+		dram->biquadF[biq_a2] = (dram->biquadF[biq_aA2]*temp)+(dram->biquadF[biq_aB2]*(1.0-temp));
+		dram->biquadF[biq_b1] = (dram->biquadF[biq_bA1]*temp)+(dram->biquadF[biq_bB1]*(1.0-temp));
+		dram->biquadF[biq_b2] = (dram->biquadF[biq_bA2]*temp)+(dram->biquadF[biq_bB2]*(1.0-temp));
 		
-		biquadG[biq_a0] = (biquadG[biq_aA0]*temp)+(biquadG[biq_aB0]*(1.0-temp));
-		biquadG[biq_a1] = (biquadG[biq_aA1]*temp)+(biquadG[biq_aB1]*(1.0-temp));
-		biquadG[biq_a2] = (biquadG[biq_aA2]*temp)+(biquadG[biq_aB2]*(1.0-temp));
-		biquadG[biq_b1] = (biquadG[biq_bA1]*temp)+(biquadG[biq_bB1]*(1.0-temp));
-		biquadG[biq_b2] = (biquadG[biq_bA2]*temp)+(biquadG[biq_bB2]*(1.0-temp));
+		dram->biquadG[biq_a0] = (dram->biquadG[biq_aA0]*temp)+(dram->biquadG[biq_aB0]*(1.0-temp));
+		dram->biquadG[biq_a1] = (dram->biquadG[biq_aA1]*temp)+(dram->biquadG[biq_aB1]*(1.0-temp));
+		dram->biquadG[biq_a2] = (dram->biquadG[biq_aA2]*temp)+(dram->biquadG[biq_aB2]*(1.0-temp));
+		dram->biquadG[biq_b1] = (dram->biquadG[biq_bA1]*temp)+(dram->biquadG[biq_bB1]*(1.0-temp));
+		dram->biquadG[biq_b2] = (dram->biquadG[biq_bA2]*temp)+(dram->biquadG[biq_bB2]*(1.0-temp));
 		//this is the interpolation code for the biquad
 		
-		outSample = (inputSample * biquadA[biq_a0]) + biquadA[biq_sL1];
-		biquadA[biq_sL1] = (inputSample * biquadA[biq_a1]) - (outSample * biquadA[biq_b1]) + biquadA[biq_sL2];
-		biquadA[biq_sL2] = (inputSample * biquadA[biq_a2]) - (outSample * biquadA[biq_b2]);
+		outSample = (inputSample * dram->biquadA[biq_a0]) + dram->biquadA[biq_sL1];
+		dram->biquadA[biq_sL1] = (inputSample * dram->biquadA[biq_a1]) - (outSample * dram->biquadA[biq_b1]) + dram->biquadA[biq_sL2];
+		dram->biquadA[biq_sL2] = (inputSample * dram->biquadA[biq_a2]) - (outSample * dram->biquadA[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * biquadB[biq_a0]) + biquadB[biq_sL1];
-		biquadB[biq_sL1] = (inputSample * biquadB[biq_a1]) - (outSample * biquadB[biq_b1]) + biquadB[biq_sL2];
-		biquadB[biq_sL2] = (inputSample * biquadB[biq_a2]) - (outSample * biquadB[biq_b2]);
+		outSample = (inputSample * dram->biquadB[biq_a0]) + dram->biquadB[biq_sL1];
+		dram->biquadB[biq_sL1] = (inputSample * dram->biquadB[biq_a1]) - (outSample * dram->biquadB[biq_b1]) + dram->biquadB[biq_sL2];
+		dram->biquadB[biq_sL2] = (inputSample * dram->biquadB[biq_a2]) - (outSample * dram->biquadB[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * biquadC[biq_a0]) + biquadC[biq_sL1];
-		biquadC[biq_sL1] = (inputSample * biquadC[biq_a1]) - (outSample * biquadC[biq_b1]) + biquadC[biq_sL2];
-		biquadC[biq_sL2] = (inputSample * biquadC[biq_a2]) - (outSample * biquadC[biq_b2]);
+		outSample = (inputSample * dram->biquadC[biq_a0]) + dram->biquadC[biq_sL1];
+		dram->biquadC[biq_sL1] = (inputSample * dram->biquadC[biq_a1]) - (outSample * dram->biquadC[biq_b1]) + dram->biquadC[biq_sL2];
+		dram->biquadC[biq_sL2] = (inputSample * dram->biquadC[biq_a2]) - (outSample * dram->biquadC[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * biquadD[biq_a0]) + biquadD[biq_sL1];
-		biquadD[biq_sL1] = (inputSample * biquadD[biq_a1]) - (outSample * biquadD[biq_b1]) + biquadD[biq_sL2];
-		biquadD[biq_sL2] = (inputSample * biquadD[biq_a2]) - (outSample * biquadD[biq_b2]);
+		outSample = (inputSample * dram->biquadD[biq_a0]) + dram->biquadD[biq_sL1];
+		dram->biquadD[biq_sL1] = (inputSample * dram->biquadD[biq_a1]) - (outSample * dram->biquadD[biq_b1]) + dram->biquadD[biq_sL2];
+		dram->biquadD[biq_sL2] = (inputSample * dram->biquadD[biq_a2]) - (outSample * dram->biquadD[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * biquadE[biq_a0]) + biquadE[biq_sL1];
-		biquadE[biq_sL1] = (inputSample * biquadE[biq_a1]) - (outSample * biquadE[biq_b1]) + biquadE[biq_sL2];
-		biquadE[biq_sL2] = (inputSample * biquadE[biq_a2]) - (outSample * biquadE[biq_b2]);
+		outSample = (inputSample * dram->biquadE[biq_a0]) + dram->biquadE[biq_sL1];
+		dram->biquadE[biq_sL1] = (inputSample * dram->biquadE[biq_a1]) - (outSample * dram->biquadE[biq_b1]) + dram->biquadE[biq_sL2];
+		dram->biquadE[biq_sL2] = (inputSample * dram->biquadE[biq_a2]) - (outSample * dram->biquadE[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * biquadF[biq_a0]) + biquadF[biq_sL1];
-		biquadF[biq_sL1] = (inputSample * biquadF[biq_a1]) - (outSample * biquadF[biq_b1]) + biquadF[biq_sL2];
-		biquadF[biq_sL2] = (inputSample * biquadF[biq_a2]) - (outSample * biquadF[biq_b2]);
+		outSample = (inputSample * dram->biquadF[biq_a0]) + dram->biquadF[biq_sL1];
+		dram->biquadF[biq_sL1] = (inputSample * dram->biquadF[biq_a1]) - (outSample * dram->biquadF[biq_b1]) + dram->biquadF[biq_sL2];
+		dram->biquadF[biq_sL2] = (inputSample * dram->biquadF[biq_a2]) - (outSample * dram->biquadF[biq_b2]);
 		inputSample = outSample;
 		
-		outSample = (inputSample * biquadG[biq_a0]) + biquadG[biq_sL1];
-		biquadG[biq_sL1] = (inputSample * biquadG[biq_a1]) - (outSample * biquadG[biq_b1]) + biquadG[biq_sL2];
-		biquadG[biq_sL2] = (inputSample * biquadG[biq_a2]) - (outSample * biquadG[biq_b2]);
+		outSample = (inputSample * dram->biquadG[biq_a0]) + dram->biquadG[biq_sL1];
+		dram->biquadG[biq_sL1] = (inputSample * dram->biquadG[biq_a1]) - (outSample * dram->biquadG[biq_b1]) + dram->biquadG[biq_sL2];
+		dram->biquadG[biq_sL2] = (inputSample * dram->biquadG[biq_a2]) - (outSample * dram->biquadG[biq_b2]);
 		inputSample = outSample;
 		
 		
@@ -517,20 +518,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	for (int x = 0; x < biq_total; x++) {
-		biquadA[x] = 0.0;
-		biquadB[x] = 0.0;
-		biquadC[x] = 0.0;
-		biquadD[x] = 0.0;
-		biquadE[x] = 0.0;
-		biquadF[x] = 0.0;
-		biquadG[x] = 0.0;
-		hiquadA[x] = 0.0;
-		hiquadB[x] = 0.0;
-		hiquadC[x] = 0.0;
-		hiquadD[x] = 0.0;
-		hiquadE[x] = 0.0;
-		hiquadF[x] = 0.0;
-		hiquadG[x] = 0.0;
+		dram->biquadA[x] = 0.0;
+		dram->biquadB[x] = 0.0;
+		dram->biquadC[x] = 0.0;
+		dram->biquadD[x] = 0.0;
+		dram->biquadE[x] = 0.0;
+		dram->biquadF[x] = 0.0;
+		dram->biquadG[x] = 0.0;
+		dram->hiquadA[x] = 0.0;
+		dram->hiquadB[x] = 0.0;
+		dram->hiquadC[x] = 0.0;
+		dram->hiquadD[x] = 0.0;
+		dram->hiquadE[x] = 0.0;
+		dram->hiquadF[x] = 0.0;
+		dram->hiquadG[x] = 0.0;
 	}
 	
 	lastSampleL = 0.0;

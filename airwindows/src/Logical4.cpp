@@ -117,15 +117,17 @@ enum { kNumTemplateParameters = 6 };
 	bool fpFlip;
 	uint32_t fpdL;
 	uint32_t fpdR;
-#include "../include/template2.h"
-struct _dram {
-	Float64 dL[1000];
+
+	struct _dram {
+		Float64 dL[1000];
 	Float64 bL[1000];
 	Float64 cL[1000];
 	Float64 dR[1000];
 	Float64 bR[1000];
 	Float64 cR[1000];
-};
+	};
+	_dram* dram;
+#include "../include/template2.h"
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 

@@ -34,7 +34,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		enum {
@@ -62,15 +61,17 @@ struct _kernel {
 			biq_total
 		};
 		
-		double biquad[biq_total];
 		
 		uint32_t fpd;
+	
+	struct _dram {
+			double biquad[biq_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -84,11 +85,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	int type = GetParameter( kParam_One);
 	
-	biquad[biq_freq] = ((pow(GetParameter( kParam_Two ),3)*20000.0)/GetSampleRate());
-	if (biquad[biq_freq] < 0.0001) biquad[biq_freq] = 0.0001;
+	dram->biquad[biq_freq] = ((pow(GetParameter( kParam_Two ),3)*20000.0)/GetSampleRate());
+	if (dram->biquad[biq_freq] < 0.0001) dram->biquad[biq_freq] = 0.0001;
 	
-    biquad[biq_reso] = GetParameter( kParam_Three );
-	if (biquad[biq_reso] < 0.0001) biquad[biq_reso] = 0.0001;
+    dram->biquad[biq_reso] = GetParameter( kParam_Three );
+	if (dram->biquad[biq_reso] < 0.0001) dram->biquad[biq_reso] = 0.0001;
 	
 	Float64 wet = GetParameter( kParam_Four );
 	
@@ -110,60 +111,60 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//or in this 'read the controls' area (for letting you change freq and res with controls)
 	//or in 'reset' if the freq and res are absolutely fixed (use GetSampleRate to define freq)
 	
-	biquad[biq_aA0] = biquad[biq_aB0];
-	biquad[biq_aA1] = biquad[biq_aB1];
-	biquad[biq_aA2] = biquad[biq_aB2];
-	biquad[biq_bA1] = biquad[biq_bB1];
-	biquad[biq_bA2] = biquad[biq_bB2];
+	dram->biquad[biq_aA0] = dram->biquad[biq_aB0];
+	dram->biquad[biq_aA1] = dram->biquad[biq_aB1];
+	dram->biquad[biq_aA2] = dram->biquad[biq_aB2];
+	dram->biquad[biq_bA1] = dram->biquad[biq_bB1];
+	dram->biquad[biq_bA2] = dram->biquad[biq_bB2];
 	//previous run through the buffer is still in the filter, so we move it
 	//to the A section and now it's the new starting point.
 	
 	if (type == 1) { //lowpass
-		double K = tan(M_PI * biquad[biq_freq]);
-		double norm = 1.0 / (1.0 + K / biquad[biq_reso] + K * K);
-		biquad[biq_aB0] = K * K * norm;
-		biquad[biq_aB1] = 2.0 * biquad[biq_aB0];
-		biquad[biq_aB2] = biquad[biq_aB0];
-		biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-		biquad[biq_bB2] = (1.0 - K / biquad[biq_reso] + K * K) * norm;
+		double K = tan(M_PI * dram->biquad[biq_freq]);
+		double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+		dram->biquad[biq_aB0] = K * K * norm;
+		dram->biquad[biq_aB1] = 2.0 * dram->biquad[biq_aB0];
+		dram->biquad[biq_aB2] = dram->biquad[biq_aB0];
+		dram->biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+		dram->biquad[biq_bB2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
 	}
 	
 	if (type == 2) { //highpass
-		double K = tan(M_PI * biquad[biq_freq]);
-		double norm = 1.0 / (1.0 + K / biquad[biq_reso] + K * K);
-		biquad[biq_aB0] = norm;
-		biquad[biq_aB1] = -2.0 * biquad[biq_aB0];
-		biquad[biq_aB2] = biquad[biq_aB0];
-		biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-		biquad[biq_bB2] = (1.0 - K / biquad[biq_reso] + K * K) * norm;
+		double K = tan(M_PI * dram->biquad[biq_freq]);
+		double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+		dram->biquad[biq_aB0] = norm;
+		dram->biquad[biq_aB1] = -2.0 * dram->biquad[biq_aB0];
+		dram->biquad[biq_aB2] = dram->biquad[biq_aB0];
+		dram->biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+		dram->biquad[biq_bB2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
 	}
 	
 	if (type == 3) { //bandpass
-		double K = tan(M_PI * biquad[biq_freq]);
-		double norm = 1.0 / (1.0 + K / biquad[biq_reso] + K * K);
-		biquad[biq_aB0] = K / biquad[biq_reso] * norm;
-		biquad[biq_aB1] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
-		biquad[biq_aB2] = -biquad[biq_aB0];
-		biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
-		biquad[biq_bB2] = (1.0 - K / biquad[biq_reso] + K * K) * norm;
+		double K = tan(M_PI * dram->biquad[biq_freq]);
+		double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+		dram->biquad[biq_aB0] = K / dram->biquad[biq_reso] * norm;
+		dram->biquad[biq_aB1] = 0.0; //bandpass can simplify the biquad kernel: leave out this multiply
+		dram->biquad[biq_aB2] = -dram->biquad[biq_aB0];
+		dram->biquad[biq_bB1] = 2.0 * (K * K - 1.0) * norm;
+		dram->biquad[biq_bB2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
 	}
 	
 	if (type == 4) { //notch
-		double K = tan(M_PI * biquad[biq_freq]);
-		double norm = 1.0 / (1.0 + K / biquad[biq_reso] + K * K);
-		biquad[biq_aB0] = (1.0 + K * K) * norm;
-		biquad[biq_aB1] = 2.0 * (K * K - 1) * norm;
-		biquad[biq_aB2] = biquad[biq_aB0];
-		biquad[biq_bB1] = biquad[biq_aB1];
-		biquad[biq_bB2] = (1.0 - K / biquad[biq_reso] + K * K) * norm;
+		double K = tan(M_PI * dram->biquad[biq_freq]);
+		double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+		dram->biquad[biq_aB0] = (1.0 + K * K) * norm;
+		dram->biquad[biq_aB1] = 2.0 * (K * K - 1) * norm;
+		dram->biquad[biq_aB2] = dram->biquad[biq_aB0];
+		dram->biquad[biq_bB1] = dram->biquad[biq_aB1];
+		dram->biquad[biq_bB2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
 	}
 	
-	if (biquad[biq_aA0] == 0.0) { // if we have just started, start directly with raw info
-		biquad[biq_aA0] = biquad[biq_aB0];
-		biquad[biq_aA1] = biquad[biq_aB1];
-		biquad[biq_aA2] = biquad[biq_aB2];
-		biquad[biq_bA1] = biquad[biq_bB1];
-		biquad[biq_bA2] = biquad[biq_bB2];
+	if (dram->biquad[biq_aA0] == 0.0) { // if we have just started, start directly with raw info
+		dram->biquad[biq_aA0] = dram->biquad[biq_aB0];
+		dram->biquad[biq_aA1] = dram->biquad[biq_aB1];
+		dram->biquad[biq_aA2] = dram->biquad[biq_aB2];
+		dram->biquad[biq_bA1] = dram->biquad[biq_bB1];
+		dram->biquad[biq_bA2] = dram->biquad[biq_bB2];
 	}
 	
 	while (nSampleFrames-- > 0) {
@@ -172,14 +173,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		double drySample = *sourceP;
 		
 		double buf = (double)nSampleFrames/inFramesToProcess;
-		biquad[biq_a0] = (biquad[biq_aA0]*buf)+(biquad[biq_aB0]*(1.0-buf));
-		biquad[biq_a1] = (biquad[biq_aA1]*buf)+(biquad[biq_aB1]*(1.0-buf));
-		biquad[biq_a2] = (biquad[biq_aA2]*buf)+(biquad[biq_aB2]*(1.0-buf));
-		biquad[biq_b1] = (biquad[biq_bA1]*buf)+(biquad[biq_bB1]*(1.0-buf));
-		biquad[biq_b2] = (biquad[biq_bA2]*buf)+(biquad[biq_bB2]*(1.0-buf));
-		double tempSample = (inputSample * biquad[biq_a0]) + biquad[biq_sL1];
-		biquad[biq_sL1] = (inputSample * biquad[biq_a1]) - (tempSample * biquad[biq_b1]) + biquad[biq_sL2];
-		biquad[biq_sL2] = (inputSample * biquad[biq_a2]) - (tempSample * biquad[biq_b2]);
+		dram->biquad[biq_a0] = (dram->biquad[biq_aA0]*buf)+(dram->biquad[biq_aB0]*(1.0-buf));
+		dram->biquad[biq_a1] = (dram->biquad[biq_aA1]*buf)+(dram->biquad[biq_aB1]*(1.0-buf));
+		dram->biquad[biq_a2] = (dram->biquad[biq_aA2]*buf)+(dram->biquad[biq_aB2]*(1.0-buf));
+		dram->biquad[biq_b1] = (dram->biquad[biq_bA1]*buf)+(dram->biquad[biq_bB1]*(1.0-buf));
+		dram->biquad[biq_b2] = (dram->biquad[biq_bA2]*buf)+(dram->biquad[biq_bB2]*(1.0-buf));
+		double tempSample = (inputSample * dram->biquad[biq_a0]) + dram->biquad[biq_sL1];
+		dram->biquad[biq_sL1] = (inputSample * dram->biquad[biq_a1]) - (tempSample * dram->biquad[biq_b1]) + dram->biquad[biq_sL2];
+		dram->biquad[biq_sL2] = (inputSample * dram->biquad[biq_a2]) - (tempSample * dram->biquad[biq_b2]);
 		inputSample = tempSample;
 		
 		
@@ -203,7 +204,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < biq_total; x++) {biquad[x] = 0.0;}
+	for (int x = 0; x < biq_total; x++) {dram->biquad[x] = 0.0;}
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

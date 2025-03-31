@@ -83,7 +83,6 @@ enum { kNumTemplateParameters = 6 };
 		threshold9,
 		gslew_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
-	double gslew[gslew_total]; //end bias	
 	
 	double iirMidRollerL;
 	double iirLowCutoffL;
@@ -106,8 +105,6 @@ enum { kNumTemplateParameters = 6 };
 		hdb_sR2,
 		hdb_total
 	}; //fixed frequency biquad filter for ultrasonics, stereo
-	double hdbA[hdb_total];
-	double hdbB[hdb_total];
 	
 	double iirDecL;
 	double iirDecR;
@@ -123,11 +120,16 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
-#include "../include/template2.h"
-struct _dram {
-	double dL[1002];
+
+	struct _dram {
+		double dL[1002];
 	double dR[1002];
-};
+	double gslew[gslew_total]; //end bias	
+	double hdbA[hdb_total];
+	double hdbB[hdb_total];
+	};
+	_dram* dram;
+#include "../include/template2.h"
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -152,45 +154,45 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	if (bias > 0.0) underBias = 0.0;
 	if (bias < 0.0) overBias = 1.0/overallscale;
 	
-	gslew[threshold9] = overBias;
+	dram->gslew[threshold9] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold8] = overBias;
+	dram->gslew[threshold8] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold7] = overBias;
+	dram->gslew[threshold7] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold6] = overBias;
+	dram->gslew[threshold6] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold5] = overBias;
+	dram->gslew[threshold5] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold4] = overBias;
+	dram->gslew[threshold4] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold3] = overBias;
+	dram->gslew[threshold3] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold2] = overBias;
+	dram->gslew[threshold2] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold1] = overBias;
+	dram->gslew[threshold1] = overBias;
 	overBias *= 1.618033988749894848204586;
 	
 	double headBumpDrive = (GetParameter( kParam_G )*0.1)/overallscale;
 	double headBumpMix = GetParameter( kParam_G )*0.5;
 	
-	hdbA[hdb_freq] = GetParameter( kParam_H )/GetSampleRate();
-	hdbB[hdb_freq] = hdbA[hdb_freq]*0.9375;
-	hdbB[hdb_reso] = hdbA[hdb_reso] = 0.618033988749894848204586;
-	hdbB[hdb_a1] = hdbA[hdb_a1] = 0.0;
+	dram->hdbA[hdb_freq] = GetParameter( kParam_H )/GetSampleRate();
+	dram->hdbB[hdb_freq] = dram->hdbA[hdb_freq]*0.9375;
+	dram->hdbB[hdb_reso] = dram->hdbA[hdb_reso] = 0.618033988749894848204586;
+	dram->hdbB[hdb_a1] = dram->hdbA[hdb_a1] = 0.0;
 	
-	double K = tan(M_PI * hdbA[hdb_freq]);
-	double norm = 1.0 / (1.0 + K / hdbA[hdb_reso] + K * K);
-	hdbA[hdb_a0] = K / hdbA[hdb_reso] * norm;
-	hdbA[hdb_a2] = -hdbA[hdb_a0];
-	hdbA[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
-	hdbA[hdb_b2] = (1.0 - K / hdbA[hdb_reso] + K * K) * norm;
-	K = tan(M_PI * hdbB[hdb_freq]);
-	norm = 1.0 / (1.0 + K / hdbB[hdb_reso] + K * K);
-	hdbB[hdb_a0] = K / hdbB[hdb_reso] * norm;
-	hdbB[hdb_a2] = -hdbB[hdb_a0];
-	hdbB[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
-	hdbB[hdb_b2] = (1.0 - K / hdbB[hdb_reso] + K * K) * norm;
+	double K = tan(M_PI * dram->hdbA[hdb_freq]);
+	double norm = 1.0 / (1.0 + K / dram->hdbA[hdb_reso] + K * K);
+	dram->hdbA[hdb_a0] = K / dram->hdbA[hdb_reso] * norm;
+	dram->hdbA[hdb_a2] = -dram->hdbA[hdb_a0];
+	dram->hdbA[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hdbA[hdb_b2] = (1.0 - K / dram->hdbA[hdb_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hdbB[hdb_freq]);
+	norm = 1.0 / (1.0 + K / dram->hdbB[hdb_reso] + K * K);
+	dram->hdbB[hdb_a0] = K / dram->hdbB[hdb_reso] * norm;
+	dram->hdbB[hdb_a2] = -dram->hdbB[hdb_a0];
+	dram->hdbB[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hdbB[hdb_b2] = (1.0 - K / dram->hdbB[hdb_reso] + K * K) * norm;
 
 	double outlyAmount = pow(GetParameter( kParam_I ),3)*0.109744;
 	double iirDecFreq = GetParameter( kParam_J )/overallscale;
@@ -265,17 +267,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (fabs(bias) > 0.001) {
 			for (int x = 0; x < gslew_total; x += 3) {
 				if (underBias > 0.0) {
-					double stuck = fabs(inputSampleL - (gslew[x]/0.975)) / underBias;
-					if (stuck < 1.0) inputSampleL = (inputSampleL * stuck) + ((gslew[x]/0.975)*(1.0-stuck));
-					stuck =  fabs(inputSampleR - (gslew[x+1]/0.975)) / underBias;
-					if (stuck < 1.0) inputSampleR = (inputSampleR * stuck) + ((gslew[x+1]/0.975)*(1.0-stuck));
+					double stuck = fabs(inputSampleL - (dram->gslew[x]/0.975)) / underBias;
+					if (stuck < 1.0) inputSampleL = (inputSampleL * stuck) + ((dram->gslew[x]/0.975)*(1.0-stuck));
+					stuck =  fabs(inputSampleR - (dram->gslew[x+1]/0.975)) / underBias;
+					if (stuck < 1.0) inputSampleR = (inputSampleR * stuck) + ((dram->gslew[x+1]/0.975)*(1.0-stuck));
 				}
-				if ((inputSampleL - gslew[x]) > gslew[x+2]) inputSampleL = gslew[x] + gslew[x+2];
-				if (-(inputSampleL - gslew[x]) > gslew[x+2]) inputSampleL = gslew[x] - gslew[x+2];
-				gslew[x] = inputSampleL * 0.975;
-				if ((inputSampleR - gslew[x+1]) > gslew[x+2]) inputSampleR = gslew[x+1] + gslew[x+2];
-				if (-(inputSampleR - gslew[x+1]) > gslew[x+2]) inputSampleR = gslew[x+1] - gslew[x+2];
-				gslew[x+1] = inputSampleR * 0.975;
+				if ((inputSampleL - dram->gslew[x]) > dram->gslew[x+2]) inputSampleL = dram->gslew[x] + dram->gslew[x+2];
+				if (-(inputSampleL - dram->gslew[x]) > dram->gslew[x+2]) inputSampleL = dram->gslew[x] - dram->gslew[x+2];
+				dram->gslew[x] = inputSampleL * 0.975;
+				if ((inputSampleR - dram->gslew[x+1]) > dram->gslew[x+2]) inputSampleR = dram->gslew[x+1] + dram->gslew[x+2];
+				if (-(inputSampleR - dram->gslew[x+1]) > dram->gslew[x+2]) inputSampleR = dram->gslew[x+1] - dram->gslew[x+2];
+				dram->gslew[x+1] = inputSampleR * 0.975;
 			}
 		}
 		//end bias routine
@@ -322,18 +324,18 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			headBumpL -= (headBumpL * headBumpL * headBumpL * (0.0618/sqrt(overallscale)));
 			headBumpR += (LowsSampleR * headBumpDrive);
 			headBumpR -= (headBumpR * headBumpR * headBumpR * (0.0618/sqrt(overallscale)));
-			double headBiqSampleL = (headBumpL * hdbA[hdb_a0]) + hdbA[hdb_sL1];
-			hdbA[hdb_sL1] = (headBumpL * hdbA[hdb_a1]) - (headBiqSampleL * hdbA[hdb_b1]) + hdbA[hdb_sL2];
-			hdbA[hdb_sL2] = (headBumpL * hdbA[hdb_a2]) - (headBiqSampleL * hdbA[hdb_b2]);
-			headBumpSampleL = (headBiqSampleL * hdbB[hdb_a0]) + hdbB[hdb_sL1];
-			hdbB[hdb_sL1] = (headBiqSampleL * hdbB[hdb_a1]) - (headBumpSampleL * hdbB[hdb_b1]) + hdbB[hdb_sL2];
-			hdbB[hdb_sL2] = (headBiqSampleL * hdbB[hdb_a2]) - (headBumpSampleL * hdbB[hdb_b2]);
-			double headBiqSampleR = (headBumpR * hdbA[hdb_a0]) + hdbA[hdb_sR1];
-			hdbA[hdb_sR1] = (headBumpR * hdbA[hdb_a1]) - (headBiqSampleR * hdbA[hdb_b1]) + hdbA[hdb_sR2];
-			hdbA[hdb_sR2] = (headBumpR * hdbA[hdb_a2]) - (headBiqSampleR * hdbA[hdb_b2]);
-			headBumpSampleR = (headBiqSampleR * hdbB[hdb_a0]) + hdbB[hdb_sR1];
-			hdbB[hdb_sR1] = (headBiqSampleR * hdbB[hdb_a1]) - (headBumpSampleR * hdbB[hdb_b1]) + hdbB[hdb_sR2];
-			hdbB[hdb_sR2] = (headBiqSampleR * hdbB[hdb_a2]) - (headBumpSampleR * hdbB[hdb_b2]);
+			double headBiqSampleL = (headBumpL * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sL1];
+			dram->hdbA[hdb_sL1] = (headBumpL * dram->hdbA[hdb_a1]) - (headBiqSampleL * dram->hdbA[hdb_b1]) + dram->hdbA[hdb_sL2];
+			dram->hdbA[hdb_sL2] = (headBumpL * dram->hdbA[hdb_a2]) - (headBiqSampleL * dram->hdbA[hdb_b2]);
+			headBumpSampleL = (headBiqSampleL * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sL1];
+			dram->hdbB[hdb_sL1] = (headBiqSampleL * dram->hdbB[hdb_a1]) - (headBumpSampleL * dram->hdbB[hdb_b1]) + dram->hdbB[hdb_sL2];
+			dram->hdbB[hdb_sL2] = (headBiqSampleL * dram->hdbB[hdb_a2]) - (headBumpSampleL * dram->hdbB[hdb_b2]);
+			double headBiqSampleR = (headBumpR * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sR1];
+			dram->hdbA[hdb_sR1] = (headBumpR * dram->hdbA[hdb_a1]) - (headBiqSampleR * dram->hdbA[hdb_b1]) + dram->hdbA[hdb_sR2];
+			dram->hdbA[hdb_sR2] = (headBumpR * dram->hdbA[hdb_a2]) - (headBiqSampleR * dram->hdbA[hdb_b2]);
+			headBumpSampleR = (headBiqSampleR * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sR1];
+			dram->hdbB[hdb_sR1] = (headBiqSampleR * dram->hdbB[hdb_a1]) - (headBumpSampleR * dram->hdbB[hdb_b1]) + dram->hdbB[hdb_sR2];
+			dram->hdbB[hdb_sR2] = (headBiqSampleR * dram->hdbB[hdb_a2]) - (headBumpSampleR * dram->hdbB[hdb_b2]);
 		}
 		//end HeadBump
 		
@@ -423,7 +425,7 @@ int _airwindowsAlgorithm::reset(void) {
 	nextmaxR = 0.5;
 	gcount = 0;	
 	
-	for (int x = 0; x < gslew_total; x++) gslew[x] = 0.0;
+	for (int x = 0; x < gslew_total; x++) dram->gslew[x] = 0.0;
 
 	iirMidRollerL = 0.0;
 	iirLowCutoffL = 0.0;
@@ -432,7 +434,7 @@ int _airwindowsAlgorithm::reset(void) {
 
 	headBumpL = 0.0;
 	headBumpR = 0.0;
-	for (int x = 0; x < hdb_total; x++) {hdbA[x] = 0.0;hdbB[x] = 0.0;}
+	for (int x = 0; x < hdb_total; x++) {dram->hdbA[x] = 0.0;dram->hdbB[x] = 0.0;}
 	//from ZBandpass, so I can use enums with it	
 	
 	iirDecL = 0.0;

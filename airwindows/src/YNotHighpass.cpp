@@ -38,7 +38,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		enum {
@@ -55,7 +54,6 @@ struct _kernel {
 			biq_sR2,
 			biq_total
 		}; //coefficient interpolating biquad filter, stereo
-		double biquad[biq_total];
 		
 		enum {
 			fix_freq,
@@ -71,16 +69,19 @@ struct _kernel {
 			fix_sR2,
 			fix_total
 		}; //fixed frequency biquad filter for ultrasonics, stereo
-		double fixA[fix_total];
-		double fixB[fix_total];
 		
 		uint32_t fpd;
+	
+	struct _dram {
+			double biquad[biq_total];
+		double fixA[fix_total];
+		double fixB[fix_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -94,17 +95,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	double inTrim = GetParameter( kParam_One )*10.0;
 	
-	biquad[biq_freq] = pow(GetParameter( kParam_Two ),3)*20000.0;
-	if (biquad[biq_freq] < 15.0) biquad[biq_freq] = 15.0;
-	biquad[biq_freq] /= GetSampleRate();
-    biquad[biq_reso] = (pow(GetParameter( kParam_Three ),2)*15.0)+0.5571;
-	double K = tan(M_PI * biquad[biq_freq]);
-	double norm = 1.0 / (1.0 + K / biquad[biq_reso] + K * K);
-	biquad[biq_a0] = norm;
-	biquad[biq_a1] = -2.0 * biquad[biq_a0];
-	biquad[biq_a2] = biquad[biq_a0];
-	biquad[biq_b1] = 2.0 * (K * K - 1.0) * norm;
-	biquad[biq_b2] = (1.0 - K / biquad[biq_reso] + K * K) * norm;
+	dram->biquad[biq_freq] = pow(GetParameter( kParam_Two ),3)*20000.0;
+	if (dram->biquad[biq_freq] < 15.0) dram->biquad[biq_freq] = 15.0;
+	dram->biquad[biq_freq] /= GetSampleRate();
+    dram->biquad[biq_reso] = (pow(GetParameter( kParam_Three ),2)*15.0)+0.5571;
+	double K = tan(M_PI * dram->biquad[biq_freq]);
+	double norm = 1.0 / (1.0 + K / dram->biquad[biq_reso] + K * K);
+	dram->biquad[biq_a0] = norm;
+	dram->biquad[biq_a1] = -2.0 * dram->biquad[biq_a0];
+	dram->biquad[biq_a2] = dram->biquad[biq_a0];
+	dram->biquad[biq_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->biquad[biq_b2] = (1.0 - K / dram->biquad[biq_reso] + K * K) * norm;
 	//for the coefficient-interpolated biquad filter
 	
 	double powFactor = pow(GetParameter( kParam_Four )+0.9,4);
@@ -115,16 +116,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	double wet = GetParameter( kParam_Six );
 	
-	fixA[fix_freq] = fixB[fix_freq] = 20000.0 / GetSampleRate();
-    fixA[fix_reso] = fixB[fix_reso] = 0.7071; //butterworth Q
+	dram->fixA[fix_freq] = dram->fixB[fix_freq] = 20000.0 / GetSampleRate();
+    dram->fixA[fix_reso] = dram->fixB[fix_reso] = 0.7071; //butterworth Q
 	
-	K = tan(M_PI * fixA[fix_freq]);
-	norm = 1.0 / (1.0 + K / fixA[fix_reso] + K * K);
-	fixA[fix_a0] = fixB[fix_a0] = K * K * norm;
-	fixA[fix_a1] = fixB[fix_a1] = 2.0 * fixA[fix_a0];
-	fixA[fix_a2] = fixB[fix_a2] = fixA[fix_a0];
-	fixA[fix_b1] = fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixA[fix_b2] = fixB[fix_b2] = (1.0 - K / fixA[fix_reso] + K * K) * norm;
+	K = tan(M_PI * dram->fixA[fix_freq]);
+	norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_a0] = dram->fixB[fix_a0] = K * K * norm;
+	dram->fixA[fix_a1] = dram->fixB[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a2] = dram->fixB[fix_a2] = dram->fixA[fix_a0];
+	dram->fixA[fix_b1] = dram->fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixA[fix_b2] = dram->fixB[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
 	//for the fixed-position biquad filter
 	
 	while (nSampleFrames-- > 0) {
@@ -134,9 +135,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample *= inTrim;
 		
-		double temp = (inputSample * fixA[fix_a0]) + fixA[fix_sL1];
-		fixA[fix_sL1] = (inputSample * fixA[fix_a1]) - (temp * fixA[fix_b1]) + fixA[fix_sL2];
-		fixA[fix_sL2] = (inputSample * fixA[fix_a2]) - (temp * fixA[fix_b2]);
+		double temp = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (temp * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
+		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (temp * dram->fixA[fix_b2]);
 		inputSample = temp; //fixed biquad filtering ultrasonics
 		
 		//encode/decode courtesy of torridgristle under the MIT license
@@ -145,9 +146,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (inputSample < -1.0) inputSample = -1.0;
 		else if (inputSample < 0.0) inputSample = -1.0 + pow(1.0+inputSample,powFactor);
 		
-		temp = (inputSample * biquad[biq_a0]) + biquad[biq_sL1];
-		biquad[biq_sL1] = (inputSample * biquad[biq_a1]) - (temp * biquad[biq_b1]) + biquad[biq_sL2];
-		biquad[biq_sL2] = (inputSample * biquad[biq_a2]) - (temp * biquad[biq_b2]);
+		temp = (inputSample * dram->biquad[biq_a0]) + dram->biquad[biq_sL1];
+		dram->biquad[biq_sL1] = (inputSample * dram->biquad[biq_a1]) - (temp * dram->biquad[biq_b1]) + dram->biquad[biq_sL2];
+		dram->biquad[biq_sL2] = (inputSample * dram->biquad[biq_a2]) - (temp * dram->biquad[biq_b2]);
 		inputSample = temp; //coefficient interpolating biquad filter
 		
 		//encode/decode courtesy of torridgristle under the MIT license
@@ -158,9 +159,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample *= outTrim;
 		
-		temp = (inputSample * fixB[fix_a0]) + fixB[fix_sL1];
-		fixB[fix_sL1] = (inputSample * fixB[fix_a1]) - (temp * fixB[fix_b1]) + fixB[fix_sL2];
-		fixB[fix_sL2] = (inputSample * fixB[fix_a2]) - (temp * fixB[fix_b2]);
+		temp = (inputSample * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
+		dram->fixB[fix_sL1] = (inputSample * dram->fixB[fix_a1]) - (temp * dram->fixB[fix_b1]) + dram->fixB[fix_sL2];
+		dram->fixB[fix_sL2] = (inputSample * dram->fixB[fix_a2]) - (temp * dram->fixB[fix_b2]);
 		inputSample = temp; //fixed biquad filtering ultrasonics
 		
 		if (wet < 1.0) {
@@ -181,8 +182,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < biq_total; x++) {biquad[x] = 0.0;}
-	for (int x = 0; x < fix_total; x++) {fixA[x] = 0.0; fixB[x] = 0.0;}
+	for (int x = 0; x < biq_total; x++) {dram->biquad[x] = 0.0;}
+	for (int x = 0; x < fix_total; x++) {dram->fixA[x] = 0.0; dram->fixB[x] = 0.0;}
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

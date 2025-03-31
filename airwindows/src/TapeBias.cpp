@@ -28,7 +28,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		enum {
@@ -61,15 +60,17 @@ struct _kernel {
 			threshold9,
 			gslew_total
 		}; //fixed frequency pear filter for ultrasonics, stereo
-		double gslew[gslew_total]; //probably worth just using a number here
 		
 		uint32_t fpd;
+	
+	struct _dram {
+			double gslew[gslew_total]; //probably worth just using a number here
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -87,23 +88,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (bias > 0.0) underBias = 0.0;
 	if (bias < 0.0) overBias = 1.0/overallscale;
 	
-	gslew[threshold9] = overBias;
+	dram->gslew[threshold9] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold8] = overBias;
+	dram->gslew[threshold8] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold7] = overBias;
+	dram->gslew[threshold7] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold6] = overBias;
+	dram->gslew[threshold6] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold5] = overBias;
+	dram->gslew[threshold5] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold4] = overBias;
+	dram->gslew[threshold4] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold3] = overBias;
+	dram->gslew[threshold3] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold2] = overBias;
+	dram->gslew[threshold2] = overBias;
 	overBias *= 1.618033988749894848204586;
-	gslew[threshold1] = overBias;
+	dram->gslew[threshold1] = overBias;
 	overBias *= 1.618033988749894848204586;
 	
 	while (nSampleFrames-- > 0) {
@@ -113,17 +114,17 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//start bias routine
 		for (int x = 0; x < gslew_total; x += 3) {
 			if (underBias > 0.0) {
-				double stuck = fabs(inputSample - (gslew[x]/0.975)) / underBias;
-				if (stuck < 1.0) inputSample = (inputSample * stuck) + ((gslew[x]/0.975)*(1.0-stuck));
-				//stuck =  fabs(inputSampleR - (gslew[x+1]/0.975)) / underBias;
-				//if (stuck < 1.0) inputSampleR = (inputSampleR * stuck) + ((gslew[x+1]/0.975)*(1.0-stuck));
+				double stuck = fabs(inputSample - (dram->gslew[x]/0.975)) / underBias;
+				if (stuck < 1.0) inputSample = (inputSample * stuck) + ((dram->gslew[x]/0.975)*(1.0-stuck));
+				//stuck =  fabs(inputSampleR - (dram->gslew[x+1]/0.975)) / underBias;
+				//if (stuck < 1.0) inputSampleR = (inputSampleR * stuck) + ((dram->gslew[x+1]/0.975)*(1.0-stuck));
 			}
-			if ((inputSample - gslew[x]) > gslew[x+2]) inputSample = gslew[x] + gslew[x+2];
-			if (-(inputSample - gslew[x]) > gslew[x+2]) inputSample = gslew[x] - gslew[x+2];
-			gslew[x] = inputSample * 0.975;
-			//if ((inputSampleR - gslew[x+1]) > gslew[x+2]) inputSampleR = gslew[x+1] + gslew[x+2];
-			//if (-(inputSampleR - gslew[x+1]) > gslew[x+2]) inputSampleR = gslew[x+1] - gslew[x+2];
-			//gslew[x+1] = inputSampleR * 0.95;
+			if ((inputSample - dram->gslew[x]) > dram->gslew[x+2]) inputSample = dram->gslew[x] + dram->gslew[x+2];
+			if (-(inputSample - dram->gslew[x]) > dram->gslew[x+2]) inputSample = dram->gslew[x] - dram->gslew[x+2];
+			dram->gslew[x] = inputSample * 0.975;
+			//if ((inputSampleR - dram->gslew[x+1]) > dram->gslew[x+2]) inputSampleR = dram->gslew[x+1] + dram->gslew[x+2];
+			//if (-(inputSampleR - dram->gslew[x+1]) > dram->gslew[x+2]) inputSampleR = dram->gslew[x+1] - dram->gslew[x+2];
+			//dram->gslew[x+1] = inputSampleR * 0.95;
 		}
 		//end bias routine
 		
@@ -141,7 +142,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < gslew_total; x++) gslew[x] = 0.0;
+	for (int x = 0; x < gslew_total; x++) dram->gslew[x] = 0.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

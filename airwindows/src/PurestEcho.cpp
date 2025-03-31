@@ -36,18 +36,19 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
 
 		const static int totalsamples = 65535;
-		Float32 d[totalsamples];
 		int gcount;
 		uint32_t fpd;
+	
+	struct _dram {
+			Float32 d[totalsamples];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -124,27 +125,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
 		
 		if (gcount < 0 || gcount > loopLimit) gcount = loopLimit;
-		d[gcount+loopLimit] = d[gcount] = inputSample * tapsTrim; //this is how the double buffer works:
+		dram->d[gcount+loopLimit] = dram->d[gcount] = inputSample * tapsTrim; //this is how the double buffer works:
 		//we can look for delay taps without ever having to 'wrap around' within our calculation.
 		//As long as the delay tap is less than our loop limit we can always just add it to where we're
 		//at, and get a valid sample back right away, no matter where we are in the buffer.
 		//The 0.5 is taking into account the interpolation, by padding down the whole buffer.
 		
-		delaysBuffer = (d[gcount+oneBefore4]*volBefore4);
-		delaysBuffer += (d[gcount+oneAfter4]*volAfter4);
-		delaysBuffer += (d[gcount+oneBefore3]*volBefore3);
-		delaysBuffer += (d[gcount+oneAfter3]*volAfter3);
-		delaysBuffer += (d[gcount+oneBefore2]*volBefore2);
-		delaysBuffer += (d[gcount+oneAfter2]*volAfter2);
-		delaysBuffer += (d[gcount+oneBefore1]*volBefore1);
-		delaysBuffer += (d[gcount+oneAfter1]*volAfter1);
+		delaysBuffer = (dram->d[gcount+oneBefore4]*volBefore4);
+		delaysBuffer += (dram->d[gcount+oneAfter4]*volAfter4);
+		delaysBuffer += (dram->d[gcount+oneBefore3]*volBefore3);
+		delaysBuffer += (dram->d[gcount+oneAfter3]*volAfter3);
+		delaysBuffer += (dram->d[gcount+oneBefore2]*volBefore2);
+		delaysBuffer += (dram->d[gcount+oneAfter2]*volAfter2);
+		delaysBuffer += (dram->d[gcount+oneBefore1]*volBefore1);
+		delaysBuffer += (dram->d[gcount+oneAfter1]*volAfter1);
 		//These are the interpolated samples. We're adding them first, because we know they're smaller
 		//and while the value of delaysBuffer is small we'll add similarly small values to it. Note the order.
 		
-		delaysBuffer += (d[gcount+position4]*tap4);
-		delaysBuffer += (d[gcount+position3]*tap3);
-		delaysBuffer += (d[gcount+position2]*tap2);
-		delaysBuffer += (d[gcount+position1]*tap1);
+		delaysBuffer += (dram->d[gcount+position4]*tap4);
+		delaysBuffer += (dram->d[gcount+position3]*tap3);
+		delaysBuffer += (dram->d[gcount+position2]*tap2);
+		delaysBuffer += (dram->d[gcount+position1]*tap1);
 		//These are the primary samples for the echo, and we're adding them last. As before we're starting with the
 		//most delayed echoes, and ending with what we think might be the loudest echo. We're building this delaybuffer
 		//from the faintest noises to the loudest, to avoid adding a bunch of teeny values at the end.
@@ -152,7 +153,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//This technique is also present in other plugins such as Iron Oxide.
 		
 		inputSample = (inputSample * gainTrim) + delaysBuffer;
-		//this could be just inputSample += d[gcount+position1];
+		//this could be just inputSample += dram->d[gcount+position1];
 		//for literally a single, full volume echo combined with dry.
 		//What I'm doing is making the echoes more interesting.
 		
@@ -177,7 +178,7 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	//to use this to define the buffer in terms of seconds: samples as a factor of GetSampleRate()
 	//The danger there, of course, is having a user start up the plugin at 384K and smashing their memory
 	
-	for(int count = 0; count < totalsamples-1; count++) {d[count] = 0;}
+	for(int count = 0; count < totalsamples-1; count++) {dram->d[count] = 0;}
 	gcount = 0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }

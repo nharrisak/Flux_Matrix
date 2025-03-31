@@ -25,20 +25,21 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		int ax, bx, cx, dx;
 		uint32_t fpd;
-	};
-_kernel kernels[1];
-
-#include "../include/template2.h"
-struct _dram {
-		Float64 a[1503];
+	
+	struct _dram {
+			Float64 a[1503];
 		Float64 b[1503];
 		Float64 c[1503];
 		Float64 d[1503];
+	};
+	_dram* dram;
 };
+_kernel kernels[1];
+
+#include "../include/template2.h"
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)

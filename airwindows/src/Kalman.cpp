@@ -30,7 +30,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			prevSampL1,
@@ -46,15 +45,17 @@ struct _kernel {
 			kalOutL,
 			kal_total
 		};
-		double kal[kal_total];
 
 		uint32_t fpd;
+	
+	struct _dram {
+			double kal[kal_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -80,31 +81,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		double dryKal = inputSample = inputSample*(1.0-kalman)*0.777;
 		inputSample *= (1.0-kalman);
 		//set up gain levels to control the beast
-		kal[prevSlewL3] += kal[prevSampL3] - kal[prevSampL2]; kal[prevSlewL3] *= 0.5;
-		kal[prevSlewL2] += kal[prevSampL2] - kal[prevSampL1]; kal[prevSlewL2] *= 0.5;
-		kal[prevSlewL1] += kal[prevSampL1] - inputSample; kal[prevSlewL1] *= 0.5;
+		dram->kal[prevSlewL3] += dram->kal[prevSampL3] - dram->kal[prevSampL2]; dram->kal[prevSlewL3] *= 0.5;
+		dram->kal[prevSlewL2] += dram->kal[prevSampL2] - dram->kal[prevSampL1]; dram->kal[prevSlewL2] *= 0.5;
+		dram->kal[prevSlewL1] += dram->kal[prevSampL1] - inputSample; dram->kal[prevSlewL1] *= 0.5;
 		//make slews from each set of samples used
-		kal[accSlewL2] += kal[prevSlewL3] - kal[prevSlewL2]; kal[accSlewL2] *= 0.5;
-		kal[accSlewL1] += kal[prevSlewL2] - kal[prevSlewL1]; kal[accSlewL1] *= 0.5;
+		dram->kal[accSlewL2] += dram->kal[prevSlewL3] - dram->kal[prevSlewL2]; dram->kal[accSlewL2] *= 0.5;
+		dram->kal[accSlewL1] += dram->kal[prevSlewL2] - dram->kal[prevSlewL1]; dram->kal[accSlewL1] *= 0.5;
 		//differences between slews: rate of change of rate of change
-		kal[accSlewL3] += (kal[accSlewL2] - kal[accSlewL1]); kal[accSlewL3] *= 0.5;
+		dram->kal[accSlewL3] += (dram->kal[accSlewL2] - dram->kal[accSlewL1]); dram->kal[accSlewL3] *= 0.5;
 		//entering the abyss, what even is this
-		kal[kalOutL] += kal[prevSampL1] + kal[prevSlewL2] + kal[accSlewL3]; kal[kalOutL] *= 0.5;
+		dram->kal[kalOutL] += dram->kal[prevSampL1] + dram->kal[prevSlewL2] + dram->kal[accSlewL3]; dram->kal[kalOutL] *= 0.5;
 		//resynthesizing predicted result (all iir smoothed)
-		kal[kalGainL] += fabs(dryKal-kal[kalOutL])*kalman*8.0; kal[kalGainL] *= 0.5;
+		dram->kal[kalGainL] += fabs(dryKal-dram->kal[kalOutL])*kalman*8.0; dram->kal[kalGainL] *= 0.5;
 		//madness takes its toll. Kalman Gain: how much dry to retain
-		if (kal[kalGainL] > kalman*0.5) kal[kalGainL] = kalman*0.5;
+		if (dram->kal[kalGainL] > kalman*0.5) dram->kal[kalGainL] = kalman*0.5;
 		//attempts to avoid explosions
-		kal[kalOutL] += (dryKal*(1.0-(0.68+(kalman*0.157))));	
+		dram->kal[kalOutL] += (dryKal*(1.0-(0.68+(kalman*0.157))));	
 		//this is for tuning a really complete cancellation up around Nyquist
-		kal[prevSampL3] = kal[prevSampL2];
-		kal[prevSampL2] = kal[prevSampL1];
-		kal[prevSampL1] = (kal[kalGainL] * kal[kalOutL]) + ((1.0-kal[kalGainL])*dryKal);
+		dram->kal[prevSampL3] = dram->kal[prevSampL2];
+		dram->kal[prevSampL2] = dram->kal[prevSampL1];
+		dram->kal[prevSampL1] = (dram->kal[kalGainL] * dram->kal[kalOutL]) + ((1.0-dram->kal[kalGainL])*dryKal);
 		//feed the chain of previous samples
-		if (kal[prevSampL1] > 1.0) kal[prevSampL1] = 1.0;
-		if (kal[prevSampL1] < -1.0) kal[prevSampL1] = -1.0;
+		if (dram->kal[prevSampL1] > 1.0) dram->kal[prevSampL1] = 1.0;
+		if (dram->kal[prevSampL1] < -1.0) dram->kal[prevSampL1] = -1.0;
 		//end Kalman Filter, except for trim on output		
-		inputSample = (drySample*dry)+(kal[kalOutL]*wet*0.777);
+		inputSample = (drySample*dry)+(dram->kal[kalOutL]*wet*0.777);
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
@@ -120,7 +121,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < kal_total; x++) kal[x] = 0.0;
+	for (int x = 0; x < kal_total; x++) dram->kal[x] = 0.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

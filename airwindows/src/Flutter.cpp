@@ -31,11 +31,13 @@ enum { kNumTemplateParameters = 6 };
 	double nextmax;
 	uint32_t fpdL;
 	uint32_t fpdR;
-#include "../include/template2.h"
-struct _dram {
-	double dL[1002];
+
+	struct _dram {
+		double dL[1002];
 	double dR[1002];
-};
+	};
+	_dram* dram;
+#include "../include/template2.h"
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 

@@ -38,22 +38,23 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		double dBaL[dscBufMax+5][layersMax];
-		double dBaPosL[layersMax];
-		double dBaPosBL[layersMax];
 		int dBaXL[layersMax];
 		double outFilterL;
 				
 		uint32_t fpd;
+	
+	struct _dram {
+			double dBaPosL[layersMax];
+		double dBaPosBL[layersMax];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -86,10 +87,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (inputSampleL < -0.222) inputSampleL = -0.222;
 			if (inputSampleL > 0.222) inputSampleL = 0.222;
 			dBaL[dBaXL[x]][x] = inputSampleL;
-			dBaPosL[x] *= (1.0-f); dBaPosL[x] += (dBaPosBL[x]*f); 
-			dBaPosBL[x] *= (1.0-f); dBaPosBL[x] += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*f);
-			int dBdly = floor(dBaPosL[x]*dscBuf);
-			double dBi = (dBaPosL[x]*dscBuf)-dBdly;
+			dram->dBaPosL[x] *= (1.0-f); dram->dBaPosL[x] += (dram->dBaPosBL[x]*f); 
+			dram->dBaPosBL[x] *= (1.0-f); dram->dBaPosBL[x] += fabs((inputSampleL*((inputSampleL*0.25)-0.5))*f);
+			int dBdly = floor(dram->dBaPosL[x]*dscBuf);
+			double dBi = (dram->dBaPosL[x]*dscBuf)-dBdly;
 			inputSampleL  = dBaL[dBaXL[x]-dBdly+((dBaXL[x]-dBdly<0)?dscBuf:0)][x] * (1.0-dBi);
 			dBdly++; inputSampleL += dBaL[dBaXL[x]-dBdly+((dBaXL[x]-dBdly<0)?dscBuf:0)][x] * dBi;
 			dBaXL[x]++; if (dBaXL[x] < 0 || dBaXL[x] >= dscBuf) dBaXL[x] = 0;
@@ -116,8 +117,8 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 		for (int count = 0; count < dscBufMax+2; count++) {
 			dBaL[count][stage] = 0.0;
 		}
-		dBaPosL[stage] = 0.0;
-		dBaPosBL[stage] = 0.0;
+		dram->dBaPosL[stage] = 0.0;
+		dram->dBaPosBL[stage] = 0.0;
 		dBaXL[stage] = 1;
 	}
 	outFilterL = 0.0;

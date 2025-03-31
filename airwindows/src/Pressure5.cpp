@@ -60,8 +60,6 @@ enum { kNumTemplateParameters = 6 };
 		fix_lastSampleR,
 		fix_total
 	};
-	double fixA[fix_total];
-	double fixB[fix_total]; //fixed frequency biquad filter for ultrasonics, stereo
 	
 	double lastSampleL;
 	double intermediateL[16];
@@ -76,9 +74,13 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double fixA[fix_total];
+	double fixB[fix_total]; //fixed frequency biquad filter for ultrasonics, stereo
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -103,17 +105,17 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	double outputGain = pow(GetParameter( kParam_Five )*2.0,2); //max 4.0 gain
 	double wet = GetParameter( kParam_Six );
 	
-	fixA[fix_freq] = 24000.0 / GetSampleRate();
-    fixA[fix_reso] = 0.7071; //butterworth Q
-	double K = tan(M_PI * fixA[fix_freq]);
-	double norm = 1.0 / (1.0 + K / fixA[fix_reso] + K * K);
-	fixA[fix_a0] = K * K * norm;
-	fixA[fix_a1] = 2.0 * fixA[fix_a0];
-	fixA[fix_a2] = fixA[fix_a0];
-	fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixA[fix_b2] = (1.0 - K / fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_freq] = 24000.0 / GetSampleRate();
+    dram->fixA[fix_reso] = 0.7071; //butterworth Q
+	double K = tan(M_PI * dram->fixA[fix_freq]);
+	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_a0] = K * K * norm;
+	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a2] = dram->fixA[fix_a0];
+	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
 	//for the fixed-position biquad filter
-	for (int x = 0; x < fix_sL1; x++) fixB[x] = fixA[x];
+	for (int x = 0; x < fix_sL1; x++) dram->fixB[x] = dram->fixA[x];
 	//make the second filter same as the first, don't use sample slots
 
 	while (nSampleFrames-- > 0) {
@@ -127,14 +129,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		inputSampleL = inputSampleL * muMakeupGain;
 		inputSampleR = inputSampleR * muMakeupGain;
 		
-		if (fixA[fix_freq] < 0.4999) {
-			double temp = (inputSampleL * fixA[fix_a0]) + fixA[fix_sL1];
-			fixA[fix_sL1] = (inputSampleL * fixA[fix_a1]) - (temp * fixA[fix_b1]) + fixA[fix_sL2];
-			fixA[fix_sL2] = (inputSampleL * fixA[fix_a2]) - (temp * fixA[fix_b2]);
+		if (dram->fixA[fix_freq] < 0.4999) {
+			double temp = (inputSampleL * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+			dram->fixA[fix_sL1] = (inputSampleL * dram->fixA[fix_a1]) - (temp * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
+			dram->fixA[fix_sL2] = (inputSampleL * dram->fixA[fix_a2]) - (temp * dram->fixA[fix_b2]);
 			inputSampleL = temp;
-			temp = (inputSampleR * fixA[fix_a0]) + fixA[fix_sR1];
-			fixA[fix_sR1] = (inputSampleR * fixA[fix_a1]) - (temp * fixA[fix_b1]) + fixA[fix_sR2];
-			fixA[fix_sR2] = (inputSampleR * fixA[fix_a2]) - (temp * fixA[fix_b2]);
+			temp = (inputSampleR * dram->fixA[fix_a0]) + dram->fixA[fix_sR1];
+			dram->fixA[fix_sR1] = (inputSampleR * dram->fixA[fix_a1]) - (temp * dram->fixA[fix_b1]) + dram->fixA[fix_sR2];
+			dram->fixA[fix_sR2] = (inputSampleR * dram->fixA[fix_a2]) - (temp * dram->fixA[fix_b2]);
 			inputSampleR = temp; //fixed biquad filtering ultrasonics before Pressure
 		}
 		
@@ -227,14 +229,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		flip = !flip;
 				
-		if (fixB[fix_freq] < 0.49999) {
-			double temp = (inputSampleL * fixB[fix_a0]) + fixB[fix_sL1];
-			fixB[fix_sL1] = (inputSampleL * fixB[fix_a1]) - (temp * fixB[fix_b1]) + fixB[fix_sL2];
-			fixB[fix_sL2] = (inputSampleL * fixB[fix_a2]) - (temp * fixB[fix_b2]);
+		if (dram->fixB[fix_freq] < 0.49999) {
+			double temp = (inputSampleL * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
+			dram->fixB[fix_sL1] = (inputSampleL * dram->fixB[fix_a1]) - (temp * dram->fixB[fix_b1]) + dram->fixB[fix_sL2];
+			dram->fixB[fix_sL2] = (inputSampleL * dram->fixB[fix_a2]) - (temp * dram->fixB[fix_b2]);
 			inputSampleL = temp;
-			temp = (inputSampleR * fixB[fix_a0]) + fixB[fix_sR1];
-			fixB[fix_sR1] = (inputSampleR * fixB[fix_a1]) - (temp * fixB[fix_b1]) + fixB[fix_sR2];
-			fixB[fix_sR2] = (inputSampleR * fixB[fix_a2]) - (temp * fixB[fix_b2]);
+			temp = (inputSampleR * dram->fixB[fix_a0]) + dram->fixB[fix_sR1];
+			dram->fixB[fix_sR1] = (inputSampleR * dram->fixB[fix_a1]) - (temp * dram->fixB[fix_b1]) + dram->fixB[fix_sR2];
+			dram->fixB[fix_sR2] = (inputSampleR * dram->fixB[fix_a2]) - (temp * dram->fixB[fix_b2]);
 			inputSampleR = temp; //fixed biquad filtering ultrasonics between Pressure and ClipOnly
 		}
 		
@@ -311,7 +313,7 @@ int _airwindowsAlgorithm::reset(void) {
 	muCoefficientB = 1;
 	muVary = 1;
 	flip = false;
-	for (int x = 0; x < fix_total; x++) {fixA[x] = 0.0; fixB[x] = 0.0;}
+	for (int x = 0; x < fix_total; x++) {dram->fixA[x] = 0.0; dram->fixB[x] = 0.0;}
 	lastSampleL = 0.0;
 	wasPosClipL = false;
 	wasNegClipL = false;

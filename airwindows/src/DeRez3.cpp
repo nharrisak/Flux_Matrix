@@ -32,7 +32,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		double rezA;
@@ -52,15 +51,17 @@ struct _kernel {
 			bez_cycle,
 			bez_total
 		}; //the new undersampling. bez signifies the bezier curve reconstruction
-		double bez[bez_total];
 		
 		uint32_t fpd;
+	
+	struct _dram {
+			double bez[bez_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -102,18 +103,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSampleL = floor(inputSampleL+(0.5/bitFactor));
 		inputSampleL /= bitFactor;
 		
-		bez[bez_cycle] += rez;
-		bez[bez_SampL] += (inputSampleL * rez);
-		if (bez[bez_cycle] > 1.0) {
-			bez[bez_cycle] -= 1.0;
-			bez[bez_CL] = bez[bez_BL];
-			bez[bez_BL] = bez[bez_AL];
-			bez[bez_AL] = inputSampleL;
-			bez[bez_SampL] = 0.0;
+		dram->bez[bez_cycle] += rez;
+		dram->bez[bez_SampL] += (inputSampleL * rez);
+		if (dram->bez[bez_cycle] > 1.0) {
+			dram->bez[bez_cycle] -= 1.0;
+			dram->bez[bez_CL] = dram->bez[bez_BL];
+			dram->bez[bez_BL] = dram->bez[bez_AL];
+			dram->bez[bez_AL] = inputSampleL;
+			dram->bez[bez_SampL] = 0.0;
 		}
-		double CBL = (bez[bez_CL]*(1.0-bez[bez_cycle]))+(bez[bez_BL]*bez[bez_cycle]);
-		double BAL = (bez[bez_BL]*(1.0-bez[bez_cycle]))+(bez[bez_AL]*bez[bez_cycle]);
-		double CBAL = (bez[bez_BL]+(CBL*(1.0-bez[bez_cycle]))+(BAL*bez[bez_cycle]))*0.5;
+		double CBL = (dram->bez[bez_CL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
+		double BAL = (dram->bez[bez_BL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
+		double CBAL = (dram->bez[bez_BL]+(CBL*(1.0-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.5;
 		
 		inputSampleL = (wet*CBAL)+(dry*drySampleL);
 		
@@ -134,8 +135,8 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	rezA = 1.0; rezB = 1.0;
 	bitA = 1.0; bitB = 1.0;
 	wetA = 1.0; wetB = 1.0;
-	for (int x = 0; x < bez_total; x++) bez[x] = 0.0;
-	bez[bez_cycle] = 1.0;
+	for (int x = 0; x < bez_total; x++) dram->bez[x] = 0.0;
+	dram->bez[bez_cycle] = 1.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

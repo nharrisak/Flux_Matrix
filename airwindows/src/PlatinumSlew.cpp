@@ -28,7 +28,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			prevSampL1,
@@ -83,14 +82,16 @@ struct _kernel {
 			threshold10,
 			gslew_total
 		}; //fixed frequency pear filter for ultrasonics, stereo
-		double gslew[gslew_total]; //probably worth just using a number here
 		uint32_t fpd;
+	
+	struct _dram {
+			double gslew[gslew_total]; //probably worth just using a number here
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -104,25 +105,25 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	double source = pow(1-GetParameter( kParam_One ),4)/overallscale;
 		
-	gslew[threshold10] = source;
+	dram->gslew[threshold10] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold9] = source;
+	dram->gslew[threshold9] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold8] = source;
+	dram->gslew[threshold8] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold7] = source;
+	dram->gslew[threshold7] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold6] = source;
+	dram->gslew[threshold6] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold5] = source;
+	dram->gslew[threshold5] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold4] = source;
+	dram->gslew[threshold4] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold3] = source;
+	dram->gslew[threshold3] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold2] = source;
+	dram->gslew[threshold2] = source;
 	source *= 1.618033988749894848204586;
-	gslew[threshold1] = source;
+	dram->gslew[threshold1] = source;
 	source *= 1.618033988749894848204586;
 	
 	while (nSampleFrames-- > 0) {
@@ -131,19 +132,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		for (int x = 0; x < gslew_total; x += 5) {
 			
-			if (((inputSample-gslew[x])-((gslew[x]-gslew[x+2])*0.618033988749894848204586)) > gslew[x+4])
-				inputSample = (gslew[x]-((gslew[x]-gslew[x+2])*0.156)) + (gslew[x+4]*0.844);
-			if (-((inputSample-gslew[x])-((gslew[x]-gslew[x+2])*0.618033988749894848204586)) > gslew[x+4])
-				inputSample = (gslew[x]-((gslew[x]-gslew[x+2])*0.2)) - (gslew[x+4]*0.8);
-			gslew[x+2] = gslew[x]*0.844;
-			gslew[x] = inputSample;
+			if (((inputSample-dram->gslew[x])-((dram->gslew[x]-dram->gslew[x+2])*0.618033988749894848204586)) > dram->gslew[x+4])
+				inputSample = (dram->gslew[x]-((dram->gslew[x]-dram->gslew[x+2])*0.156)) + (dram->gslew[x+4]*0.844);
+			if (-((inputSample-dram->gslew[x])-((dram->gslew[x]-dram->gslew[x+2])*0.618033988749894848204586)) > dram->gslew[x+4])
+				inputSample = (dram->gslew[x]-((dram->gslew[x]-dram->gslew[x+2])*0.2)) - (dram->gslew[x+4]*0.8);
+			dram->gslew[x+2] = dram->gslew[x]*0.844;
+			dram->gslew[x] = inputSample;
 			
-			//if (((inputSampleR-gslew[x+1])-((gslew[x+1]-gslew[x+3])*0.618033988749894848204586)) > gslew[x+4])
-			//	inputSampleR = (gslew[x+1]-((gslew[x+1]-gslew[x+3])*0.156)) + (gslew[x+4]*0.844);
-			//if (-((inputSampleR-gslew[x+1])-((gslew[x+1]-gslew[x+3])*0.618033988749894848204586)) > gslew[x+4])
-			//	inputSampleR = (gslew[x+1]-((gslew[x+1]-gslew[x+3])*0.2)) - (gslew[x+4]*0.8);
-			//gslew[x+3] = gslew[x+1]*0.844;
-			//gslew[x+1] = inputSampleR;
+			//if (((inputSampleR-dram->gslew[x+1])-((dram->gslew[x+1]-dram->gslew[x+3])*0.618033988749894848204586)) > dram->gslew[x+4])
+			//	inputSampleR = (dram->gslew[x+1]-((dram->gslew[x+1]-dram->gslew[x+3])*0.156)) + (dram->gslew[x+4]*0.844);
+			//if (-((inputSampleR-dram->gslew[x+1])-((dram->gslew[x+1]-dram->gslew[x+3])*0.618033988749894848204586)) > dram->gslew[x+4])
+			//	inputSampleR = (dram->gslew[x+1]-((dram->gslew[x+1]-dram->gslew[x+3])*0.2)) - (dram->gslew[x+4]*0.8);
+			//dram->gslew[x+3] = dram->gslew[x+1]*0.844;
+			//dram->gslew[x+1] = inputSampleR;
 		}
 		
 		//begin 32 bit floating point dither
@@ -160,7 +161,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < gslew_total; x++) gslew[x] = 0.0;
+	for (int x = 0; x < gslew_total; x++) dram->gslew[x] = 0.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

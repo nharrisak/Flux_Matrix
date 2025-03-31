@@ -125,6 +125,16 @@ for f in files:
 						dram += p + '\n'
 						dramSymbols.append( m.group(1) )
 						privates = privates.replace( p + '\n', '' )
+				else:
+					# look for arrays with symbols as sizes
+					# assume these are big
+					# though this is defintely not the case for all examples
+					pat = r'\s*' + t + r'\s+([\d\w]+)\[([\w\d]+)\];'
+					m = re.match( pat, p )
+					if m:
+						dram += p + '\n'
+						dramSymbols.append( m.group(1) )
+						privates = privates.replace( p + '\n', '' )
 
 		consts = ''
 		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
@@ -187,10 +197,11 @@ for f in files:
 				G.write( 'enum { kNumTemplateParameters = 6 };\n' )
 				G.write( '#include "../include/template1.h"\n' )
 				G.write( privates )
-				G.write( '#include "../include/template2.h"\n' )
-				G.write( 'struct _dram {\n' )
+				G.write( '\n\tstruct _dram {\n\t' )
 				G.write( dram )
-				G.write( '};\n' )
+				G.write( '\t};\n' )
+				G.write( '\t_dram* dram;\n' )
+				G.write( '#include "../include/template2.h"\n' )
 				G.write( '#include "../include/templateStereo.h"\n' )
 				G.write( 'void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {\n')
 				G.write( renderCall )
@@ -243,14 +254,14 @@ for f in files:
 				G.write( '\tvoid reset(void);\n' )
 				G.write( '\tfloat GetParameter( int index ) { return owner->GetParameter( index ); }\n' )
 				G.write( '\t_airwindowsAlgorithm* owner;\n' )
-				G.write( '\tstruct _dram* dram;\n' )
 				G.write( privates )
+				G.write( '\n\tstruct _dram {\n\t' )
+				G.write( dram )
+				G.write( '\t};\n' )
+				G.write( '\t_dram* dram;\n' )
 				G.write( '};\n' )
 				G.write( '_kernel kernels[1];\n' )
 				G.write( '\n#include "../include/template2.h"\n' )
-				G.write( 'struct _dram {\n' )
-				G.write( dram )
-				G.write( '};\n' )
 				G.write( '#include "../include/templateKernels.h"\n' )
 				G.write( 'void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {\n')
 				G.write( '#define inNumChannels (1)\n')

@@ -82,9 +82,9 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
-#include "../include/template2.h"
-struct _dram {
-	double aIL[6480];
+
+	struct _dram {
+		double aIL[6480];
 	double aJL[3660];
 	double aKL[1720];
 	double aLL[680];
@@ -110,7 +110,9 @@ struct _dram {
 	double aFR[8460];
 	double aGR[4540];
 	double aHR[3200];
-};
+	};
+	_dram* dram;
+#include "../include/template2.h"
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 

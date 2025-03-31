@@ -36,7 +36,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		int alpA, delayA;
@@ -99,12 +98,9 @@ struct _kernel {
 		int cycle;		
 		
 		uint32_t fpd;
-	};
-_kernel kernels[1];
-
-#include "../include/template2.h"
-struct _dram {
-		Float64 aA[15150];
+	
+	struct _dram {
+			Float64 aA[15150];
 		Float64 aB[14618];
 		Float64 aC[14358];
 		Float64 aD[13818];		
@@ -130,7 +126,12 @@ struct _dram {
 		Float64 aX[4850];
 		Float64 aY[4296];
 		Float64 aZ[4180];
+	};
+	_dram* dram;
 };
+_kernel kernels[1];
+
+#include "../include/template2.h"
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)

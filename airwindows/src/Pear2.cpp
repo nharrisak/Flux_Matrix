@@ -98,7 +98,6 @@ enum { kNumTemplateParameters = 6 };
 		prevSlewR16,
 		pear_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
-	double pear[pear_total]; //probably worth just using a number here
 	
 	double freqA;
 	double freqB;
@@ -109,9 +108,12 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double pear[pear_total]; //probably worth just using a number here
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -147,13 +149,13 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 						
 		for (int x = 0; x < maxPoles; x += 4) {
 			double di = fabs(freq*(1.0+(inputSampleL*nonLin))); if (di > 1.0) di = 1.0;
-			double slew = ((inputSampleL - pear[x]) + pear[x+1])*di*0.5;
-			pear[x] = inputSampleL = (di * inputSampleL) + ((1.0-di) * (pear[x] + pear[x+1]));
-			pear[x+1] = slew;
+			double slew = ((inputSampleL - dram->pear[x]) + dram->pear[x+1])*di*0.5;
+			dram->pear[x] = inputSampleL = (di * inputSampleL) + ((1.0-di) * (dram->pear[x] + dram->pear[x+1]));
+			dram->pear[x+1] = slew;
 			di = fabs(freq*(1.0+(inputSampleR*nonLin))); if (di > 1.0) di = 1.0;
-			slew = ((inputSampleR - pear[x+2]) + pear[x+3])*di*0.5;
-			pear[x+2] = inputSampleR = (di * inputSampleR) + ((1.0-di) * (pear[x+2] + pear[x+3]));
-			pear[x+3] = slew;
+			slew = ((inputSampleR - dram->pear[x+2]) + dram->pear[x+3])*di*0.5;
+			dram->pear[x+2] = inputSampleR = (di * inputSampleR) + ((1.0-di) * (dram->pear[x+2] + dram->pear[x+3]));
+			dram->pear[x+3] = slew;
 		}
 		
 		inputSampleL *= wet;
@@ -185,7 +187,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for (int x = 0; x < pear_total; x++) pear[x] = 0.0;
+	for (int x = 0; x < pear_total; x++) dram->pear[x] = 0.0;
 	freqA = freqB = 0.5;
 	nonLinA = nonLinB = 0.0;
 	wetA = wetB = 0.5;

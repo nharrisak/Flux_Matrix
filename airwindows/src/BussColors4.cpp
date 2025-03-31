@@ -44,7 +44,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		int c[35]; //just the number of taps we use, doesn't have to scale
 		Float64 g[9]; //console model
@@ -53,14 +52,16 @@ struct _kernel {
 		int gcount;
 		Float64 slowdyn;
 		uint32_t fpd;
+	
+	struct _dram {
+			Float64 b[175]; //full buffer for high sample rates. Scales to 192K
+		Float64 d[100]; //buffer for calculating sag as it relates to the dynamic impulse synthesis. To 192K.
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-		Float64 b[175]; //full buffer for high sample rates. Scales to 192K
-		Float64 d[100]; //buffer for calculating sag as it relates to the dynamic impulse synthesis. To 192K.
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)

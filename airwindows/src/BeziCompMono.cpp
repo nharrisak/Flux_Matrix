@@ -32,7 +32,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			bez_AL,
@@ -44,7 +43,6 @@ struct _kernel {
 			bez_cycle,
 			bez_total
 		}; //the new undersampling. bez signifies the bezier curve reconstruction
-		double bezComp[bez_total];
 		
 		double lastSampleL;
 		double intermediateL[16];
@@ -52,12 +50,15 @@ struct _kernel {
 		bool wasNegClipL;
 
 		uint32_t fpd;
+	
+	struct _dram {
+			double bezComp[bez_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -81,19 +82,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpd * 1.18e-17;
 		double drySampleL = inputSampleL;
 		
-		bezComp[bez_cycle] += bezRez;
-		bezComp[bez_SampL] += (fabs(inputSampleL) * bezRez);
+		dram->bezComp[bez_cycle] += bezRez;
+		dram->bezComp[bez_SampL] += (fabs(inputSampleL) * bezRez);
 		
-		if (bezComp[bez_cycle] > 1.0) {
-			bezComp[bez_cycle] -= 1.0;
-			bezComp[bez_CL] = bezComp[bez_BL];
-			bezComp[bez_BL] = bezComp[bez_AL];
-			bezComp[bez_AL] = bezComp[bez_SampL];
-			bezComp[bez_SampL] = 0.0;
+		if (dram->bezComp[bez_cycle] > 1.0) {
+			dram->bezComp[bez_cycle] -= 1.0;
+			dram->bezComp[bez_CL] = dram->bezComp[bez_BL];
+			dram->bezComp[bez_BL] = dram->bezComp[bez_AL];
+			dram->bezComp[bez_AL] = dram->bezComp[bez_SampL];
+			dram->bezComp[bez_SampL] = 0.0;
 		}
-		double CBL = (bezComp[bez_CL]*(1.0-bezComp[bez_cycle]))+(bezComp[bez_BL]*bezComp[bez_cycle]);
-		double BAL = (bezComp[bez_BL]*(1.0-bezComp[bez_cycle]))+(bezComp[bez_AL]*bezComp[bez_cycle]);
-		double CBAL = (bezComp[bez_BL]+(CBL*(1.0-bezComp[bez_cycle]))+(BAL*bezComp[bez_cycle]))*0.5;
+		double CBL = (dram->bezComp[bez_CL]*(1.0-dram->bezComp[bez_cycle]))+(dram->bezComp[bez_BL]*dram->bezComp[bez_cycle]);
+		double BAL = (dram->bezComp[bez_BL]*(1.0-dram->bezComp[bez_cycle]))+(dram->bezComp[bez_AL]*dram->bezComp[bez_cycle]);
+		double CBAL = (dram->bezComp[bez_BL]+(CBL*(1.0-dram->bezComp[bez_cycle]))+(BAL*dram->bezComp[bez_cycle]))*0.5;
 		inputSampleL *= 1.0-(fmin(CBAL*bezCThresh,1.0));
 		inputSampleL *= bezMakeUp;
 		
@@ -131,8 +132,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < bez_total; x++) {bezComp[x] = 0.0;}
-	bezComp[bez_cycle] = 1.0;
+	for (int x = 0; x < bez_total; x++) {dram->bezComp[x] = 0.0;}
+	dram->bezComp[bez_cycle] = 1.0;
 
 	lastSampleL = 0.0;
 	wasPosClipL = false;

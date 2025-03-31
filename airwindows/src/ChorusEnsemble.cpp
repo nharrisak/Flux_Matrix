@@ -32,10 +32,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		const static int totalsamples = 32767;
-		Float32 d[totalsamples];
 		Float64 sweep;
 		int gcount;
 		Float64 airPrev;
@@ -44,12 +42,15 @@ struct _kernel {
 		Float64 airFactor;
 		uint32_t fpd;
 		bool fpFlip;
+	
+	struct _dram {
+			Float32 d[totalsamples];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -98,39 +99,39 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (gcount < 1 || gcount > loopLimit) {gcount = loopLimit;}
 		count = gcount;
-		d[count+loopLimit] = d[count] = inputSample;
+		dram->d[count+loopLimit] = dram->d[count] = inputSample;
 		//double buffer, inverted so we get some cancellation at small range values
 		
 		
 		offset = start[0] + (modulation * sin(sweep));
 		count = gcount + (int)floor(offset);
-		inputSample = d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
-		inputSample += d[count+1]; //we can assume always using this in one way or another?
-		inputSample += (d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
-		inputSample -= (((d[count]-d[count+1])-(d[count+1]-d[count+2]))/50); //interpolation hacks 'r us
+		inputSample = dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
+		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
+		inputSample += (dram->d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
+		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 
 		offset = start[1] + (modulation * sin(sweep + 1.0));
 		count = gcount + (int)floor(offset);
-		inputSample += d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
-		inputSample += d[count+1]; //we can assume always using this in one way or another?
-		inputSample += (d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
-		inputSample -= (((d[count]-d[count+1])-(d[count+1]-d[count+2]))/50); //interpolation hacks 'r us
+		inputSample += dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
+		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
+		inputSample += (dram->d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
+		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 
 		
 		offset = start[2] + (modulation * sin(sweep + 2.0));
 		count = gcount + (int)floor(offset);
-		inputSample += d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
-		inputSample += d[count+1]; //we can assume always using this in one way or another?
-		inputSample += (d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
-		inputSample -= (((d[count]-d[count+1])-(d[count+1]-d[count+2]))/50); //interpolation hacks 'r us
+		inputSample += dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
+		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
+		inputSample += (dram->d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
+		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 
 		
 		offset = start[3] + (modulation * sin(sweep + 3.0));
 		count = gcount + (int)floor(offset);
-		inputSample += d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
-		inputSample += d[count+1]; //we can assume always using this in one way or another?
-		inputSample += (d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
-		inputSample -= (((d[count]-d[count+1])-(d[count+1]-d[count+2]))/50); //interpolation hacks 'r us
+		inputSample += dram->d[count] * (1-(offset-floor(offset))); //less as value moves away from .0
+		inputSample += dram->d[count+1]; //we can assume always using this in one way or another?
+		inputSample += (dram->d[count+2] * (offset-floor(offset))); //greater as value moves away from .0
+		inputSample -= (((dram->d[count]-dram->d[count+1])-(dram->d[count+1]-dram->d[count+2]))/50); //interpolation hacks 'r us
 		
 		inputSample *= 0.125; //to get a comparable level
 		gcount--;
@@ -158,7 +159,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < totalsamples-1; count++) {d[count] = 0;}
+	for(int count = 0; count < totalsamples-1; count++) {dram->d[count] = 0;}
 	sweep = 3.141592653589793238 / 2.0;
 	gcount = 0;
 	airPrev = 0.0;

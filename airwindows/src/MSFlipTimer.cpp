@@ -26,9 +26,11 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	uint32_t tick;
+
+	struct _dram {
+		};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 

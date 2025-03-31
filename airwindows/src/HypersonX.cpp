@@ -37,7 +37,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			fix_freq,
@@ -53,14 +52,16 @@ struct _kernel {
 			fix_sR2,
 			fix_total
 		}; //fixed frequency biquad filter for ultrasonics, stereo
-		double fixA[fix_total];
 		uint32_t fpd;
+	
+	struct _dram {
+			double fixA[fix_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -72,48 +73,48 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	double cutoff = 25000.0 / GetSampleRate();
 	if (cutoff > 0.49) cutoff = 0.49; //don't crash if run at 44.1k
 	
-	fixA[fix_freq] = cutoff;
+	dram->fixA[fix_freq] = cutoff;
 	
 	switch ((int) GetParameter( kParam_One ))
 	{
 		case kA:
-			fixA[fix_reso] = 4.46570214;
+			dram->fixA[fix_reso] = 4.46570214;
 			break;
 		case kB:
-			fixA[fix_reso] = 1.51387132;;
+			dram->fixA[fix_reso] = 1.51387132;;
 			break;
 		case kC:
-			fixA[fix_reso] = 0.93979296;
+			dram->fixA[fix_reso] = 0.93979296;
 			break;
 		case kD:
-			fixA[fix_reso] = 0.70710678; //butterworth Q
+			dram->fixA[fix_reso] = 0.70710678; //butterworth Q
 			break;
 		case kE:
-			fixA[fix_reso] = 0.59051105;
+			dram->fixA[fix_reso] = 0.59051105;
 			break;
 		case kF:
-			fixA[fix_reso] = 0.52972649;
+			dram->fixA[fix_reso] = 0.52972649;
 			break;
 		case kG:
-			fixA[fix_reso] = 0.50316379;
+			dram->fixA[fix_reso] = 0.50316379;
 			break;
 	}	
 	
-	double K = tan(M_PI * fixA[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / fixA[fix_reso] + K * K);
-	fixA[fix_a0] = K * K * norm;
-	fixA[fix_a1] = 2.0 * fixA[fix_a0];
-	fixA[fix_a2] = fixA[fix_a0];
-	fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixA[fix_b2] = (1.0 - K / fixA[fix_reso] + K * K) * norm;
+	double K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
+	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_a0] = K * K * norm;
+	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a2] = dram->fixA[fix_a0];
+	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
 	
 	while (nSampleFrames-- > 0) {
 		double inputSample = *sourceP;
 		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
 		
-		double outSample = (inputSample * fixA[fix_a0]) + fixA[fix_sL1];
-		fixA[fix_sL1] = (inputSample * fixA[fix_a1]) - (outSample * fixA[fix_b1]) + fixA[fix_sL2];
-		fixA[fix_sL2] = (inputSample * fixA[fix_a2]) - (outSample * fixA[fix_b2]);
+		double outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
+		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
 		//begin 32 bit floating point dither
@@ -130,8 +131,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < fix_total; x++) fixA[x] = 0.0;
-	fixA[fix_reso] = 0.7071; //butterworth Q
+	for (int x = 0; x < fix_total; x++) dram->fixA[x] = 0.0;
+	dram->fixA[fix_reso] = 0.7071; //butterworth Q
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

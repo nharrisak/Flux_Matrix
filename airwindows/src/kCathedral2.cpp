@@ -278,12 +278,6 @@ enum { kNumTemplateParameters = 6 };
 		pear_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
 	
-	double pearA[pear_total]; //probably worth just using a number here
-	double pearB[pear_total]; //probably worth just using a number here
-	double pearC[pear_total]; //probably worth just using a number here
-	double pearD[pear_total]; //probably worth just using a number here
-	double pearE[pear_total]; //probably worth just using a number here
-	double pearF[pear_total]; //probably worth just using a number here
 	
 	double vibratoL;
 	double vibratoR;
@@ -308,9 +302,17 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double pearA[pear_total]; //probably worth just using a number here
+	double pearB[pear_total]; //probably worth just using a number here
+	double pearC[pear_total]; //probably worth just using a number here
+	double pearD[pear_total]; //probably worth just using a number here
+	double pearE[pear_total]; //probably worth just using a number here
+	double pearF[pear_total]; //probably worth just using a number here
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -758,56 +760,56 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			feedbackER = ((outUL*3.0) - ((outVL + outWL + outXL + outYL)*2.0));
 			feedbackAL = ((outAR*3.0) - ((outFR + outKR + outPR + outUR)*2.0));
 			for (int x = 0; x < 1; x += 4) {
-				double slew = ((feedbackAL - pearA[x]) + pearA[x+1])*pear*0.5;
-				pearA[x] = feedbackAL = (pear * feedbackAL) + ((1.0-pear) * (pearA[x] + pearA[x+1]));
-				pearA[x+1] = slew;
-				slew = ((feedbackER - pearA[x+2]) + pearA[x+3])*pear*0.5;
-				pearA[x+2] = feedbackER = (pear * feedbackER) + ((1.0-pear) * (pearA[x+2] + pearA[x+3]));
-				pearA[x+3] = slew;
+				double slew = ((feedbackAL - dram->pearA[x]) + dram->pearA[x+1])*pear*0.5;
+				dram->pearA[x] = feedbackAL = (pear * feedbackAL) + ((1.0-pear) * (dram->pearA[x] + dram->pearA[x+1]));
+				dram->pearA[x+1] = slew;
+				slew = ((feedbackER - dram->pearA[x+2]) + dram->pearA[x+3])*pear*0.5;
+				dram->pearA[x+2] = feedbackER = (pear * feedbackER) + ((1.0-pear) * (dram->pearA[x+2] + dram->pearA[x+3]));
+				dram->pearA[x+3] = slew;
 			}			
 			
 			feedbackBL = ((outVL*3.0) - ((outUL + outWL + outXL + outYL)*2.0));
 			feedbackJR = ((outFR*3.0) - ((outAR + outKR + outPR + outUR)*2.0));
 			for (int x = 0; x < pearStages; x += 4) {
-				double slew = ((feedbackBL - pearB[x]) + pearB[x+1])*pear*0.5;
-				pearB[x] = feedbackBL = (pear * feedbackBL) + ((1.0-pear) * (pearB[x] + pearB[x+1]));
-				pearB[x+1] = slew;
-				slew = ((feedbackJR - pearB[x+2]) + pearB[x+3])*pear*0.5;
-				pearB[x+2] = feedbackJR = (pear * feedbackJR) + ((1.0-pear) * (pearB[x+2] + pearB[x+3]));
-				pearB[x+3] = slew;
+				double slew = ((feedbackBL - dram->pearB[x]) + dram->pearB[x+1])*pear*0.5;
+				dram->pearB[x] = feedbackBL = (pear * feedbackBL) + ((1.0-pear) * (dram->pearB[x] + dram->pearB[x+1]));
+				dram->pearB[x+1] = slew;
+				slew = ((feedbackJR - dram->pearB[x+2]) + dram->pearB[x+3])*pear*0.5;
+				dram->pearB[x+2] = feedbackJR = (pear * feedbackJR) + ((1.0-pear) * (dram->pearB[x+2] + dram->pearB[x+3]));
+				dram->pearB[x+3] = slew;
 			}			
 			
 			feedbackCL = ((outWL*3.0) - ((outUL + outVL + outXL + outYL)*2.0));
 			feedbackOR = ((outKR*3.0) - ((outAR + outFR + outPR + outUR)*2.0));
 			for (int x = 0; x < pearStages; x += 4) {
-				double slew = ((feedbackCL - pearC[x]) + pearC[x+1])*pear*0.5;
-				pearC[x] = feedbackCL = (pear * feedbackCL) + ((1.0-pear) * (pearC[x] + pearC[x+1]));
-				pearC[x+1] = slew;
-				slew = ((feedbackOR - pearC[x+2]) + pearC[x+3])*pear*0.5;
-				pearC[x+2] = feedbackOR = (pear * feedbackOR) + ((1.0-pear) * (pearC[x+2] + pearC[x+3]));
-				pearC[x+3] = slew;
+				double slew = ((feedbackCL - dram->pearC[x]) + dram->pearC[x+1])*pear*0.5;
+				dram->pearC[x] = feedbackCL = (pear * feedbackCL) + ((1.0-pear) * (dram->pearC[x] + dram->pearC[x+1]));
+				dram->pearC[x+1] = slew;
+				slew = ((feedbackOR - dram->pearC[x+2]) + dram->pearC[x+3])*pear*0.5;
+				dram->pearC[x+2] = feedbackOR = (pear * feedbackOR) + ((1.0-pear) * (dram->pearC[x+2] + dram->pearC[x+3]));
+				dram->pearC[x+3] = slew;
 			}			
 			
 			feedbackDL = ((outXL*3.0) - ((outUL + outVL + outWL + outYL)*2.0));
 			feedbackTR = ((outPR*3.0) - ((outAR + outFR + outKR + outUR)*2.0));
 			for (int x = 0; x < pearStages; x += 4) {
-				double slew = ((feedbackDL - pearD[x]) + pearD[x+1])*pear*0.5;
-				pearD[x] = feedbackDL = (pear * feedbackDL) + ((1.0-pear) * (pearD[x] + pearD[x+1]));
-				pearD[x+1] = slew;
-				slew = ((feedbackTR - pearD[x+2]) + pearD[x+3])*pear*0.5;
-				pearD[x+2] = feedbackTR = (pear * feedbackTR) + ((1.0-pear) * (pearD[x+2] + pearD[x+3]));
-				pearD[x+3] = slew;
+				double slew = ((feedbackDL - dram->pearD[x]) + dram->pearD[x+1])*pear*0.5;
+				dram->pearD[x] = feedbackDL = (pear * feedbackDL) + ((1.0-pear) * (dram->pearD[x] + dram->pearD[x+1]));
+				dram->pearD[x+1] = slew;
+				slew = ((feedbackTR - dram->pearD[x+2]) + dram->pearD[x+3])*pear*0.5;
+				dram->pearD[x+2] = feedbackTR = (pear * feedbackTR) + ((1.0-pear) * (dram->pearD[x+2] + dram->pearD[x+3]));
+				dram->pearD[x+3] = slew;
 			}			
 			
 			feedbackEL = ((outYL*3.0) - ((outUL + outVL + outWL + outXL)*2.0));
 			feedbackYR = ((outUR*3.0) - ((outAR + outFR + outKR + outPR)*2.0));
 			for (int x = 0; x < pearStages; x += 4) {
-				double slew = ((feedbackEL - pearE[x]) + pearE[x+1])*pear*0.5;
-				pearE[x] = feedbackEL = (pear * feedbackEL) + ((1.0-pear) * (pearE[x] + pearE[x+1]));
-				pearE[x+1] = slew;
-				slew = ((feedbackYR - pearE[x+2]) + pearE[x+3])*pear*0.5;
-				pearE[x+2] = feedbackYR = (pear * feedbackYR) + ((1.0-pear) * (pearE[x+2] + pearE[x+3]));
-				pearE[x+3] = slew;
+				double slew = ((feedbackEL - dram->pearE[x]) + dram->pearE[x+1])*pear*0.5;
+				dram->pearE[x] = feedbackEL = (pear * feedbackEL) + ((1.0-pear) * (dram->pearE[x] + dram->pearE[x+1]));
+				dram->pearE[x+1] = slew;
+				slew = ((feedbackYR - dram->pearE[x+2]) + dram->pearE[x+3])*pear*0.5;
+				dram->pearE[x+2] = feedbackYR = (pear * feedbackYR) + ((1.0-pear) * (dram->pearE[x+2] + dram->pearE[x+3]));
+				dram->pearE[x+3] = slew;
 			}			
 			//which we need to feed back into the input again, a bit
 						 
@@ -892,12 +894,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		}
 		
 		for (int x = 0; x < 1; x += 4) {
-			double slew = ((inputSampleL - pearF[x]) + pearF[x+1])*pearScaled*0.5;
-			pearF[x] = inputSampleL = (pearScaled * inputSampleL) + ((1.0-pearScaled) * (pearF[x] + pearF[x+1]));
-			pearF[x+1] = slew;
-			slew = ((inputSampleR - pearF[x+2]) + pearF[x+3])*pearScaled*0.5;
-			pearF[x+2] = inputSampleR = (pearScaled * inputSampleR) + ((1.0-pearScaled) * (pearF[x+2] + pearF[x+3]));
-			pearF[x+3] = slew;
+			double slew = ((inputSampleL - dram->pearF[x]) + dram->pearF[x+1])*pearScaled*0.5;
+			dram->pearF[x] = inputSampleL = (pearScaled * inputSampleL) + ((1.0-pearScaled) * (dram->pearF[x] + dram->pearF[x+1]));
+			dram->pearF[x+1] = slew;
+			slew = ((inputSampleR - dram->pearF[x+2]) + dram->pearF[x+3])*pearScaled*0.5;
+			dram->pearF[x+2] = inputSampleR = (pearScaled * inputSampleR) + ((1.0-pearScaled) * (dram->pearF[x+2] + dram->pearF[x+3]));
+			dram->pearF[x+3] = slew;
 		}
 				
 		if (wet < 1.0) {inputSampleL *= wet; inputSampleR *= wet;}
@@ -1083,7 +1085,7 @@ int _airwindowsAlgorithm::reset(void) {
 	
 	cycle = 0;
 	
-	for (int x = 0; x < pear_total; x++) {pearA[x] = 0.0; pearB[x] = 0.0; pearC[x] = 0.0; pearD[x] = 0.0; pearE[x] = 0.0; pearF[x] = 0.0;}
+	for (int x = 0; x < pear_total; x++) {dram->pearA[x] = 0.0; dram->pearB[x] = 0.0; dram->pearC[x] = 0.0; dram->pearD[x] = 0.0; dram->pearE[x] = 0.0; dram->pearF[x] = 0.0;}
 	//from PearEQ
 	
 	vibratoL = vibAL = vibAR = vibBL = vibBR = 0.0;

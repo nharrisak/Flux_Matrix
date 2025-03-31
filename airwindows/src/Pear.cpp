@@ -73,13 +73,15 @@ enum { kNumTemplateParameters = 6 };
 		prevSlewR10,
 		pear_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
-	double pear[pear_total]; //probably worth just using a number here
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double pear[pear_total]; //probably worth just using a number here
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -136,12 +138,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//lettered suffixes like iirA through iirZ. The use of an array will make this a lot tidier.
 		
 		for (int x = 0; x < maxPoles; x += 4) {
-			double slew = ((inputSampleL - pear[x]) + pear[x+1])*freq*0.5;
-			pear[x] = inputSampleL = (freq * inputSampleL) + ((1.0-freq) * (pear[x] + pear[x+1]));
-			pear[x+1] = slew;
-			slew = ((inputSampleR - pear[x+2]) + pear[x+3])*freq*0.5;
-			pear[x+2] = inputSampleR = (freq * inputSampleR) + ((1.0-freq) * (pear[x+2] + pear[x+3]));
-			pear[x+3] = slew;
+			double slew = ((inputSampleL - dram->pear[x]) + dram->pear[x+1])*freq*0.5;
+			dram->pear[x] = inputSampleL = (freq * inputSampleL) + ((1.0-freq) * (dram->pear[x] + dram->pear[x+1]));
+			dram->pear[x+1] = slew;
+			slew = ((inputSampleR - dram->pear[x+2]) + dram->pear[x+3])*freq*0.5;
+			dram->pear[x+2] = inputSampleR = (freq * inputSampleR) + ((1.0-freq) * (dram->pear[x+2] + dram->pear[x+3]));
+			dram->pear[x+3] = slew;
 		}
 		
 		inputSampleL *= wet;
@@ -173,7 +175,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for (int x = 0; x < pear_total; x++) pear[x] = 0.0;
+	for (int x = 0; x < pear_total; x++) dram->pear[x] = 0.0;
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;
 	fpdR = 1.0; while (fpdR < 16386) fpdR = rand()*UINT32_MAX;
 	return noErr;

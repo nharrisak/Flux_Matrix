@@ -229,10 +229,6 @@ enum { kNumTemplateParameters = 6 };
 		fix_sR2,
 		fix_total
 	}; //fixed frequency biquad filter for ultrasonics, stereo
-	double fixA[fix_total];
-	double fixB[fix_total];
-	double fixC[fix_total];
-	double fixD[fix_total];
 	
 	double prevMulchBL;
 	double prevMulchBR;
@@ -255,9 +251,15 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double fixA[fix_total];
+	double fixB[fix_total];
+	double fixC[fix_total];
+	double fixD[fix_total];
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -291,49 +293,49 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//that's so it can be on submixes without cutting back dry channel when adjusted:
 	//unless you go super heavy, you are only adjusting the added verb loudness.
 	
-	fixA[fix_freq] = 20.0/downRate;
-	fixA[fix_reso] = 0.0018769;
-	fixD[fix_freq] = 14.0/downRate;
-	fixD[fix_reso] = 0.0024964;
-	fixB[fix_freq] = (fixA[fix_freq] + fixA[fix_freq] + fixD[fix_freq]) / 3.0;
-	fixB[fix_reso] = 0.0020834;	
-	fixC[fix_freq] = (fixA[fix_freq] + fixD[fix_freq] + fixD[fix_freq]) / 3.0;
-	fixC[fix_reso] = 0.0022899;
+	dram->fixA[fix_freq] = 20.0/downRate;
+	dram->fixA[fix_reso] = 0.0018769;
+	dram->fixD[fix_freq] = 14.0/downRate;
+	dram->fixD[fix_reso] = 0.0024964;
+	dram->fixB[fix_freq] = (dram->fixA[fix_freq] + dram->fixA[fix_freq] + dram->fixD[fix_freq]) / 3.0;
+	dram->fixB[fix_reso] = 0.0020834;	
+	dram->fixC[fix_freq] = (dram->fixA[fix_freq] + dram->fixD[fix_freq] + dram->fixD[fix_freq]) / 3.0;
+	dram->fixC[fix_reso] = 0.0022899;
 	
-	double K = tan(M_PI * fixA[fix_freq]);
-	double norm = 1.0 / (1.0 + K / fixA[fix_reso] + K * K);
-	fixA[fix_a0] = K / fixA[fix_reso] * norm;
-	fixA[fix_a1] = 0.0;
-	fixA[fix_a2] = -fixA[fix_a0];
-	fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixA[fix_b2] = (1.0 - K / fixA[fix_reso] + K * K) * norm;
+	double K = tan(M_PI * dram->fixA[fix_freq]);
+	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_a0] = K / dram->fixA[fix_reso] * norm;
+	dram->fixA[fix_a1] = 0.0;
+	dram->fixA[fix_a2] = -dram->fixA[fix_a0];
+	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
 	//stereo biquad bandpasses we can put into the reverb matrix
 	
-	K = tan(M_PI * fixB[fix_freq]);
-	norm = 1.0 / (1.0 + K / fixB[fix_reso] + K * K);
-	fixB[fix_a0] = K / fixB[fix_reso] * norm;
-	fixB[fix_a1] = 0.0;
-	fixB[fix_a2] = -fixB[fix_a0];
-	fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixB[fix_b2] = (1.0 - K / fixB[fix_reso] + K * K) * norm;
+	K = tan(M_PI * dram->fixB[fix_freq]);
+	norm = 1.0 / (1.0 + K / dram->fixB[fix_reso] + K * K);
+	dram->fixB[fix_a0] = K / dram->fixB[fix_reso] * norm;
+	dram->fixB[fix_a1] = 0.0;
+	dram->fixB[fix_a2] = -dram->fixB[fix_a0];
+	dram->fixB[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixB[fix_b2] = (1.0 - K / dram->fixB[fix_reso] + K * K) * norm;
 	//stereo biquad bandpasses we can put into the reverb matrix
 	
-	K = tan(M_PI * fixC[fix_freq]);
-	norm = 1.0 / (1.0 + K / fixC[fix_reso] + K * K);
-	fixC[fix_a0] = K / fixC[fix_reso] * norm;
-	fixC[fix_a1] = 0.0;
-	fixC[fix_a2] = -fixC[fix_a0];
-	fixC[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixC[fix_b2] = (1.0 - K / fixC[fix_reso] + K * K) * norm;
+	K = tan(M_PI * dram->fixC[fix_freq]);
+	norm = 1.0 / (1.0 + K / dram->fixC[fix_reso] + K * K);
+	dram->fixC[fix_a0] = K / dram->fixC[fix_reso] * norm;
+	dram->fixC[fix_a1] = 0.0;
+	dram->fixC[fix_a2] = -dram->fixC[fix_a0];
+	dram->fixC[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixC[fix_b2] = (1.0 - K / dram->fixC[fix_reso] + K * K) * norm;
 	//stereo biquad bandpasses we can put into the reverb matrix
 	
-	K = tan(M_PI * fixD[fix_freq]);
-	norm = 1.0 / (1.0 + K / fixD[fix_reso] + K * K);
-	fixD[fix_a0] = K / fixD[fix_reso] * norm;
-	fixD[fix_a1] = 0.0;
-	fixD[fix_a2] = -fixD[fix_a0];
-	fixD[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixD[fix_b2] = (1.0 - K / fixD[fix_reso] + K * K) * norm;
+	K = tan(M_PI * dram->fixD[fix_freq]);
+	norm = 1.0 / (1.0 + K / dram->fixD[fix_reso] + K * K);
+	dram->fixD[fix_a0] = K / dram->fixD[fix_reso] * norm;
+	dram->fixD[fix_a1] = 0.0;
+	dram->fixD[fix_a2] = -dram->fixD[fix_a0];
+	dram->fixD[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixD[fix_b2] = (1.0 - K / dram->fixD[fix_reso] + K * K) * norm;
 	//stereo biquad bandpasses we can put into the reverb matrix
 	
 	while (nSampleFrames-- > 0) {
@@ -526,14 +528,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- one
 			
-			outSample = (outAL * fixA[fix_a0]) + fixA[fix_sL1];
-			fixA[fix_sL1] = (outAL * fixA[fix_a1]) - (outSample * fixA[fix_b1]) + fixA[fix_sL2];
-			fixA[fix_sL2] = (outAL * fixA[fix_a2]) - (outSample * fixA[fix_b2]);
+			outSample = (outAL * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+			dram->fixA[fix_sL1] = (outAL * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
+			dram->fixA[fix_sL2] = (outAL * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 			outAL = outSample; //fixed biquad
 			
-			outSample = (outER * fixA[fix_a0]) + fixA[fix_sR1];
-			fixA[fix_sR1] = (outER * fixA[fix_a1]) - (outSample * fixA[fix_b1]) + fixA[fix_sR2];
-			fixA[fix_sR2] = (outER * fixA[fix_a2]) - (outSample * fixA[fix_b2]);
+			outSample = (outER * dram->fixA[fix_a0]) + dram->fixA[fix_sR1];
+			dram->fixA[fix_sR1] = (outER * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sR2];
+			dram->fixA[fix_sR2] = (outER * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 			outER = outSample; //fixed biquad
 						
 			//-------- filtered (one path in five, feeding the rest of the matrix
@@ -576,14 +578,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- mulch
 			
-			outSample = (outFL * fixB[fix_a0]) + fixB[fix_sL1];
-			fixB[fix_sL1] = (outFL * fixB[fix_a1]) - (outSample * fixB[fix_b1]) + fixB[fix_sL2];
-			fixB[fix_sL2] = (outFL * fixB[fix_a2]) - (outSample * fixB[fix_b2]);
+			outSample = (outFL * dram->fixB[fix_a0]) + dram->fixB[fix_sL1];
+			dram->fixB[fix_sL1] = (outFL * dram->fixB[fix_a1]) - (outSample * dram->fixB[fix_b1]) + dram->fixB[fix_sL2];
+			dram->fixB[fix_sL2] = (outFL * dram->fixB[fix_a2]) - (outSample * dram->fixB[fix_b2]);
 			outFL = outSample; //fixed biquad
 			
-			outSample = (outDR * fixB[fix_a0]) + fixB[fix_sR1];
-			fixB[fix_sR1] = (outDR * fixB[fix_a1]) - (outSample * fixB[fix_b1]) + fixB[fix_sR2];
-			fixB[fix_sR2] = (outDR * fixB[fix_a2]) - (outSample * fixB[fix_b2]);
+			outSample = (outDR * dram->fixB[fix_a0]) + dram->fixB[fix_sR1];
+			dram->fixB[fix_sR1] = (outDR * dram->fixB[fix_a1]) - (outSample * dram->fixB[fix_b1]) + dram->fixB[fix_sR2];
+			dram->fixB[fix_sR2] = (outDR * dram->fixB[fix_a2]) - (outSample * dram->fixB[fix_b2]);
 			outDR = outSample; //fixed biquad			
 			
 			outSample = (outGL + prevMulchBL)*0.5;
@@ -631,14 +633,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- mulch
 			
-			outSample = (outKL * fixC[fix_a0]) + fixC[fix_sL1];
-			fixC[fix_sL1] = (outKL * fixC[fix_a1]) - (outSample * fixC[fix_b1]) + fixC[fix_sL2];
-			fixC[fix_sL2] = (outKL * fixC[fix_a2]) - (outSample * fixC[fix_b2]);
+			outSample = (outKL * dram->fixC[fix_a0]) + dram->fixC[fix_sL1];
+			dram->fixC[fix_sL1] = (outKL * dram->fixC[fix_a1]) - (outSample * dram->fixC[fix_b1]) + dram->fixC[fix_sL2];
+			dram->fixC[fix_sL2] = (outKL * dram->fixC[fix_a2]) - (outSample * dram->fixC[fix_b2]);
 			outKL = outSample; //fixed biquad
 			
-			outSample = (outCR * fixC[fix_a0]) + fixC[fix_sR1];
-			fixC[fix_sR1] = (outCR * fixC[fix_a1]) - (outSample * fixC[fix_b1]) + fixC[fix_sR2];
-			fixC[fix_sR2] = (outCR * fixC[fix_a2]) - (outSample * fixC[fix_b2]);
+			outSample = (outCR * dram->fixC[fix_a0]) + dram->fixC[fix_sR1];
+			dram->fixC[fix_sR1] = (outCR * dram->fixC[fix_a1]) - (outSample * dram->fixC[fix_b1]) + dram->fixC[fix_sR2];
+			dram->fixC[fix_sR2] = (outCR * dram->fixC[fix_a2]) - (outSample * dram->fixC[fix_b2]);
 			outCR = outSample; //fixed biquad			
 			
 			outSample = (outLL + prevMulchCL)*0.5;
@@ -686,14 +688,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- mulch
 			
-			outSample = (outPL * fixD[fix_a0]) + fixD[fix_sL1];
-			fixD[fix_sL1] = (outPL * fixD[fix_a1]) - (outSample * fixD[fix_b1]) + fixD[fix_sL2];
-			fixD[fix_sL2] = (outPL * fixD[fix_a2]) - (outSample * fixD[fix_b2]);
+			outSample = (outPL * dram->fixD[fix_a0]) + dram->fixD[fix_sL1];
+			dram->fixD[fix_sL1] = (outPL * dram->fixD[fix_a1]) - (outSample * dram->fixD[fix_b1]) + dram->fixD[fix_sL2];
+			dram->fixD[fix_sL2] = (outPL * dram->fixD[fix_a2]) - (outSample * dram->fixD[fix_b2]);
 			outPL = outSample; //fixed biquad
 			
-			outSample = (outBR * fixD[fix_a0]) + fixD[fix_sR1];
-			fixD[fix_sR1] = (outBR * fixD[fix_a1]) - (outSample * fixD[fix_b1]) + fixD[fix_sR2];
-			fixD[fix_sR2] = (outBR * fixD[fix_a2]) - (outSample * fixD[fix_b2]);
+			outSample = (outBR * dram->fixD[fix_a0]) + dram->fixD[fix_sR1];
+			dram->fixD[fix_sR1] = (outBR * dram->fixD[fix_a1]) - (outSample * dram->fixD[fix_b1]) + dram->fixD[fix_sR2];
+			dram->fixD[fix_sR2] = (outBR * dram->fixD[fix_a2]) - (outSample * dram->fixD[fix_b2]);
 			outBR = outSample; //fixed biquad			
 			
 			outSample = (outQL + prevMulchDL)*0.5;
@@ -1033,7 +1035,7 @@ int _airwindowsAlgorithm::reset(void) {
 	
 	cycle = 0;
 	
-	for (int x = 0; x < fix_total; x++) {fixA[x] = 0.0; fixB[x] = 0.0; fixC[x] = 0.0; fixD[x] = 0.0;}
+	for (int x = 0; x < fix_total; x++) {dram->fixA[x] = 0.0; dram->fixB[x] = 0.0; dram->fixC[x] = 0.0; dram->fixD[x] = 0.0;}
 	//from ZBandpass, so I can use enums with it
 	
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;

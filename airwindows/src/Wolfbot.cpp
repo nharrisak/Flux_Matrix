@@ -26,7 +26,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			prevSampL1,
@@ -42,16 +41,18 @@ struct _kernel {
 			kalOutL,
 			kal_total
 		};
-		double kHP[kal_total];
-		double kLP[kal_total];
 
 		uint32_t fpd;
+	
+	struct _dram {
+			double kHP[kal_total];
+		double kLP[kal_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -75,61 +76,61 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		double dryKal = inputSample = inputSample*(1.0-kalHP)*0.777;
 		inputSample *= (1.0-kalHP);
 		//set up gain levels to control the beast
-		kHP[prevSlewL3] += kHP[prevSampL3] - kHP[prevSampL2]; kHP[prevSlewL3] *= 0.5;
-		kHP[prevSlewL2] += kHP[prevSampL2] - kHP[prevSampL1]; kHP[prevSlewL2] *= 0.5;
-		kHP[prevSlewL1] += kHP[prevSampL1] - inputSample; kHP[prevSlewL1] *= 0.5;
+		dram->kHP[prevSlewL3] += dram->kHP[prevSampL3] - dram->kHP[prevSampL2]; dram->kHP[prevSlewL3] *= 0.5;
+		dram->kHP[prevSlewL2] += dram->kHP[prevSampL2] - dram->kHP[prevSampL1]; dram->kHP[prevSlewL2] *= 0.5;
+		dram->kHP[prevSlewL1] += dram->kHP[prevSampL1] - inputSample; dram->kHP[prevSlewL1] *= 0.5;
 		//make slews from each set of samples used
-		kHP[accSlewL2] += kHP[prevSlewL3] - kHP[prevSlewL2]; kHP[accSlewL2] *= 0.5;
-		kHP[accSlewL1] += kHP[prevSlewL2] - kHP[prevSlewL1]; kHP[accSlewL1] *= 0.5;
+		dram->kHP[accSlewL2] += dram->kHP[prevSlewL3] - dram->kHP[prevSlewL2]; dram->kHP[accSlewL2] *= 0.5;
+		dram->kHP[accSlewL1] += dram->kHP[prevSlewL2] - dram->kHP[prevSlewL1]; dram->kHP[accSlewL1] *= 0.5;
 		//differences between slews: rate of change of rate of change
-		kHP[accSlewL3] += (kHP[accSlewL2] - kHP[accSlewL1]); kHP[accSlewL3] *= 0.5;
+		dram->kHP[accSlewL3] += (dram->kHP[accSlewL2] - dram->kHP[accSlewL1]); dram->kHP[accSlewL3] *= 0.5;
 		//entering the abyss, what even is this
-		kHP[kalOutL] += kHP[prevSampL1] + kHP[prevSlewL2] + kHP[accSlewL3]; kHP[kalOutL] *= 0.5;
+		dram->kHP[kalOutL] += dram->kHP[prevSampL1] + dram->kHP[prevSlewL2] + dram->kHP[accSlewL3]; dram->kHP[kalOutL] *= 0.5;
 		//resynthesizing predicted result (all iir smoothed)
-		kHP[kalGainL] += fabs(dryKal-kHP[kalOutL])*kalHP*8.0; kHP[kalGainL] *= 0.5;
+		dram->kHP[kalGainL] += fabs(dryKal-dram->kHP[kalOutL])*kalHP*8.0; dram->kHP[kalGainL] *= 0.5;
 		//madness takes its toll. Kalman Gain: how much dry to retain
-		if (kHP[kalGainL] > kalHP*0.5) kHP[kalGainL] = kalHP*0.5;
+		if (dram->kHP[kalGainL] > kalHP*0.5) dram->kHP[kalGainL] = kalHP*0.5;
 		//attempts to avoid explosions
-		kHP[kalOutL] += (dryKal*(1.0-(0.68+(kalHP*0.157))));	
+		dram->kHP[kalOutL] += (dryKal*(1.0-(0.68+(kalHP*0.157))));	
 		//this is for tuning a really complete cancellation up around Nyquist
-		kHP[prevSampL3] = kHP[prevSampL2];
-		kHP[prevSampL2] = kHP[prevSampL1];
-		kHP[prevSampL1] = (kHP[kalGainL] * kHP[kalOutL]) + ((1.0-kHP[kalGainL])*dryKal);
+		dram->kHP[prevSampL3] = dram->kHP[prevSampL2];
+		dram->kHP[prevSampL2] = dram->kHP[prevSampL1];
+		dram->kHP[prevSampL1] = (dram->kHP[kalGainL] * dram->kHP[kalOutL]) + ((1.0-dram->kHP[kalGainL])*dryKal);
 		//feed the chain of previous samples
-		if (kHP[prevSampL1] > 1.0) kHP[prevSampL1] = 1.0;
-		if (kHP[prevSampL1] < -1.0) kHP[prevSampL1] = -1.0;
+		if (dram->kHP[prevSampL1] > 1.0) dram->kHP[prevSampL1] = 1.0;
+		if (dram->kHP[prevSampL1] < -1.0) dram->kHP[prevSampL1] = -1.0;
 		//end Kalman Filter, except for trim on output		
-		inputSample = drySample+(kHP[kalOutL]*-0.777); //highpass
+		inputSample = drySample+(dram->kHP[kalOutL]*-0.777); //highpass
 		
 		//begin Kalman Filter
 		dryKal = inputSample = inputSample*(1.0-kalLP)*0.777;
 		inputSample *= (1.0-kalLP);
 		//set up gain levels to control the beast
-		kLP[prevSlewL3] += kLP[prevSampL3] - kLP[prevSampL2]; kLP[prevSlewL3] *= 0.5;
-		kLP[prevSlewL2] += kLP[prevSampL2] - kLP[prevSampL1]; kLP[prevSlewL2] *= 0.5;
-		kLP[prevSlewL1] += kLP[prevSampL1] - inputSample; kLP[prevSlewL1] *= 0.5;
+		dram->kLP[prevSlewL3] += dram->kLP[prevSampL3] - dram->kLP[prevSampL2]; dram->kLP[prevSlewL3] *= 0.5;
+		dram->kLP[prevSlewL2] += dram->kLP[prevSampL2] - dram->kLP[prevSampL1]; dram->kLP[prevSlewL2] *= 0.5;
+		dram->kLP[prevSlewL1] += dram->kLP[prevSampL1] - inputSample; dram->kLP[prevSlewL1] *= 0.5;
 		//make slews from each set of samples used
-		kLP[accSlewL2] += kLP[prevSlewL3] - kLP[prevSlewL2]; kLP[accSlewL2] *= 0.5;
-		kLP[accSlewL1] += kLP[prevSlewL2] - kLP[prevSlewL1]; kLP[accSlewL1] *= 0.5;
+		dram->kLP[accSlewL2] += dram->kLP[prevSlewL3] - dram->kLP[prevSlewL2]; dram->kLP[accSlewL2] *= 0.5;
+		dram->kLP[accSlewL1] += dram->kLP[prevSlewL2] - dram->kLP[prevSlewL1]; dram->kLP[accSlewL1] *= 0.5;
 		//differences between slews: rate of change of rate of change
-		kLP[accSlewL3] += (kLP[accSlewL2] - kLP[accSlewL1]); kLP[accSlewL3] *= 0.5;
+		dram->kLP[accSlewL3] += (dram->kLP[accSlewL2] - dram->kLP[accSlewL1]); dram->kLP[accSlewL3] *= 0.5;
 		//entering the abyss, what even is this
-		kLP[kalOutL] += kLP[prevSampL1] + kLP[prevSlewL2] + kLP[accSlewL3]; kLP[kalOutL] *= 0.5;
+		dram->kLP[kalOutL] += dram->kLP[prevSampL1] + dram->kLP[prevSlewL2] + dram->kLP[accSlewL3]; dram->kLP[kalOutL] *= 0.5;
 		//resynthesizing predicted result (all iir smoothed)
-		kLP[kalGainL] += fabs(dryKal-kLP[kalOutL])*kalLP*8.0; kLP[kalGainL] *= 0.5;
+		dram->kLP[kalGainL] += fabs(dryKal-dram->kLP[kalOutL])*kalLP*8.0; dram->kLP[kalGainL] *= 0.5;
 		//madness takes its toll. Kalman Gain: how much dry to retain
-		if (kLP[kalGainL] > kalLP*0.5) kLP[kalGainL] = kalLP*0.5;
+		if (dram->kLP[kalGainL] > kalLP*0.5) dram->kLP[kalGainL] = kalLP*0.5;
 		//attempts to avoid explosions
-		kLP[kalOutL] += (dryKal*(1.0-(0.68+(kalLP*0.157))));	
+		dram->kLP[kalOutL] += (dryKal*(1.0-(0.68+(kalLP*0.157))));	
 		//this is for tuning a really complete cancellation up around Nyquist
-		kLP[prevSampL3] = kLP[prevSampL2];
-		kLP[prevSampL2] = kLP[prevSampL1];
-		kLP[prevSampL1] = (kLP[kalGainL] * kLP[kalOutL]) + ((1.0-kLP[kalGainL])*dryKal);
+		dram->kLP[prevSampL3] = dram->kLP[prevSampL2];
+		dram->kLP[prevSampL2] = dram->kLP[prevSampL1];
+		dram->kLP[prevSampL1] = (dram->kLP[kalGainL] * dram->kLP[kalOutL]) + ((1.0-dram->kLP[kalGainL])*dryKal);
 		//feed the chain of previous samples
-		if (kLP[prevSampL1] > 1.0) kLP[prevSampL1] = 1.0;
-		if (kLP[prevSampL1] < -1.0) kLP[prevSampL1] = -1.0;
+		if (dram->kLP[prevSampL1] > 1.0) dram->kLP[prevSampL1] = 1.0;
+		if (dram->kLP[prevSampL1] < -1.0) dram->kLP[prevSampL1] = -1.0;
 		//end Kalman Filter, except for trim on output		
-		inputSample = sin(kLP[kalOutL]*0.7943)*1.2589; //lowpass
+		inputSample = sin(dram->kLP[kalOutL]*0.7943)*1.2589; //lowpass
 		
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
@@ -145,7 +146,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < kal_total; x++) {kHP[x] = 0.0; kLP[x] = 0.0;}
+	for (int x = 0; x < kal_total; x++) {dram->kHP[x] = 0.0; dram->kLP[x] = 0.0;}
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

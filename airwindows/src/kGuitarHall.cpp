@@ -172,12 +172,6 @@ enum { kNumTemplateParameters = 6 };
 		pear_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
 	
-	double pearA[pear_total]; //probably worth just using a number here
-	double pearB[pear_total]; //probably worth just using a number here
-	double pearC[pear_total]; //probably worth just using a number here
-	double pearD[pear_total]; //probably worth just using a number here
-	double pearE[pear_total]; //probably worth just using a number here
-	double pearF[pear_total]; //probably worth just using a number here
 	
 	double vibratoL;
 	double vibratoR;
@@ -249,13 +243,21 @@ enum { kNumTemplateParameters = 6 };
 		bez_cycle,
 		bez_total
 	}; //the new undersampling. bez signifies the bezier curve reconstruction
-	double bez[bez_total];
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double pearA[pear_total]; //probably worth just using a number here
+	double pearB[pear_total]; //probably worth just using a number here
+	double pearC[pear_total]; //probably worth just using a number here
+	double pearD[pear_total]; //probably worth just using a number here
+	double pearE[pear_total]; //probably worth just using a number here
+	double pearF[pear_total]; //probably worth just using a number here
+	double bez[bez_total];
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -297,16 +299,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		double drySampleL = inputSampleL;
 		double drySampleR = inputSampleR;
 		
-		bez[bez_cycle] += derez;
-		bez[bez_SampL] += ((inputSampleL+bez[bez_InL]) * derez);
-		bez[bez_SampR] += ((inputSampleR+bez[bez_InR]) * derez);
-		bez[bez_InL] = inputSampleL; bez[bez_InR] = inputSampleR;
-		if (bez[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
-			bez[bez_cycle] = 0.0;
+		dram->bez[bez_cycle] += derez;
+		dram->bez[bez_SampL] += ((inputSampleL+dram->bez[bez_InL]) * derez);
+		dram->bez[bez_SampR] += ((inputSampleR+dram->bez[bez_InR]) * derez);
+		dram->bez[bez_InL] = inputSampleL; dram->bez[bez_InR] = inputSampleR;
+		if (dram->bez[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
+			dram->bez[bez_cycle] = 0.0;
 			
 			//predelay
-			aZL[countZ] = bez[bez_SampL];
-			aZR[countZ] = bez[bez_SampR];
+			aZL[countZ] = dram->bez[bez_SampL];
+			aZR[countZ] = dram->bez[bez_SampR];
 			countZ++; if (countZ < 0 || countZ > adjPredelay) countZ = 0;
 			double avgSampL = aZL[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
 			double avgSampR = aZR[countZ-((countZ > adjPredelay)?adjPredelay+1:0)];
@@ -563,12 +565,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			feedbackAL = ((outAR*3.0) - ((outFR + outKR + outPR + outUR)*2.0));
 			feedbackER = ((outUL*3.0) - ((outVL + outWL + outXL + outYL)*2.0));
-			double slew = ((feedbackAL - pearA[0]) + pearA[1])*pear*0.5;
-			pearA[0] = feedbackAL = (pear * feedbackAL) + ((1.0-pear) * (pearA[0] + pearA[1]));
-			pearA[1] = slew;
-			slew = ((feedbackER - pearA[2]) + pearA[3])*pear*0.5;
-			pearA[2] = feedbackER = (pear * feedbackER) + ((1.0-pear) * (pearA[2] + pearA[3]));
-			pearA[3] = slew;
+			double slew = ((feedbackAL - dram->pearA[0]) + dram->pearA[1])*pear*0.5;
+			dram->pearA[0] = feedbackAL = (pear * feedbackAL) + ((1.0-pear) * (dram->pearA[0] + dram->pearA[1]));
+			dram->pearA[1] = slew;
+			slew = ((feedbackER - dram->pearA[2]) + dram->pearA[3])*pear*0.5;
+			dram->pearA[2] = feedbackER = (pear * feedbackER) + ((1.0-pear) * (dram->pearA[2] + dram->pearA[3]));
+			dram->pearA[3] = slew;
 			//Air Discontinuity A begin
 			feedbackAL *= topdB;
 			if (feedbackAL < -0.222) feedbackAL = -0.222; if (feedbackAL > 0.222) feedbackAL = 0.222;
@@ -592,12 +594,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			feedbackBL = ((outVL*3.0) - ((outUL + outWL + outXL + outYL)*2.0));
 			feedbackJR = ((outFR*3.0) - ((outAR + outKR + outPR + outUR)*2.0));
-			slew = ((feedbackBL - pearB[0]) + pearB[1])*pear*0.5;
-			pearB[0] = feedbackBL = (pear * feedbackBL) + ((1.0-pear) * (pearB[0] + pearB[1]));
-			pearB[1] = slew;
-			slew = ((feedbackJR - pearB[2]) + pearB[3])*pear*0.5;
-			pearB[2] = feedbackJR = (pear * feedbackJR) + ((1.0-pear) * (pearB[2] + pearB[3]));
-			pearB[3] = slew;
+			slew = ((feedbackBL - dram->pearB[0]) + dram->pearB[1])*pear*0.5;
+			dram->pearB[0] = feedbackBL = (pear * feedbackBL) + ((1.0-pear) * (dram->pearB[0] + dram->pearB[1]));
+			dram->pearB[1] = slew;
+			slew = ((feedbackJR - dram->pearB[2]) + dram->pearB[3])*pear*0.5;
+			dram->pearB[2] = feedbackJR = (pear * feedbackJR) + ((1.0-pear) * (dram->pearB[2] + dram->pearB[3]));
+			dram->pearB[3] = slew;
 			//Air Discontinuity B begin
 			feedbackBL *= topdB;
 			if (feedbackBL < -0.222) feedbackBL = -0.222; if (feedbackBL > 0.222) feedbackBL = 0.222;
@@ -619,12 +621,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			feedbackCL = ((outWL*3.0) - ((outUL + outVL + outXL + outYL)*2.0));
 			feedbackOR = ((outKR*3.0) - ((outAR + outFR + outPR + outUR)*2.0));
-			slew = ((feedbackCL - pearC[0]) + pearC[1])*pear*0.5;
-			pearC[0] = feedbackCL = (pear * feedbackCL) + ((1.0-pear) * (pearC[0] + pearC[1]));
-			pearC[1] = slew;
-			slew = ((feedbackOR - pearC[2]) + pearC[3])*pear*0.5;
-			pearC[2] = feedbackOR = (pear * feedbackOR) + ((1.0-pear) * (pearC[2] + pearC[3]));
-			pearC[3] = slew;
+			slew = ((feedbackCL - dram->pearC[0]) + dram->pearC[1])*pear*0.5;
+			dram->pearC[0] = feedbackCL = (pear * feedbackCL) + ((1.0-pear) * (dram->pearC[0] + dram->pearC[1]));
+			dram->pearC[1] = slew;
+			slew = ((feedbackOR - dram->pearC[2]) + dram->pearC[3])*pear*0.5;
+			dram->pearC[2] = feedbackOR = (pear * feedbackOR) + ((1.0-pear) * (dram->pearC[2] + dram->pearC[3]));
+			dram->pearC[3] = slew;
 			//Air Discontinuity C begin
 			feedbackCL *= topdB;
 			if (feedbackCL < -0.222) feedbackCL = -0.222; if (feedbackCL > 0.222) feedbackCL = 0.222;
@@ -646,12 +648,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			feedbackDL = ((outXL*3.0) - ((outUL + outVL + outWL + outYL)*2.0));
 			feedbackTR = ((outPR*3.0) - ((outAR + outFR + outKR + outUR)*2.0));
-			slew = ((feedbackDL - pearD[0]) + pearD[1])*pear*0.5;
-			pearD[0] = feedbackDL = (pear * feedbackDL) + ((1.0-pear) * (pearD[0] + pearD[1]));
-			pearD[1] = slew;
-			slew = ((feedbackTR - pearD[2]) + pearD[3])*pear*0.5;
-			pearD[2] = feedbackTR = (pear * feedbackTR) + ((1.0-pear) * (pearD[2] + pearD[3]));
-			pearD[3] = slew;
+			slew = ((feedbackDL - dram->pearD[0]) + dram->pearD[1])*pear*0.5;
+			dram->pearD[0] = feedbackDL = (pear * feedbackDL) + ((1.0-pear) * (dram->pearD[0] + dram->pearD[1]));
+			dram->pearD[1] = slew;
+			slew = ((feedbackTR - dram->pearD[2]) + dram->pearD[3])*pear*0.5;
+			dram->pearD[2] = feedbackTR = (pear * feedbackTR) + ((1.0-pear) * (dram->pearD[2] + dram->pearD[3]));
+			dram->pearD[3] = slew;
 			//Air Discontinuity D begin
 			feedbackDL *= topdB;
 			if (feedbackDL < -0.222) feedbackDL = -0.222; if (feedbackDL > 0.222) feedbackDL = 0.222;
@@ -673,12 +675,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			feedbackEL = ((outYL*3.0) - ((outUL + outVL + outWL + outXL)*2.0));
 			feedbackYR = ((outUR*3.0) - ((outAR + outFR + outKR + outPR)*2.0));
-			slew = ((feedbackEL - pearE[0]) + pearE[1])*pear*0.5;
-			pearE[0] = feedbackEL = (pear * feedbackEL) + ((1.0-pear) * (pearE[0] + pearE[1]));
-			pearE[1] = slew;
-			slew = ((feedbackYR - pearE[2]) + pearE[3])*pear*0.5;
-			pearE[2] = feedbackYR = (pear * feedbackYR) + ((1.0-pear) * (pearE[2] + pearE[3]));
-			pearE[3] = slew;
+			slew = ((feedbackEL - dram->pearE[0]) + dram->pearE[1])*pear*0.5;
+			dram->pearE[0] = feedbackEL = (pear * feedbackEL) + ((1.0-pear) * (dram->pearE[0] + dram->pearE[1]));
+			dram->pearE[1] = slew;
+			slew = ((feedbackYR - dram->pearE[2]) + dram->pearE[3])*pear*0.5;
+			dram->pearE[2] = feedbackYR = (pear * feedbackYR) + ((1.0-pear) * (dram->pearE[2] + dram->pearE[3]));
+			dram->pearE[3] = slew;
 			//Air Discontinuity E begin
 			feedbackEL *= topdB;
 			if (feedbackEL < -0.222) feedbackEL = -0.222; if (feedbackEL > 0.222) feedbackEL = 0.222;
@@ -703,22 +705,22 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			inputSampleR = (outAR + outFR + outKR + outPR + outUR)*0.0008;
 			//and take the final combined sum of outputs, corrected for Householder gain
 						
-			bez[bez_CL] = bez[bez_BL];
-			bez[bez_BL] = bez[bez_AL];
-			bez[bez_AL] = inputSampleL;
-			bez[bez_SampL] = 0.0;
+			dram->bez[bez_CL] = dram->bez[bez_BL];
+			dram->bez[bez_BL] = dram->bez[bez_AL];
+			dram->bez[bez_AL] = inputSampleL;
+			dram->bez[bez_SampL] = 0.0;
 			
-			bez[bez_CR] = bez[bez_BR];
-			bez[bez_BR] = bez[bez_AR];
-			bez[bez_AR] = inputSampleR;
-			bez[bez_SampR] = 0.0;
+			dram->bez[bez_CR] = dram->bez[bez_BR];
+			dram->bez[bez_BR] = dram->bez[bez_AR];
+			dram->bez[bez_AR] = inputSampleR;
+			dram->bez[bez_SampR] = 0.0;
 		}
-		double CBL = (bez[bez_CL]*(1.0-bez[bez_cycle]))+(bez[bez_BL]*bez[bez_cycle]);
-		double CBR = (bez[bez_CR]*(1.0-bez[bez_cycle]))+(bez[bez_BR]*bez[bez_cycle]);
-		double BAL = (bez[bez_BL]*(1.0-bez[bez_cycle]))+(bez[bez_AL]*bez[bez_cycle]);
-		double BAR = (bez[bez_BR]*(1.0-bez[bez_cycle]))+(bez[bez_AR]*bez[bez_cycle]);
-		double CBAL = (bez[bez_BL]+(CBL*(1.0-bez[bez_cycle]))+(BAL*bez[bez_cycle]))*0.125;
-		double CBAR = (bez[bez_BR]+(CBR*(1.0-bez[bez_cycle]))+(BAR*bez[bez_cycle]))*0.125;
+		double CBL = (dram->bez[bez_CL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BL]*dram->bez[bez_cycle]);
+		double CBR = (dram->bez[bez_CR]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_BR]*dram->bez[bez_cycle]);
+		double BAL = (dram->bez[bez_BL]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AL]*dram->bez[bez_cycle]);
+		double BAR = (dram->bez[bez_BR]*(1.0-dram->bez[bez_cycle]))+(dram->bez[bez_AR]*dram->bez[bez_cycle]);
+		double CBAL = (dram->bez[bez_BL]+(CBL*(1.0-dram->bez[bez_cycle]))+(BAL*dram->bez[bez_cycle]))*0.125;
+		double CBAR = (dram->bez[bez_BR]+(CBR*(1.0-dram->bez[bez_cycle]))+(BAR*dram->bez[bez_cycle]))*0.125;
 		inputSampleL = CBAL;
 		inputSampleR = CBAR;
 		
@@ -727,12 +729,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (inputSampleR > 1.0) inputSampleR = 1.0;
 		if (inputSampleR < -1.0) inputSampleR = -1.0;
 		
-		double slew = ((inputSampleL - pearF[0]) + pearF[1])*pearScaled*0.5;
-		pearF[0] = inputSampleL = (pearScaled * inputSampleL) + ((1.0-pearScaled) * (pearF[0] + pearF[1]));
-		pearF[1] = slew;
-		slew = ((inputSampleR - pearF[2]) + pearF[3])*pearScaled*0.5;
-		pearF[2] = inputSampleR = (pearScaled * inputSampleR) + ((1.0-pearScaled) * (pearF[2] + pearF[3]));
-		pearF[3] = slew;
+		double slew = ((inputSampleL - dram->pearF[0]) + dram->pearF[1])*pearScaled*0.5;
+		dram->pearF[0] = inputSampleL = (pearScaled * inputSampleL) + ((1.0-pearScaled) * (dram->pearF[0] + dram->pearF[1]));
+		dram->pearF[1] = slew;
+		slew = ((inputSampleR - dram->pearF[2]) + dram->pearF[3])*pearScaled*0.5;
+		dram->pearF[2] = inputSampleR = (pearScaled * inputSampleR) + ((1.0-pearScaled) * (dram->pearF[2] + dram->pearF[3]));
+		dram->pearF[3] = slew;
 		
 		if (wet < 1.0) {inputSampleL *= wet; inputSampleR *= wet;}
 		if (dry < 1.0) {drySampleL *= dry; drySampleR *= dry;}
@@ -860,7 +862,7 @@ int _airwindowsAlgorithm::reset(void) {
 	countZ = 1;
 	countVLF = 1;
 	
-	for (int x = 0; x < pear_total; x++) {pearA[x] = 0.0; pearB[x] = 0.0; pearC[x] = 0.0; pearD[x] = 0.0; pearE[x] = 0.0; pearF[x] = 0.0;}
+	for (int x = 0; x < pear_total; x++) {dram->pearA[x] = 0.0; dram->pearB[x] = 0.0; dram->pearC[x] = 0.0; dram->pearD[x] = 0.0; dram->pearE[x] = 0.0; dram->pearF[x] = 0.0;}
 	//from PearEQ
 	
 	vibratoL = vibAL = vibAR = vibBL = vibBR = 0.0;
@@ -902,8 +904,8 @@ int _airwindowsAlgorithm::reset(void) {
 	dBdXR = 1;	
 	dBeXR = 1;	
 	
-	for (int x = 0; x < bez_total; x++) bez[x] = 0.0;
-	bez[bez_cycle] = 1.0;
+	for (int x = 0; x < bez_total; x++) dram->bez[x] = 0.0;
+	dram->bez[bez_cycle] = 1.0;
 	
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;
 	fpdR = 1.0; while (fpdR < 16386) fpdR = rand()*UINT32_MAX;

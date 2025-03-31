@@ -37,8 +37,6 @@ struct _airwindowsAlgorithm : public _NT_algorithm
 	uint32_t	numChannels;
 #endif
 
-	struct _dram*	dram;
-
 	inline float GetParameter( int index )
 	{
 		return scaled[ index ];

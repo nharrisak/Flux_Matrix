@@ -46,14 +46,16 @@ enum { kNumTemplateParameters = 6 };
 		hdb_sR2,
 		hdb_total
 	}; //fixed frequency biquad filter for ultrasonics, stereo
-	double hdbA[hdb_total];
-	double hdbB[hdb_total];
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double hdbA[hdb_total];
+	double hdbB[hdb_total];
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -64,24 +66,24 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	double headBumpDrive = (GetParameter( kParam_A )*0.1)/overallscale;
 
-	hdbA[hdb_freq] = GetParameter( kParam_B )/GetSampleRate();
-	hdbB[hdb_freq] = hdbA[hdb_freq]*0.9375;
+	dram->hdbA[hdb_freq] = GetParameter( kParam_B )/GetSampleRate();
+	dram->hdbB[hdb_freq] = dram->hdbA[hdb_freq]*0.9375;
 	//displayNumber = ((B*B)*175.0)+25.0
-	hdbB[hdb_reso] = hdbA[hdb_reso] = 0.618033988749894848204586;
-	hdbB[hdb_a1] = hdbA[hdb_a1] = 0.0;
+	dram->hdbB[hdb_reso] = dram->hdbA[hdb_reso] = 0.618033988749894848204586;
+	dram->hdbB[hdb_a1] = dram->hdbA[hdb_a1] = 0.0;
 	
-	double K = tan(M_PI * hdbA[hdb_freq]);
-	double norm = 1.0 / (1.0 + K / hdbA[hdb_reso] + K * K);
-	hdbA[hdb_a0] = K / hdbA[hdb_reso] * norm;
-	hdbA[hdb_a2] = -hdbA[hdb_a0];
-	hdbA[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
-	hdbA[hdb_b2] = (1.0 - K / hdbA[hdb_reso] + K * K) * norm;
-	K = tan(M_PI * hdbB[hdb_freq]);
-	norm = 1.0 / (1.0 + K / hdbB[hdb_reso] + K * K);
-	hdbB[hdb_a0] = K / hdbB[hdb_reso] * norm;
-	hdbB[hdb_a2] = -hdbB[hdb_a0];
-	hdbB[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
-	hdbB[hdb_b2] = (1.0 - K / hdbB[hdb_reso] + K * K) * norm;
+	double K = tan(M_PI * dram->hdbA[hdb_freq]);
+	double norm = 1.0 / (1.0 + K / dram->hdbA[hdb_reso] + K * K);
+	dram->hdbA[hdb_a0] = K / dram->hdbA[hdb_reso] * norm;
+	dram->hdbA[hdb_a2] = -dram->hdbA[hdb_a0];
+	dram->hdbA[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hdbA[hdb_b2] = (1.0 - K / dram->hdbA[hdb_reso] + K * K) * norm;
+	K = tan(M_PI * dram->hdbB[hdb_freq]);
+	norm = 1.0 / (1.0 + K / dram->hdbB[hdb_reso] + K * K);
+	dram->hdbB[hdb_a0] = K / dram->hdbB[hdb_reso] * norm;
+	dram->hdbB[hdb_a2] = -dram->hdbB[hdb_a0];
+	dram->hdbB[hdb_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->hdbB[hdb_b2] = (1.0 - K / dram->hdbB[hdb_reso] + K * K) * norm;
 	
 	double headWet = GetParameter( kParam_C );	
 		
@@ -98,18 +100,18 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		headBumpL -= (headBumpL * headBumpL * headBumpL * (0.0618/sqrt(overallscale)));
 		headBumpR += (inputSampleR * headBumpDrive);
 		headBumpR -= (headBumpR * headBumpR * headBumpR * (0.0618/sqrt(overallscale)));
-		double headBiqSampleL = (headBumpL * hdbA[hdb_a0]) + hdbA[hdb_sL1];
-		hdbA[hdb_sL1] = (headBumpL * hdbA[hdb_a1]) - (headBiqSampleL * hdbA[hdb_b1]) + hdbA[hdb_sL2];
-		hdbA[hdb_sL2] = (headBumpL * hdbA[hdb_a2]) - (headBiqSampleL * hdbA[hdb_b2]);
-		double headBumpSampleL = (headBiqSampleL * hdbB[hdb_a0]) + hdbB[hdb_sL1];
-		hdbB[hdb_sL1] = (headBiqSampleL * hdbB[hdb_a1]) - (headBumpSampleL * hdbB[hdb_b1]) + hdbB[hdb_sL2];
-		hdbB[hdb_sL2] = (headBiqSampleL * hdbB[hdb_a2]) - (headBumpSampleL * hdbB[hdb_b2]);
-		double headBiqSampleR = (headBumpR * hdbA[hdb_a0]) + hdbA[hdb_sR1];
-		hdbA[hdb_sR1] = (headBumpR * hdbA[hdb_a1]) - (headBiqSampleR * hdbA[hdb_b1]) + hdbA[hdb_sR2];
-		hdbA[hdb_sR2] = (headBumpR * hdbA[hdb_a2]) - (headBiqSampleR * hdbA[hdb_b2]);
-		double headBumpSampleR = (headBiqSampleR * hdbB[hdb_a0]) + hdbB[hdb_sR1];
-		hdbB[hdb_sR1] = (headBiqSampleR * hdbB[hdb_a1]) - (headBumpSampleR * hdbB[hdb_b1]) + hdbB[hdb_sR2];
-		hdbB[hdb_sR2] = (headBiqSampleR * hdbB[hdb_a2]) - (headBumpSampleR * hdbB[hdb_b2]);
+		double headBiqSampleL = (headBumpL * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sL1];
+		dram->hdbA[hdb_sL1] = (headBumpL * dram->hdbA[hdb_a1]) - (headBiqSampleL * dram->hdbA[hdb_b1]) + dram->hdbA[hdb_sL2];
+		dram->hdbA[hdb_sL2] = (headBumpL * dram->hdbA[hdb_a2]) - (headBiqSampleL * dram->hdbA[hdb_b2]);
+		double headBumpSampleL = (headBiqSampleL * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sL1];
+		dram->hdbB[hdb_sL1] = (headBiqSampleL * dram->hdbB[hdb_a1]) - (headBumpSampleL * dram->hdbB[hdb_b1]) + dram->hdbB[hdb_sL2];
+		dram->hdbB[hdb_sL2] = (headBiqSampleL * dram->hdbB[hdb_a2]) - (headBumpSampleL * dram->hdbB[hdb_b2]);
+		double headBiqSampleR = (headBumpR * dram->hdbA[hdb_a0]) + dram->hdbA[hdb_sR1];
+		dram->hdbA[hdb_sR1] = (headBumpR * dram->hdbA[hdb_a1]) - (headBiqSampleR * dram->hdbA[hdb_b1]) + dram->hdbA[hdb_sR2];
+		dram->hdbA[hdb_sR2] = (headBumpR * dram->hdbA[hdb_a2]) - (headBiqSampleR * dram->hdbA[hdb_b2]);
+		double headBumpSampleR = (headBiqSampleR * dram->hdbB[hdb_a0]) + dram->hdbB[hdb_sR1];
+		dram->hdbB[hdb_sR1] = (headBiqSampleR * dram->hdbB[hdb_a1]) - (headBumpSampleR * dram->hdbB[hdb_b1]) + dram->hdbB[hdb_sR2];
+		dram->hdbB[hdb_sR2] = (headBiqSampleR * dram->hdbB[hdb_a2]) - (headBumpSampleR * dram->hdbB[hdb_b2]);
 		//end HeadBump
 		
 		inputSampleL = (headBumpSampleL * headWet) + (drySampleL * (1.0-headWet));
@@ -139,7 +141,7 @@ int _airwindowsAlgorithm::reset(void) {
 {
 	headBumpL = 0.0;
 	headBumpR = 0.0;
-	for (int x = 0; x < hdb_total; x++) {hdbA[x] = 0.0;hdbB[x] = 0.0;}
+	for (int x = 0; x < hdb_total; x++) {dram->hdbA[x] = 0.0;dram->hdbB[x] = 0.0;}
 	//from ZBandpass, so I can use enums with it
 	
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;

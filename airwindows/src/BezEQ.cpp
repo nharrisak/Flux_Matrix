@@ -36,7 +36,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		
 		enum {
@@ -55,16 +54,18 @@ struct _kernel {
 			bez_cycle,
 			bez_total
 		}; //the new undersampling. bez signifies the bezier curve reconstruction
-		double bezA[bez_total];
-		double bezB[bez_total];
 		
 		uint32_t fpd;
+	
+	struct _dram {
+			double bezA[bez_total];
+		double bezB[bez_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -94,37 +95,37 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		double inputSampleL = *sourceP;
 		if (fabs(inputSampleL)<1.18e-23) inputSampleL = fpd * 1.18e-17;
 
-		bezA[bez_cycle] += derezA;
-		bezA[bez_SampL] += ((inputSampleL+bezA[bez_InL]) * derezA);
-		bezA[bez_InL] = inputSampleL;
+		dram->bezA[bez_cycle] += derezA;
+		dram->bezA[bez_SampL] += ((inputSampleL+dram->bezA[bez_InL]) * derezA);
+		dram->bezA[bez_InL] = inputSampleL;
 		
-		if (bezA[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
-			bezA[bez_cycle] = 0.0;
-			bezA[bez_CL] = bezA[bez_BL];
-			bezA[bez_BL] = bezA[bez_AL];
-			bezA[bez_AL] = inputSampleL;
-			bezA[bez_SampL] = 0.0;
+		if (dram->bezA[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
+			dram->bezA[bez_cycle] = 0.0;
+			dram->bezA[bez_CL] = dram->bezA[bez_BL];
+			dram->bezA[bez_BL] = dram->bezA[bez_AL];
+			dram->bezA[bez_AL] = inputSampleL;
+			dram->bezA[bez_SampL] = 0.0;
 		}
-		double CBL = (bezA[bez_CL]*(1.0-bezA[bez_cycle]))+(bezA[bez_BL]*bezA[bez_cycle]);
-		double BAL = (bezA[bez_BL]*(1.0-bezA[bez_cycle]))+(bezA[bez_AL]*bezA[bez_cycle]);
-		double CBAL = (bezA[bez_BL]+(CBL*(1.0-bezA[bez_cycle]))+(BAL*bezA[bez_cycle]))*0.5;
+		double CBL = (dram->bezA[bez_CL]*(1.0-dram->bezA[bez_cycle]))+(dram->bezA[bez_BL]*dram->bezA[bez_cycle]);
+		double BAL = (dram->bezA[bez_BL]*(1.0-dram->bezA[bez_cycle]))+(dram->bezA[bez_AL]*dram->bezA[bez_cycle]);
+		double CBAL = (dram->bezA[bez_BL]+(CBL*(1.0-dram->bezA[bez_cycle]))+(BAL*dram->bezA[bez_cycle]))*0.5;
 		double mid = CBAL;
 		double treble = inputSampleL - CBAL;
 		
-		bezB[bez_cycle] += derezB;
-		bezB[bez_SampL] += ((mid+bezB[bez_InL]) * derezB);
-		bezB[bez_InL] = mid;
+		dram->bezB[bez_cycle] += derezB;
+		dram->bezB[bez_SampL] += ((mid+dram->bezB[bez_InL]) * derezB);
+		dram->bezB[bez_InL] = mid;
 		
-		if (bezB[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
-			bezB[bez_cycle] = 0.0;
-			bezB[bez_CL] = bezB[bez_BL];
-			bezB[bez_BL] = bezB[bez_AL];
-			bezB[bez_AL] = inputSampleL;
-			bezB[bez_SampL] = 0.0;
+		if (dram->bezB[bez_cycle] > 1.0) { //hit the end point and we do a reverb sample
+			dram->bezB[bez_cycle] = 0.0;
+			dram->bezB[bez_CL] = dram->bezB[bez_BL];
+			dram->bezB[bez_BL] = dram->bezB[bez_AL];
+			dram->bezB[bez_AL] = inputSampleL;
+			dram->bezB[bez_SampL] = 0.0;
 		}
-		CBL = (bezB[bez_CL]*(1.0-bezB[bez_cycle]))+(bezB[bez_BL]*bezB[bez_cycle]);
-		BAL = (bezB[bez_BL]*(1.0-bezB[bez_cycle]))+(bezB[bez_AL]*bezB[bez_cycle]);
-		CBAL = (bezB[bez_BL]+(CBL*(1.0-bezB[bez_cycle]))+(BAL*bezB[bez_cycle]))*0.5;
+		CBL = (dram->bezB[bez_CL]*(1.0-dram->bezB[bez_cycle]))+(dram->bezB[bez_BL]*dram->bezB[bez_cycle]);
+		BAL = (dram->bezB[bez_BL]*(1.0-dram->bezB[bez_cycle]))+(dram->bezB[bez_AL]*dram->bezB[bez_cycle]);
+		CBAL = (dram->bezB[bez_BL]+(CBL*(1.0-dram->bezB[bez_cycle]))+(BAL*dram->bezB[bez_cycle]))*0.5;
 		double bass = CBAL;
 		mid -= bass;
 		
@@ -144,8 +145,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < bez_total; x++) {bezA[x] = 0.0; bezB[x] = 0.0;}
-	bezA[bez_cycle] = 1.0; bezB[bez_cycle] = 1.0;
+	for (int x = 0; x < bez_total; x++) {dram->bezA[x] = 0.0; dram->bezB[x] = 0.0;}
+	dram->bezA[bez_cycle] = 1.0; dram->bezB[bez_cycle] = 1.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

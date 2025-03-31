@@ -235,9 +235,6 @@ enum { kNumTemplateParameters = 6 };
 		pear_total
 	}; //fixed frequency pear filter for ultrasonics, stereo
 	
-	double pearA[pear_total]; //probably worth just using a number here
-	double pearB[pear_total]; //probably worth just using a number here
-	double pearC[pear_total]; //probably worth just using a number here
 		
 	double subAL;
 	double subAR;
@@ -265,9 +262,14 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double pearA[pear_total]; //probably worth just using a number here
+	double pearB[pear_total]; //probably worth just using a number here
+	double pearC[pear_total]; //probably worth just using a number here
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -464,12 +466,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//-------- one
 			
 			for (int x = 0; x < 31.32; x += 4) {
-				double slew = ((outAL - pearA[x]) + pearA[x+1])*0.304*0.5;
-				pearA[x] = outAL = (0.304 * outAL) + ((1.0-0.304) * (pearA[x] + pearA[x+1]));
-				pearA[x+1] = slew;
-				slew = ((outER - pearA[x+2]) + pearA[x+3])*0.304*0.5;
-				pearA[x+2] = outER = (0.304 * outER) + ((1.0-0.304) * (pearA[x+2] + pearA[x+3]));
-				pearA[x+3] = slew;
+				double slew = ((outAL - dram->pearA[x]) + dram->pearA[x+1])*0.304*0.5;
+				dram->pearA[x] = outAL = (0.304 * outAL) + ((1.0-0.304) * (dram->pearA[x] + dram->pearA[x+1]));
+				dram->pearA[x+1] = slew;
+				slew = ((outER - dram->pearA[x+2]) + dram->pearA[x+3])*0.304*0.5;
+				dram->pearA[x+2] = outER = (0.304 * outER) + ((1.0-0.304) * (dram->pearA[x+2] + dram->pearA[x+3]));
+				dram->pearA[x+3] = slew;
 			}
 			
 			aFL[countFL] = ((outAL*3.0) - ((outBL + outCL + outDL + outEL)*2.0));
@@ -511,12 +513,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//-------- mulch
 			
 			for (int x = 0; x < 31.32; x += 4) {
-				double slew = ((outFL - pearB[x]) + pearB[x+1])*0.566*0.5;
-				pearB[x] = outFL = (0.566 * outFL) + ((1.0-0.566) * (pearB[x] + pearB[x+1]));
-				pearB[x+1] = slew;
-				slew = ((outDR - pearB[x+2]) + pearB[x+3])*0.566*0.5;
-				pearB[x+2] = outDR = (0.566 * outDR) + ((1.0-0.566) * (pearB[x+2] + pearB[x+3]));
-				pearB[x+3] = slew;
+				double slew = ((outFL - dram->pearB[x]) + dram->pearB[x+1])*0.566*0.5;
+				dram->pearB[x] = outFL = (0.566 * outFL) + ((1.0-0.566) * (dram->pearB[x] + dram->pearB[x+1]));
+				dram->pearB[x+1] = slew;
+				slew = ((outDR - dram->pearB[x+2]) + dram->pearB[x+3])*0.566*0.5;
+				dram->pearB[x+2] = outDR = (0.566 * outDR) + ((1.0-0.566) * (dram->pearB[x+2] + dram->pearB[x+3]));
+				dram->pearB[x+3] = slew;
 			}
 			
 			outSample = (outGL + prevMulchBL)*0.5;
@@ -566,12 +568,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//-------- mulch
 			
 			for (int x = 0; x < 31.32; x += 4) {
-				double slew = ((outKL - pearC[x]) + pearC[x+1])*0.416*0.5;
-				pearC[x] = outKL = (0.416 * outKL) + ((1.0-0.416) * (pearC[x] + pearC[x+1]));
-				pearC[x+1] = slew;
-				slew = ((outCR - pearC[x+2]) + pearC[x+3])*0.416*0.5;
-				pearC[x+2] = outCR = (0.416 * outCR) + ((1.0-0.416) * (pearC[x+2] + pearC[x+3]));
-				pearC[x+3] = slew;
+				double slew = ((outKL - dram->pearC[x]) + dram->pearC[x+1])*0.416*0.5;
+				dram->pearC[x] = outKL = (0.416 * outKL) + ((1.0-0.416) * (dram->pearC[x] + dram->pearC[x+1]));
+				dram->pearC[x+1] = slew;
+				slew = ((outCR - dram->pearC[x+2]) + dram->pearC[x+3])*0.416*0.5;
+				dram->pearC[x+2] = outCR = (0.416 * outCR) + ((1.0-0.416) * (dram->pearC[x+2] + dram->pearC[x+3]));
+				dram->pearC[x+3] = slew;
 			}
 			
 			outSample = (outLL + prevMulchCL)*0.5;
@@ -947,7 +949,7 @@ int _airwindowsAlgorithm::reset(void) {
 	
 	cycle = 0;
 		
-	for (int x = 0; x < pear_total; x++) {pearA[x] = 0.0; pearB[x] = 0.0; pearC[x] = 0.0;}
+	for (int x = 0; x < pear_total; x++) {dram->pearA[x] = 0.0; dram->pearB[x] = 0.0; dram->pearC[x] = 0.0;}
 	//from PearEQ
 	
 	subAL = subAR = subBL = subBR = subCL = subCR = 0.0;

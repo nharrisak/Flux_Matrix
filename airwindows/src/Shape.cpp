@@ -30,7 +30,6 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
-	struct _dram* dram;
  
 		enum {
 			fix_freq,
@@ -46,14 +45,16 @@ struct _kernel {
 			fix_sR2,
 			fix_total
 		}; //fixed frequency biquad filter for ultrasonics, stereo
-		double fixA[fix_total];
 		uint32_t fpd;
+	
+	struct _dram {
+			double fixA[fix_total];
 	};
+	_dram* dram;
+};
 _kernel kernels[1];
 
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -73,19 +74,19 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (shape < 0) postOffset = asin(offset);
 	double cutoff = 25000.0 / GetSampleRate();
 	if (cutoff > 0.49) cutoff = 0.49; //don't crash if run at 44.1k
-	fixA[fix_freq] = cutoff;
-	fixA[fix_reso] = 0.70710678; //butterworth Q
-	double K = tan(M_PI * fixA[fix_freq]); //lowpass
-	double norm = 1.0 / (1.0 + K / fixA[fix_reso] + K * K);
-	fixA[fix_a0] = K * K * norm;
-	fixA[fix_a1] = 2.0 * fixA[fix_a0];
-	fixA[fix_a2] = fixA[fix_a0];
-	fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixA[fix_b2] = (1.0 - K / fixA[fix_reso] + K * K) * norm;
-	fixA[fix_sL1] = 0.0;
-	fixA[fix_sL2] = 0.0;
-	fixA[fix_sR1] = 0.0;
-	fixA[fix_sR2] = 0.0;
+	dram->fixA[fix_freq] = cutoff;
+	dram->fixA[fix_reso] = 0.70710678; //butterworth Q
+	double K = tan(M_PI * dram->fixA[fix_freq]); //lowpass
+	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_a0] = K * K * norm;
+	dram->fixA[fix_a1] = 2.0 * dram->fixA[fix_a0];
+	dram->fixA[fix_a2] = dram->fixA[fix_a0];
+	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
+	dram->fixA[fix_sL1] = 0.0;
+	dram->fixA[fix_sL2] = 0.0;
+	dram->fixA[fix_sR1] = 0.0;
+	dram->fixA[fix_sR2] = 0.0;
 	//define filters here: on VST you can't define them in reset 'cos getSampleRate isn't returning good information yet
 	
 	
@@ -94,9 +95,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
 		double drySample = inputSample;
 
-		double outSample = (inputSample * fixA[fix_a0]) + fixA[fix_sL1];
-		fixA[fix_sL1] = (inputSample * fixA[fix_a1]) - (outSample * fixA[fix_b1]) + fixA[fix_sL2];
-		fixA[fix_sL2] = (inputSample * fixA[fix_a2]) - (outSample * fixA[fix_b2]);
+		double outSample = (inputSample * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+		dram->fixA[fix_sL1] = (inputSample * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
+		dram->fixA[fix_sL2] = (inputSample * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 		inputSample = outSample; //fixed biquad filtering ultrasonics
 		
 		inputSample *= gainstage;

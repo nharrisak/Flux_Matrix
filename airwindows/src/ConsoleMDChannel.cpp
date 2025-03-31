@@ -44,14 +44,16 @@ enum { kNumTemplateParameters = 6 };
 	double gainB; //smoothed master fader for channel, from Z2 series filter code
 	uint32_t fpdL;
 	uint32_t fpdR;
-#include "../include/template2.h"
-struct _dram {
-	double pearA[18];
+
+	struct _dram {
+		double pearA[18];
 	double pearB[22];
 	double mpkL[2005];
 	double mpkR[2005];
 	double f[66];
-};
+	};
+	_dram* dram;
+#include "../include/template2.h"
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 

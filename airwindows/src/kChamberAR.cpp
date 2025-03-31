@@ -238,9 +238,6 @@ enum { kNumTemplateParameters = 6 };
 		fix_sR2,
 		fix_total
 	}; //fixed frequency biquad filter for ultrasonics, stereo
-	double fixA[fix_total];
-	double fixC[fix_total];
-	double fixD[fix_total];
 	
 	double prevMulchDL;
 	double prevMulchDR;
@@ -259,9 +256,14 @@ enum { kNumTemplateParameters = 6 };
 	
 	uint32_t fpdL;
 	uint32_t fpdR;
+
+	struct _dram {
+		double fixA[fix_total];
+	double fixC[fix_total];
+	double fixD[fix_total];
+	};
+	_dram* dram;
 #include "../include/template2.h"
-struct _dram {
-};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -294,27 +296,27 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	double regen = 0.0002825;
 	int adjPredelay = downRate;
 	
-	fixA[fix_freq] = 3059.0/downRate;
-	fixA[fix_reso] = 0.0166464;
-	fixC[fix_freq] = fixD[fix_freq] = 217.0/downRate;
-	fixC[fix_reso] = fixD[fix_reso] = 0.0039204;
+	dram->fixA[fix_freq] = 3059.0/downRate;
+	dram->fixA[fix_reso] = 0.0166464;
+	dram->fixC[fix_freq] = dram->fixD[fix_freq] = 217.0/downRate;
+	dram->fixC[fix_reso] = dram->fixD[fix_reso] = 0.0039204;
 	
-	double K = tan(M_PI * fixA[fix_freq]);
-	double norm = 1.0 / (1.0 + K / fixA[fix_reso] + K * K);
-	fixA[fix_a0] = K / fixA[fix_reso] * norm;
-	fixA[fix_a1] = 0.0;
-	fixA[fix_a2] = -fixA[fix_a0];
-	fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixA[fix_b2] = (1.0 - K / fixA[fix_reso] + K * K) * norm;
+	double K = tan(M_PI * dram->fixA[fix_freq]);
+	double norm = 1.0 / (1.0 + K / dram->fixA[fix_reso] + K * K);
+	dram->fixA[fix_a0] = K / dram->fixA[fix_reso] * norm;
+	dram->fixA[fix_a1] = 0.0;
+	dram->fixA[fix_a2] = -dram->fixA[fix_a0];
+	dram->fixA[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixA[fix_b2] = (1.0 - K / dram->fixA[fix_reso] + K * K) * norm;
 	//stereo biquad bandpasses we can put into the reverb matrix
 			
-	K = tan(M_PI * fixD[fix_freq]);
-	norm = 1.0 / (1.0 + K / fixD[fix_reso] + K * K);
-	fixC[fix_a0] = fixD[fix_a0] = K / fixD[fix_reso] * norm;
-	fixC[fix_a1] = fixD[fix_a1] = 0.0;
-	fixC[fix_a2] = fixD[fix_a2] = -fixD[fix_a0];
-	fixC[fix_b1] = fixD[fix_b1] = 2.0 * (K * K - 1.0) * norm;
-	fixC[fix_b2] = fixD[fix_b2] = (1.0 - K / fixD[fix_reso] + K * K) * norm;
+	K = tan(M_PI * dram->fixD[fix_freq]);
+	norm = 1.0 / (1.0 + K / dram->fixD[fix_reso] + K * K);
+	dram->fixC[fix_a0] = dram->fixD[fix_a0] = K / dram->fixD[fix_reso] * norm;
+	dram->fixC[fix_a1] = dram->fixD[fix_a1] = 0.0;
+	dram->fixC[fix_a2] = dram->fixD[fix_a2] = -dram->fixD[fix_a0];
+	dram->fixC[fix_b1] = dram->fixD[fix_b1] = 2.0 * (K * K - 1.0) * norm;
+	dram->fixC[fix_b2] = dram->fixD[fix_b2] = (1.0 - K / dram->fixD[fix_reso] + K * K) * norm;
 	//stereo biquad bandpasses we can put into the tape emu
 	
 	while (nSampleFrames-- > 0) {
@@ -354,14 +356,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			else inputSampleR = -(inputSampleR/-2.0)*(2.8274333882308+inputSampleR);
 			//end overdrive
 			
-			outSample = (inputSampleL * fixD[fix_a0]) + fixD[fix_sL1];
-			fixD[fix_sL1] = (inputSampleL * fixD[fix_a1]) - (outSample * fixD[fix_b1]) + fixD[fix_sL2];
-			fixD[fix_sL2] = (inputSampleL * fixD[fix_a2]) - (outSample * fixD[fix_b2]);
+			outSample = (inputSampleL * dram->fixD[fix_a0]) + dram->fixD[fix_sL1];
+			dram->fixD[fix_sL1] = (inputSampleL * dram->fixD[fix_a1]) - (outSample * dram->fixD[fix_b1]) + dram->fixD[fix_sL2];
+			dram->fixD[fix_sL2] = (inputSampleL * dram->fixD[fix_a2]) - (outSample * dram->fixD[fix_b2]);
 			inputSampleL = outSample; //fixed biquad
 			
-			outSample = (inputSampleR * fixD[fix_a0]) + fixD[fix_sR1];
-			fixD[fix_sR1] = (inputSampleR * fixD[fix_a1]) - (outSample * fixD[fix_b1]) + fixD[fix_sR2];
-			fixD[fix_sR2] = (inputSampleR * fixD[fix_a2]) - (outSample * fixD[fix_b2]);
+			outSample = (inputSampleR * dram->fixD[fix_a0]) + dram->fixD[fix_sR1];
+			dram->fixD[fix_sR1] = (inputSampleR * dram->fixD[fix_a1]) - (outSample * dram->fixD[fix_b1]) + dram->fixD[fix_sR2];
+			dram->fixD[fix_sR2] = (inputSampleR * dram->fixD[fix_a2]) - (outSample * dram->fixD[fix_b2]);
 			inputSampleR = outSample; //fixed biquad			
 			
 			//early reflection predelay
@@ -397,14 +399,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//600hz highpass on input
 			
 			//fixC is the dry-only extra color
-			outSample = (inputSampleL * fixC[fix_a0]) + fixC[fix_sL1];
-			fixC[fix_sL1] = (inputSampleL * fixC[fix_a1]) - (outSample * fixC[fix_b1]) + fixC[fix_sL2];
-			fixC[fix_sL2] = (inputSampleL * fixC[fix_a2]) - (outSample * fixC[fix_b2]);
+			outSample = (inputSampleL * dram->fixC[fix_a0]) + dram->fixC[fix_sL1];
+			dram->fixC[fix_sL1] = (inputSampleL * dram->fixC[fix_a1]) - (outSample * dram->fixC[fix_b1]) + dram->fixC[fix_sL2];
+			dram->fixC[fix_sL2] = (inputSampleL * dram->fixC[fix_a2]) - (outSample * dram->fixC[fix_b2]);
 			inputSampleL = outSample; //fixed biquad
 			
-			outSample = (inputSampleR * fixC[fix_a0]) + fixC[fix_sR1];
-			fixC[fix_sR1] = (inputSampleR * fixC[fix_a1]) - (outSample * fixC[fix_b1]) + fixC[fix_sR2];
-			fixC[fix_sR2] = (inputSampleR * fixC[fix_a2]) - (outSample * fixC[fix_b2]);
+			outSample = (inputSampleR * dram->fixC[fix_a0]) + dram->fixC[fix_sR1];
+			dram->fixC[fix_sR1] = (inputSampleR * dram->fixC[fix_a1]) - (outSample * dram->fixC[fix_b1]) + dram->fixC[fix_sR2];
+			dram->fixC[fix_sR2] = (inputSampleR * dram->fixC[fix_a2]) - (outSample * dram->fixC[fix_b2]);
 			inputSampleR = outSample; //fixed biquad			
 			
 			outSample = (inputSampleL + prevInDL)*0.5;
@@ -521,14 +523,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			
 			//-------- one
 			
-			outSample = (outAL * fixA[fix_a0]) + fixA[fix_sL1];
-			fixA[fix_sL1] = (outAL * fixA[fix_a1]) - (outSample * fixA[fix_b1]) + fixA[fix_sL2];
-			fixA[fix_sL2] = (outAL * fixA[fix_a2]) - (outSample * fixA[fix_b2]);
+			outSample = (outAL * dram->fixA[fix_a0]) + dram->fixA[fix_sL1];
+			dram->fixA[fix_sL1] = (outAL * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sL2];
+			dram->fixA[fix_sL2] = (outAL * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 			outAL = outSample; //fixed biquad
 			
-			outSample = (outER * fixA[fix_a0]) + fixA[fix_sR1];
-			fixA[fix_sR1] = (outER * fixA[fix_a1]) - (outSample * fixA[fix_b1]) + fixA[fix_sR2];
-			fixA[fix_sR2] = (outER * fixA[fix_a2]) - (outSample * fixA[fix_b2]);
+			outSample = (outER * dram->fixA[fix_a0]) + dram->fixA[fix_sR1];
+			dram->fixA[fix_sR1] = (outER * dram->fixA[fix_a1]) - (outSample * dram->fixA[fix_b1]) + dram->fixA[fix_sR2];
+			dram->fixA[fix_sR2] = (outER * dram->fixA[fix_a2]) - (outSample * dram->fixA[fix_b2]);
 			outER = outSample; //fixed biquad
 			
 			
@@ -989,7 +991,7 @@ int _airwindowsAlgorithm::reset(void) {
 	
 	cycle = 0;
 	
-	for (int x = 0; x < fix_total; x++) {fixA[x] = 0.0; fixC[x] = 0.0; fixD[x] = 0.0;}
+	for (int x = 0; x < fix_total; x++) {dram->fixA[x] = 0.0; dram->fixC[x] = 0.0; dram->fixD[x] = 0.0;}
 	//from ZBandpass, so I can use enums with it
 	
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;
