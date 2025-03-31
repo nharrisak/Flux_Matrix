@@ -69,8 +69,6 @@ enum { kNumTemplateParameters = 6 };
 	double NSEvenR;
 	double prevShapeR;
 	bool flip; //VinylDither
-	double darkSampleL[100];
-	double darkSampleR[100];
 	int depth; //Dark
 		
 	Float64 aL[1503], bL[1503], cL[1503], dL[1503];
@@ -95,6 +93,10 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double darkSampleL[100];
+	double darkSampleR[100];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -523,14 +525,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		float expectedSlew = 0;
 		for(int x = 0; x < depth; x++) {
-			expectedSlew += (darkSampleL[x+1] - darkSampleL[x]);
+			expectedSlew += (dram->darkSampleL[x+1] - dram->darkSampleL[x]);
 		}
 		expectedSlew /= depth; //we have an average of all recent slews
 		//we are doing that to voice the thing down into the upper mids a bit
 		//it mustn't just soften the brightest treble, it must smooth high mids too
 		
-		float testA = fabs((darkSampleL[0] - quantA) - expectedSlew);
-		float testB = fabs((darkSampleL[0] - quantB) - expectedSlew);
+		float testA = fabs((dram->darkSampleL[0] - quantA) - expectedSlew);
+		float testB = fabs((dram->darkSampleL[0] - quantB) - expectedSlew);
 		
 		if (testA < testB) inputSampleL = quantA;
 		else inputSampleL = quantB;
@@ -539,9 +541,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//as it'll make the output end up as smooth as possible
 		
 		for(int x = depth; x >=0; x--) {
-			darkSampleL[x+1] = darkSampleL[x];
+			dram->darkSampleL[x+1] = dram->darkSampleL[x];
 		}
-		darkSampleL[0] = inputSampleL;
+		dram->darkSampleL[0] = inputSampleL;
 		//end Dark left
 		
 		prevShapeL = (floor(shapedSampleL) - inputSampleL)*0.9999999999;
@@ -570,14 +572,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		expectedSlew = 0;
 		for(int x = 0; x < depth; x++) {
-			expectedSlew += (darkSampleR[x+1] - darkSampleR[x]);
+			expectedSlew += (dram->darkSampleR[x+1] - dram->darkSampleR[x]);
 		}
 		expectedSlew /= depth; //we have an average of all recent slews
 		//we are doing that to voice the thing down into the upper mids a bit
 		//it mustn't just soften the brightest treble, it must smooth high mids too
 		
-		testA = fabs((darkSampleR[0] - quantA) - expectedSlew);
-		testB = fabs((darkSampleR[0] - quantB) - expectedSlew);
+		testA = fabs((dram->darkSampleR[0] - quantA) - expectedSlew);
+		testB = fabs((dram->darkSampleR[0] - quantB) - expectedSlew);
 		
 		if (testA < testB) inputSampleR = quantA;
 		else inputSampleR = quantB;
@@ -586,9 +588,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//as it'll make the output end up as smooth as possible
 		
 		for(int x = depth; x >=0; x--) {
-			darkSampleR[x+1] = darkSampleR[x];
+			dram->darkSampleR[x+1] = dram->darkSampleR[x];
 		}
-		darkSampleR[0] = inputSampleR;
+		dram->darkSampleR[0] = inputSampleR;
 		//end Dark right
 		
 		prevShapeR = (floor(shapedSampleR) - inputSampleR)*0.9999999999;
@@ -621,8 +623,8 @@ int _airwindowsAlgorithm::reset(void) {
 	NSOddR = 0.0; NSEvenR = 0.0; prevShapeR = 0.0;
 	flip = true; //Ten Nines
 	for(int count = 0; count < 99; count++) {
-		darkSampleL[count] = 0;
-		darkSampleR[count] = 0;
+		dram->darkSampleL[count] = 0;
+		dram->darkSampleR[count] = 0;
 	}
 	
 	for(int count = 0; count < 1502; count++) {

@@ -34,10 +34,10 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		const static int totalsamples = 65540;
 		Float32 p[totalsamples];
-		Float64 sweep[49];
 		int gcount;
 		Float64 airPrev;
 		Float64 airEven;
@@ -49,6 +49,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 sweep[49];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -110,15 +113,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		for(ensemble = 1; ensemble <= taps; ensemble++)
 			{
-				offset = start[ensemble] + (depth * sin(sweep[ensemble]+sinoffset[ensemble]));
+				offset = start[ensemble] + (depth * sin(dram->sweep[ensemble]+sinoffset[ensemble]));
 				floffset = offset-floor(offset);
 				count = gcount + (int)floor(offset);
 				temp += p[count] * (1-floffset); //less as value moves away from .0
 				temp += p[count+1]; //we can assume always using this in one way or another?
 				temp += p[count+2] * floffset; //greater as value moves away from .0
 				temp -= ((p[count]-p[count+1])-(p[count+1]-p[count+2]))/50; //interpolation hacks 'r us
-				sweep[ensemble] += speed[ensemble];
-				if (sweep[ensemble] > tupi){sweep[ensemble] -= tupi;}
+				dram->sweep[ensemble] += speed[ensemble];
+				if (dram->sweep[ensemble] > tupi){dram->sweep[ensemble] -= tupi;}
 			}
 		gcount--;
 		//still scrolling through the samples, remember
@@ -146,7 +149,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	for(int count = 0; count < 65539; count++) {p[count] = 0;}
-	for(int count = 0; count < 49; count++) {sweep[count] = 3.141592653589793238 / 2.0;}
+	for(int count = 0; count < 49; count++) {dram->sweep[count] = 3.141592653589793238 / 2.0;}
 	gcount = 0;
 	airPrev = 0.0;
 	airEven = 0.0;

@@ -3,7 +3,7 @@ void	calculateRequirements( _NT_algorithmRequirements& req, const int32_t* speci
 {
 	req.numParameters = ARRAY_SIZE(parameters);
 	req.sram = sizeof(_airwindowsAlgorithm);
-	req.dram = 0;
+	req.dram = sizeof(_dram);
 	req.dtc = 0;
 	req.itc = 0;
 }
@@ -11,6 +11,7 @@ void	calculateRequirements( _NT_algorithmRequirements& req, const int32_t* speci
 _NT_algorithm*	construct( const _NT_algorithmMemoryPtrs& ptrs, const _NT_algorithmRequirements& req, const int32_t* specifications )
 {
 	_airwindowsAlgorithm* alg = new (ptrs.sram) _airwindowsAlgorithm();
+	alg->dram = (_dram*)ptrs.dram;
 	alg->reset();
 	alg->parameters = parameters;
 	alg->parameterPages = &parameterPages;

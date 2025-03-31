@@ -30,10 +30,9 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		
-		double mpk[2005];
-		double f[66];
 		double prevfreqMPeak;
 		double prevamountMPeak;
 		int mpc;
@@ -43,6 +42,10 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double mpk[2005];
+		double f[66];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -64,8 +67,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int maxMPeak = (amountMPeak*63.0)+1;
 	if ((freqMPeak != prevfreqMPeak)||(amountMPeak != prevamountMPeak)) {
 	for (int x = 0; x < maxMPeak; x++) {
-		if (((double)x*freqMPeak) < M_PI_4) f[x] = sin(((double)x*freqMPeak)*4.0)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
-		else f[x] = cos((double)x*freqMPeak)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
+		if (((double)x*freqMPeak) < M_PI_4) dram->f[x] = sin(((double)x*freqMPeak)*4.0)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
+		else dram->f[x] = cos((double)x*freqMPeak)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
 	}
 	prevfreqMPeak = freqMPeak; prevamountMPeak = amountMPeak;
 	}//end ResEQ2 Mid Boost
@@ -76,26 +79,26 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		//begin ResEQ2 Mid Boost
 		mpc++; if (mpc < 1 || mpc > 2001) mpc = 1;
-		mpk[mpc] = inputSample;
+		dram->mpk[mpc] = inputSample;
 		double midMPeak = 0.0;
 		for (int x = 0; x < maxMPeak; x++) {
 			int y = x*cycleEnd;
 			switch (cycleEnd)
 			{
 				case 1: 
-					midMPeak += (mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x]); break;
+					midMPeak += (dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x]); break;
 				case 2: 
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.5); y--;
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.5); break;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5); break;
 				case 3: 
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333); y--;
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333); y--;
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333); break;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); break;
 				case 4: 
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); y--;
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); y--;
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); y--;
-					midMPeak += ((mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); //break
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
+					midMPeak += ((dram->mpk[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); //break
 			}
 		}
 		inputSample = (midMPeak*amountMPeak)+((1.5-amountMPeak>1.0)?inputSample:inputSample*(1.5-amountMPeak));
@@ -115,8 +118,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 2004; count++) {mpk[count] = 0.0;}
-	for(int count = 0; count < 65; count++) {f[count] = 0.0;}
+	for(int count = 0; count < 2004; count++) {dram->mpk[count] = 0.0;}
+	for(int count = 0; count < 65; count++) {dram->f[count] = 0.0;}
 	prevfreqMPeak = -1;
 	prevamountMPeak = -1;
 	mpc = 1;

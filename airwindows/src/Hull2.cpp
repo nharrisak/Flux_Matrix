@@ -32,8 +32,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
 
-		double hull[225];	
 		int hullp;
 		double hullb[5];
 		
@@ -42,6 +42,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double hull[225];	
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -72,40 +75,40 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		//begin Hull2 treble crossover
 		hullp--; if (hullp < 0) hullp += 60;
-		hull[hullp] = hull[hullp+60] = inputSample;
+		dram->hull[hullp] = dram->hull[hullp+60] = inputSample;
 		int x = hullp;
 		double midSample = 0.0;
 		while (x < hullp+(limit/2)) {
-			midSample += hull[x] * divisor;
+			midSample += dram->hull[x] * divisor;
 			x++;
 		}
 		midSample += midSample * 0.125;
 		while (x < hullp+limit) {
-			midSample -= hull[x] * 0.125 * divisor;
+			midSample -= dram->hull[x] * 0.125 * divisor;
 			x++;
 		}
-		hull[hullp+20] = hull[hullp+80] = midSample;
+		dram->hull[hullp+20] = dram->hull[hullp+80] = midSample;
 		x = hullp+20;
 		midSample = 0.0;
 		while (x < hullp+20+(limit/2)) {
-			midSample += hull[x] * divisor;
+			midSample += dram->hull[x] * divisor;
 			x++;
 		}
 		midSample += midSample * 0.125;
 		while (x < hullp+20+limit) {
-			midSample -= hull[x] * 0.125 * divisor;
+			midSample -= dram->hull[x] * 0.125 * divisor;
 			x++;
 		}
-		hull[hullp+40] = hull[hullp+100] = midSample;
+		dram->hull[hullp+40] = dram->hull[hullp+100] = midSample;
 		x = hullp+40;
 		midSample = 0.0;
 		while (x < hullp+40+(limit/2)) {
-			midSample += hull[x] * divisor;
+			midSample += dram->hull[x] * divisor;
 			x++;
 		}
 		midSample += midSample * 0.125;
 		while (x < hullp+40+limit) {
-			midSample -= hull[x] * 0.125 * divisor;
+			midSample -= dram->hull[x] * 0.125 * divisor;
 			x++;
 		}
 		double trebleSample = drySample - midSample;
@@ -138,7 +141,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 222; count++) {hull[count] = 0.0;}
+	for(int count = 0; count < 222; count++) {dram->hull[count] = 0.0;}
 	for(int count = 0; count < 4; count++) {hullb[count] = 0.0;}
 	hullp = 1;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;

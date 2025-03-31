@@ -34,13 +34,16 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float32 lastSample[100];
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float32 lastSample[100];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -82,14 +85,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		Float32 expectedSlew = 0;
 		for(int x = 0; x < depth; x++) {
-			expectedSlew += (lastSample[x+1] - lastSample[x]);
+			expectedSlew += (dram->lastSample[x+1] - dram->lastSample[x]);
 		}
 		expectedSlew /= depth; //we have an average of all recent slews
 		//we are doing that to voice the thing down into the upper mids a bit
 		//it mustn't just soften the brightest treble, it must smooth high mids too
 		
-		Float32 testA = fabs((lastSample[0] - quantA) - expectedSlew);
-		Float32 testB = fabs((lastSample[0] - quantB) - expectedSlew);
+		Float32 testA = fabs((dram->lastSample[0] - quantA) - expectedSlew);
+		Float32 testB = fabs((dram->lastSample[0] - quantB) - expectedSlew);
 		
 		if (testA < testB) inputSample = quantA;
 		else inputSample = quantB;
@@ -98,9 +101,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//as it'll make the output end up as smooth as possible
 		
 		for(int x = depth; x >=0; x--) {
-			lastSample[x+1] = lastSample[x];
+			dram->lastSample[x+1] = dram->lastSample[x];
 		}
-		lastSample[0] = inputSample;
+		dram->lastSample[0] = inputSample;
 				
 		inputSample /= outScale;
 		
@@ -112,7 +115,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 99; count++) {lastSample[count] = 0;}
+	for(int count = 0; count < 99; count++) {dram->lastSample[count] = 0;}
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

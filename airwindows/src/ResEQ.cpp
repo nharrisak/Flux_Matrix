@@ -44,15 +44,18 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 b[61];
-		Float64 f[61];
 		int framenumber;
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 b[61];
+		Float64 f[61];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -112,43 +115,43 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	framenumber += 1; if (framenumber > 59) framenumber = 1;
 	falloff = sin(framenumber / 19.098992);
-	f[framenumber] = 0.0;
-	if ((framenumber * f1) < 1.57079633) f[framenumber]  += (sin((framenumber * f1)*2.0) * falloff * v1);
-	else f[framenumber]  += (cos(framenumber * f1) * falloff * v1);
-	if ((framenumber * f2) < 1.57079633) f[framenumber]  += (sin((framenumber * f2)*2.0) * falloff * v2);
-	else f[framenumber]  += (cos(framenumber * f2) * falloff * v2);
-	if ((framenumber * f3) < 1.57079633) f[framenumber]  += (sin((framenumber * f3)*2.0) * falloff * v3);
-	else f[framenumber]  += (cos(framenumber * f3) * falloff * v3);
-	if ((framenumber * f4) < 1.57079633) f[framenumber]  += (sin((framenumber * f4)*2.0) * falloff * v4);
-	else f[framenumber]  += (cos(framenumber * f4) * falloff * v4);
-	if ((framenumber * f5) < 1.57079633) f[framenumber]  += (sin((framenumber * f5)*2.0) * falloff * v5);
-	else f[framenumber]  += (cos(framenumber * f5) * falloff * v5);
-	if ((framenumber * f6) < 1.57079633) f[framenumber]  += (sin((framenumber * f6)*2.0) * falloff * v6);
-	else f[framenumber]  += (cos(framenumber * f6) * falloff * v6);
-	if ((framenumber * f7) < 1.57079633) f[framenumber]  += (sin((framenumber * f7)*2.0) * falloff * v7);
-	else f[framenumber]  += (cos(framenumber * f7) * falloff * v7);
-	if ((framenumber * f8) < 1.57079633) f[framenumber]  += (sin((framenumber * f8)*2.0) * falloff * v8);
-	else f[framenumber]  += (cos(framenumber * f8) * falloff * v8);
+	dram->f[framenumber] = 0.0;
+	if ((framenumber * f1) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f1)*2.0) * falloff * v1);
+	else dram->f[framenumber]  += (cos(framenumber * f1) * falloff * v1);
+	if ((framenumber * f2) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f2)*2.0) * falloff * v2);
+	else dram->f[framenumber]  += (cos(framenumber * f2) * falloff * v2);
+	if ((framenumber * f3) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f3)*2.0) * falloff * v3);
+	else dram->f[framenumber]  += (cos(framenumber * f3) * falloff * v3);
+	if ((framenumber * f4) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f4)*2.0) * falloff * v4);
+	else dram->f[framenumber]  += (cos(framenumber * f4) * falloff * v4);
+	if ((framenumber * f5) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f5)*2.0) * falloff * v5);
+	else dram->f[framenumber]  += (cos(framenumber * f5) * falloff * v5);
+	if ((framenumber * f6) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f6)*2.0) * falloff * v6);
+	else dram->f[framenumber]  += (cos(framenumber * f6) * falloff * v6);
+	if ((framenumber * f7) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f7)*2.0) * falloff * v7);
+	else dram->f[framenumber]  += (cos(framenumber * f7) * falloff * v7);
+	if ((framenumber * f8) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f8)*2.0) * falloff * v8);
+	else dram->f[framenumber]  += (cos(framenumber * f8) * falloff * v8);
 
 	framenumber += 1; if (framenumber > 59) framenumber = 1;
 	falloff = sin(framenumber / 19.098992);
-	f[framenumber] = 0.0;
-	if ((framenumber * f1) < 1.57079633) f[framenumber]  += (sin((framenumber * f1)*2.0) * falloff * v1);
-	else f[framenumber]  += (cos(framenumber * f1) * falloff * v1);
-	if ((framenumber * f2) < 1.57079633) f[framenumber]  += (sin((framenumber * f2)*2.0) * falloff * v2);
-	else f[framenumber]  += (cos(framenumber * f2) * falloff * v2);
-	if ((framenumber * f3) < 1.57079633) f[framenumber]  += (sin((framenumber * f3)*2.0) * falloff * v3);
-	else f[framenumber]  += (cos(framenumber * f3) * falloff * v3);
-	if ((framenumber * f4) < 1.57079633) f[framenumber]  += (sin((framenumber * f4)*2.0) * falloff * v4);
-	else f[framenumber]  += (cos(framenumber * f4) * falloff * v4);
-	if ((framenumber * f5) < 1.57079633) f[framenumber]  += (sin((framenumber * f5)*2.0) * falloff * v5);
-	else f[framenumber]  += (cos(framenumber * f5) * falloff * v5);
-	if ((framenumber * f6) < 1.57079633) f[framenumber]  += (sin((framenumber * f6)*2.0) * falloff * v6);
-	else f[framenumber]  += (cos(framenumber * f6) * falloff * v6);
-	if ((framenumber * f7) < 1.57079633) f[framenumber]  += (sin((framenumber * f7)*2.0) * falloff * v7);
-	else f[framenumber]  += (cos(framenumber * f7) * falloff * v7);
-	if ((framenumber * f8) < 1.57079633) f[framenumber]  += (sin((framenumber * f8)*2.0) * falloff * v8);
-	else f[framenumber]  += (cos(framenumber * f8) * falloff * v8);
+	dram->f[framenumber] = 0.0;
+	if ((framenumber * f1) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f1)*2.0) * falloff * v1);
+	else dram->f[framenumber]  += (cos(framenumber * f1) * falloff * v1);
+	if ((framenumber * f2) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f2)*2.0) * falloff * v2);
+	else dram->f[framenumber]  += (cos(framenumber * f2) * falloff * v2);
+	if ((framenumber * f3) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f3)*2.0) * falloff * v3);
+	else dram->f[framenumber]  += (cos(framenumber * f3) * falloff * v3);
+	if ((framenumber * f4) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f4)*2.0) * falloff * v4);
+	else dram->f[framenumber]  += (cos(framenumber * f4) * falloff * v4);
+	if ((framenumber * f5) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f5)*2.0) * falloff * v5);
+	else dram->f[framenumber]  += (cos(framenumber * f5) * falloff * v5);
+	if ((framenumber * f6) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f6)*2.0) * falloff * v6);
+	else dram->f[framenumber]  += (cos(framenumber * f6) * falloff * v6);
+	if ((framenumber * f7) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f7)*2.0) * falloff * v7);
+	else dram->f[framenumber]  += (cos(framenumber * f7) * falloff * v7);
+	if ((framenumber * f8) < 1.57079633) dram->f[framenumber]  += (sin((framenumber * f8)*2.0) * falloff * v8);
+	else dram->f[framenumber]  += (cos(framenumber * f8) * falloff * v8);
 
 	//done updating the kernel for this go-round
 		
@@ -157,72 +160,72 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
 		double drySample = inputSample;
 		
-b[59] = b[58]; b[58] = b[57]; b[57] = b[56]; b[56] = b[55]; b[55] = b[54]; b[54] = b[53]; b[53] = b[52]; b[52] = b[51]; b[51] = b[50]; b[50] = b[49]; b[49] = b[48];
-b[48] = b[47]; b[47] = b[46]; b[46] = b[45]; b[45] = b[44]; b[44] = b[43]; b[43] = b[42]; b[42] = b[41]; b[41] = b[40]; b[40] = b[39]; b[39] = b[38];
-b[38] = b[37]; b[37] = b[36]; b[36] = b[35]; b[35] = b[34]; b[34] = b[33]; b[33] = b[32]; b[32] = b[31]; b[31] = b[30]; b[30] = b[29]; b[29] = b[28]; 
-b[28] = b[27]; b[27] = b[26]; b[26] = b[25]; b[25] = b[24]; b[24] = b[23]; b[23] = b[22]; b[22] = b[21]; b[21] = b[20]; b[20] = b[19]; b[19] = b[18];
-b[18] = b[17]; b[17] = b[16]; b[16] = b[15]; b[15] = b[14]; b[14] = b[13]; b[13] = b[12]; b[12] = b[11]; b[11] = b[10]; b[10] = b[9]; b[9] = b[8]; b[8] = b[7]; 
-b[7] = b[6]; b[6] = b[5]; b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1]; b[1] = b[0]; b[0] = inputSample;
+dram->b[59] = dram->b[58]; dram->b[58] = dram->b[57]; dram->b[57] = dram->b[56]; dram->b[56] = dram->b[55]; dram->b[55] = dram->b[54]; dram->b[54] = dram->b[53]; dram->b[53] = dram->b[52]; dram->b[52] = dram->b[51]; dram->b[51] = dram->b[50]; dram->b[50] = dram->b[49]; dram->b[49] = dram->b[48];
+dram->b[48] = dram->b[47]; dram->b[47] = dram->b[46]; dram->b[46] = dram->b[45]; dram->b[45] = dram->b[44]; dram->b[44] = dram->b[43]; dram->b[43] = dram->b[42]; dram->b[42] = dram->b[41]; dram->b[41] = dram->b[40]; dram->b[40] = dram->b[39]; dram->b[39] = dram->b[38];
+dram->b[38] = dram->b[37]; dram->b[37] = dram->b[36]; dram->b[36] = dram->b[35]; dram->b[35] = dram->b[34]; dram->b[34] = dram->b[33]; dram->b[33] = dram->b[32]; dram->b[32] = dram->b[31]; dram->b[31] = dram->b[30]; dram->b[30] = dram->b[29]; dram->b[29] = dram->b[28]; 
+dram->b[28] = dram->b[27]; dram->b[27] = dram->b[26]; dram->b[26] = dram->b[25]; dram->b[25] = dram->b[24]; dram->b[24] = dram->b[23]; dram->b[23] = dram->b[22]; dram->b[22] = dram->b[21]; dram->b[21] = dram->b[20]; dram->b[20] = dram->b[19]; dram->b[19] = dram->b[18];
+dram->b[18] = dram->b[17]; dram->b[17] = dram->b[16]; dram->b[16] = dram->b[15]; dram->b[15] = dram->b[14]; dram->b[14] = dram->b[13]; dram->b[13] = dram->b[12]; dram->b[12] = dram->b[11]; dram->b[11] = dram->b[10]; dram->b[10] = dram->b[9]; dram->b[9] = dram->b[8]; dram->b[8] = dram->b[7]; 
+dram->b[7] = dram->b[6]; dram->b[6] = dram->b[5]; dram->b[5] = dram->b[4]; dram->b[4] = dram->b[3]; dram->b[3] = dram->b[2]; dram->b[2] = dram->b[1]; dram->b[1] = dram->b[0]; dram->b[0] = inputSample;
 		
-		inputSample = (b[1] * f[1]);
-		inputSample += (b[2] * f[2]);
-		inputSample += (b[3] * f[3]);
-		inputSample += (b[4] * f[4]);
-		inputSample += (b[5] * f[5]);
-		inputSample += (b[6] * f[6]);
-		inputSample += (b[7] * f[7]);
-		inputSample += (b[8] * f[8]);
-		inputSample += (b[9] * f[9]);
-		inputSample += (b[10] * f[10]);
-		inputSample += (b[11] * f[11]);
-		inputSample += (b[12] * f[12]);
-		inputSample += (b[13] * f[13]);
-		inputSample += (b[14] * f[14]);
-		inputSample += (b[15] * f[15]);
-		inputSample += (b[16] * f[16]);
-		inputSample += (b[17] * f[17]);
-		inputSample += (b[18] * f[18]);
-		inputSample += (b[19] * f[19]);
-		inputSample += (b[20] * f[20]);
-		inputSample += (b[21] * f[21]);
-		inputSample += (b[22] * f[22]);
-		inputSample += (b[23] * f[23]);
-		inputSample += (b[24] * f[24]);
-		inputSample += (b[25] * f[25]);
-		inputSample += (b[26] * f[26]);
-		inputSample += (b[27] * f[27]);
-		inputSample += (b[28] * f[28]);
-		inputSample += (b[29] * f[29]);
-		inputSample += (b[30] * f[30]);
-		inputSample += (b[31] * f[31]);
-		inputSample += (b[32] * f[32]);
-		inputSample += (b[33] * f[33]);
-		inputSample += (b[34] * f[34]);
-		inputSample += (b[35] * f[35]);
-		inputSample += (b[36] * f[36]);
-		inputSample += (b[37] * f[37]);
-		inputSample += (b[38] * f[38]);
-		inputSample += (b[39] * f[39]);
-		inputSample += (b[40] * f[40]);
-		inputSample += (b[41] * f[41]);
-		inputSample += (b[42] * f[42]);
-		inputSample += (b[43] * f[43]);
-		inputSample += (b[44] * f[44]);
-		inputSample += (b[45] * f[45]);
-		inputSample += (b[46] * f[46]);
-		inputSample += (b[47] * f[47]);
-		inputSample += (b[48] * f[48]);
-		inputSample += (b[49] * f[49]);
-		inputSample += (b[50] * f[50]);
-		inputSample += (b[51] * f[51]);
-		inputSample += (b[52] * f[52]);
-		inputSample += (b[53] * f[53]);
-		inputSample += (b[54] * f[54]);
-		inputSample += (b[55] * f[55]);
-		inputSample += (b[56] * f[56]);
-		inputSample += (b[57] * f[57]);
-		inputSample += (b[58] * f[58]);
-		inputSample += (b[59] * f[59]);
+		inputSample = (dram->b[1] * dram->f[1]);
+		inputSample += (dram->b[2] * dram->f[2]);
+		inputSample += (dram->b[3] * dram->f[3]);
+		inputSample += (dram->b[4] * dram->f[4]);
+		inputSample += (dram->b[5] * dram->f[5]);
+		inputSample += (dram->b[6] * dram->f[6]);
+		inputSample += (dram->b[7] * dram->f[7]);
+		inputSample += (dram->b[8] * dram->f[8]);
+		inputSample += (dram->b[9] * dram->f[9]);
+		inputSample += (dram->b[10] * dram->f[10]);
+		inputSample += (dram->b[11] * dram->f[11]);
+		inputSample += (dram->b[12] * dram->f[12]);
+		inputSample += (dram->b[13] * dram->f[13]);
+		inputSample += (dram->b[14] * dram->f[14]);
+		inputSample += (dram->b[15] * dram->f[15]);
+		inputSample += (dram->b[16] * dram->f[16]);
+		inputSample += (dram->b[17] * dram->f[17]);
+		inputSample += (dram->b[18] * dram->f[18]);
+		inputSample += (dram->b[19] * dram->f[19]);
+		inputSample += (dram->b[20] * dram->f[20]);
+		inputSample += (dram->b[21] * dram->f[21]);
+		inputSample += (dram->b[22] * dram->f[22]);
+		inputSample += (dram->b[23] * dram->f[23]);
+		inputSample += (dram->b[24] * dram->f[24]);
+		inputSample += (dram->b[25] * dram->f[25]);
+		inputSample += (dram->b[26] * dram->f[26]);
+		inputSample += (dram->b[27] * dram->f[27]);
+		inputSample += (dram->b[28] * dram->f[28]);
+		inputSample += (dram->b[29] * dram->f[29]);
+		inputSample += (dram->b[30] * dram->f[30]);
+		inputSample += (dram->b[31] * dram->f[31]);
+		inputSample += (dram->b[32] * dram->f[32]);
+		inputSample += (dram->b[33] * dram->f[33]);
+		inputSample += (dram->b[34] * dram->f[34]);
+		inputSample += (dram->b[35] * dram->f[35]);
+		inputSample += (dram->b[36] * dram->f[36]);
+		inputSample += (dram->b[37] * dram->f[37]);
+		inputSample += (dram->b[38] * dram->f[38]);
+		inputSample += (dram->b[39] * dram->f[39]);
+		inputSample += (dram->b[40] * dram->f[40]);
+		inputSample += (dram->b[41] * dram->f[41]);
+		inputSample += (dram->b[42] * dram->f[42]);
+		inputSample += (dram->b[43] * dram->f[43]);
+		inputSample += (dram->b[44] * dram->f[44]);
+		inputSample += (dram->b[45] * dram->f[45]);
+		inputSample += (dram->b[46] * dram->f[46]);
+		inputSample += (dram->b[47] * dram->f[47]);
+		inputSample += (dram->b[48] * dram->f[48]);
+		inputSample += (dram->b[49] * dram->f[49]);
+		inputSample += (dram->b[50] * dram->f[50]);
+		inputSample += (dram->b[51] * dram->f[51]);
+		inputSample += (dram->b[52] * dram->f[52]);
+		inputSample += (dram->b[53] * dram->f[53]);
+		inputSample += (dram->b[54] * dram->f[54]);
+		inputSample += (dram->b[55] * dram->f[55]);
+		inputSample += (dram->b[56] * dram->f[56]);
+		inputSample += (dram->b[57] * dram->f[57]);
+		inputSample += (dram->b[58] * dram->f[58]);
+		inputSample += (dram->b[59] * dram->f[59]);
 		inputSample /= 12.0;
 		//inlined- this is our little EQ kernel. Longer will give better tightness on bass frequencies.
 		inputSample = (drySample*(1.0-wet))+(inputSample*wet);
@@ -243,7 +246,7 @@ b[7] = b[6]; b[6] = b[5]; b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1]; b[
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	register UInt32 count;
-	for(count = 0; count < 60; count++) {b[count] = 0.0; f[count] = 0.0;}
+	for(count = 0; count < 60; count++) {dram->b[count] = 0.0; dram->f[count] = 0.0;}
 	framenumber = 0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }

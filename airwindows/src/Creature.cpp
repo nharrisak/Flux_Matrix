@@ -32,13 +32,16 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		double slew[102]; //probably worth just using a number here
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double slew[102]; //probably worth just using a number here
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -62,8 +65,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		double drySample = inputSample;
 		
 		for (int x = 0; x < stages; x++) {
-			inputSample = (slew[x]+(sin(slew[x]-inputSample)*0.5))*source;
-			slew[x] = inputSample*0.5;
+			inputSample = (dram->slew[x]+(sin(dram->slew[x]-inputSample)*0.5))*source;
+			dram->slew[x] = inputSample*0.5;
 		}
 		if (stages % 2 > 0) inputSample = -inputSample;
 		
@@ -85,7 +88,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int x = 0; x < 101; x++) slew[x] = 0.0;
+	for (int x = 0; x < 101; x++) dram->slew[x] = 0.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

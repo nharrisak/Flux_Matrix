@@ -32,10 +32,10 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		Float64 iirSampleA;
 		Float64 iirSampleB;
-		Float64 d[264];
 		Float64 fastIIRA;
 		Float64 fastIIRB;
 		Float64 slowIIRA;
@@ -48,6 +48,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[264];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -110,50 +113,50 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		count = gcount;
 		//increment the counter
 		
-		d[count+131] = d[count] = inputSample;
+		dram->d[count+131] = dram->d[count] = inputSample;
 		if (fpFlip)
 		{
 			fastIIRA = fastIIRA/fastTaper;
 			slowIIRA = slowIIRA/slowTaper;
 			//scale stuff down
-			fastIIRA += d[count];
+			fastIIRA += dram->d[count];
 			count += 3;
-			temp = d[count+127];
-			temp += d[count+113];
-			temp += d[count+109];
-			temp += d[count+107];
-			temp += d[count+103];
-			temp += d[count+101];
-			temp += d[count+97];
-			temp += d[count+89];
-			temp += d[count+83];
+			temp = dram->d[count+127];
+			temp += dram->d[count+113];
+			temp += dram->d[count+109];
+			temp += dram->d[count+107];
+			temp += dram->d[count+103];
+			temp += dram->d[count+101];
+			temp += dram->d[count+97];
+			temp += dram->d[count+89];
+			temp += dram->d[count+83];
 			temp /= 2;
-			temp += d[count+79];
-			temp += d[count+73];
-			temp += d[count+71];
-			temp += d[count+67];
-			temp += d[count+61];
-			temp += d[count+59];
-			temp += d[count+53];
-			temp += d[count+47];
-			temp += d[count+43];
-			temp += d[count+41];
-			temp += d[count+37];
-			temp += d[count+31];
-			temp += d[count+29];
+			temp += dram->d[count+79];
+			temp += dram->d[count+73];
+			temp += dram->d[count+71];
+			temp += dram->d[count+67];
+			temp += dram->d[count+61];
+			temp += dram->d[count+59];
+			temp += dram->d[count+53];
+			temp += dram->d[count+47];
+			temp += dram->d[count+43];
+			temp += dram->d[count+41];
+			temp += dram->d[count+37];
+			temp += dram->d[count+31];
+			temp += dram->d[count+29];
 			temp /= 2;
-			temp += d[count+23];
-			temp += d[count+19];
-			temp += d[count+17];
-			temp += d[count+13];
-			temp += d[count+11];
+			temp += dram->d[count+23];
+			temp += dram->d[count+19];
+			temp += dram->d[count+17];
+			temp += dram->d[count+13];
+			temp += dram->d[count+11];
 			temp /= 2;
-			temp += d[count+7];
-			temp += d[count+5];
-			temp += d[count+3];
+			temp += dram->d[count+7];
+			temp += dram->d[count+5];
+			temp += dram->d[count+3];
 			temp /= 2;
-			temp += d[count+2];
-			temp += d[count+1];
+			temp += dram->d[count+2];
+			temp += dram->d[count+1];
 			slowIIRA += (temp/128);
 			inputSample = fastIIRA - (slowIIRA / slowTaper);
 		}
@@ -162,44 +165,44 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			fastIIRB = fastIIRB/fastTaper;
 			slowIIRB = slowIIRB/slowTaper;
 			//scale stuff down
-			fastIIRB += d[count];
+			fastIIRB += dram->d[count];
 			count += 3;
-			temp = d[count+127];
-			temp += d[count+113];
-			temp += d[count+109];
-			temp += d[count+107];
-			temp += d[count+103];
-			temp += d[count+101];
-			temp += d[count+97];
-			temp += d[count+89];
-			temp += d[count+83];
+			temp = dram->d[count+127];
+			temp += dram->d[count+113];
+			temp += dram->d[count+109];
+			temp += dram->d[count+107];
+			temp += dram->d[count+103];
+			temp += dram->d[count+101];
+			temp += dram->d[count+97];
+			temp += dram->d[count+89];
+			temp += dram->d[count+83];
 			temp /= 2;
-			temp += d[count+79];
-			temp += d[count+73];
-			temp += d[count+71];
-			temp += d[count+67];
-			temp += d[count+61];
-			temp += d[count+59];
-			temp += d[count+53];
-			temp += d[count+47];
-			temp += d[count+43];
-			temp += d[count+41];
-			temp += d[count+37];
-			temp += d[count+31];
-			temp += d[count+29];
+			temp += dram->d[count+79];
+			temp += dram->d[count+73];
+			temp += dram->d[count+71];
+			temp += dram->d[count+67];
+			temp += dram->d[count+61];
+			temp += dram->d[count+59];
+			temp += dram->d[count+53];
+			temp += dram->d[count+47];
+			temp += dram->d[count+43];
+			temp += dram->d[count+41];
+			temp += dram->d[count+37];
+			temp += dram->d[count+31];
+			temp += dram->d[count+29];
 			temp /= 2;
-			temp += d[count+23];
-			temp += d[count+19];
-			temp += d[count+17];
-			temp += d[count+13];
-			temp += d[count+11];
+			temp += dram->d[count+23];
+			temp += dram->d[count+19];
+			temp += dram->d[count+17];
+			temp += dram->d[count+13];
+			temp += dram->d[count+11];
 			temp /= 2;
-			temp += d[count+7];
-			temp += d[count+5];
-			temp += d[count+3];
+			temp += dram->d[count+7];
+			temp += dram->d[count+5];
+			temp += dram->d[count+3];
 			temp /= 2;
-			temp += d[count+2];
-			temp += d[count+1];
+			temp += dram->d[count+2];
+			temp += dram->d[count+1];
 			slowIIRB += (temp/128);
 			inputSample = fastIIRB - (slowIIRB / slowTaper);
 		}
@@ -231,7 +234,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int temp = 0; temp < 263; temp++) {d[temp] = 0.0;}
+	for (int temp = 0; temp < 263; temp++) {dram->d[temp] = 0.0;}
 	gcount = 0;
 	fastIIRA = fastIIRB = slowIIRA = slowIIRB = 0.0;
 	iirSampleA = iirSampleB = 0.0;

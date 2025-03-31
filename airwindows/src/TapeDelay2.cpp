@@ -38,8 +38,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d[88211];
 		Float64 prevSample;
 		Float64 delay;
 		Float64 sweep;
@@ -52,6 +52,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[88211];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -118,7 +121,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			sweep += (0.05*inputSample*inputSample); if (sweep > 6.283185307179586) sweep -= 6.283185307179586;
 			
 			int pos = floor(delay);
-			Float64 newSample = inputSample + d[pos]*feedback;
+			Float64 newSample = inputSample + dram->d[pos]*feedback;
 			double tempSample = (newSample * regenFilter[2]) + regenFilter[7];
 			regenFilter[7] = -(tempSample * regenFilter[5]) + regenFilter[8];
 			regenFilter[8] = (newSample * regenFilter[4]) - (tempSample * regenFilter[6]);
@@ -126,14 +129,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			
 			delay -= speed; if (delay < 0) delay += 88200.0;
 			Float64 increment = (newSample - prevSample) / speed;
-			d[pos] = prevSample;
+			dram->d[pos] = prevSample;
 			while (pos != floor(delay)) {
-				d[pos] = prevSample;
+				dram->d[pos] = prevSample;
 				prevSample += increment;
 				pos--; if (pos < 0) pos += 88200;
 			}
 			prevSample = newSample;
-			pos = floor(delay); inputSample = d[pos];
+			pos = floor(delay); inputSample = dram->d[pos];
 			tempSample = (inputSample * outFilter[2]) + outFilter[7];
 			outFilter[7] = -(tempSample * outFilter[5]) + outFilter[8];
 			outFilter[8] = (inputSample * outFilter[4]) - (tempSample * outFilter[6]);
@@ -200,7 +203,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int x = 0; x < 88210; x++) {d[x] = 0.0;}
+	for(int x = 0; x < 88210; x++) {dram->d[x] = 0.0;}
 	prevSample = 0.0;
 	delay = 0.0;
 	sweep = 0.0;

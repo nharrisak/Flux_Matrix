@@ -30,8 +30,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 p[4001];
 		Float64 slide;
 		int gcount;
 		uint32_t fpd;
@@ -39,6 +39,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 p[4001];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -77,22 +80,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (gcount < 1 || gcount > 2000) {gcount = 2000;}
 		count = gcount;
 
-		p[count+2000] = p[count] = inputSample;
+		dram->p[count+2000] = dram->p[count] = inputSample;
 		//double buffer
 		
 		count = (int)(gcount+floor(offsetA));
 
-		total = p[count] * 0.391; //less as value moves away from .0
-		total += p[count+widthA]; //we can assume always using this in one way or another?
-		total += p[count+widthA+widthA] * 0.391; //greater as value moves away from .0
+		total = dram->p[count] * 0.391; //less as value moves away from .0
+		total += dram->p[count+widthA]; //we can assume always using this in one way or another?
+		total += dram->p[count+widthA+widthA] * 0.391; //greater as value moves away from .0
 
 		inputSample += ((total * 0.274));
 
 		count = (int)(gcount+floor(offsetB));
 
-		total = p[count] * 0.918; //less as value moves away from .0
-		total += p[count+widthB]; //we can assume always using this in one way or another?
-		total += p[count+widthB+widthB] * 0.918; //greater as value moves away from .0
+		total = dram->p[count] * 0.918; //less as value moves away from .0
+		total += dram->p[count+widthB]; //we can assume always using this in one way or another?
+		total += dram->p[count+widthB+widthB] * 0.918; //greater as value moves away from .0
 
 		inputSample -= ((total * 0.629));
 
@@ -119,7 +122,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 4000; count++) {p[count] = 0.0;}
+	for(int count = 0; count < 4000; count++) {dram->p[count] = 0.0;}
 	gcount = 0;
 	slide = 0.421;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;

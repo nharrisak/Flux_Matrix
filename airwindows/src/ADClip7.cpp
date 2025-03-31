@@ -38,9 +38,9 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		double lastSample;
-		Float32 b[22200];
 		int gcount;
 		Float64 lows;
 		Float64 iirLowsA;
@@ -51,6 +51,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float32 b[22200];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -113,31 +116,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				
 		if (gcount < 0 || gcount > 11020) {gcount = 11020;}
 		count = gcount;
-		b[count+11020] = b[count] = overshoot;
+		dram->b[count+11020] = dram->b[count] = overshoot;
 		gcount--;
 		
 		if (highslift > 0.0)
 		{
-			//we have a big pile of b[] which is overshoots
+			//we have a big pile of dram->b[] which is overshoots
 			temp = count+refH3;
-			highs = -(b[temp] * minusH3); //less as value moves away from .0
-			highs -= b[temp+1]; //we can assume always using this in one way or another?
-			highs -= (b[temp+2] * fractionH3); //greater as value moves away from .0
-			highs += (((b[temp]-b[temp+1])-(b[temp+1]-b[temp+2]))/50); //interpolation hacks 'r us
+			highs = -(dram->b[temp] * minusH3); //less as value moves away from .0
+			highs -= dram->b[temp+1]; //we can assume always using this in one way or another?
+			highs -= (dram->b[temp+2] * fractionH3); //greater as value moves away from .0
+			highs += (((dram->b[temp]-dram->b[temp+1])-(dram->b[temp+1]-dram->b[temp+2]))/50); //interpolation hacks 'r us
 			highs *= adjust; //add in the kernel elements backwards saves multiplies
 			//stage 3 is a negative add
 			temp = count+refH2;
-			highs += (b[temp] * minusH2); //less as value moves away from .0
-			highs += b[temp+1]; //we can assume always using this in one way or another?
-			highs += (b[temp+2] * fractionH2); //greater as value moves away from .0
-			highs -= (((b[temp]-b[temp+1])-(b[temp+1]-b[temp+2]))/50); //interpolation hacks 'r us
+			highs += (dram->b[temp] * minusH2); //less as value moves away from .0
+			highs += dram->b[temp+1]; //we can assume always using this in one way or another?
+			highs += (dram->b[temp+2] * fractionH2); //greater as value moves away from .0
+			highs -= (((dram->b[temp]-dram->b[temp+1])-(dram->b[temp+1]-dram->b[temp+2]))/50); //interpolation hacks 'r us
 			highs *= adjust; //add in the kernel elements backwards saves multiplies
 			//stage 2 is a positive feedback of the overshoot
 			temp = count+refH1;
-			highs -= (b[temp] * minusH1); //less as value moves away from .0
-			highs -= b[temp+1]; //we can assume always using this in one way or another?
-			highs -= (b[temp+2] * fractionH1); //greater as value moves away from .0
-			highs += (((b[temp]-b[temp+1])-(b[temp+1]-b[temp+2]))/50); //interpolation hacks 'r us
+			highs -= (dram->b[temp] * minusH1); //less as value moves away from .0
+			highs -= dram->b[temp+1]; //we can assume always using this in one way or another?
+			highs -= (dram->b[temp+2] * fractionH1); //greater as value moves away from .0
+			highs += (((dram->b[temp]-dram->b[temp+1])-(dram->b[temp+1]-dram->b[temp+2]))/50); //interpolation hacks 'r us
 			highs *= adjust; //add in the kernel elements backwards saves multiplies
 			//stage 1 is a negative feedback of the overshoot
 			//done with interpolated mostly negative feedback of the overshoot
@@ -154,75 +157,75 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			lows *= subs;
 			//going in we'll reel back some of the swing
 			temp = count+refL1;
-			lows -= b[temp+127];
-			lows -= b[temp+113];
-			lows -= b[temp+109];
-			lows -= b[temp+107];
-			lows -= b[temp+103];
-			lows -= b[temp+101];
-			lows -= b[temp+97];
-			lows -= b[temp+89];
-			lows -= b[temp+83];
-			lows -= b[temp+79];
-			lows -= b[temp+73];
-			lows -= b[temp+71];
-			lows -= b[temp+67];
-			lows -= b[temp+61];
-			lows -= b[temp+59];
-			lows -= b[temp+53];
-			lows -= b[temp+47];
-			lows -= b[temp+43];
-			lows -= b[temp+41];
-			lows -= b[temp+37];
-			lows -= b[temp+31];
-			lows -= b[temp+29];
-			lows -= b[temp+23];
-			lows -= b[temp+19];
-			lows -= b[temp+17];
-			lows -= b[temp+13];
-			lows -= b[temp+11];
-			lows -= b[temp+7];
-			lows -= b[temp+5];
-			lows -= b[temp+3];
-			lows -= b[temp+2];
-			lows -= b[temp+1];
+			lows -= dram->b[temp+127];
+			lows -= dram->b[temp+113];
+			lows -= dram->b[temp+109];
+			lows -= dram->b[temp+107];
+			lows -= dram->b[temp+103];
+			lows -= dram->b[temp+101];
+			lows -= dram->b[temp+97];
+			lows -= dram->b[temp+89];
+			lows -= dram->b[temp+83];
+			lows -= dram->b[temp+79];
+			lows -= dram->b[temp+73];
+			lows -= dram->b[temp+71];
+			lows -= dram->b[temp+67];
+			lows -= dram->b[temp+61];
+			lows -= dram->b[temp+59];
+			lows -= dram->b[temp+53];
+			lows -= dram->b[temp+47];
+			lows -= dram->b[temp+43];
+			lows -= dram->b[temp+41];
+			lows -= dram->b[temp+37];
+			lows -= dram->b[temp+31];
+			lows -= dram->b[temp+29];
+			lows -= dram->b[temp+23];
+			lows -= dram->b[temp+19];
+			lows -= dram->b[temp+17];
+			lows -= dram->b[temp+13];
+			lows -= dram->b[temp+11];
+			lows -= dram->b[temp+7];
+			lows -= dram->b[temp+5];
+			lows -= dram->b[temp+3];
+			lows -= dram->b[temp+2];
+			lows -= dram->b[temp+1];
 			//initial negative lobe
 			lows *= subs;
 			lows *= subs;
 			//twice, to minimize the suckout in low boost situations
 			temp = count+refL2;
-			lows += b[temp+127];
-			lows += b[temp+113];
-			lows += b[temp+109];
-			lows += b[temp+107];
-			lows += b[temp+103];
-			lows += b[temp+101];
-			lows += b[temp+97];
-			lows += b[temp+89];
-			lows += b[temp+83];
-			lows += b[temp+79];
-			lows += b[temp+73];
-			lows += b[temp+71];
-			lows += b[temp+67];
-			lows += b[temp+61];
-			lows += b[temp+59];
-			lows += b[temp+53];
-			lows += b[temp+47];
-			lows += b[temp+43];
-			lows += b[temp+41];
-			lows += b[temp+37];
-			lows += b[temp+31];
-			lows += b[temp+29];
-			lows += b[temp+23];
-			lows += b[temp+19];
-			lows += b[temp+17];
-			lows += b[temp+13];
-			lows += b[temp+11];
-			lows += b[temp+7];
-			lows += b[temp+5];
-			lows += b[temp+3];
-			lows += b[temp+2];
-			lows += b[temp+1];
+			lows += dram->b[temp+127];
+			lows += dram->b[temp+113];
+			lows += dram->b[temp+109];
+			lows += dram->b[temp+107];
+			lows += dram->b[temp+103];
+			lows += dram->b[temp+101];
+			lows += dram->b[temp+97];
+			lows += dram->b[temp+89];
+			lows += dram->b[temp+83];
+			lows += dram->b[temp+79];
+			lows += dram->b[temp+73];
+			lows += dram->b[temp+71];
+			lows += dram->b[temp+67];
+			lows += dram->b[temp+61];
+			lows += dram->b[temp+59];
+			lows += dram->b[temp+53];
+			lows += dram->b[temp+47];
+			lows += dram->b[temp+43];
+			lows += dram->b[temp+41];
+			lows += dram->b[temp+37];
+			lows += dram->b[temp+31];
+			lows += dram->b[temp+29];
+			lows += dram->b[temp+23];
+			lows += dram->b[temp+19];
+			lows += dram->b[temp+17];
+			lows += dram->b[temp+13];
+			lows += dram->b[temp+11];
+			lows += dram->b[temp+7];
+			lows += dram->b[temp+5];
+			lows += dram->b[temp+3];
+			lows += dram->b[temp+2];
+			lows += dram->b[temp+1];
 			lows *= subs;
 			//followup positive lobe
 			//now we have the lows content to use
@@ -306,7 +309,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	lastSample = 0.0;
-	for(int count = 0; count < 22199; count++) {b[count] = 0;}
+	for(int count = 0; count < 22199; count++) {dram->b[count] = 0;}
 	gcount = 0;
 	lows = 0;
 	refclip = 0.99;

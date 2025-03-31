@@ -26,8 +26,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d[20];
 		Float64 control;
 		int gcount;
 		double lastSample;
@@ -38,6 +38,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[20];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -81,9 +84,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (gcount < 0 || gcount > 9) {gcount = 9;}
 		
-		d[gcount+9] = d[gcount] = fabs(inputSample)*intensity;
-		control += (d[gcount] / offsetA);
-		control -= (d[gcount+offsetA] / offsetA);
+		dram->d[gcount+9] = dram->d[gcount] = fabs(inputSample)*intensity;
+		control += (dram->d[gcount] / offsetA);
+		control -= (dram->d[gcount+offsetA] / offsetA);
 		control -= 0.000001;
 		
 		clamp = 1;
@@ -157,7 +160,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	int count;
-	for(count = 0; count < 19; count++) {d[count] = 0;}
+	for(count = 0; count < 19; count++) {dram->d[count] = 0;}
 	control = 0;
 	gcount = 0;
 	lastSample = 0.0;

@@ -30,9 +30,9 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		Float64 lastSample;
-		Float64 s[34];
 		Float64 m1;
 		Float64 m2;
 		double biquadA[11];
@@ -42,6 +42,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 s[34];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -89,9 +92,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		Float64 smooth = tempSample; 
 		biquadA[10] = biquadA[9]; biquadA[9] = smooth; //DF1
 		
-		for(int count = spacing*2; count >= 0; count--) {s[count+1] = s[count];} s[0] = inputSample;
-		m1 = (s[0]-s[spacing])*(fabs(s[0]-s[spacing]));
-		m2 = (s[spacing]-s[spacing*2])*(fabs(s[spacing]-s[spacing*2]));
+		for(int count = spacing*2; count >= 0; count--) {dram->s[count+1] = dram->s[count];} dram->s[0] = inputSample;
+		m1 = (dram->s[0]-dram->s[spacing])*(fabs(dram->s[0]-dram->s[spacing]));
+		m2 = (dram->s[spacing]-dram->s[spacing*2])*(fabs(dram->s[spacing]-dram->s[spacing*2]));
 		
 		Float64 sense = (intensity*intensity*fabs(m1-m2));
 		if (sense > 1.0) sense = 1.0;
@@ -121,7 +124,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	lastSample = 0.0;
-	for(int count = 0; count < 33; count++) {s[count] = 0.0;}
+	for(int count = 0; count < 33; count++) {dram->s[count] = 0.0;}
 	m1 = m2 = 0.0;
 	for (int x = 0; x < 11; x++) {biquadA[x] = 0.0; biquadB[x] = 0.0;}
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;

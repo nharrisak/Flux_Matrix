@@ -30,16 +30,19 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		double b[4005];	
 		int bPointer;
-		double c[105];
 		int cPointer;
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double b[4005];	
+		double c[105];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -67,18 +70,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		double drySample = inputSample;
 		
 		bPointer--; if (bPointer < 0) bPointer += 2000;
-		b[bPointer] = b[bPointer+2000] = inputSample;
+		dram->b[bPointer] = dram->b[bPointer+2000] = inputSample;
 
 		int x = bPointer;
 		double longAverage = 0.0;
 		double shortAverage = 0.0;
 		while (x < bPointer+limitB) {
-			shortAverage += b[x];
-			longAverage += b[x];
+			shortAverage += dram->b[x];
+			longAverage += dram->b[x];
 			x++;
 		} //once shorter average is reached, continue to longer
 		while (x < bPointer+limitA) {
-			longAverage += b[x];
+			longAverage += dram->b[x];
 			x++;
 		}
 		longAverage *= divisorA;
@@ -86,12 +89,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		cPointer--; if (cPointer < 0) cPointer += 50;
-		c[cPointer] = c[cPointer+50] = shortAverage+(shortAverage-longAverage);
+		dram->c[cPointer] = dram->c[cPointer+50] = shortAverage+(shortAverage-longAverage);
 		
 		x = cPointer;
 		double shortestAverage = 0.0;
 		while (x < cPointer+limitC) {
-			shortestAverage += c[x];
+			shortestAverage += dram->c[x];
 			x++;
 		}
 		shortestAverage *= divisorC;
@@ -116,8 +119,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 4002; count++) b[count] = 0.0;
-	for(int count = 0; count < 102; count++) c[count] = 0.0;
+	for(int count = 0; count < 4002; count++) dram->b[count] = 0.0;
+	for(int count = 0; count < 102; count++) dram->c[count] = 0.0;
 	bPointer = 1; cPointer = 1;
 	
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;

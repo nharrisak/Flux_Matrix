@@ -38,8 +38,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d[502];
 		int gcount;		
 		Float64 rateof;
 		Float64 sweep;
@@ -60,6 +60,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[502];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -118,15 +121,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		Float64 flutterrandy = fpd / (double)UINT32_MAX;
 		//now we've got a random flutter, so we're messing with the pitch before tape effects go on
 		if (gcount < 0 || gcount > 499) {gcount = 499;}
-		d[gcount] = inputSample;
+		dram->d[gcount] = inputSample;
 		int count = gcount;
 		if (depth != 0.0) {
 			
 			double offset = depth + (depth * pow(rateof,2) * sin(sweep));
 			
 			count += (int)floor(offset);
-			inputSample = (d[count-((count > 499)?500:0)] * (1-(offset-floor(offset))) );
-			inputSample += (d[count+1-((count+1 > 499)?500:0)] * (offset-floor(offset)) );
+			inputSample = (dram->d[count-((count > 499)?500:0)] * (1-(offset-floor(offset))) );
+			inputSample += (dram->d[count+1-((count+1 > 499)?500:0)] * (offset-floor(offset)) );
 			
 			rateof = (rateof * (1.0-fluttertrim)) + (nextmax * fluttertrim);
 			sweep += rateof * fluttertrim;
@@ -285,7 +288,7 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	iirHeadBumpB = 0.0;	
 	for (int x = 0; x < 9; x++) {biquadA[x] = 0.0;biquadB[x] = 0.0;biquadC[x] = 0.0;biquadD[x] = 0.0;}
 	flip = false;
-	for (int temp = 0; temp < 501; temp++) {d[temp] = 0.0;}
+	for (int temp = 0; temp < 501; temp++) {dram->d[temp] = 0.0;}
 	gcount = 0;	
 	sweep = pi;
 	rateof = 0.5;

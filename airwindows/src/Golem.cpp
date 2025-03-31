@@ -37,11 +37,13 @@ kParam0, kParam1, kParam2, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
     
-	Float64 p[4099];
 	int count;
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	Float64 p[4099];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -85,9 +87,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		if (offset > 0)
 			{
-				p[count+2048] = p[count] = inputSampleL;
-				inputSampleL = p[count+near]*nearLevel;
-				inputSampleL += p[count+far]*farLevel;
+				dram->p[count+2048] = dram->p[count] = inputSampleL;
+				inputSampleL = dram->p[count+near]*nearLevel;
+				inputSampleL += dram->p[count+far]*farLevel;
 				
 				//consider adding third sample just to bring out superhighs subtly, like old interpolation hacks
 				//or third and fifth samples, ditto
@@ -96,9 +98,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		if (offset < 0)
 			{
-				p[count+2048] = p[count] = inputSampleR;
-				inputSampleR = p[count+near]*nearLevel;
-				inputSampleR += p[count+far]*farLevel;
+				dram->p[count+2048] = dram->p[count] = inputSampleR;
+				inputSampleR = dram->p[count+near]*nearLevel;
+				inputSampleR += dram->p[count+far]*farLevel;
 			}
 
 		count -= 1;
@@ -129,7 +131,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for(count = 0; count < 4098; count++) {p[count] = 0.0;}
+	for(count = 0; count < 4098; count++) {dram->p[count] = 0.0;}
 	count = 0;
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;
 	fpdR = 1.0; while (fpdR < 16386) fpdR = rand()*UINT32_MAX;

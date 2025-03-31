@@ -28,8 +28,6 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 
-		Float64 pL[5001];
-		Float64 pR[5001];
 		int gcountL;
 		int lastcountL;
 		int gcountR;
@@ -67,6 +65,10 @@ enum { kNumTemplateParameters = 6 };
 		uint32_t fpdL;
 		uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+		Float64 pL[5001];
+		Float64 pR[5001];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -207,24 +209,24 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			if (gcountR < 0 || gcountR > width) {gcountR -= width;}
 			lastcountR = bcountR = gcountR;
 			
-			pL[bcountL+width] = pL[bcountL] = inputSampleL;
-			pR[bcountR+width] = pR[bcountR] = inputSampleR;
+			dram->pL[bcountL+width] = dram->pL[bcountL] = inputSampleL;
+			dram->pR[bcountR+width] = dram->pR[bcountR] = inputSampleR;
 			
 			
 			for(count = 0; count < 8; count++)
 			{
 				base = (int)floor(positionL[count]);
-				tempL[count] = (pL[base] * (1-(positionL[count]-base))); //less as value moves away from .0
-				tempL[count] += pL[base+1]; //we can assume always using this in one way or another?
-				tempL[count] += (pL[base+2] * (positionL[count]-base)); //greater as value moves away from .0
-				tempL[count] -= (((pL[base]-pL[base+1])-(pL[base+1]-pL[base+2]))/50); //interpolation hacks 'r us		
+				tempL[count] = (dram->pL[base] * (1-(positionL[count]-base))); //less as value moves away from .0
+				tempL[count] += dram->pL[base+1]; //we can assume always using this in one way or another?
+				tempL[count] += (dram->pL[base+2] * (positionL[count]-base)); //greater as value moves away from .0
+				tempL[count] -= (((dram->pL[base]-dram->pL[base+1])-(dram->pL[base+1]-dram->pL[base+2]))/50); //interpolation hacks 'r us		
 				tempL[count] /= 2;
 				
 				base = (int)floor(positionR[count]);
-				tempR[count] = (pR[base] * (1-(positionR[count]-base))); //less as value moves away from .0
-				tempR[count] += pR[base+1]; //we can assume always using this in one way or another?
-				tempR[count] += (pR[base+2] * (positionR[count]-base)); //greater as value moves away from .0
-				tempR[count] -= (((pR[base]-pR[base+1])-(pR[base+1]-pR[base+2]))/50); //interpolation hacks 'r us		
+				tempR[count] = (dram->pR[base] * (1-(positionR[count]-base))); //less as value moves away from .0
+				tempR[count] += dram->pR[base+1]; //we can assume always using this in one way or another?
+				tempR[count] += (dram->pR[base+2] * (positionR[count]-base)); //greater as value moves away from .0
+				tempR[count] -= (((dram->pR[base]-dram->pR[base+1])-(dram->pR[base+1]-dram->pR[base+2]))/50); //interpolation hacks 'r us		
 				tempR[count] /= 2;
 			}
 			
@@ -361,7 +363,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for(int count = 0; count < 5000; count++) {pL[count] = 0.0; pR[count] = 0.0;}
+	for(int count = 0; count < 5000; count++) {dram->pL[count] = 0.0; dram->pR[count] = 0.0;}
 	for(int count = 0; count < 8; count++)
 	{tempL[count] = 0.0; positionL[count] = 0.0; lastpositionL[count] = 0.0; trackingL[count] = 0.0;}
 	for(int count = 0; count < 8; count++)

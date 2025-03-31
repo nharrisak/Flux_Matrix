@@ -55,8 +55,6 @@ enum { kNumTemplateParameters = 6 };
 	double avgEncR;
 	double avgDecR;
 	
-	double dL[1002];
-	double dR[1002];
 	double sweepL;
 	double sweepR;
 	double nextmaxL;
@@ -131,6 +129,10 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double dL[1002];
+	double dR[1002];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -243,7 +245,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin Flutter
 		if (flutDepth > 0.0) {
 			if (gcount < 0 || gcount > 999) gcount = 999;
-			dL[gcount] = inputSampleL;
+			dram->dL[gcount] = inputSampleL;
 			int count = gcount;
 			double offset = flutDepth + (flutDepth * sin(sweepL));
 			sweepL += nextmaxL * flutFrequency;
@@ -255,9 +257,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				if (fabs(flutA-sin(sweepR+nextmaxR))<fabs(flutB-sin(sweepR+nextmaxR))) nextmaxL = flutA; else nextmaxL = flutB;
 			}
 			count += (int)floor(offset);
-			inputSampleL = (dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
-			inputSampleL += (dL[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
-			dR[gcount] = inputSampleR;
+			inputSampleL = (dram->dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
+			inputSampleL += (dram->dL[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
+			dram->dR[gcount] = inputSampleR;
 			count = gcount;
 			offset = flutDepth + (flutDepth * sin(sweepR));
 			sweepR += nextmaxR * flutFrequency;
@@ -269,8 +271,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 				if (fabs(flutA-sin(sweepL+nextmaxL))<fabs(flutB-sin(sweepL+nextmaxL))) nextmaxR = flutA; else nextmaxR = flutB;
 			}
 			count += (int)floor(offset);
-			inputSampleR = (dR[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
-			inputSampleR += (dR[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
+			inputSampleR = (dram->dR[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
+			inputSampleR += (dram->dR[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
 			gcount--;
 		}
 		//end Flutter
@@ -448,7 +450,7 @@ int _airwindowsAlgorithm::reset(void) {
 	compEncR = 1.0; compDecR = 1.0;
 	avgEncR = 0.0; avgDecR = 0.0;
 
-	for (int temp = 0; temp < 1001; temp++) {dL[temp] = 0.0;dR[temp] = 0.0;}
+	for (int temp = 0; temp < 1001; temp++) {dram->dL[temp] = 0.0;dram->dR[temp] = 0.0;}
 	sweepL = M_PI;
 	sweepR = M_PI;
 	nextmaxL = 0.5;	

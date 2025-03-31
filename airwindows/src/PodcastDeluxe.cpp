@@ -28,12 +28,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d1[503];
-		Float64 d2[503];
-		Float64 d3[503];
-		Float64 d4[503];
-		Float64 d5[503];
 		int tap1, tap2, tap3, tap4, tap5, maxdelay1, maxdelay2, maxdelay3, maxdelay4, maxdelay5;
 		//the phase rotator
 		
@@ -52,6 +48,13 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d1[503];
+		Float64 d2[503];
+		Float64 d3[503];
+		Float64 d4[503];
+		Float64 d5[503];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -96,10 +99,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (allpasstemp < 0 || allpasstemp > maxdelay1) {allpasstemp = maxdelay1;}
 		//set up the delay position
 		//using 'tap' and 'allpasstemp' to position the tap		
-		inputSample -= d1[allpasstemp]*outallpass;
-		d1[tap1] = inputSample;
+		inputSample -= dram->d1[allpasstemp]*outallpass;
+		dram->d1[tap1] = inputSample;
 		inputSample *= outallpass;
-		inputSample += (d1[allpasstemp]);
+		inputSample += (dram->d1[allpasstemp]);
 		//allpass stage
 		tap1--; if (tap1 < 0 || tap1 > maxdelay1) {tap1 = maxdelay1;}
 		//decrement the position for reals
@@ -118,10 +121,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (allpasstemp < 0 || allpasstemp > maxdelay2) {allpasstemp = maxdelay2;}
 		//set up the delay position
 		//using 'tap' and 'allpasstemp' to position the tap
-		inputSample -= d2[allpasstemp]*outallpass;
-		d2[tap2] = inputSample;
+		inputSample -= dram->d2[allpasstemp]*outallpass;
+		dram->d2[tap2] = inputSample;
 		inputSample *= outallpass;
-		inputSample += (d2[allpasstemp]);
+		inputSample += (dram->d2[allpasstemp]);
 		//allpass stage
 		tap2--; if (tap2 < 0 || tap2 > maxdelay2) {tap2 = maxdelay2;}
 		//decrement the position for reals
@@ -140,10 +143,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (allpasstemp < 0 || allpasstemp > maxdelay3) {allpasstemp = maxdelay3;}
 		//set up the delay position
 		//using 'tap' and 'allpasstemp' to position the tap
-		inputSample -= d3[allpasstemp]*outallpass;
-		d3[tap3] = inputSample;
+		inputSample -= dram->d3[allpasstemp]*outallpass;
+		dram->d3[tap3] = inputSample;
 		inputSample *= outallpass;
-		inputSample += (d3[allpasstemp]);
+		inputSample += (dram->d3[allpasstemp]);
 		//allpass stage
 		tap3--; if (tap3 < 0 || tap3 > maxdelay3) {tap3 = maxdelay3;}
 		//decrement the position for reals
@@ -162,10 +165,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (allpasstemp < 0 || allpasstemp > maxdelay4) {allpasstemp = maxdelay4;}
 		//set up the delay position
 		//using 'tap' and 'allpasstemp' to position the tap
-		inputSample -= d4[allpasstemp]*outallpass;
-		d4[tap4] = inputSample;
+		inputSample -= dram->d4[allpasstemp]*outallpass;
+		dram->d4[tap4] = inputSample;
 		inputSample *= outallpass;
-		inputSample += (d4[allpasstemp]);
+		inputSample += (dram->d4[allpasstemp]);
 		//allpass stage
 		tap4--; if (tap4 < 0 || tap4 > maxdelay4) {tap4 = maxdelay4;}
 		//decrement the position for reals
@@ -184,10 +187,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (allpasstemp < 0 || allpasstemp > maxdelay5) {allpasstemp = maxdelay5;}
 		//set up the delay position
 		//using 'tap' and 'allpasstemp' to position the tap
-		inputSample -= d5[allpasstemp]*outallpass;
-		d5[tap5] = inputSample;
+		inputSample -= dram->d5[allpasstemp]*outallpass;
+		dram->d5[tap5] = inputSample;
 		inputSample *= outallpass;
-		inputSample += (d5[allpasstemp]);
+		inputSample += (dram->d5[allpasstemp]);
 		//allpass stage
 		tap5--; if (tap5 < 0 || tap5 > maxdelay5) {tap5 = maxdelay5;}
 		//decrement the position for reals
@@ -254,7 +257,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 502; count++) {d1[count] = 0.0; d2[count] = 0.0; d3[count] = 0.0; d4[count] = 0.0; d5[count] = 0.0;}
+	for(int count = 0; count < 502; count++) {dram->d1[count] = 0.0; dram->d2[count] = 0.0; dram->d3[count] = 0.0; dram->d4[count] = 0.0; dram->d5[count] = 0.0;}
 	tap1 = 1; tap2 = 1; tap3 = 1; tap4 = 1; tap5 = 1;
 	maxdelay1 = 9001; maxdelay2 = 9001; maxdelay3 = 9001; maxdelay4 = 9001; maxdelay5 = 9001;
 	c1 = 2.0; c2 = 2.0; c3 = 2.0; c4 = 2.0; c5 = 2.0; //startup comp gains

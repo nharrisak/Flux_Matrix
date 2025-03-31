@@ -28,8 +28,6 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	
-	double aML[3111];
-	double aMR[3111];
 	double vibML, vibMR, depthM, oldfpd;	
 	double vibM;
 	int countM;
@@ -37,6 +35,10 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double aML[3111];
+	double aMR[3111];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -63,18 +65,18 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			oldfpd = 0.4294967295+(fpdL*0.0000000000618);
 		}
 		
-		aML[countM] = inputSampleL;
-		aMR[countM] = inputSampleR;
+		dram->aML[countM] = inputSampleL;
+		dram->aMR[countM] = inputSampleR;
 		countM++; if (countM < 0 || countM > delayM) countM = 0;
 		
 		double offsetML = (sin(vibM)+1.0)*127;
 		double offsetMR = (sin(vibM+(3.141592653589793238/2.0))+1.0)*127;
 		int workingML = countM + offsetML;
 		int workingMR = countM + offsetMR;
-		double interpolML = (aML[workingML-((workingML > delayM)?delayM+1:0)] * (1-(offsetML-floor(offsetML))));
-		interpolML += (aML[workingML+1-((workingML+1 > delayM)?delayM+1:0)] * ((offsetML-floor(offsetML))) );
-		double interpolMR = (aMR[workingMR-((workingMR > delayM)?delayM+1:0)] * (1-(offsetMR-floor(offsetMR))));
-		interpolMR += (aMR[workingMR+1-((workingMR+1 > delayM)?delayM+1:0)] * ((offsetMR-floor(offsetMR))) );
+		double interpolML = (dram->aML[workingML-((workingML > delayM)?delayM+1:0)] * (1-(offsetML-floor(offsetML))));
+		interpolML += (dram->aML[workingML+1-((workingML+1 > delayM)?delayM+1:0)] * ((offsetML-floor(offsetML))) );
+		double interpolMR = (dram->aMR[workingMR-((workingMR > delayM)?delayM+1:0)] * (1-(offsetMR-floor(offsetMR))));
+		interpolMR += (dram->aMR[workingMR+1-((workingMR+1 > delayM)?delayM+1:0)] * ((offsetMR-floor(offsetMR))) );
 		inputSampleL = interpolML;
 		inputSampleR = interpolMR;
 		//predelay that applies vibrato
@@ -108,7 +110,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for(int count = 0; count < 3110; count++) {aML[count] = aMR[count] = 0.0;}	
+	for(int count = 0; count < 3110; count++) {dram->aML[count] = dram->aMR[count] = 0.0;}	
 	vibM = 3.0;
 	vibML = vibMR = depthM = 0.0;
 	oldfpd = 429496.7295;

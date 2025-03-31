@@ -25,17 +25,20 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 a[1503];
-		Float64 b[1503];
-		Float64 c[1503];
-		Float64 d[1503];
 		int ax, bx, cx, dx;
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 a[1503];
+		Float64 b[1503];
+		Float64 c[1503];
+		Float64 d[1503];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -64,11 +67,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//amplitude aspect
 
 		allpasstemp = ax - 1; if (allpasstemp < 0 || allpasstemp > am) allpasstemp = am;
-		inputSample -= a[allpasstemp]*0.5;
-		a[ax] = inputSample;
+		inputSample -= dram->a[allpasstemp]*0.5;
+		dram->a[ax] = inputSample;
 		inputSample *= 0.5;
 		ax--; if (ax < 0 || ax > am) {ax = am;}
-		inputSample += (a[ax]);
+		inputSample += (dram->a[ax]);
 		//a single Midiverb-style allpass
 		
 		if (inputSample > 1.0) inputSample = 1.0;
@@ -78,11 +81,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//amplitude aspect
 		
 		allpasstemp = bx - 1; if (allpasstemp < 0 || allpasstemp > bm) allpasstemp = bm;
-		inputSample -= b[allpasstemp]*0.5;
-		b[bx] = inputSample;
+		inputSample -= dram->b[allpasstemp]*0.5;
+		dram->b[bx] = inputSample;
 		inputSample *= 0.5;
 		bx--; if (bx < 0 || bx > bm) {bx = bm;}
-		inputSample += (b[bx]);
+		inputSample += (dram->b[bx]);
 		//a single Midiverb-style allpass
 		
 		if (inputSample > 1.0) inputSample = 1.0;
@@ -92,11 +95,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//amplitude aspect
 		
 		allpasstemp = cx - 1; if (allpasstemp < 0 || allpasstemp > cm) allpasstemp = cm;
-		inputSample -= c[allpasstemp]*0.5;
-		c[cx] = inputSample;
+		inputSample -= dram->c[allpasstemp]*0.5;
+		dram->c[cx] = inputSample;
 		inputSample *= 0.5;
 		cx--; if (cx < 0 || cx > cm) {cx = cm;}
-		inputSample += (c[cx]);
+		inputSample += (dram->c[cx]);
 		//a single Midiverb-style allpass
 		
 		if (inputSample > 1.0) inputSample = 1.0;
@@ -106,11 +109,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//amplitude aspect
 		
 		allpasstemp = dx - 1; if (allpasstemp < 0 || allpasstemp > dm) allpasstemp = dm;
-		inputSample -= d[allpasstemp]*0.5;
-		d[dx] = inputSample;
+		inputSample -= dram->d[allpasstemp]*0.5;
+		dram->d[dx] = inputSample;
 		inputSample *= 0.5;
 		dx--; if (dx < 0 || dx > dm) {dx = dm;}
-		inputSample += (d[dx]);
+		inputSample += (dram->d[dx]);
 		//a single Midiverb-style allpass
 		
 		if (inputSample > 1.0) inputSample = 1.0;
@@ -135,7 +138,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 1502; count++) {a[count] = 0.0; b[count] = 0.0; c[count] = 0.0; d[count] = 0.0;}
+	for(int count = 0; count < 1502; count++) {dram->a[count] = 0.0; dram->b[count] = 0.0; dram->c[count] = 0.0; dram->d[count] = 0.0;}
 	ax = 1; bx = 1; cx = 1; dx = 1;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }

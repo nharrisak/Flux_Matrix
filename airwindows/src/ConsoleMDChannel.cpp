@@ -35,11 +35,6 @@ kParam0, kParam1, kParam2, kParam3, kParam4, kParam5, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double pearA[18];
-	double pearB[22];
-	double mpkL[2005];
-	double mpkR[2005];
-	double f[66];
 	double prevfreqMPeak;
 	double prevamountMPeak;
 	int mpc;
@@ -50,6 +45,13 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double pearA[18];
+	double pearB[22];
+	double mpkL[2005];
+	double mpkR[2005];
+	double f[66];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -91,8 +93,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	int maxMPeak = (amountMPeak*63.0)+1;
 	if ((freqMPeak != prevfreqMPeak)||(amountMPeak != prevamountMPeak)) {
 		for (int x = 0; x < maxMPeak; x++) {
-			if (((double)x*freqMPeak) < M_PI_4) f[x] = sin(((double)x*freqMPeak)*4.0)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
-			else f[x] = cos((double)x*freqMPeak)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
+			if (((double)x*freqMPeak) < M_PI_4) dram->f[x] = sin(((double)x*freqMPeak)*4.0)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
+			else dram->f[x] = cos((double)x*freqMPeak)*freqMPeak*sin(((double)(maxMPeak-x)/(double)maxMPeak)*M_PI_2);
 		}
 		prevfreqMPeak = freqMPeak; prevamountMPeak = amountMPeak;
 	}//end ResEQ2 Mid Boost
@@ -173,48 +175,48 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//begin Pear filter stages
 		double bassL = inputSampleL;
 		double bassR = inputSampleR;
-		double slew = ((bassL - pearA[0]) + pearA[1])*freqTreble*0.5;
-		pearA[0] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (pearA[0] + pearA[1]));
-		pearA[1] = slew; slew = ((bassR - pearA[2]) + pearA[3])*freqTreble*0.5;
-		pearA[2] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (pearA[2] + pearA[3]));
-		pearA[3] = slew; slew = ((bassL - pearA[4]) + pearA[5])*freqTreble*0.5;
-		pearA[4] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (pearA[4] + pearA[5]));
-		pearA[5] = slew; slew = ((bassR - pearA[6]) + pearA[7])*freqTreble*0.5;
-		pearA[6] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (pearA[6] + pearA[7]));
-		pearA[7] = slew; slew = ((bassL - pearA[8]) + pearA[9])*freqTreble*0.5;
-		pearA[8] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (pearA[8] + pearA[9]));
-		pearA[9] = slew; slew = ((bassR - pearA[10]) + pearA[11])*freqTreble*0.5;
-		pearA[10] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (pearA[10] + pearA[11]));
-		pearA[11] = slew; slew = ((bassL - pearA[12]) + pearA[13])*freqTreble*0.5;
-		pearA[12] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (pearA[12] + pearA[13]));
-		pearA[13] = slew; slew = ((bassR - pearA[14]) + pearA[15])*freqTreble*0.5;
-		pearA[14] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (pearA[14] + pearA[15]));
-		pearA[15] = slew;
+		double slew = ((bassL - dram->pearA[0]) + dram->pearA[1])*freqTreble*0.5;
+		dram->pearA[0] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (dram->pearA[0] + dram->pearA[1]));
+		dram->pearA[1] = slew; slew = ((bassR - dram->pearA[2]) + dram->pearA[3])*freqTreble*0.5;
+		dram->pearA[2] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (dram->pearA[2] + dram->pearA[3]));
+		dram->pearA[3] = slew; slew = ((bassL - dram->pearA[4]) + dram->pearA[5])*freqTreble*0.5;
+		dram->pearA[4] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (dram->pearA[4] + dram->pearA[5]));
+		dram->pearA[5] = slew; slew = ((bassR - dram->pearA[6]) + dram->pearA[7])*freqTreble*0.5;
+		dram->pearA[6] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (dram->pearA[6] + dram->pearA[7]));
+		dram->pearA[7] = slew; slew = ((bassL - dram->pearA[8]) + dram->pearA[9])*freqTreble*0.5;
+		dram->pearA[8] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (dram->pearA[8] + dram->pearA[9]));
+		dram->pearA[9] = slew; slew = ((bassR - dram->pearA[10]) + dram->pearA[11])*freqTreble*0.5;
+		dram->pearA[10] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (dram->pearA[10] + dram->pearA[11]));
+		dram->pearA[11] = slew; slew = ((bassL - dram->pearA[12]) + dram->pearA[13])*freqTreble*0.5;
+		dram->pearA[12] = bassL = (freqTreble * bassL) + ((1.0-freqTreble) * (dram->pearA[12] + dram->pearA[13]));
+		dram->pearA[13] = slew; slew = ((bassR - dram->pearA[14]) + dram->pearA[15])*freqTreble*0.5;
+		dram->pearA[14] = bassR = (freqTreble * bassR) + ((1.0-freqTreble) * (dram->pearA[14] + dram->pearA[15]));
+		dram->pearA[15] = slew;
 		//unrolled mid/treble crossover (called bass to use fewer variables)		
 		double trebleL = inputSampleL - bassL; inputSampleL = bassL;
 		double trebleR = inputSampleR - bassR; inputSampleR = bassR;
 		//at this point 'bass' is actually still mid and bass
-		slew = ((bassL - pearB[0]) + pearB[1])*freqMid*0.5;
-		pearB[0] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[0] + pearB[1]));
-		pearB[1] = slew; slew = ((bassR - pearB[2]) + pearB[3])*freqMid*0.5;
-		pearB[2] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[2] + pearB[3]));
-		pearB[3] = slew; slew = ((bassL - pearB[4]) + pearB[5])*freqMid*0.5;
-		pearB[4] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[4] + pearB[5]));
-		pearB[5] = slew; slew = ((bassR - pearB[6]) + pearB[7])*freqMid*0.5;
-		pearB[6] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[6] + pearB[7]));
-		pearB[7] = slew; slew = ((bassL - pearB[8]) + pearB[9])*freqMid*0.5;
-		pearB[8] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[8] + pearB[9]));
-		pearB[9] = slew; slew = ((bassR - pearB[10]) + pearB[11])*freqMid*0.5;
-		pearB[10] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[10] + pearB[11]));
-		pearB[11] = slew; slew = ((bassL - pearB[12]) + pearB[13])*freqMid*0.5;
-		pearB[12] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[12] + pearB[13]));
-		pearB[13] = slew; slew = ((bassR - pearB[14]) + pearB[15])*freqMid*0.5;
-		pearB[14] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[14] + pearB[15]));
-		pearB[15] = slew; slew = ((bassL - pearB[16]) + pearB[17])*freqMid*0.5;
-		pearB[16] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[16] + pearB[17]));
-		pearB[17] = slew; slew = ((bassR - pearB[18]) + pearB[19])*freqMid*0.5;
-		pearB[18] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[18] + pearB[19]));
-		pearB[19] = slew;
+		slew = ((bassL - dram->pearB[0]) + dram->pearB[1])*freqMid*0.5;
+		dram->pearB[0] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[0] + dram->pearB[1]));
+		dram->pearB[1] = slew; slew = ((bassR - dram->pearB[2]) + dram->pearB[3])*freqMid*0.5;
+		dram->pearB[2] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[2] + dram->pearB[3]));
+		dram->pearB[3] = slew; slew = ((bassL - dram->pearB[4]) + dram->pearB[5])*freqMid*0.5;
+		dram->pearB[4] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[4] + dram->pearB[5]));
+		dram->pearB[5] = slew; slew = ((bassR - dram->pearB[6]) + dram->pearB[7])*freqMid*0.5;
+		dram->pearB[6] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[6] + dram->pearB[7]));
+		dram->pearB[7] = slew; slew = ((bassL - dram->pearB[8]) + dram->pearB[9])*freqMid*0.5;
+		dram->pearB[8] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[8] + dram->pearB[9]));
+		dram->pearB[9] = slew; slew = ((bassR - dram->pearB[10]) + dram->pearB[11])*freqMid*0.5;
+		dram->pearB[10] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[10] + dram->pearB[11]));
+		dram->pearB[11] = slew; slew = ((bassL - dram->pearB[12]) + dram->pearB[13])*freqMid*0.5;
+		dram->pearB[12] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[12] + dram->pearB[13]));
+		dram->pearB[13] = slew; slew = ((bassR - dram->pearB[14]) + dram->pearB[15])*freqMid*0.5;
+		dram->pearB[14] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[14] + dram->pearB[15]));
+		dram->pearB[15] = slew; slew = ((bassL - dram->pearB[16]) + dram->pearB[17])*freqMid*0.5;
+		dram->pearB[16] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[16] + dram->pearB[17]));
+		dram->pearB[17] = slew; slew = ((bassR - dram->pearB[18]) + dram->pearB[19])*freqMid*0.5;
+		dram->pearB[18] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[18] + dram->pearB[19]));
+		dram->pearB[19] = slew;
 		double midL = inputSampleL - bassL;
 		double midR = inputSampleR - bassR;
 		//we now have three bands out of two pear filters
@@ -247,8 +249,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		//begin ResEQ2 Mid Boost
 		mpc++; if (mpc < 1 || mpc > 2001) mpc = 1;
-		mpkL[mpc] = midL;
-		mpkR[mpc] = midR;
+		dram->mpkL[mpc] = midL;
+		dram->mpkR[mpc] = midR;
 		double midMPeakL = 0.0;
 		double midMPeakR = 0.0;
 		for (int x = 0; x < maxMPeak; x++) {
@@ -256,29 +258,29 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			switch (cycleEnd)
 			{
 				case 1: 
-					midMPeakL += (mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x]);
-					midMPeakR += (mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x]); break;
+					midMPeakL += (dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x]);
+					midMPeakR += (dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x]); break;
 				case 2: 
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.5);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.5); y--;
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.5);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.5); break;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5); y--;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.5); break;
 				case 3: 
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333); y--;
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333); y--;
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.333); break;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); y--;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); y--;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.333); break;
 				case 4: 
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); y--;
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); y--;
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); y--;
-					midMPeakL += ((mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25);
-					midMPeakR += ((mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * f[x])*0.25); //break
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); y--;
+					midMPeakL += ((dram->mpkL[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25);
+					midMPeakR += ((dram->mpkR[(mpc-y)+((mpc-y < 1)?2001:0)] * dram->f[x])*0.25); //break
 			}
 		}
 		midL = (midMPeakL*amountMPeak)+((1.5-amountMPeak>1.0)?midL:midL*(1.5-amountMPeak));
@@ -345,10 +347,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for (int x = 0; x < 17; x++) pearA[x] = 0.0;
-	for (int x = 0; x < 21; x++) pearB[x] = 0.0;
-	for(int count = 0; count < 2004; count++) {mpkL[count] = 0.0; mpkR[count] = 0.0;}
-	for(int count = 0; count < 65; count++) {f[count] = 0.0;}
+	for (int x = 0; x < 17; x++) dram->pearA[x] = 0.0;
+	for (int x = 0; x < 21; x++) dram->pearB[x] = 0.0;
+	for(int count = 0; count < 2004; count++) {dram->mpkL[count] = 0.0; dram->mpkR[count] = 0.0;}
+	for(int count = 0; count < 65; count++) {dram->f[count] = 0.0;}
 	prevfreqMPeak = -1;
 	prevamountMPeak = -1;
 	mpc = 1;	

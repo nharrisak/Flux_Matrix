@@ -36,13 +36,16 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float32 lastSample[100];
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float32 lastSample[100];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -84,11 +87,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		Float32 expectedSlewA = 0;
 		for(int x = 0; x < depth; x++) {
-			expectedSlewA += (lastSample[x+1] - lastSample[x]);
+			expectedSlewA += (dram->lastSample[x+1] - dram->lastSample[x]);
 		}
 		Float32 expectedSlewB = expectedSlewA;
-		expectedSlewA += (lastSample[0] - quantA);
-		expectedSlewB += (lastSample[0] - quantB);
+		expectedSlewA += (dram->lastSample[0] - quantA);
+		expectedSlewB += (dram->lastSample[0] - quantB);
 		//now we have a collection of all slews, averaged and left at total scale
 		Float32 clamp = sonority;
 		if (fabs(inputSample) < sonority) clamp = fabs(inputSample);
@@ -103,9 +106,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		else inputSample = quantB;
 				
 		for(int x = depth; x >=0; x--) {
-			lastSample[x+1] = lastSample[x];
+			dram->lastSample[x+1] = dram->lastSample[x];
 		}
-		lastSample[0] = inputSample;
+		dram->lastSample[0] = inputSample;
 		
 		inputSample /= outScale;
 		
@@ -117,7 +120,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 99; count++) {lastSample[count] = 0;}
+	for(int count = 0; count < 99; count++) {dram->lastSample[count] = 0;}
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

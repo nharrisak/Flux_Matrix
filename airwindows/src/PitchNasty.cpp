@@ -38,8 +38,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		double d[10002];
 		int inCount;
 		double outCount;
 		bool switchTransition;
@@ -50,6 +50,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double d[10002];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -78,7 +81,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample += (feedbackSample * feedback);
 		if (fabs(feedbackSample) > 1.0) inputSample /= fabs(feedbackSample);
 		
-		d[inCount] = inputSample;
+		dram->d[inCount] = inputSample;
 		
 		inCount++;
 		outCount += speed;
@@ -98,13 +101,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		int count = floor(outCount);
 		int arrayWidth = floor(width);
 		
-		inputSample = (d[count-((count > arrayWidth)?arrayWidth+1:0)] * (1-(outCount-floor(outCount))));
-		inputSample += (d[count+1-((count+1 > arrayWidth)?arrayWidth+1:0)] * (outCount-floor(outCount)));
+		inputSample = (dram->d[count-((count > arrayWidth)?arrayWidth+1:0)] * (1-(outCount-floor(outCount))));
+		inputSample += (dram->d[count+1-((count+1 > arrayWidth)?arrayWidth+1:0)] * (outCount-floor(outCount)));
 		
-		if (switchAmount > fabs(inputSample-d[inCount])*2.0) {
-			switchAmount = (switchAmount * 0.5) + (fabs(inputSample-d[inCount]));
+		if (switchAmount > fabs(inputSample-dram->d[inCount])*2.0) {
+			switchAmount = (switchAmount * 0.5) + (fabs(inputSample-dram->d[inCount]));
 		}
-		inputSample = (d[inCount] * switchAmount) + (inputSample * (1.0-switchAmount));
+		inputSample = (dram->d[inCount] * switchAmount) + (inputSample * (1.0-switchAmount));
 		
 		feedbackSample = inputSample;
 		
@@ -131,7 +134,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for (int temp = 0; temp < 10001; temp++) {d[temp] = 0.0;}
+	for (int temp = 0; temp < 10001; temp++) {dram->d[temp] = 0.0;}
 	inCount = 1;	
 	outCount = 1.0;
 	switchTransition = false;

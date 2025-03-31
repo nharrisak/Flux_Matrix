@@ -68,40 +68,8 @@ enum { kNumTemplateParameters = 6 };
 	Float64 iirSampleL;
 	Float64 iirSampleR;
 	
-	Float64 dMid[2348];
-	Float64 dSide[1334];
-	Float64 dLeft[5924];
-	Float64 dRight[5926];
 	
-	Float64 dpreR[7575];
-	Float64 dpreL[7575];
 	
-	Float64 dA[7575];
-	Float64 dB[7309];
-	Float64 dC[7179];
-	Float64 dD[6909];		
-	Float64 dE[6781];
-	Float64 dF[6523];
-	Float64 dG[5983];
-	Float64 dH[5565];
-	Float64 dI[5299];
-	Float64 dJ[4905];
-	Float64 dK[4761];
-	Float64 dL[4491];
-	Float64 dM[4393];
-	Float64 dN[4231];
-	Float64 dO[4155];
-	Float64 dP[3991];
-	Float64 dQ[3661];
-	Float64 dR[3409];
-	Float64 dS[3253];
-	Float64 dT[3001];
-	Float64 dU[2919];
-	Float64 dV[2751];
-	Float64 dW[2505];
-	Float64 dX[2425];
-	Float64 dY[2148];
-	Float64 dZ[2090];
 	
 	Float64 interpolA, pitchshiftA; //7575
 	Float64 interpolB, pitchshiftB; //7309
@@ -198,6 +166,40 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	Float64 dMid[2348];
+	Float64 dSide[1334];
+	Float64 dLeft[5924];
+	Float64 dRight[5926];
+	Float64 dpreR[7575];
+	Float64 dpreL[7575];
+	Float64 dA[7575];
+	Float64 dB[7309];
+	Float64 dC[7179];
+	Float64 dD[6909];		
+	Float64 dE[6781];
+	Float64 dF[6523];
+	Float64 dG[5983];
+	Float64 dH[5565];
+	Float64 dI[5299];
+	Float64 dJ[4905];
+	Float64 dK[4761];
+	Float64 dL[4491];
+	Float64 dM[4393];
+	Float64 dN[4231];
+	Float64 dO[4155];
+	Float64 dP[3991];
+	Float64 dQ[3661];
+	Float64 dR[3409];
+	Float64 dS[3253];
+	Float64 dT[3001];
+	Float64 dU[2919];
+	Float64 dV[2751];
+	Float64 dW[2505];
+	Float64 dX[2425];
+	Float64 dY[2148];
+	Float64 dZ[2090];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -291,11 +293,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		drySampleR = inputSampleR;
 		
 		
-		dpreL[onepre] = inputSampleL;
-		dpreR[onepre] = inputSampleR;
+		dram->dpreL[onepre] = inputSampleL;
+		dram->dpreR[onepre] = inputSampleR;
 		onepre--; if (onepre < 0 || onepre > delaypre) {onepre = delaypre;}
-		inputSampleL = (dpreL[onepre]);
-		inputSampleR = (dpreR[onepre]);
+		inputSampleL = (dram->dpreL[onepre]);
+		inputSampleR = (dram->dpreR[onepre]);
 		//predelay
 		
 		interpolA += pitchshiftA*pspeed;
@@ -399,45 +401,45 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		allpasstemp = oneMid - 1;
 		if (allpasstemp < 0 || allpasstemp > delayMid) {allpasstemp = delayMid;}
-		mid -= dMid[allpasstemp]*constallpass;
-		dMid[oneMid] = mid;
+		mid -= dram->dMid[allpasstemp]*constallpass;
+		dram->dMid[oneMid] = mid;
 		mid *= constallpass;
 		oneMid--; if (oneMid < 0 || oneMid > delayMid) {oneMid = delayMid;}
-		mid += (dMid[oneMid]);
-		nonlin += fabs(dMid[oneMid]);
+		mid += (dram->dMid[oneMid]);
+		nonlin += fabs(dram->dMid[oneMid]);
 		//allpass filter mid		
 		
 		allpasstemp = oneSide - 1;
 		if (allpasstemp < 0 || allpasstemp > delaySide) {allpasstemp = delaySide;}
-		side -= dSide[allpasstemp]*constallpass;
-		dSide[oneSide] = side;
+		side -= dram->dSide[allpasstemp]*constallpass;
+		dram->dSide[oneSide] = side;
 		side *= constallpass;
 		oneSide--; if (oneSide < 0 || oneSide > delaySide) {oneSide = delaySide;}
-		side += (dSide[oneSide]);
-		nonlin += fabs(dSide[oneSide]);
+		side += (dram->dSide[oneSide]);
+		nonlin += fabs(dram->dSide[oneSide]);
 		//allpass filter side
 		
 		//here we do allpasses on the mid and side
 		
 		allpasstemp = oneLeft - 1;
 		if (allpasstemp < 0 || allpasstemp > delayLeft) {allpasstemp = delayLeft;}
-		inputSampleL -= dLeft[allpasstemp]*constallpass;
-		dLeft[oneLeft] = verboutL;
+		inputSampleL -= dram->dLeft[allpasstemp]*constallpass;
+		dram->dLeft[oneLeft] = verboutL;
 		inputSampleL *= constallpass;
 		oneLeft--; if (oneLeft < 0 || oneLeft > delayLeft) {oneLeft = delayLeft;}
-		inputSampleL += (dLeft[oneLeft]);
-		nonlin += fabs(dLeft[oneLeft]);
+		inputSampleL += (dram->dLeft[oneLeft]);
+		nonlin += fabs(dram->dLeft[oneLeft]);
 		//allpass filter left
 		
 		
 		allpasstemp = oneRight - 1;
 		if (allpasstemp < 0 || allpasstemp > delayRight) {allpasstemp = delayRight;}
-		inputSampleR -= dRight[allpasstemp]*constallpass;
-		dRight[oneRight] = verboutR;
+		inputSampleR -= dram->dRight[allpasstemp]*constallpass;
+		dram->dRight[oneRight] = verboutR;
 		inputSampleR *= constallpass;
 		oneRight--; if (oneRight < 0 || oneRight > delayRight) {oneRight = delayRight;}
-		inputSampleR += (dRight[oneRight]);
-		nonlin += fabs(dRight[oneRight]);
+		inputSampleR += (dram->dRight[oneRight]);
+		nonlin += fabs(dram->dRight[oneRight]);
 		//allpass filter right
 		
 		
@@ -447,344 +449,344 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		
 		
-		temp = (dA[oneA]*interpolA );
-		temp += (dA[treA]*( 1.0 - interpolA ));
-		temp += ((dA[twoA]));
-		dA[treA] = (temp*tankfeedback);
-		dA[treA] += inputSampleL;
+		temp = (dram->dA[oneA]*interpolA );
+		temp += (dram->dA[treA]*( 1.0 - interpolA ));
+		temp += ((dram->dA[twoA]));
+		dram->dA[treA] = (temp*tankfeedback);
+		dram->dA[treA] += inputSampleL;
 		oneA--; if (oneA < 0 || oneA > delayA) {oneA = delayA;}
 		twoA--; if (twoA < 0 || twoA > delayA) {twoA = delayA;}
 		treA--; if (treA < 0 || treA > delayA) {treA = delayA;}
-		temp = (dA[oneA]*interpolA );
-		temp += (dA[treA]*( 1.0 - interpolA ));
-		temp *=  (invlean + (lean*fabs(dA[twoA])));
+		temp = (dram->dA[oneA]*interpolA );
+		temp += (dram->dA[treA]*( 1.0 - interpolA ));
+		temp *=  (invlean + (lean*fabs(dram->dA[twoA])));
    		verboutL += temp;
 		//comb filter A
-		temp = (dC[oneC]*interpolC );
-		temp += (dC[treC]*( 1.0 - interpolC ));
-		temp += ((dC[twoC]));
-		dC[treC] = (temp*tankfeedback);
-		dC[treC] += inputSampleL;
+		temp = (dram->dC[oneC]*interpolC );
+		temp += (dram->dC[treC]*( 1.0 - interpolC ));
+		temp += ((dram->dC[twoC]));
+		dram->dC[treC] = (temp*tankfeedback);
+		dram->dC[treC] += inputSampleL;
 		oneC--; if (oneC < 0 || oneC > delayC) {oneC = delayC;}
 		twoC--; if (twoC < 0 || twoC > delayC) {twoC = delayC;}
 		treC--; if (treC < 0 || treC > delayC) {treC = delayC;}
-		temp = (dC[oneC]*interpolC );
-		temp += (dC[treC]*( 1.0 - interpolC ));
-		temp *=  (invlean + (lean*fabs(dC[twoC])));
+		temp = (dram->dC[oneC]*interpolC );
+		temp += (dram->dC[treC]*( 1.0 - interpolC ));
+		temp *=  (invlean + (lean*fabs(dram->dC[twoC])));
    		verboutL += temp;
 		//comb filter C
-		temp = (dE[oneE]*interpolE );
-		temp += (dE[treE]*( 1.0 - interpolE ));
-		temp += ((dE[twoE]));
-		dE[treE] = (temp*tankfeedback);
-		dE[treE] += inputSampleL;
+		temp = (dram->dE[oneE]*interpolE );
+		temp += (dram->dE[treE]*( 1.0 - interpolE ));
+		temp += ((dram->dE[twoE]));
+		dram->dE[treE] = (temp*tankfeedback);
+		dram->dE[treE] += inputSampleL;
 		oneE--; if (oneE < 0 || oneE > delayE) {oneE = delayE;}
 		twoE--; if (twoE < 0 || twoE > delayE) {twoE = delayE;}
 		treE--; if (treE < 0 || treE > delayE) {treE = delayE;}
-		temp = (dE[oneE]*interpolE );
-		temp += (dE[treE]*( 1.0 - interpolE ));
-		temp *=  (invlean + (lean*fabs(dE[twoE])));
+		temp = (dram->dE[oneE]*interpolE );
+		temp += (dram->dE[treE]*( 1.0 - interpolE ));
+		temp *=  (invlean + (lean*fabs(dram->dE[twoE])));
    		verboutL += temp;
 		//comb filter E
-		temp = (dG[oneG]*interpolG );
-		temp += (dG[treG]*( 1.0 - interpolG ));
-		temp += ((dG[twoG]));
-		dG[treG] = (temp*tankfeedback);
-		dG[treG] += inputSampleL;
+		temp = (dram->dG[oneG]*interpolG );
+		temp += (dram->dG[treG]*( 1.0 - interpolG ));
+		temp += ((dram->dG[twoG]));
+		dram->dG[treG] = (temp*tankfeedback);
+		dram->dG[treG] += inputSampleL;
 		oneG--; if (oneG < 0 || oneG > delayG) {oneG = delayG;}
 		twoG--; if (twoG < 0 || twoG > delayG) {twoG = delayG;}
 		treG--; if (treG < 0 || treG > delayG) {treG = delayG;}
-		temp = (dG[oneG]*interpolG );
-		temp += (dG[treG]*( 1.0 - interpolG ));
-		temp *=  (invlean + (lean*fabs(dG[twoG])));
+		temp = (dram->dG[oneG]*interpolG );
+		temp += (dram->dG[treG]*( 1.0 - interpolG ));
+		temp *=  (invlean + (lean*fabs(dram->dG[twoG])));
    		verboutL += temp;
 		//comb filter G
-		temp = (dI[oneI]*interpolI );
-		temp += (dI[treI]*( 1.0 - interpolI ));
-		temp += ((dI[twoI]));
-		dI[treI] = (temp*tankfeedback);
-		dI[treI] += inputSampleL;
+		temp = (dram->dI[oneI]*interpolI );
+		temp += (dram->dI[treI]*( 1.0 - interpolI ));
+		temp += ((dram->dI[twoI]));
+		dram->dI[treI] = (temp*tankfeedback);
+		dram->dI[treI] += inputSampleL;
 		oneI--; if (oneI < 0 || oneI > delayI) {oneI = delayI;}
 		twoI--; if (twoI < 0 || twoI > delayI) {twoI = delayI;}
 		treI--; if (treI < 0 || treI > delayI) {treI = delayI;}
-		temp = (dI[oneI]*interpolI );
-		temp += (dI[treI]*( 1.0 - interpolI ));
-		temp *=  (invlean + (lean*fabs(dI[twoI])));
+		temp = (dram->dI[oneI]*interpolI );
+		temp += (dram->dI[treI]*( 1.0 - interpolI ));
+		temp *=  (invlean + (lean*fabs(dram->dI[twoI])));
   		verboutL += temp;
 		//comb filter I
-		temp = (dK[oneK]*interpolK );
-		temp += (dK[treK]*( 1.0 - interpolK ));
-		temp += ((dK[twoK]));
-		dK[treK] = (temp*tankfeedback);
-		dK[treK] += inputSampleL;
+		temp = (dram->dK[oneK]*interpolK );
+		temp += (dram->dK[treK]*( 1.0 - interpolK ));
+		temp += ((dram->dK[twoK]));
+		dram->dK[treK] = (temp*tankfeedback);
+		dram->dK[treK] += inputSampleL;
 		oneK--; if (oneK < 0 || oneK > delayK) {oneK = delayK;}
 		twoK--; if (twoK < 0 || twoK > delayK) {twoK = delayK;}
 		treK--; if (treK < 0 || treK > delayK) {treK = delayK;}
-		temp = (dK[oneK]*interpolK );
-		temp += (dK[treK]*( 1.0 - interpolK ));
-		temp *=  (invlean + (lean*fabs(dK[twoK])));
+		temp = (dram->dK[oneK]*interpolK );
+		temp += (dram->dK[treK]*( 1.0 - interpolK ));
+		temp *=  (invlean + (lean*fabs(dram->dK[twoK])));
   		verboutL += temp;
 		//comb filter K
-		temp = (dM[oneM]*interpolM );
-		temp += (dM[treM]*( 1.0 - interpolM ));
-		temp += ((dM[twoM]));
-		dM[treM] = (temp*tankfeedback);
-		dM[treM] += inputSampleL;
+		temp = (dram->dM[oneM]*interpolM );
+		temp += (dram->dM[treM]*( 1.0 - interpolM ));
+		temp += ((dram->dM[twoM]));
+		dram->dM[treM] = (temp*tankfeedback);
+		dram->dM[treM] += inputSampleL;
 		oneM--; if (oneM < 0 || oneM > delayM) {oneM = delayM;}
 		twoM--; if (twoM < 0 || twoM > delayM) {twoM = delayM;}
 		treM--; if (treM < 0 || treM > delayM) {treM = delayM;}
-		temp = (dM[oneM]*interpolM );
-		temp += (dM[treM]*( 1.0 - interpolM ));
-		temp *=  (invlean + (lean*fabs(dM[twoM])));
+		temp = (dram->dM[oneM]*interpolM );
+		temp += (dram->dM[treM]*( 1.0 - interpolM ));
+		temp *=  (invlean + (lean*fabs(dram->dM[twoM])));
    		verboutL += temp;
 		//comb filter M
-		temp = (dO[oneO]*interpolO );
-		temp += (dO[treO]*( 1.0 - interpolO ));
-		temp += ((dO[twoO]));
-		dO[treO] = (temp*tankfeedback);
-		dO[treO] += inputSampleL;
+		temp = (dram->dO[oneO]*interpolO );
+		temp += (dram->dO[treO]*( 1.0 - interpolO ));
+		temp += ((dram->dO[twoO]));
+		dram->dO[treO] = (temp*tankfeedback);
+		dram->dO[treO] += inputSampleL;
 		oneO--; if (oneO < 0 || oneO > delayO) {oneO = delayO;}
 		twoO--; if (twoO < 0 || twoO > delayO) {twoO = delayO;}
 		treO--; if (treO < 0 || treO > delayO) {treO = delayO;}
-		temp = (dO[oneO]*interpolO );
-		temp += (dO[treO]*( 1.0 - interpolO ));
-		temp *=  (invlean + (lean*fabs(dO[twoO])));
+		temp = (dram->dO[oneO]*interpolO );
+		temp += (dram->dO[treO]*( 1.0 - interpolO ));
+		temp *=  (invlean + (lean*fabs(dram->dO[twoO])));
   		verboutL += temp;
 		//comb filter O
-		temp = (dQ[oneQ]*interpolQ );
-		temp += (dQ[treQ]*( 1.0 - interpolQ ));
-		temp += ((dQ[twoQ]));
-		dQ[treQ] = (temp*tankfeedback);
-		dQ[treQ] += inputSampleL;
+		temp = (dram->dQ[oneQ]*interpolQ );
+		temp += (dram->dQ[treQ]*( 1.0 - interpolQ ));
+		temp += ((dram->dQ[twoQ]));
+		dram->dQ[treQ] = (temp*tankfeedback);
+		dram->dQ[treQ] += inputSampleL;
 		oneQ--; if (oneQ < 0 || oneQ > delayQ) {oneQ = delayQ;}
 		twoQ--; if (twoQ < 0 || twoQ > delayQ) {twoQ = delayQ;}
 		treQ--; if (treQ < 0 || treQ > delayQ) {treQ = delayQ;}
-		temp = (dQ[oneQ]*interpolQ );
-		temp += (dQ[treQ]*( 1.0 - interpolQ ));
-		temp *=  (invlean + (lean*fabs(dQ[twoQ])));
+		temp = (dram->dQ[oneQ]*interpolQ );
+		temp += (dram->dQ[treQ]*( 1.0 - interpolQ ));
+		temp *=  (invlean + (lean*fabs(dram->dQ[twoQ])));
   		verboutL += temp;
 		//comb filter Q
-		temp = (dS[oneS]*interpolS );
-		temp += (dS[treS]*( 1.0 - interpolS ));
-		temp += ((dS[twoS]));
-		dS[treS] = (temp*tankfeedback);
-		dS[treS] += inputSampleL;
+		temp = (dram->dS[oneS]*interpolS );
+		temp += (dram->dS[treS]*( 1.0 - interpolS ));
+		temp += ((dram->dS[twoS]));
+		dram->dS[treS] = (temp*tankfeedback);
+		dram->dS[treS] += inputSampleL;
 		oneS--; if (oneS < 0 || oneS > delayS) {oneS = delayS;}
 		twoS--; if (twoS < 0 || twoS > delayS) {twoS = delayS;}
 		treS--; if (treS < 0 || treS > delayS) {treS = delayS;}
-		temp = (dS[oneS]*interpolS );
-		temp += (dS[treS]*( 1.0 - interpolS ));
-		temp *=  (invlean + (lean*fabs(dS[twoS])));
+		temp = (dram->dS[oneS]*interpolS );
+		temp += (dram->dS[treS]*( 1.0 - interpolS ));
+		temp *=  (invlean + (lean*fabs(dram->dS[twoS])));
    		verboutL += temp;
 		//comb filter S
-		temp = (dU[oneU]*interpolU );
-		temp += (dU[treU]*( 1.0 - interpolU ));
-		temp += ((dU[twoU]));
-		dU[treU] = (temp*tankfeedback);
-		dU[treU] += inputSampleL;
+		temp = (dram->dU[oneU]*interpolU );
+		temp += (dram->dU[treU]*( 1.0 - interpolU ));
+		temp += ((dram->dU[twoU]));
+		dram->dU[treU] = (temp*tankfeedback);
+		dram->dU[treU] += inputSampleL;
 		oneU--; if (oneU < 0 || oneU > delayU) {oneU = delayU;}
 		twoU--; if (twoU < 0 || twoU > delayU) {twoU = delayU;}
 		treU--; if (treU < 0 || treU > delayU) {treU = delayU;}
-		temp = (dU[oneU]*interpolU );
-		temp += (dU[treU]*( 1.0 - interpolU ));
-		temp *=  (invlean + (lean*fabs(dU[twoU])));
+		temp = (dram->dU[oneU]*interpolU );
+		temp += (dram->dU[treU]*( 1.0 - interpolU ));
+		temp *=  (invlean + (lean*fabs(dram->dU[twoU])));
   		verboutL += temp;
 		//comb filter U
-		temp = (dW[oneW]*interpolW );
-		temp += (dW[treW]*( 1.0 - interpolW ));
-		temp += ((dW[twoW]));
-		dW[treW] = (temp*tankfeedback);
-		dW[treW] += inputSampleL;
+		temp = (dram->dW[oneW]*interpolW );
+		temp += (dram->dW[treW]*( 1.0 - interpolW ));
+		temp += ((dram->dW[twoW]));
+		dram->dW[treW] = (temp*tankfeedback);
+		dram->dW[treW] += inputSampleL;
 		oneW--; if (oneW < 0 || oneW > delayW) {oneW = delayW;}
 		twoW--; if (twoW < 0 || twoW > delayW) {twoW = delayW;}
 		treW--; if (treW < 0 || treW > delayW) {treW = delayW;}
-		temp = (dW[oneW]*interpolW );
-		temp += (dW[treW]*( 1.0 - interpolW ));
-		temp *=  (invlean + (lean*fabs(dW[twoW])));
+		temp = (dram->dW[oneW]*interpolW );
+		temp += (dram->dW[treW]*( 1.0 - interpolW ));
+		temp *=  (invlean + (lean*fabs(dram->dW[twoW])));
   		verboutL += temp;
 		//comb filter W
-		temp = (dY[oneY]*interpolY );
-		temp += (dY[treY]*( 1.0 - interpolY ));
-		temp += ((dY[twoY]));
-		dY[treY] = (temp*tankfeedback);
-		dY[treY] += inputSampleL;
+		temp = (dram->dY[oneY]*interpolY );
+		temp += (dram->dY[treY]*( 1.0 - interpolY ));
+		temp += ((dram->dY[twoY]));
+		dram->dY[treY] = (temp*tankfeedback);
+		dram->dY[treY] += inputSampleL;
 		oneY--; if (oneY < 0 || oneY > delayY) {oneY = delayY;}
 		twoY--; if (twoY < 0 || twoY > delayY) {twoY = delayY;}
 		treY--; if (treY < 0 || treY > delayY) {treY = delayY;}
-		temp = (dY[oneY]*interpolY );
-		temp += (dY[treY]*( 1.0 - interpolY ));
-		temp *=  (invlean + (lean*fabs(dY[twoY])));
+		temp = (dram->dY[oneY]*interpolY );
+		temp += (dram->dY[treY]*( 1.0 - interpolY ));
+		temp *=  (invlean + (lean*fabs(dram->dY[twoY])));
   		verboutL += temp;
 		//comb filter Y
 		//here we do the L delay tank, every other letter A C E G I
 		
-		temp = (dB[oneB]*interpolB );
-		temp += (dB[treB]*( 1.0 - interpolB ));
-		temp += ((dB[twoB]));
-		dB[treB] = (temp*tankfeedback);
-		dB[treB] += inputSampleR;
+		temp = (dram->dB[oneB]*interpolB );
+		temp += (dram->dB[treB]*( 1.0 - interpolB ));
+		temp += ((dram->dB[twoB]));
+		dram->dB[treB] = (temp*tankfeedback);
+		dram->dB[treB] += inputSampleR;
 		oneB--; if (oneB < 0 || oneB > delayB) {oneB = delayB;}
 		twoB--; if (twoB < 0 || twoB > delayB) {twoB = delayB;}
 		treB--; if (treB < 0 || treB > delayB) {treB = delayB;}
-		temp = (dB[oneB]*interpolB );
-		temp += (dB[treB]*( 1.0 - interpolB ));
-		temp *=  (invlean + (lean*fabs(dB[twoB])));
+		temp = (dram->dB[oneB]*interpolB );
+		temp += (dram->dB[treB]*( 1.0 - interpolB ));
+		temp *=  (invlean + (lean*fabs(dram->dB[twoB])));
 		verboutR += temp;
 		//comb filter B		
-		temp = (dD[oneD]*interpolD );
-		temp += (dD[treD]*( 1.0 - interpolD ));
-		temp += ((dD[twoD]));
-		dD[treD] = (temp*tankfeedback);
-		dD[treD] += inputSampleR;
+		temp = (dram->dD[oneD]*interpolD );
+		temp += (dram->dD[treD]*( 1.0 - interpolD ));
+		temp += ((dram->dD[twoD]));
+		dram->dD[treD] = (temp*tankfeedback);
+		dram->dD[treD] += inputSampleR;
 		oneD--; if (oneD < 0 || oneD > delayD) {oneD = delayD;}
 		twoD--; if (twoD < 0 || twoD > delayD) {twoD = delayD;}
 		treD--; if (treD < 0 || treD > delayD) {treD = delayD;}
-		temp = (dD[oneD]*interpolD );
-		temp += (dD[treD]*( 1.0 - interpolD ));
-		temp *=  (invlean + (lean*fabs(dD[twoD])));
+		temp = (dram->dD[oneD]*interpolD );
+		temp += (dram->dD[treD]*( 1.0 - interpolD ));
+		temp *=  (invlean + (lean*fabs(dram->dD[twoD])));
    		verboutR += temp;
 		//comb filter D
-		temp = (dF[oneF]*interpolF );
-		temp += (dF[treF]*( 1.0 - interpolF ));
-		temp += ((dF[twoF]));
-		dF[treF] = (temp*tankfeedback);
-		dF[treF] += inputSampleR;
+		temp = (dram->dF[oneF]*interpolF );
+		temp += (dram->dF[treF]*( 1.0 - interpolF ));
+		temp += ((dram->dF[twoF]));
+		dram->dF[treF] = (temp*tankfeedback);
+		dram->dF[treF] += inputSampleR;
 		oneF--; if (oneF < 0 || oneF > delayF) {oneF = delayF;}
 		twoF--; if (twoF < 0 || twoF > delayF) {twoF = delayF;}
 		treF--; if (treF < 0 || treF > delayF) {treF = delayF;}
-		temp = (dF[oneF]*interpolF );
-		temp += (dF[treF]*( 1.0 - interpolF ));
-		temp *=  (invlean + (lean*fabs(dF[twoF])));
+		temp = (dram->dF[oneF]*interpolF );
+		temp += (dram->dF[treF]*( 1.0 - interpolF ));
+		temp *=  (invlean + (lean*fabs(dram->dF[twoF])));
    		verboutR += temp;
 		//comb filter F
-		temp = (dH[oneH]*interpolH );
-		temp += (dH[treH]*( 1.0 - interpolH ));
-		temp += ((dH[twoH]));
-		dH[treH] = (temp*tankfeedback);
-		dH[treH] += inputSampleR;
+		temp = (dram->dH[oneH]*interpolH );
+		temp += (dram->dH[treH]*( 1.0 - interpolH ));
+		temp += ((dram->dH[twoH]));
+		dram->dH[treH] = (temp*tankfeedback);
+		dram->dH[treH] += inputSampleR;
 		oneH--; if (oneH < 0 || oneH > delayH) {oneH = delayH;}
 		twoH--; if (twoH < 0 || twoH > delayH) {twoH = delayH;}
 		treH--; if (treH < 0 || treH > delayH) {treH = delayH;}
-		temp = (dH[oneH]*interpolH );
-		temp += (dH[treH]*( 1.0 - interpolH ));
-		temp *=  (invlean + (lean*fabs(dH[twoH])));
+		temp = (dram->dH[oneH]*interpolH );
+		temp += (dram->dH[treH]*( 1.0 - interpolH ));
+		temp *=  (invlean + (lean*fabs(dram->dH[twoH])));
    		verboutR += temp;
 		//comb filter H
-		temp = (dJ[oneJ]*interpolJ );
-		temp += (dJ[treJ]*( 1.0 - interpolJ ));
-		temp += ((dJ[twoJ]));
-		dJ[treJ] = (temp*tankfeedback);
-		dJ[treJ] += inputSampleR;
+		temp = (dram->dJ[oneJ]*interpolJ );
+		temp += (dram->dJ[treJ]*( 1.0 - interpolJ ));
+		temp += ((dram->dJ[twoJ]));
+		dram->dJ[treJ] = (temp*tankfeedback);
+		dram->dJ[treJ] += inputSampleR;
 		oneJ--; if (oneJ < 0 || oneJ > delayJ) {oneJ = delayJ;}
 		twoJ--; if (twoJ < 0 || twoJ > delayJ) {twoJ = delayJ;}
 		treJ--; if (treJ < 0 || treJ > delayJ) {treJ = delayJ;}
-		temp = (dJ[oneJ]*interpolJ );
-		temp += (dJ[treJ]*( 1.0 - interpolJ ));
-		temp *=  (invlean + (lean*fabs(dJ[twoJ])));
+		temp = (dram->dJ[oneJ]*interpolJ );
+		temp += (dram->dJ[treJ]*( 1.0 - interpolJ ));
+		temp *=  (invlean + (lean*fabs(dram->dJ[twoJ])));
    		verboutR += temp;
 		//comb filter J
-		temp = (dL[oneL]*interpolL );
-		temp += (dL[treL]*( 1.0 - interpolL ));
-		temp += ((dL[twoL]));
-		dL[treL] = (temp*tankfeedback);
-		dL[treL] += inputSampleR;
+		temp = (dram->dL[oneL]*interpolL );
+		temp += (dram->dL[treL]*( 1.0 - interpolL ));
+		temp += ((dram->dL[twoL]));
+		dram->dL[treL] = (temp*tankfeedback);
+		dram->dL[treL] += inputSampleR;
 		oneL--; if (oneL < 0 || oneL > delayL) {oneL = delayL;}
 		twoL--; if (twoL < 0 || twoL > delayL) {twoL = delayL;}
 		treL--; if (treL < 0 || treL > delayL) {treL = delayL;}
-		temp = (dL[oneL]*interpolL );
-		temp += (dL[treL]*( 1.0 - interpolL ));
-		temp *=  (invlean + (lean*fabs(dL[twoL])));
+		temp = (dram->dL[oneL]*interpolL );
+		temp += (dram->dL[treL]*( 1.0 - interpolL ));
+		temp *=  (invlean + (lean*fabs(dram->dL[twoL])));
    		verboutR += temp;
 		//comb filter L
-		temp = (dN[oneN]*interpolN );
-		temp += (dN[treN]*( 1.0 - interpolN ));
-		temp += ((dN[twoN]));
-		dN[treN] = (temp*tankfeedback);
-		dN[treN] += inputSampleR;
+		temp = (dram->dN[oneN]*interpolN );
+		temp += (dram->dN[treN]*( 1.0 - interpolN ));
+		temp += ((dram->dN[twoN]));
+		dram->dN[treN] = (temp*tankfeedback);
+		dram->dN[treN] += inputSampleR;
 		oneN--; if (oneN < 0 || oneN > delayN) {oneN = delayN;}
 		twoN--; if (twoN < 0 || twoN > delayN) {twoN = delayN;}
 		treN--; if (treN < 0 || treN > delayN) {treN = delayN;}
-		temp = (dN[oneN]*interpolN );
-		temp += (dN[treN]*( 1.0 - interpolN ));
-		temp *=  (invlean + (lean*fabs(dN[twoN])));
+		temp = (dram->dN[oneN]*interpolN );
+		temp += (dram->dN[treN]*( 1.0 - interpolN ));
+		temp *=  (invlean + (lean*fabs(dram->dN[twoN])));
    		verboutR += temp;
 		//comb filter N
-		temp = (dP[oneP]*interpolP );
-		temp += (dP[treP]*( 1.0 - interpolP ));
-		temp += ((dP[twoP]));
-		dP[treP] = (temp*tankfeedback);
-		dP[treP] += inputSampleR;
+		temp = (dram->dP[oneP]*interpolP );
+		temp += (dram->dP[treP]*( 1.0 - interpolP ));
+		temp += ((dram->dP[twoP]));
+		dram->dP[treP] = (temp*tankfeedback);
+		dram->dP[treP] += inputSampleR;
 		oneP--; if (oneP < 0 || oneP > delayP) {oneP = delayP;}
 		twoP--; if (twoP < 0 || twoP > delayP) {twoP = delayP;}
 		treP--; if (treP < 0 || treP > delayP) {treP = delayP;}
-		temp = (dP[oneP]*interpolP );
-		temp += (dP[treP]*( 1.0 - interpolP ));
-		temp *=  (invlean + (lean*fabs(dP[twoP])));
+		temp = (dram->dP[oneP]*interpolP );
+		temp += (dram->dP[treP]*( 1.0 - interpolP ));
+		temp *=  (invlean + (lean*fabs(dram->dP[twoP])));
    		verboutR += temp;
 		//comb filter P
-		temp = (dR[oneR]*interpolR );
-		temp += (dR[treR]*( 1.0 - interpolR ));
-		temp += ((dR[twoR]));
-		dR[treR] = (temp*tankfeedback);
-		dR[treR] += inputSampleR;
+		temp = (dram->dR[oneR]*interpolR );
+		temp += (dram->dR[treR]*( 1.0 - interpolR ));
+		temp += ((dram->dR[twoR]));
+		dram->dR[treR] = (temp*tankfeedback);
+		dram->dR[treR] += inputSampleR;
 		oneR--; if (oneR < 0 || oneR > delayR) {oneR = delayR;}
 		twoR--; if (twoR < 0 || twoR > delayR) {twoR = delayR;}
 		treR--; if (treR < 0 || treR > delayR) {treR = delayR;}
-		temp = (dR[oneR]*interpolR );
-		temp += (dR[treR]*( 1.0 - interpolR ));
-		temp *=  (invlean + (lean*fabs(dR[twoR])));
+		temp = (dram->dR[oneR]*interpolR );
+		temp += (dram->dR[treR]*( 1.0 - interpolR ));
+		temp *=  (invlean + (lean*fabs(dram->dR[twoR])));
    		verboutR += temp;
 		//comb filter R
-		temp = (dT[oneT]*interpolT );
-		temp += (dT[treT]*( 1.0 - interpolT ));
-		temp += ((dT[twoT]));
-		dT[treT] = (temp*tankfeedback);
-		dT[treT] += inputSampleR;
+		temp = (dram->dT[oneT]*interpolT );
+		temp += (dram->dT[treT]*( 1.0 - interpolT ));
+		temp += ((dram->dT[twoT]));
+		dram->dT[treT] = (temp*tankfeedback);
+		dram->dT[treT] += inputSampleR;
 		oneT--; if (oneT < 0 || oneT > delayT) {oneT = delayT;}
 		twoT--; if (twoT < 0 || twoT > delayT) {twoT = delayT;}
 		treT--; if (treT < 0 || treT > delayT) {treT = delayT;}
-		temp = (dT[oneT]*interpolT );
-		temp += (dT[treT]*( 1.0 - interpolT ));
-		temp *=  (invlean + (lean*fabs(dT[twoT])));
+		temp = (dram->dT[oneT]*interpolT );
+		temp += (dram->dT[treT]*( 1.0 - interpolT ));
+		temp *=  (invlean + (lean*fabs(dram->dT[twoT])));
    		verboutR += temp;
 		//comb filter T
-		temp = (dV[oneV]*interpolV );
-		temp += (dV[treV]*( 1.0 - interpolV ));
-		temp += ((dV[twoV]));
-		dV[treV] = (temp*tankfeedback);
-		dV[treV] += inputSampleR;
+		temp = (dram->dV[oneV]*interpolV );
+		temp += (dram->dV[treV]*( 1.0 - interpolV ));
+		temp += ((dram->dV[twoV]));
+		dram->dV[treV] = (temp*tankfeedback);
+		dram->dV[treV] += inputSampleR;
 		oneV--; if (oneV < 0 || oneV > delayV) {oneV = delayV;}
 		twoV--; if (twoV < 0 || twoV > delayV) {twoV = delayV;}
 		treV--; if (treV < 0 || treV > delayV) {treV = delayV;}
-		temp = (dV[oneV]*interpolV );
-		temp += (dV[treV]*( 1.0 - interpolV ));
-		temp *=  (invlean + (lean*fabs(dV[twoV])));
+		temp = (dram->dV[oneV]*interpolV );
+		temp += (dram->dV[treV]*( 1.0 - interpolV ));
+		temp *=  (invlean + (lean*fabs(dram->dV[twoV])));
    		verboutR += temp;
 		//comb filter V
-		temp = (dX[oneX]*interpolX );
-		temp += (dX[treX]*( 1.0 - interpolX ));
-		temp += ((dX[twoX]));
-		dX[treX] = (temp*tankfeedback);
-		dX[treX] += inputSampleR;
+		temp = (dram->dX[oneX]*interpolX );
+		temp += (dram->dX[treX]*( 1.0 - interpolX ));
+		temp += ((dram->dX[twoX]));
+		dram->dX[treX] = (temp*tankfeedback);
+		dram->dX[treX] += inputSampleR;
 		oneX--; if (oneX < 0 || oneX > delayX) {oneX = delayX;}
 		twoX--; if (twoX < 0 || twoX > delayX) {twoX = delayX;}
 		treX--; if (treX < 0 || treX > delayX) {treX = delayX;}
-		temp = (dX[oneX]*interpolX );
-		temp += (dX[treX]*( 1.0 - interpolX ));
-		temp *=  (invlean + (lean*fabs(dX[twoX])));
+		temp = (dram->dX[oneX]*interpolX );
+		temp += (dram->dX[treX]*( 1.0 - interpolX ));
+		temp *=  (invlean + (lean*fabs(dram->dX[twoX])));
    		verboutR += temp;
 		//comb filter X
-		temp = (dZ[oneZ]*interpolZ );
-		temp += (dZ[treZ]*( 1.0 - interpolZ ));
-		temp += ((dZ[twoZ]));
-		dZ[treZ] = (temp*tankfeedback);
-		dZ[treZ] += inputSampleR;
+		temp = (dram->dZ[oneZ]*interpolZ );
+		temp += (dram->dZ[treZ]*( 1.0 - interpolZ ));
+		temp += ((dram->dZ[twoZ]));
+		dram->dZ[treZ] = (temp*tankfeedback);
+		dram->dZ[treZ] += inputSampleR;
 		oneZ--; if (oneZ < 0 || oneZ > delayZ) {oneZ = delayZ;}
 		twoZ--; if (twoZ < 0 || twoZ > delayZ) {twoZ = delayZ;}
 		treZ--; if (treZ < 0 || treZ > delayZ) {treZ = delayZ;}
-		temp = (dZ[oneZ]*interpolZ );
-		temp += (dZ[treZ]*( 1.0 - interpolZ ));
-		temp *=  (invlean + (lean*fabs(dZ[twoZ])));
+		temp = (dram->dZ[oneZ]*interpolZ );
+		temp += (dram->dZ[treZ]*( 1.0 - interpolZ ));
+		temp *=  (invlean + (lean*fabs(dram->dZ[twoZ])));
    		verboutR += temp;
 		//comb filter Z
 		//here we do the R delay tank, every other letter B D F H J
@@ -917,40 +919,40 @@ int _airwindowsAlgorithm::reset(void) {
 
 {
 	int count;
-	for(count = 0; count < 2347; count++) {dMid[count] = 0.0;}
-	for(count = 0; count < 1333; count++) {dSide[count] = 0.0;}
-	for(count = 0; count < 5923; count++) {dLeft[count] = 0.0;}
-	for(count = 0; count < 5925; count++) {dRight[count] = 0.0;}
+	for(count = 0; count < 2347; count++) {dram->dMid[count] = 0.0;}
+	for(count = 0; count < 1333; count++) {dram->dSide[count] = 0.0;}
+	for(count = 0; count < 5923; count++) {dram->dLeft[count] = 0.0;}
+	for(count = 0; count < 5925; count++) {dram->dRight[count] = 0.0;}
 	
-	for(count = 0; count < 7574; count++) {dpreR[count] = 0.0;}
-	for(count = 0; count < 7574; count++) {dpreL[count] = 0.0;}
+	for(count = 0; count < 7574; count++) {dram->dpreR[count] = 0.0;}
+	for(count = 0; count < 7574; count++) {dram->dpreL[count] = 0.0;}
 	
-	for(count = 0; count < 7574; count++) {dA[count] = 0.0;}
-	for(count = 0; count < 7308; count++) {dB[count] = 0.0;}
-	for(count = 0; count < 7178; count++) {dC[count] = 0.0;}
-	for(count = 0; count < 6908; count++) {dD[count] = 0.0;}
-	for(count = 0; count < 6780; count++) {dE[count] = 0.0;}
-	for(count = 0; count < 6522; count++) {dF[count] = 0.0;}
-	for(count = 0; count < 5982; count++) {dG[count] = 0.0;}
-	for(count = 0; count < 5564; count++) {dH[count] = 0.0;}
-	for(count = 0; count < 5298; count++) {dI[count] = 0.0;}
-	for(count = 0; count < 4904; count++) {dJ[count] = 0.0;}
-	for(count = 0; count < 4760; count++) {dK[count] = 0.0;}
-	for(count = 0; count < 4490; count++) {dL[count] = 0.0;}
-	for(count = 0; count < 4392; count++) {dM[count] = 0.0;}
-	for(count = 0; count < 4230; count++) {dN[count] = 0.0;}
-	for(count = 0; count < 4154; count++) {dO[count] = 0.0;}
-	for(count = 0; count < 3990; count++) {dP[count] = 0.0;}
-	for(count = 0; count < 3660; count++) {dQ[count] = 0.0;}
-	for(count = 0; count < 3408; count++) {dR[count] = 0.0;}
-	for(count = 0; count < 3252; count++) {dS[count] = 0.0;}
-	for(count = 0; count < 3000; count++) {dT[count] = 0.0;}
-	for(count = 0; count < 2918; count++) {dU[count] = 0.0;}
-	for(count = 0; count < 2750; count++) {dV[count] = 0.0;}
-	for(count = 0; count < 2504; count++) {dW[count] = 0.0;}
-	for(count = 0; count < 2424; count++) {dX[count] = 0.0;}
-	for(count = 0; count < 2147; count++) {dY[count] = 0.0;}
-	for(count = 0; count < 2089; count++) {dZ[count] = 0.0;}
+	for(count = 0; count < 7574; count++) {dram->dA[count] = 0.0;}
+	for(count = 0; count < 7308; count++) {dram->dB[count] = 0.0;}
+	for(count = 0; count < 7178; count++) {dram->dC[count] = 0.0;}
+	for(count = 0; count < 6908; count++) {dram->dD[count] = 0.0;}
+	for(count = 0; count < 6780; count++) {dram->dE[count] = 0.0;}
+	for(count = 0; count < 6522; count++) {dram->dF[count] = 0.0;}
+	for(count = 0; count < 5982; count++) {dram->dG[count] = 0.0;}
+	for(count = 0; count < 5564; count++) {dram->dH[count] = 0.0;}
+	for(count = 0; count < 5298; count++) {dram->dI[count] = 0.0;}
+	for(count = 0; count < 4904; count++) {dram->dJ[count] = 0.0;}
+	for(count = 0; count < 4760; count++) {dram->dK[count] = 0.0;}
+	for(count = 0; count < 4490; count++) {dram->dL[count] = 0.0;}
+	for(count = 0; count < 4392; count++) {dram->dM[count] = 0.0;}
+	for(count = 0; count < 4230; count++) {dram->dN[count] = 0.0;}
+	for(count = 0; count < 4154; count++) {dram->dO[count] = 0.0;}
+	for(count = 0; count < 3990; count++) {dram->dP[count] = 0.0;}
+	for(count = 0; count < 3660; count++) {dram->dQ[count] = 0.0;}
+	for(count = 0; count < 3408; count++) {dram->dR[count] = 0.0;}
+	for(count = 0; count < 3252; count++) {dram->dS[count] = 0.0;}
+	for(count = 0; count < 3000; count++) {dram->dT[count] = 0.0;}
+	for(count = 0; count < 2918; count++) {dram->dU[count] = 0.0;}
+	for(count = 0; count < 2750; count++) {dram->dV[count] = 0.0;}
+	for(count = 0; count < 2504; count++) {dram->dW[count] = 0.0;}
+	for(count = 0; count < 2424; count++) {dram->dX[count] = 0.0;}
+	for(count = 0; count < 2147; count++) {dram->dY[count] = 0.0;}
+	for(count = 0; count < 2089; count++) {dram->dZ[count] = 0.0;}
 	
 	oneMid = 1; delayMid = 2346; maxdelayMid = 2346;
 	oneSide = 1; delaySide = 1332; maxdelaySide = 1332;

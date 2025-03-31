@@ -36,23 +36,12 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		Float64 iirA;
 		Float64 iirB;
 		Float64 iirC;
 		
-		Float64 aE[20000];
-		Float64 aF[12361];
-		Float64 aG[7640];
-		Float64 aH[4722];
-		Float64 aA[2916];
-		Float64 aB[1804];
-		Float64 aC[1115];
-		Float64 aD[689];
-		Float64 aI[426];
-		Float64 aJ[264];
-		Float64 aK[163];
-		Float64 aL[101];
 		
 		Float64 feedbackA;
 		Float64 feedbackB;
@@ -84,6 +73,20 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 aE[20000];
+		Float64 aF[12361];
+		Float64 aG[7640];
+		Float64 aH[4722];
+		Float64 aA[2916];
+		Float64 aB[1804];
+		Float64 aC[1115];
+		Float64 aD[689];
+		Float64 aI[426];
+		Float64 aJ[264];
+		Float64 aK[163];
+		Float64 aL[101];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -153,52 +156,52 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			feedbackC = (feedbackC*(1.0-interpolate))+(previousC*interpolate); previousC = feedbackC;
 			feedbackD = (feedbackD*(1.0-interpolate))+(previousD*interpolate); previousD = feedbackD;
 			
-			aI[countI] = inputSample + (feedbackA * regen);
-			aJ[countJ] = inputSample + (feedbackB * regen);
-			aK[countK] = inputSample + (feedbackC * regen);
-			aL[countL] = inputSample + (feedbackD * regen);
+			dram->aI[countI] = inputSample + (feedbackA * regen);
+			dram->aJ[countJ] = inputSample + (feedbackB * regen);
+			dram->aK[countK] = inputSample + (feedbackC * regen);
+			dram->aL[countL] = inputSample + (feedbackD * regen);
 			
 			countI++; if (countI < 0 || countI > delayI) countI = 0;
 			countJ++; if (countJ < 0 || countJ > delayJ) countJ = 0;
 			countK++; if (countK < 0 || countK > delayK) countK = 0;
 			countL++; if (countL < 0 || countL > delayL) countL = 0;
 			
-			Float64 outI = aI[countI-((countI > delayI)?delayI+1:0)];
-			Float64 outJ = aJ[countJ-((countJ > delayJ)?delayJ+1:0)];
-			Float64 outK = aK[countK-((countK > delayK)?delayK+1:0)];
-			Float64 outL = aL[countL-((countL > delayL)?delayL+1:0)];
+			Float64 outI = dram->aI[countI-((countI > delayI)?delayI+1:0)];
+			Float64 outJ = dram->aJ[countJ-((countJ > delayJ)?delayJ+1:0)];
+			Float64 outK = dram->aK[countK-((countK > delayK)?delayK+1:0)];
+			Float64 outL = dram->aL[countL-((countL > delayL)?delayL+1:0)];
 			//first block: now we have four outputs
 			
-			aA[countA] = (outI - (outJ + outK + outL));
-			aB[countB] = (outJ - (outI + outK + outL));
-			aC[countC] = (outK - (outI + outJ + outL));
-			aD[countD] = (outL - (outI + outJ + outK));
+			dram->aA[countA] = (outI - (outJ + outK + outL));
+			dram->aB[countB] = (outJ - (outI + outK + outL));
+			dram->aC[countC] = (outK - (outI + outJ + outL));
+			dram->aD[countD] = (outL - (outI + outJ + outK));
 			
 			countA++; if (countA < 0 || countA > delayA) countA = 0;
 			countB++; if (countB < 0 || countB > delayB) countB = 0;
 			countC++; if (countC < 0 || countC > delayC) countC = 0;
 			countD++; if (countD < 0 || countD > delayD) countD = 0;
 			
-			Float64 outA = aA[countA-((countA > delayA)?delayA+1:0)];
-			Float64 outB = aB[countB-((countB > delayB)?delayB+1:0)];
-			Float64 outC = aC[countC-((countC > delayC)?delayC+1:0)];
-			Float64 outD = aD[countD-((countD > delayD)?delayD+1:0)];
+			Float64 outA = dram->aA[countA-((countA > delayA)?delayA+1:0)];
+			Float64 outB = dram->aB[countB-((countB > delayB)?delayB+1:0)];
+			Float64 outC = dram->aC[countC-((countC > delayC)?delayC+1:0)];
+			Float64 outD = dram->aD[countD-((countD > delayD)?delayD+1:0)];
 			//second block: four more outputs
 			
-			aE[countE] = (outA - (outB + outC + outD));
-			aF[countF] = (outB - (outA + outC + outD));
-			aG[countG] = (outC - (outA + outB + outD));
-			aH[countH] = (outD - (outA + outB + outC));
+			dram->aE[countE] = (outA - (outB + outC + outD));
+			dram->aF[countF] = (outB - (outA + outC + outD));
+			dram->aG[countG] = (outC - (outA + outB + outD));
+			dram->aH[countH] = (outD - (outA + outB + outC));
 			
 			countE++; if (countE < 0 || countE > delayE) countE = 0;
 			countF++; if (countF < 0 || countF > delayF) countF = 0;
 			countG++; if (countG < 0 || countG > delayG) countG = 0;
 			countH++; if (countH < 0 || countH > delayH) countH = 0;
 			
-			Float64 outE = aE[countE-((countE > delayE)?delayE+1:0)];
-			Float64 outF = aF[countF-((countF > delayF)?delayF+1:0)];
-			Float64 outG = aG[countG-((countG > delayG)?delayG+1:0)];
-			Float64 outH = aH[countH-((countH > delayH)?delayH+1:0)];
+			Float64 outE = dram->aE[countE-((countE > delayE)?delayE+1:0)];
+			Float64 outF = dram->aF[countF-((countF > delayF)?delayF+1:0)];
+			Float64 outG = dram->aG[countG-((countG > delayG)?delayG+1:0)];
+			Float64 outH = dram->aH[countH-((countH > delayH)?delayH+1:0)];
 			//third block: final outputs
 			
 			feedbackA = (outE - (outF + outG + outH));
@@ -277,18 +280,18 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	iirB = 0.0;
 	iirC = 0.0;
 	
-	for(int count = 0; count < 19999; count++) {aE[count] = 0.0;}
-	for(int count = 0; count < 12360; count++) {aF[count] = 0.0;}
-	for(int count = 0; count < 7639; count++) {aG[count] = 0.0;}
-	for(int count = 0; count < 4721; count++) {aH[count] = 0.0;}
-	for(int count = 0; count < 2915; count++) {aA[count] = 0.0;}
-	for(int count = 0; count < 1803; count++) {aB[count] = 0.0;}
-	for(int count = 0; count < 1114; count++) {aC[count] = 0.0;}
-	for(int count = 0; count < 688; count++) {aD[count] = 0.0;}
-	for(int count = 0; count < 425; count++) {aI[count] = 0.0;}
-	for(int count = 0; count < 263; count++) {aJ[count] = 0.0;}
-	for(int count = 0; count < 162; count++) {aK[count] = 0.0;}
-	for(int count = 0; count < 100; count++) {aL[count] = 0.0;}
+	for(int count = 0; count < 19999; count++) {dram->aE[count] = 0.0;}
+	for(int count = 0; count < 12360; count++) {dram->aF[count] = 0.0;}
+	for(int count = 0; count < 7639; count++) {dram->aG[count] = 0.0;}
+	for(int count = 0; count < 4721; count++) {dram->aH[count] = 0.0;}
+	for(int count = 0; count < 2915; count++) {dram->aA[count] = 0.0;}
+	for(int count = 0; count < 1803; count++) {dram->aB[count] = 0.0;}
+	for(int count = 0; count < 1114; count++) {dram->aC[count] = 0.0;}
+	for(int count = 0; count < 688; count++) {dram->aD[count] = 0.0;}
+	for(int count = 0; count < 425; count++) {dram->aI[count] = 0.0;}
+	for(int count = 0; count < 263; count++) {dram->aJ[count] = 0.0;}
+	for(int count = 0; count < 162; count++) {dram->aK[count] = 0.0;}
+	for(int count = 0; count < 100; count++) {dram->aL[count] = 0.0;}
 	
 	feedbackA = 0.0;
 	feedbackB = 0.0;

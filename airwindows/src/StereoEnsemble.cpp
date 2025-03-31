@@ -27,18 +27,6 @@ kParam0, kParam1, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-		double dA[7491];
-		double dB[7533];
-		double dC[5789];
-		double dD[5747];		
-		double dE[4841];
-		double dF[4871];
-		double dG[3119];
-		double dH[3089];
-		double dI[2213];
-		double dJ[2223];
-		double dK[1337];
-		double dL[1331];
 		
 		double levelA;
 		double levelB;
@@ -78,6 +66,20 @@ enum { kNumTemplateParameters = 6 };
 		uint32_t fpdL;
 		uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+		double dA[7491];
+		double dB[7533];
+		double dC[5789];
+		double dD[5747];		
+		double dE[4841];
+		double dF[4871];
+		double dG[3119];
+		double dH[3089];
+		double dI[2213];
+		double dJ[2223];
+		double dK[1337];
+		double dL[1331];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -132,52 +134,52 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			double outR = 0.0;
 			double temp = 0.0;
 			
-			dA[oneA] = inputSampleL;
-			oneA--; if (oneA < 0 || oneA > maxdelayA) {oneA = maxdelayA;} temp = dA[oneA];
+			dram->dA[oneA] = inputSampleL;
+			oneA--; if (oneA < 0 || oneA > maxdelayA) {oneA = maxdelayA;} temp = dram->dA[oneA];
 			outL += (temp*levelA);
 			
-			dB[oneB] = inputSampleR;
-			oneB--; if (oneB < 0 || oneB > maxdelayB) {oneB = maxdelayB;} temp += dB[oneB];
+			dram->dB[oneB] = inputSampleR;
+			oneB--; if (oneB < 0 || oneB > maxdelayB) {oneB = maxdelayB;} temp += dram->dB[oneB];
 			outR += (temp*levelB);
 			
-			dC[oneC] = inputSampleL;
-			oneC--; if (oneC < 0 || oneC > maxdelayC) {oneC = maxdelayC;} temp = dC[oneC];
+			dram->dC[oneC] = inputSampleL;
+			oneC--; if (oneC < 0 || oneC > maxdelayC) {oneC = maxdelayC;} temp = dram->dC[oneC];
 			outL += (temp*levelC);
 			
-			dD[oneD] = inputSampleR;
-			oneD--; if (oneD < 0 || oneD > maxdelayD) {oneD = maxdelayD;} temp += dD[oneD];
+			dram->dD[oneD] = inputSampleR;
+			oneD--; if (oneD < 0 || oneD > maxdelayD) {oneD = maxdelayD;} temp += dram->dD[oneD];
 			outR += (temp*levelD);
 			
-			dE[oneE] = inputSampleL;
-			oneE--; if (oneE < 0 || oneE > maxdelayE) {oneE = maxdelayE;} temp = dE[oneE];
+			dram->dE[oneE] = inputSampleL;
+			oneE--; if (oneE < 0 || oneE > maxdelayE) {oneE = maxdelayE;} temp = dram->dE[oneE];
 			outL += (temp*levelE);
 			
-			dF[oneF] = inputSampleR;
-			oneF--; if (oneF < 0 || oneF > maxdelayF) {oneF = maxdelayF;} temp += dF[oneF];
+			dram->dF[oneF] = inputSampleR;
+			oneF--; if (oneF < 0 || oneF > maxdelayF) {oneF = maxdelayF;} temp += dram->dF[oneF];
 			outR += (temp*levelF);
 			
-			dG[oneG] = inputSampleL;
-			oneG--; if (oneG < 0 || oneG > maxdelayG) {oneG = maxdelayG;} temp = dG[oneG];
+			dram->dG[oneG] = inputSampleL;
+			oneG--; if (oneG < 0 || oneG > maxdelayG) {oneG = maxdelayG;} temp = dram->dG[oneG];
 			outL += (temp*levelG);
 			
-			dH[oneH] = inputSampleR;
-			oneH--; if (oneH < 0 || oneH > maxdelayH) {oneH = maxdelayH;} temp += dH[oneH];
+			dram->dH[oneH] = inputSampleR;
+			oneH--; if (oneH < 0 || oneH > maxdelayH) {oneH = maxdelayH;} temp += dram->dH[oneH];
 			outR += (temp*levelH);
 			
-			dI[oneI] = inputSampleL;
-			oneI--; if (oneI < 0 || oneI > maxdelayI) {oneI = maxdelayI;} temp = dI[oneI];
+			dram->dI[oneI] = inputSampleL;
+			oneI--; if (oneI < 0 || oneI > maxdelayI) {oneI = maxdelayI;} temp = dram->dI[oneI];
 			outL += (temp*levelI);
 			
-			dJ[oneJ] = inputSampleR;
-			oneJ--; if (oneJ < 0 || oneJ > maxdelayJ) {oneJ = maxdelayJ;} temp += dJ[oneJ];
+			dram->dJ[oneJ] = inputSampleR;
+			oneJ--; if (oneJ < 0 || oneJ > maxdelayJ) {oneJ = maxdelayJ;} temp += dram->dJ[oneJ];
 			outR += (temp*levelJ);
 			
-			dK[oneK] = inputSampleL;
-			oneK--; if (oneK < 0 || oneK > maxdelayK) {oneK = maxdelayK;} temp = dK[oneK];
+			dram->dK[oneK] = inputSampleL;
+			oneK--; if (oneK < 0 || oneK > maxdelayK) {oneK = maxdelayK;} temp = dram->dK[oneK];
 			outL += (temp*levelK);
 			
-			dL[oneL] = inputSampleR;
-			oneL--; if (oneL < 0 || oneL > maxdelayL) {oneL = maxdelayL;} temp += dL[oneL];
+			dram->dL[oneL] = inputSampleR;
+			oneL--; if (oneL < 0 || oneL > maxdelayL) {oneL = maxdelayL;} temp += dram->dL[oneL];
 			outR += (temp*levelL);
 			
 			inputSampleL = (outL * outlevel) + (drySampleL * dryL);
@@ -249,23 +251,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for(int count = 0; count < 7490; count++) {dA[count] = 0.0;}
-	for(int count = 0; count < 7532; count++) {dB[count] = 0.0;}
+	for(int count = 0; count < 7490; count++) {dram->dA[count] = 0.0;}
+	for(int count = 0; count < 7532; count++) {dram->dB[count] = 0.0;}
 
-	for(int count = 0; count < 5788; count++) {dC[count] = 0.0;}
-	for(int count = 0; count < 5746; count++) {dD[count] = 0.0;}
+	for(int count = 0; count < 5788; count++) {dram->dC[count] = 0.0;}
+	for(int count = 0; count < 5746; count++) {dram->dD[count] = 0.0;}
 
-	for(int count = 0; count < 4840; count++) {dE[count] = 0.0;}
-	for(int count = 0; count < 4870; count++) {dF[count] = 0.0;}
+	for(int count = 0; count < 4840; count++) {dram->dE[count] = 0.0;}
+	for(int count = 0; count < 4870; count++) {dram->dF[count] = 0.0;}
 
-	for(int count = 0; count < 3118; count++) {dG[count] = 0.0;}
-	for(int count = 0; count < 3088; count++) {dH[count] = 0.0;}
+	for(int count = 0; count < 3118; count++) {dram->dG[count] = 0.0;}
+	for(int count = 0; count < 3088; count++) {dram->dH[count] = 0.0;}
 
-	for(int count = 0; count < 2212; count++) {dI[count] = 0.0;}
-	for(int count = 0; count < 2222; count++) {dJ[count] = 0.0;}
+	for(int count = 0; count < 2212; count++) {dram->dI[count] = 0.0;}
+	for(int count = 0; count < 2222; count++) {dram->dJ[count] = 0.0;}
 
-	for(int count = 0; count < 1336; count++) {dK[count] = 0.0;}
-	for(int count = 0; count < 1330; count++) {dL[count] = 0.0;}
+	for(int count = 0; count < 1336; count++) {dram->dK[count] = 0.0;}
+	for(int count = 0; count < 1330; count++) {dram->dL[count] = 0.0;}
 	
 	oneA = 1;
 	oneB = 1;

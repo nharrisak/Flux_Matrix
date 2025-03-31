@@ -35,14 +35,17 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		double p[16386];
 		int gcount;
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double p[16386];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -71,10 +74,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (gcount < 0 || gcount > maxtime) {gcount = maxtime;}
 		int count = gcount;
-		p[count] = inputSample;
+		dram->p[count] = inputSample;
 		count += offset;
-		inputSample = p[count-((count > maxtime)?maxtime+1:0)]*(1.0 - subsample);
-		inputSample += p[count+1-((count+1 > maxtime)?maxtime+1:0)]*subsample;
+		inputSample = dram->p[count-((count > maxtime)?maxtime+1:0)]*(1.0 - subsample);
+		inputSample += dram->p[count+1-((count+1 > maxtime)?maxtime+1:0)]*subsample;
 		gcount--;
 		
 		if (phase < 1.0) inputSample *= phase;
@@ -95,7 +98,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 16385; count++) {p[count] = 0.0;}
+	for(int count = 0; count < 16385; count++) {dram->p[count] = 0.0;}
 	gcount = 0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }

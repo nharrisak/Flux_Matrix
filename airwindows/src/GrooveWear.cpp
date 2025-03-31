@@ -30,12 +30,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
 
-		Float64 aMid[21];
-		Float64 bMid[21];
-		Float64 cMid[21];
-		Float64 dMid[21];
-		Float64 fMid[21];		
 		Float64 aMidPrev;
 		Float64 bMidPrev;
 		Float64 cMidPrev;
@@ -46,6 +42,13 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 aMid[21];
+		Float64 bMid[21];
+		Float64 cMid[21];
+		Float64 dMid[21];
+		Float64 fMid[21];		
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -57,49 +60,49 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float64 overallscale = (pow(GetParameter( kParam_One ),2)*19.0)+1.0;
 	Float64 gain = overallscale;
 	//mid groove wear
-	if (gain > 1.0) {fMid[0] = 1.0; gain -= 1.0;} else {fMid[0] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[1] = 1.0; gain -= 1.0;} else {fMid[1] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[2] = 1.0; gain -= 1.0;} else {fMid[2] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[3] = 1.0; gain -= 1.0;} else {fMid[3] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[4] = 1.0; gain -= 1.0;} else {fMid[4] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[5] = 1.0; gain -= 1.0;} else {fMid[5] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[6] = 1.0; gain -= 1.0;} else {fMid[6] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[7] = 1.0; gain -= 1.0;} else {fMid[7] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[8] = 1.0; gain -= 1.0;} else {fMid[8] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[9] = 1.0; gain -= 1.0;} else {fMid[9] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[10] = 1.0; gain -= 1.0;} else {fMid[10] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[11] = 1.0; gain -= 1.0;} else {fMid[11] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[12] = 1.0; gain -= 1.0;} else {fMid[12] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[13] = 1.0; gain -= 1.0;} else {fMid[13] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[14] = 1.0; gain -= 1.0;} else {fMid[14] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[15] = 1.0; gain -= 1.0;} else {fMid[15] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[16] = 1.0; gain -= 1.0;} else {fMid[16] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[17] = 1.0; gain -= 1.0;} else {fMid[17] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[18] = 1.0; gain -= 1.0;} else {fMid[18] = gain; gain = 0.0;}
-	if (gain > 1.0) {fMid[19] = 1.0; gain -= 1.0;} else {fMid[19] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[0] = 1.0; gain -= 1.0;} else {dram->fMid[0] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[1] = 1.0; gain -= 1.0;} else {dram->fMid[1] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[2] = 1.0; gain -= 1.0;} else {dram->fMid[2] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[3] = 1.0; gain -= 1.0;} else {dram->fMid[3] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[4] = 1.0; gain -= 1.0;} else {dram->fMid[4] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[5] = 1.0; gain -= 1.0;} else {dram->fMid[5] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[6] = 1.0; gain -= 1.0;} else {dram->fMid[6] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[7] = 1.0; gain -= 1.0;} else {dram->fMid[7] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[8] = 1.0; gain -= 1.0;} else {dram->fMid[8] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[9] = 1.0; gain -= 1.0;} else {dram->fMid[9] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[10] = 1.0; gain -= 1.0;} else {dram->fMid[10] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[11] = 1.0; gain -= 1.0;} else {dram->fMid[11] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[12] = 1.0; gain -= 1.0;} else {dram->fMid[12] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[13] = 1.0; gain -= 1.0;} else {dram->fMid[13] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[14] = 1.0; gain -= 1.0;} else {dram->fMid[14] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[15] = 1.0; gain -= 1.0;} else {dram->fMid[15] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[16] = 1.0; gain -= 1.0;} else {dram->fMid[16] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[17] = 1.0; gain -= 1.0;} else {dram->fMid[17] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[18] = 1.0; gain -= 1.0;} else {dram->fMid[18] = gain; gain = 0.0;}
+	if (gain > 1.0) {dram->fMid[19] = 1.0; gain -= 1.0;} else {dram->fMid[19] = gain; gain = 0.0;}
 	//there, now we have a neat little moving average with remainders
 	
 	if (overallscale < 1.0) overallscale = 1.0;
-	fMid[0] /= overallscale;
-	fMid[1] /= overallscale;
-	fMid[2] /= overallscale;
-	fMid[3] /= overallscale;
-	fMid[4] /= overallscale;
-	fMid[5] /= overallscale;
-	fMid[6] /= overallscale;
-	fMid[7] /= overallscale;
-	fMid[8] /= overallscale;
-	fMid[9] /= overallscale;
-	fMid[10] /= overallscale;
-	fMid[11] /= overallscale;
-	fMid[12] /= overallscale;
-	fMid[13] /= overallscale;
-	fMid[14] /= overallscale;
-	fMid[15] /= overallscale;
-	fMid[16] /= overallscale;
-	fMid[17] /= overallscale;
-	fMid[18] /= overallscale;
-	fMid[19] /= overallscale;
+	dram->fMid[0] /= overallscale;
+	dram->fMid[1] /= overallscale;
+	dram->fMid[2] /= overallscale;
+	dram->fMid[3] /= overallscale;
+	dram->fMid[4] /= overallscale;
+	dram->fMid[5] /= overallscale;
+	dram->fMid[6] /= overallscale;
+	dram->fMid[7] /= overallscale;
+	dram->fMid[8] /= overallscale;
+	dram->fMid[9] /= overallscale;
+	dram->fMid[10] /= overallscale;
+	dram->fMid[11] /= overallscale;
+	dram->fMid[12] /= overallscale;
+	dram->fMid[13] /= overallscale;
+	dram->fMid[14] /= overallscale;
+	dram->fMid[15] /= overallscale;
+	dram->fMid[16] /= overallscale;
+	dram->fMid[17] /= overallscale;
+	dram->fMid[18] /= overallscale;
+	dram->fMid[19] /= overallscale;
 	//and now it's neatly scaled, too
 
 	Float64 aWet = 1.0;
@@ -140,33 +143,33 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		drySample = inputSample;		
 		
 		if (aWet > 0.0) {
-			aMid[19] = aMid[18]; aMid[18] = aMid[17]; aMid[17] = aMid[16]; aMid[16] = aMid[15];
-			aMid[15] = aMid[14]; aMid[14] = aMid[13]; aMid[13] = aMid[12]; aMid[12] = aMid[11];
-			aMid[11] = aMid[10]; aMid[10] = aMid[9];
-			aMid[9] = aMid[8]; aMid[8] = aMid[7]; aMid[7] = aMid[6]; aMid[6] = aMid[5];
-			aMid[5] = aMid[4]; aMid[4] = aMid[3]; aMid[3] = aMid[2]; aMid[2] = aMid[1];
-			aMid[1] = aMid[0]; aMid[0] = accumulatorSample = (inputSample-aMidPrev);
+			dram->aMid[19] = dram->aMid[18]; dram->aMid[18] = dram->aMid[17]; dram->aMid[17] = dram->aMid[16]; dram->aMid[16] = dram->aMid[15];
+			dram->aMid[15] = dram->aMid[14]; dram->aMid[14] = dram->aMid[13]; dram->aMid[13] = dram->aMid[12]; dram->aMid[12] = dram->aMid[11];
+			dram->aMid[11] = dram->aMid[10]; dram->aMid[10] = dram->aMid[9];
+			dram->aMid[9] = dram->aMid[8]; dram->aMid[8] = dram->aMid[7]; dram->aMid[7] = dram->aMid[6]; dram->aMid[6] = dram->aMid[5];
+			dram->aMid[5] = dram->aMid[4]; dram->aMid[4] = dram->aMid[3]; dram->aMid[3] = dram->aMid[2]; dram->aMid[2] = dram->aMid[1];
+			dram->aMid[1] = dram->aMid[0]; dram->aMid[0] = accumulatorSample = (inputSample-aMidPrev);
 			//this is different from Aura because that is accumulating rates of change OF the rate of change
-			accumulatorSample *= fMid[0];
-			accumulatorSample += (aMid[1] * fMid[1]);
-			accumulatorSample += (aMid[2] * fMid[2]);
-			accumulatorSample += (aMid[3] * fMid[3]);
-			accumulatorSample += (aMid[4] * fMid[4]);
-			accumulatorSample += (aMid[5] * fMid[5]);
-			accumulatorSample += (aMid[6] * fMid[6]);
-			accumulatorSample += (aMid[7] * fMid[7]);
-			accumulatorSample += (aMid[8] * fMid[8]);
-			accumulatorSample += (aMid[9] * fMid[9]);
-			accumulatorSample += (aMid[10] * fMid[10]);
-			accumulatorSample += (aMid[11] * fMid[11]);
-			accumulatorSample += (aMid[12] * fMid[12]);
-			accumulatorSample += (aMid[13] * fMid[13]);
-			accumulatorSample += (aMid[14] * fMid[14]);
-			accumulatorSample += (aMid[15] * fMid[15]);
-			accumulatorSample += (aMid[16] * fMid[16]);
-			accumulatorSample += (aMid[17] * fMid[17]);
-			accumulatorSample += (aMid[18] * fMid[18]);
-			accumulatorSample += (aMid[19] * fMid[19]);
+			accumulatorSample *= dram->fMid[0];
+			accumulatorSample += (dram->aMid[1] * dram->fMid[1]);
+			accumulatorSample += (dram->aMid[2] * dram->fMid[2]);
+			accumulatorSample += (dram->aMid[3] * dram->fMid[3]);
+			accumulatorSample += (dram->aMid[4] * dram->fMid[4]);
+			accumulatorSample += (dram->aMid[5] * dram->fMid[5]);
+			accumulatorSample += (dram->aMid[6] * dram->fMid[6]);
+			accumulatorSample += (dram->aMid[7] * dram->fMid[7]);
+			accumulatorSample += (dram->aMid[8] * dram->fMid[8]);
+			accumulatorSample += (dram->aMid[9] * dram->fMid[9]);
+			accumulatorSample += (dram->aMid[10] * dram->fMid[10]);
+			accumulatorSample += (dram->aMid[11] * dram->fMid[11]);
+			accumulatorSample += (dram->aMid[12] * dram->fMid[12]);
+			accumulatorSample += (dram->aMid[13] * dram->fMid[13]);
+			accumulatorSample += (dram->aMid[14] * dram->fMid[14]);
+			accumulatorSample += (dram->aMid[15] * dram->fMid[15]);
+			accumulatorSample += (dram->aMid[16] * dram->fMid[16]);
+			accumulatorSample += (dram->aMid[17] * dram->fMid[17]);
+			accumulatorSample += (dram->aMid[18] * dram->fMid[18]);
+			accumulatorSample += (dram->aMid[19] * dram->fMid[19]);
 			//we are doing our repetitive calculations on a separate value
 			correction = (inputSample-aMidPrev) - accumulatorSample;
 			aMidPrev = inputSample;		
@@ -176,33 +179,33 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		if (bWet > 0.0) {
-			bMid[19] = bMid[18]; bMid[18] = bMid[17]; bMid[17] = bMid[16]; bMid[16] = bMid[15];
-			bMid[15] = bMid[14]; bMid[14] = bMid[13]; bMid[13] = bMid[12]; bMid[12] = bMid[11];
-			bMid[11] = bMid[10]; bMid[10] = bMid[9];
-			bMid[9] = bMid[8]; bMid[8] = bMid[7]; bMid[7] = bMid[6]; bMid[6] = bMid[5];
-			bMid[5] = bMid[4]; bMid[4] = bMid[3]; bMid[3] = bMid[2]; bMid[2] = bMid[1];
-			bMid[1] = bMid[0]; bMid[0] = accumulatorSample = (inputSample-bMidPrev);
+			dram->bMid[19] = dram->bMid[18]; dram->bMid[18] = dram->bMid[17]; dram->bMid[17] = dram->bMid[16]; dram->bMid[16] = dram->bMid[15];
+			dram->bMid[15] = dram->bMid[14]; dram->bMid[14] = dram->bMid[13]; dram->bMid[13] = dram->bMid[12]; dram->bMid[12] = dram->bMid[11];
+			dram->bMid[11] = dram->bMid[10]; dram->bMid[10] = dram->bMid[9];
+			dram->bMid[9] = dram->bMid[8]; dram->bMid[8] = dram->bMid[7]; dram->bMid[7] = dram->bMid[6]; dram->bMid[6] = dram->bMid[5];
+			dram->bMid[5] = dram->bMid[4]; dram->bMid[4] = dram->bMid[3]; dram->bMid[3] = dram->bMid[2]; dram->bMid[2] = dram->bMid[1];
+			dram->bMid[1] = dram->bMid[0]; dram->bMid[0] = accumulatorSample = (inputSample-bMidPrev);
 			
-			accumulatorSample *= fMid[0];
-			accumulatorSample += (bMid[1] * fMid[1]);
-			accumulatorSample += (bMid[2] * fMid[2]);
-			accumulatorSample += (bMid[3] * fMid[3]);
-			accumulatorSample += (bMid[4] * fMid[4]);
-			accumulatorSample += (bMid[5] * fMid[5]);
-			accumulatorSample += (bMid[6] * fMid[6]);
-			accumulatorSample += (bMid[7] * fMid[7]);
-			accumulatorSample += (bMid[8] * fMid[8]);
-			accumulatorSample += (bMid[9] * fMid[9]);
-			accumulatorSample += (bMid[10] * fMid[10]);
-			accumulatorSample += (bMid[11] * fMid[11]);
-			accumulatorSample += (bMid[12] * fMid[12]);
-			accumulatorSample += (bMid[13] * fMid[13]);
-			accumulatorSample += (bMid[14] * fMid[14]);
-			accumulatorSample += (bMid[15] * fMid[15]);
-			accumulatorSample += (bMid[16] * fMid[16]);
-			accumulatorSample += (bMid[17] * fMid[17]);
-			accumulatorSample += (bMid[18] * fMid[18]);
-			accumulatorSample += (bMid[19] * fMid[19]);
+			accumulatorSample *= dram->fMid[0];
+			accumulatorSample += (dram->bMid[1] * dram->fMid[1]);
+			accumulatorSample += (dram->bMid[2] * dram->fMid[2]);
+			accumulatorSample += (dram->bMid[3] * dram->fMid[3]);
+			accumulatorSample += (dram->bMid[4] * dram->fMid[4]);
+			accumulatorSample += (dram->bMid[5] * dram->fMid[5]);
+			accumulatorSample += (dram->bMid[6] * dram->fMid[6]);
+			accumulatorSample += (dram->bMid[7] * dram->fMid[7]);
+			accumulatorSample += (dram->bMid[8] * dram->fMid[8]);
+			accumulatorSample += (dram->bMid[9] * dram->fMid[9]);
+			accumulatorSample += (dram->bMid[10] * dram->fMid[10]);
+			accumulatorSample += (dram->bMid[11] * dram->fMid[11]);
+			accumulatorSample += (dram->bMid[12] * dram->fMid[12]);
+			accumulatorSample += (dram->bMid[13] * dram->fMid[13]);
+			accumulatorSample += (dram->bMid[14] * dram->fMid[14]);
+			accumulatorSample += (dram->bMid[15] * dram->fMid[15]);
+			accumulatorSample += (dram->bMid[16] * dram->fMid[16]);
+			accumulatorSample += (dram->bMid[17] * dram->fMid[17]);
+			accumulatorSample += (dram->bMid[18] * dram->fMid[18]);
+			accumulatorSample += (dram->bMid[19] * dram->fMid[19]);
 			//we are doing our repetitive calculations on a separate value
 			correction = (inputSample-bMidPrev) - accumulatorSample;
 			bMidPrev = inputSample;
@@ -212,33 +215,33 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		if (cWet > 0.0) {
-			cMid[19] = cMid[18]; cMid[18] = cMid[17]; cMid[17] = cMid[16]; cMid[16] = cMid[15];
-			cMid[15] = cMid[14]; cMid[14] = cMid[13]; cMid[13] = cMid[12]; cMid[12] = cMid[11];
-			cMid[11] = cMid[10]; cMid[10] = cMid[9];
-			cMid[9] = cMid[8]; cMid[8] = cMid[7]; cMid[7] = cMid[6]; cMid[6] = cMid[5];
-			cMid[5] = cMid[4]; cMid[4] = cMid[3]; cMid[3] = cMid[2]; cMid[2] = cMid[1];
-			cMid[1] = cMid[0]; cMid[0] = accumulatorSample = (inputSample-cMidPrev);
+			dram->cMid[19] = dram->cMid[18]; dram->cMid[18] = dram->cMid[17]; dram->cMid[17] = dram->cMid[16]; dram->cMid[16] = dram->cMid[15];
+			dram->cMid[15] = dram->cMid[14]; dram->cMid[14] = dram->cMid[13]; dram->cMid[13] = dram->cMid[12]; dram->cMid[12] = dram->cMid[11];
+			dram->cMid[11] = dram->cMid[10]; dram->cMid[10] = dram->cMid[9];
+			dram->cMid[9] = dram->cMid[8]; dram->cMid[8] = dram->cMid[7]; dram->cMid[7] = dram->cMid[6]; dram->cMid[6] = dram->cMid[5];
+			dram->cMid[5] = dram->cMid[4]; dram->cMid[4] = dram->cMid[3]; dram->cMid[3] = dram->cMid[2]; dram->cMid[2] = dram->cMid[1];
+			dram->cMid[1] = dram->cMid[0]; dram->cMid[0] = accumulatorSample = (inputSample-cMidPrev);
 			
-			accumulatorSample *= fMid[0];
-			accumulatorSample += (cMid[1] * fMid[1]);
-			accumulatorSample += (cMid[2] * fMid[2]);
-			accumulatorSample += (cMid[3] * fMid[3]);
-			accumulatorSample += (cMid[4] * fMid[4]);
-			accumulatorSample += (cMid[5] * fMid[5]);
-			accumulatorSample += (cMid[6] * fMid[6]);
-			accumulatorSample += (cMid[7] * fMid[7]);
-			accumulatorSample += (cMid[8] * fMid[8]);
-			accumulatorSample += (cMid[9] * fMid[9]);
-			accumulatorSample += (cMid[10] * fMid[10]);
-			accumulatorSample += (cMid[11] * fMid[11]);
-			accumulatorSample += (cMid[12] * fMid[12]);
-			accumulatorSample += (cMid[13] * fMid[13]);
-			accumulatorSample += (cMid[14] * fMid[14]);
-			accumulatorSample += (cMid[15] * fMid[15]);
-			accumulatorSample += (cMid[16] * fMid[16]);
-			accumulatorSample += (cMid[17] * fMid[17]);
-			accumulatorSample += (cMid[18] * fMid[18]);
-			accumulatorSample += (cMid[19] * fMid[19]);
+			accumulatorSample *= dram->fMid[0];
+			accumulatorSample += (dram->cMid[1] * dram->fMid[1]);
+			accumulatorSample += (dram->cMid[2] * dram->fMid[2]);
+			accumulatorSample += (dram->cMid[3] * dram->fMid[3]);
+			accumulatorSample += (dram->cMid[4] * dram->fMid[4]);
+			accumulatorSample += (dram->cMid[5] * dram->fMid[5]);
+			accumulatorSample += (dram->cMid[6] * dram->fMid[6]);
+			accumulatorSample += (dram->cMid[7] * dram->fMid[7]);
+			accumulatorSample += (dram->cMid[8] * dram->fMid[8]);
+			accumulatorSample += (dram->cMid[9] * dram->fMid[9]);
+			accumulatorSample += (dram->cMid[10] * dram->fMid[10]);
+			accumulatorSample += (dram->cMid[11] * dram->fMid[11]);
+			accumulatorSample += (dram->cMid[12] * dram->fMid[12]);
+			accumulatorSample += (dram->cMid[13] * dram->fMid[13]);
+			accumulatorSample += (dram->cMid[14] * dram->fMid[14]);
+			accumulatorSample += (dram->cMid[15] * dram->fMid[15]);
+			accumulatorSample += (dram->cMid[16] * dram->fMid[16]);
+			accumulatorSample += (dram->cMid[17] * dram->fMid[17]);
+			accumulatorSample += (dram->cMid[18] * dram->fMid[18]);
+			accumulatorSample += (dram->cMid[19] * dram->fMid[19]);
 			//we are doing our repetitive calculations on a separate value
 			correction = (inputSample-cMidPrev) - accumulatorSample;
 			cMidPrev = inputSample;
@@ -248,33 +251,33 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		}
 		
 		if (dWet > 0.0) {
-			dMid[19] = dMid[18]; dMid[18] = dMid[17]; dMid[17] = dMid[16]; dMid[16] = dMid[15];
-			dMid[15] = dMid[14]; dMid[14] = dMid[13]; dMid[13] = dMid[12]; dMid[12] = dMid[11];
-			dMid[11] = dMid[10]; dMid[10] = dMid[9];
-			dMid[9] = dMid[8]; dMid[8] = dMid[7]; dMid[7] = dMid[6]; dMid[6] = dMid[5];
-			dMid[5] = dMid[4]; dMid[4] = dMid[3]; dMid[3] = dMid[2]; dMid[2] = dMid[1];
-			dMid[1] = dMid[0]; dMid[0] = accumulatorSample = (inputSample-dMidPrev);
+			dram->dMid[19] = dram->dMid[18]; dram->dMid[18] = dram->dMid[17]; dram->dMid[17] = dram->dMid[16]; dram->dMid[16] = dram->dMid[15];
+			dram->dMid[15] = dram->dMid[14]; dram->dMid[14] = dram->dMid[13]; dram->dMid[13] = dram->dMid[12]; dram->dMid[12] = dram->dMid[11];
+			dram->dMid[11] = dram->dMid[10]; dram->dMid[10] = dram->dMid[9];
+			dram->dMid[9] = dram->dMid[8]; dram->dMid[8] = dram->dMid[7]; dram->dMid[7] = dram->dMid[6]; dram->dMid[6] = dram->dMid[5];
+			dram->dMid[5] = dram->dMid[4]; dram->dMid[4] = dram->dMid[3]; dram->dMid[3] = dram->dMid[2]; dram->dMid[2] = dram->dMid[1];
+			dram->dMid[1] = dram->dMid[0]; dram->dMid[0] = accumulatorSample = (inputSample-dMidPrev);
 			
-			accumulatorSample *= fMid[0];
-			accumulatorSample += (dMid[1] * fMid[1]);
-			accumulatorSample += (dMid[2] * fMid[2]);
-			accumulatorSample += (dMid[3] * fMid[3]);
-			accumulatorSample += (dMid[4] * fMid[4]);
-			accumulatorSample += (dMid[5] * fMid[5]);
-			accumulatorSample += (dMid[6] * fMid[6]);
-			accumulatorSample += (dMid[7] * fMid[7]);
-			accumulatorSample += (dMid[8] * fMid[8]);
-			accumulatorSample += (dMid[9] * fMid[9]);
-			accumulatorSample += (dMid[10] * fMid[10]);
-			accumulatorSample += (dMid[11] * fMid[11]);
-			accumulatorSample += (dMid[12] * fMid[12]);
-			accumulatorSample += (dMid[13] * fMid[13]);
-			accumulatorSample += (dMid[14] * fMid[14]);
-			accumulatorSample += (dMid[15] * fMid[15]);
-			accumulatorSample += (dMid[16] * fMid[16]);
-			accumulatorSample += (dMid[17] * fMid[17]);
-			accumulatorSample += (dMid[18] * fMid[18]);
-			accumulatorSample += (dMid[19] * fMid[19]);
+			accumulatorSample *= dram->fMid[0];
+			accumulatorSample += (dram->dMid[1] * dram->fMid[1]);
+			accumulatorSample += (dram->dMid[2] * dram->fMid[2]);
+			accumulatorSample += (dram->dMid[3] * dram->fMid[3]);
+			accumulatorSample += (dram->dMid[4] * dram->fMid[4]);
+			accumulatorSample += (dram->dMid[5] * dram->fMid[5]);
+			accumulatorSample += (dram->dMid[6] * dram->fMid[6]);
+			accumulatorSample += (dram->dMid[7] * dram->fMid[7]);
+			accumulatorSample += (dram->dMid[8] * dram->fMid[8]);
+			accumulatorSample += (dram->dMid[9] * dram->fMid[9]);
+			accumulatorSample += (dram->dMid[10] * dram->fMid[10]);
+			accumulatorSample += (dram->dMid[11] * dram->fMid[11]);
+			accumulatorSample += (dram->dMid[12] * dram->fMid[12]);
+			accumulatorSample += (dram->dMid[13] * dram->fMid[13]);
+			accumulatorSample += (dram->dMid[14] * dram->fMid[14]);
+			accumulatorSample += (dram->dMid[15] * dram->fMid[15]);
+			accumulatorSample += (dram->dMid[16] * dram->fMid[16]);
+			accumulatorSample += (dram->dMid[17] * dram->fMid[17]);
+			accumulatorSample += (dram->dMid[18] * dram->fMid[18]);
+			accumulatorSample += (dram->dMid[19] * dram->fMid[19]);
 			//we are doing our repetitive calculations on a separate value
 			correction = (inputSample-dMidPrev) - accumulatorSample;
 			dMidPrev = inputSample;
@@ -297,11 +300,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	for(int count = 0; count < 21; count++) {
-		aMid[count] = 0.0;
-		bMid[count] = 0.0;
-		cMid[count] = 0.0;
-		dMid[count] = 0.0;
-		fMid[count] = 0.0;
+		dram->aMid[count] = 0.0;
+		dram->bMid[count] = 0.0;
+		dram->cMid[count] = 0.0;
+		dram->dMid[count] = 0.0;
+		dram->fMid[count] = 0.0;
 	}
 	aMidPrev = 0.0;
 	bMidPrev = 0.0;

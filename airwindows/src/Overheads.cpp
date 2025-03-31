@@ -30,12 +30,14 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 	double ovhGain;
-	double ovhL[130];
-	double ovhR[130];
 	int ovhCount;
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double ovhL[130];
+	double ovhR[130];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -59,10 +61,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		//begin Overheads compressor
 		inputSampleL *= ovhTrim; inputSampleR *= ovhTrim;
-		ovhCount--; if (ovhCount < 0 || ovhCount > 128) ovhCount = 128; ovhL[ovhCount] = inputSampleL; ovhR[ovhCount] = inputSampleR;
-		double ovhClamp = sin(fabs(inputSampleL - ovhL[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0)*64.0);
+		ovhCount--; if (ovhCount < 0 || ovhCount > 128) ovhCount = 128; dram->ovhL[ovhCount] = inputSampleL; dram->ovhR[ovhCount] = inputSampleR;
+		double ovhClamp = sin(fabs(inputSampleL - dram->ovhL[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0)*64.0);
 		ovhGain *= (1.0 - ovhClamp); ovhGain += ((1.0-ovhClamp) * ovhClamp);
-		ovhClamp = sin(fabs(inputSampleR - ovhR[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0)*64.0);
+		ovhClamp = sin(fabs(inputSampleR - dram->ovhR[(ovhCount+offset)-(((ovhCount+offset) > 128)?129:0)])*(ovhTrim-1.0)*64.0);
 		ovhGain *= (1.0 - ovhClamp); ovhGain += ((1.0-ovhClamp) * ovhClamp);
 		if (ovhGain > 1.0) ovhGain = 1.0; if (ovhGain < 0.0) ovhGain = 0.0;
 		inputSampleL *= ovhGain; inputSampleR *= ovhGain;
@@ -97,7 +99,7 @@ int _airwindowsAlgorithm::reset(void) {
 
 {
 	ovhGain = 1.0;
-	for(int count = 0; count < 129; count++) {ovhL[count] = 0.0; ovhR[count] = 0.0;}
+	for(int count = 0; count < 129; count++) {dram->ovhL[count] = 0.0; dram->ovhR[count] = 0.0;}
 	ovhCount = 0;
 	fpdL = 1.0; while (fpdL < 16386) fpdL = rand()*UINT32_MAX;
 	fpdR = 1.0; while (fpdR < 16386) fpdR = rand()*UINT32_MAX;

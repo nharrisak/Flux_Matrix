@@ -34,8 +34,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float32 d[32002];
 		int minTap[32];
 		int maxTap[32];
 		int position[32];
@@ -51,6 +51,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float32 d[32002];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -105,7 +108,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		drySample = inputSample;
 		
 		if (gcount < 0 || gcount > 16000) {gcount = 16000;}
-		d[gcount+16000] = d[gcount] = inputSample;
+		dram->d[gcount+16000] = dram->d[gcount] = inputSample;
 		
 		if (slowCount > rate || slowCount < 0) {
 			slowCount = 0;
@@ -125,64 +128,64 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		scalefactor += (100.0 - fabs(combine)) * 0.000001;
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[29]]);
-		combine += (d[gcount+position[28]]);
+		combine -= (dram->d[gcount+position[29]]);
+		combine += (dram->d[gcount+position[28]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[27]]);
-		combine += (d[gcount+position[26]]);
+		combine -= (dram->d[gcount+position[27]]);
+		combine += (dram->d[gcount+position[26]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[25]]);
-		combine += (d[gcount+position[24]]);
+		combine -= (dram->d[gcount+position[25]]);
+		combine += (dram->d[gcount+position[24]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[23]]);
-		combine += (d[gcount+position[22]]);
+		combine -= (dram->d[gcount+position[23]]);
+		combine += (dram->d[gcount+position[22]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[21]]);
-		combine += (d[gcount+position[20]]);
+		combine -= (dram->d[gcount+position[21]]);
+		combine += (dram->d[gcount+position[20]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[19]]);
-		combine += (d[gcount+position[18]]);
+		combine -= (dram->d[gcount+position[19]]);
+		combine += (dram->d[gcount+position[18]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[17]]);
-		combine += (d[gcount+position[16]]);
+		combine -= (dram->d[gcount+position[17]]);
+		combine += (dram->d[gcount+position[16]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[15]]);
-		combine += (d[gcount+position[14]]);
+		combine -= (dram->d[gcount+position[15]]);
+		combine += (dram->d[gcount+position[14]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[13]]);
-		combine += (d[gcount+position[12]]);
+		combine -= (dram->d[gcount+position[13]]);
+		combine += (dram->d[gcount+position[12]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[11]]);
-		combine += (d[gcount+position[10]]);
+		combine -= (dram->d[gcount+position[11]]);
+		combine += (dram->d[gcount+position[10]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[9]]);
-		combine += (d[gcount+position[8]]);
+		combine -= (dram->d[gcount+position[9]]);
+		combine += (dram->d[gcount+position[8]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[7]]);
-		combine += (d[gcount+position[6]]);
+		combine -= (dram->d[gcount+position[7]]);
+		combine += (dram->d[gcount+position[6]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[5]]);
-		combine += (d[gcount+position[4]]);
+		combine -= (dram->d[gcount+position[5]]);
+		combine += (dram->d[gcount+position[4]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[3]]);
-		combine += (d[gcount+position[2]]);
+		combine -= (dram->d[gcount+position[3]]);
+		combine += (dram->d[gcount+position[2]]);
 		
 		combine *= scalefactor;
-		combine -= (d[gcount+position[1]]);
-		combine += (d[gcount+position[0]]);
+		combine -= (dram->d[gcount+position[1]]);
+		combine += (dram->d[gcount+position[0]]);
 		
 		gcount--;
 		slowCount++;
@@ -208,7 +211,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 32001; count++) {d[count] = 0;}
+	for(int count = 0; count < 32001; count++) {dram->d[count] = 0;}
 	for(int count = 0; count < 31; count++) {minTap[count] = 0; maxTap[count] = 0; position[count] = 1; stepTap[count] = 1;}
 	combine = 0;
 	scalefactor = 0.999;

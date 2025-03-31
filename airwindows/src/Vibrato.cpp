@@ -36,8 +36,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 p[16386]; //this is processed, not raw incoming samples
 		Float64 sweep;
 		Float64 sweepB;
 		int gcount;
@@ -51,6 +51,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 p[16386]; //this is processed, not raw incoming samples
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -82,15 +85,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (gcount < 1 || gcount > 8192) {gcount = 8192;}
 		int count = gcount;
-		p[count+8192] = p[count] = inputSample;
+		dram->p[count+8192] = dram->p[count] = inputSample;
 		
 		Float64 offset = depth + (depth * sin(sweep));
 		count += (int)floor(offset);
 		
-		inputSample = p[count] * (1-(offset-floor(offset))); //less as value moves away from .0
-		inputSample += p[count+1]; //we can assume always using this in one way or another?
-		inputSample += p[count+2] * (offset-floor(offset)); //greater as value moves away from .0
-		inputSample -= ((p[count]-p[count+1])-(p[count+1]-p[count+2]))/50; //interpolation hacks 'r us
+		inputSample = dram->p[count] * (1-(offset-floor(offset))); //less as value moves away from .0
+		inputSample += dram->p[count+1]; //we can assume always using this in one way or another?
+		inputSample += dram->p[count+2] * (offset-floor(offset)); //greater as value moves away from .0
+		inputSample -= ((dram->p[count]-dram->p[count+1])-(dram->p[count+1]-dram->p[count+2]))/50; //interpolation hacks 'r us
 		inputSample *= 0.5; // gain trim
 		
 		sweep += (speed + (speedB * sin(sweepB) * depthB));
@@ -120,7 +123,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 16385; count++) {p[count] = 0;}
+	for(int count = 0; count < 16385; count++) {dram->p[count] = 0;}
 	sweep = 3.141592653589793238 / 2.0;
 	sweepB = 3.141592653589793238 / 2.0;
 	gcount = 0;

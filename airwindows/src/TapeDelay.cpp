@@ -38,9 +38,9 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
 
 		SInt32 p[258];
-		Float64 d[44100];
 		int gcount;
 		int delay;
 		int maxdelay;
@@ -50,6 +50,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[44100];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -79,7 +82,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (gcount < 0 || gcount > 128) {gcount = 128;}
 		count = gcount;
 		if (delay < 0 || delay > maxdelay) {delay = maxdelay;}
-		sum = inputSample + (d[delay]*feedback);
+		sum = inputSample + (dram->d[delay]*feedback);
 		p[count+128] = p[count] = sumtotal = (SInt32)(sum*8388608.0);
 		switch (fatness)
 		{
@@ -126,20 +129,20 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		chase += abs(maxdelay - targetdelay);
 		if (chase > 9000)
 		{
-			if (maxdelay > targetdelay) {d[delay] = storedelay; maxdelay -= 1; delay -= 1; if (delay < 0) {delay = maxdelay;} d[delay] = storedelay;}
-			if (maxdelay < targetdelay) {maxdelay += 1; delay += 1; if (delay > maxdelay) {delay = 0;} d[delay] = storedelay;}
+			if (maxdelay > targetdelay) {dram->d[delay] = storedelay; maxdelay -= 1; delay -= 1; if (delay < 0) {delay = maxdelay;} dram->d[delay] = storedelay;}
+			if (maxdelay < targetdelay) {maxdelay += 1; delay += 1; if (delay > maxdelay) {delay = 0;} dram->d[delay] = storedelay;}
 			chase = 0;
 		}
 		else
 		{
-			d[delay] = storedelay;
+			dram->d[delay] = storedelay;
 		}
 		
 		gcount--;
 		delay--;
 		if (delay < 0 || delay > maxdelay) {delay = maxdelay;}
 		//yes this is a second bounds check. it's cheap, check EVERY time
-		inputSample = (inputSample * dry) + (d[delay] * wet);		
+		inputSample = (inputSample * dry) + (dram->d[delay] * wet);		
 
 		//begin 32 bit floating point dither
 		int expon; frexpf((float)inputSample, &expon);
@@ -156,7 +159,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	for(int count = 0; count < 257; count++) {p[count] = 0;}
-	for(delay = 0; delay < 44100; delay++) {d[delay] = 0.0;}
+	for(delay = 0; delay < 44100; delay++) {dram->d[delay] = 0.0;}
 	maxdelay = 0;
 	delay = 0;
 	gcount = 0;

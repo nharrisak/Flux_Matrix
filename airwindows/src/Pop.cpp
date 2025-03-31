@@ -32,6 +32,7 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		double muVary;
 		double muAttack;
@@ -46,7 +47,6 @@ struct _kernel {
 		double previous3;
 		double previous4;
 		double previous5;
-		Float64 d[10001];
 		int delay;
 		bool flip;
 		uint32_t fpd;
@@ -54,6 +54,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[10001];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -85,11 +88,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
 		double drySample = inputSample;
 		
-		d[delay] = inputSample;
+		dram->d[delay] = inputSample;
 		delay--;
 		if (delay < 0 || delay > maxdelay) {delay = maxdelay;}
 		//yes this is a second bounds check. it's cheap, check EVERY time
-		inputSample = (inputSample * thicken) + (d[delay] * (1.0-thicken));
+		inputSample = (inputSample * thicken) + (dram->d[delay] * (1.0-thicken));
 		
 		double lowestSample = inputSample;
 		if (fabs(inputSample) > fabs(previous)) lowestSample = previous;
@@ -196,7 +199,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 10000; count++) {d[count] = 0;}
+	for(int count = 0; count < 10000; count++) {dram->d[count] = 0;}
 	delay = 0;
 	muSpeedA = 10000;
 	muSpeedB = 10000;

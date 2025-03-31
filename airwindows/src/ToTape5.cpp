@@ -38,14 +38,13 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d[1000];
 		SInt32 gcount;
 		Float64 rateof;
 		Float64 sweep;
 		Float64 nextmax;
 		
-		Float64 e[1000];
 		SInt32 hcount;		
 				
 		Float64 iirMidRollerA;
@@ -89,6 +88,10 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[1000];
+		Float64 e[1000];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -153,16 +156,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			//now we've got a random flutter, so we're messing with the pitch before tape effects go on
 		if (gcount < 0 || gcount > 300) {gcount = 300;}
 		count = gcount;
-		d[count+301] = d[count] = inputSample;
+		dram->d[count+301] = dram->d[count] = inputSample;
 		gcount--;
 		//we will also keep the buffer going, even when not in use
 		
 		if (depth != 0.0) {
 			offset = (1.0 + sin(sweep)) * depth;
 			count += (int)floor(offset);
-			bridgerectifier = (d[count] * (1-(offset-floor(offset))));
-			bridgerectifier += (d[count+1] * (offset-floor(offset)));
-			bridgerectifier -= ((d[count+2] * (offset-floor(offset)))*trim);
+			bridgerectifier = (dram->d[count] * (1-(offset-floor(offset))));
+			bridgerectifier += (dram->d[count+1] * (offset-floor(offset)));
+			bridgerectifier -= ((dram->d[count+2] * (offset-floor(offset)))*trim);
 			rateof = (nextmax * newrate) + (rateof * oldrate);
 			sweep += rateof * fluttertrim;
 			sweep += sweep * sweeptrim;
@@ -234,11 +237,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin PhaseNudge
 		allpasstemp = hcount - 1;
 		if (allpasstemp < 0 || allpasstemp > maxdelay) {allpasstemp = maxdelay;}
-		HeadBump -= e[allpasstemp] * fpOld;
-		e[hcount] = HeadBump;
+		HeadBump -= dram->e[allpasstemp] * fpOld;
+		dram->e[hcount] = HeadBump;
 		inputSample *= fpOld;
 		hcount--; if (hcount < 0 || hcount > maxdelay) {hcount = maxdelay;}
-		HeadBump += (e[hcount]);
+		HeadBump += (dram->e[hcount]);
 		//end PhaseNudge on head bump in lieu of delay. 
 		Subtract -= (HeadBump * (HeadBumpControl+iirMinHeadBump));
 		//makes a second soften and a single head bump after saturation.
@@ -340,7 +343,7 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	iirSampleY = 0.0;
 	iirSampleZ = 0.0;
 	flip = 0;
-	for (int temp = 0; temp < 999; temp++) {d[temp] = 0.0; e[temp] = 0.0;}
+	for (int temp = 0; temp < 999; temp++) {dram->d[temp] = 0.0; dram->e[temp] = 0.0;}
 	gcount = 0;	
 	hcount = 0;	
 	sweep = 0.0;

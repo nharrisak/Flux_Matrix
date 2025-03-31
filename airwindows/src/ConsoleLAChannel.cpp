@@ -39,10 +39,7 @@ enum { kNumTemplateParameters = 6 };
 	double subBR;
 	double subCL;
 	double subCR;
-	double hullL[225];	
-	double hullR[225];	
 	int hullp;
-	double pearB[22];
 	double midA;
 	double midB;
 	double bassA;
@@ -53,6 +50,11 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double hullL[225];	
+	double hullR[225];	
+	double pearB[22];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -166,54 +168,54 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		//begin Hull2 Treble
 		hullp--; if (hullp < 0) hullp += 60;
-		hullL[hullp] = hullL[hullp+60] = inputSampleL;
-		hullR[hullp] = hullR[hullp+60] = inputSampleR;
+		dram->hullL[hullp] = dram->hullL[hullp+60] = inputSampleL;
+		dram->hullR[hullp] = dram->hullR[hullp+60] = inputSampleR;
 		
 		int x = hullp;
 		double bassL = 0.0;
 		double bassR = 0.0;
 		while (x < hullp+(limit/2)) {
-			bassL += hullL[x] * divisor;
-			bassR += hullR[x] * divisor;
+			bassL += dram->hullL[x] * divisor;
+			bassR += dram->hullR[x] * divisor;
 			x++;
 		}
 		bassL += bassL * 0.125;
 		bassR += bassR * 0.125;
 		while (x < hullp+limit) {
-			bassL -= hullL[x] * 0.125 * divisor;
-			bassR -= hullR[x] * 0.125 * divisor;
+			bassL -= dram->hullL[x] * 0.125 * divisor;
+			bassR -= dram->hullR[x] * 0.125 * divisor;
 			x++;
 		}
-		hullL[hullp+20] = hullL[hullp+80] = bassL;
-		hullR[hullp+20] = hullR[hullp+80] = bassR;
+		dram->hullL[hullp+20] = dram->hullL[hullp+80] = bassL;
+		dram->hullR[hullp+20] = dram->hullR[hullp+80] = bassR;
 		x = hullp+20;
 		bassL = bassR = 0.0;
 		while (x < hullp+20+(limit/2)) {
-			bassL += hullL[x] * divisor;
-			bassR += hullR[x] * divisor;
+			bassL += dram->hullL[x] * divisor;
+			bassR += dram->hullR[x] * divisor;
 			x++;
 		}
 		bassL += bassL * 0.125;
 		bassR += bassR * 0.125;
 		while (x < hullp+20+limit) {
-			bassL -= hullL[x] * 0.125 * divisor;
-			bassR -= hullR[x] * 0.125 * divisor;
+			bassL -= dram->hullL[x] * 0.125 * divisor;
+			bassR -= dram->hullR[x] * 0.125 * divisor;
 			x++;
 		}
-		hullL[hullp+40] = hullL[hullp+100] = bassL;
-		hullR[hullp+40] = hullR[hullp+100] = bassR;
+		dram->hullL[hullp+40] = dram->hullL[hullp+100] = bassL;
+		dram->hullR[hullp+40] = dram->hullR[hullp+100] = bassR;
 		x = hullp+40;
 		bassL = bassR = 0.0;
 		while (x < hullp+40+(limit/2)) {
-			bassL += hullL[x] * divisor;
-			bassR += hullR[x] * divisor;
+			bassL += dram->hullL[x] * divisor;
+			bassR += dram->hullR[x] * divisor;
 			x++;
 		}
 		bassL += bassL * 0.125;
 		bassR += bassR * 0.125;
 		while (x < hullp+40+limit) {
-			bassL -= hullL[x] * 0.125 * divisor;
-			bassR -= hullR[x] * 0.125 * divisor;
+			bassL -= dram->hullL[x] * 0.125 * divisor;
+			bassR -= dram->hullR[x] * 0.125 * divisor;
 			x++;
 		}
 		double trebleL = inputSampleL - bassL; inputSampleL = bassL;
@@ -222,27 +224,27 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		//begin Pear filter stages
 		//at this point 'bass' is actually still mid and bass
-		double slew = ((bassL - pearB[0]) + pearB[1])*freqMid*0.5;
-		pearB[0] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[0] + pearB[1]));
-		pearB[1] = slew; slew = ((bassR - pearB[2]) + pearB[3])*freqMid*0.5;
-		pearB[2] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[2] + pearB[3]));
-		pearB[3] = slew; slew = ((bassL - pearB[4]) + pearB[5])*freqMid*0.5;
-		pearB[4] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[4] + pearB[5]));
-		pearB[5] = slew; slew = ((bassR - pearB[6]) + pearB[7])*freqMid*0.5;
-		pearB[6] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[6] + pearB[7]));
-		pearB[7] = slew; slew = ((bassL - pearB[8]) + pearB[9])*freqMid*0.5;
-		pearB[8] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[8] + pearB[9]));
-		pearB[9] = slew; slew = ((bassR - pearB[10]) + pearB[11])*freqMid*0.5;
-		pearB[10] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[10] + pearB[11]));
-		pearB[11] = slew; slew = ((bassL - pearB[12]) + pearB[13])*freqMid*0.5;
-		pearB[12] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[12] + pearB[13]));
-		pearB[13] = slew; slew = ((bassR - pearB[14]) + pearB[15])*freqMid*0.5;
-		pearB[14] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[14] + pearB[15]));
-		pearB[15] = slew; slew = ((bassL - pearB[16]) + pearB[17])*freqMid*0.5;
-		pearB[16] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (pearB[16] + pearB[17]));
-		pearB[17] = slew; slew = ((bassR - pearB[18]) + pearB[19])*freqMid*0.5;
-		pearB[18] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (pearB[18] + pearB[19]));
-		pearB[19] = slew;
+		double slew = ((bassL - dram->pearB[0]) + dram->pearB[1])*freqMid*0.5;
+		dram->pearB[0] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[0] + dram->pearB[1]));
+		dram->pearB[1] = slew; slew = ((bassR - dram->pearB[2]) + dram->pearB[3])*freqMid*0.5;
+		dram->pearB[2] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[2] + dram->pearB[3]));
+		dram->pearB[3] = slew; slew = ((bassL - dram->pearB[4]) + dram->pearB[5])*freqMid*0.5;
+		dram->pearB[4] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[4] + dram->pearB[5]));
+		dram->pearB[5] = slew; slew = ((bassR - dram->pearB[6]) + dram->pearB[7])*freqMid*0.5;
+		dram->pearB[6] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[6] + dram->pearB[7]));
+		dram->pearB[7] = slew; slew = ((bassL - dram->pearB[8]) + dram->pearB[9])*freqMid*0.5;
+		dram->pearB[8] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[8] + dram->pearB[9]));
+		dram->pearB[9] = slew; slew = ((bassR - dram->pearB[10]) + dram->pearB[11])*freqMid*0.5;
+		dram->pearB[10] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[10] + dram->pearB[11]));
+		dram->pearB[11] = slew; slew = ((bassL - dram->pearB[12]) + dram->pearB[13])*freqMid*0.5;
+		dram->pearB[12] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[12] + dram->pearB[13]));
+		dram->pearB[13] = slew; slew = ((bassR - dram->pearB[14]) + dram->pearB[15])*freqMid*0.5;
+		dram->pearB[14] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[14] + dram->pearB[15]));
+		dram->pearB[15] = slew; slew = ((bassL - dram->pearB[16]) + dram->pearB[17])*freqMid*0.5;
+		dram->pearB[16] = bassL = (freqMid * bassL) + ((1.0-freqMid) * (dram->pearB[16] + dram->pearB[17]));
+		dram->pearB[17] = slew; slew = ((bassR - dram->pearB[18]) + dram->pearB[19])*freqMid*0.5;
+		dram->pearB[18] = bassR = (freqMid * bassR) + ((1.0-freqMid) * (dram->pearB[18] + dram->pearB[19]));
+		dram->pearB[19] = slew;
 		double midL = inputSampleL - bassL;
 		double midR = inputSampleR - bassR;
 		//we now have three bands out of hull and pear filters
@@ -359,9 +361,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for(int count = 0; count < 222; count++) {hullL[count] = 0.0; hullR[count] = 0.0;}
+	for(int count = 0; count < 222; count++) {dram->hullL[count] = 0.0; dram->hullR[count] = 0.0;}
 	hullp = 1;
-	for (int x = 0; x < 21; x++) pearB[x] = 0.0;
+	for (int x = 0; x < 21; x++) dram->pearB[x] = 0.0;
 	subAL = subAR = subBL = subBR = subCL = subCR = 0.0;
 	midA = midB = 0.0;
 	bassA = bassB = 0.0;

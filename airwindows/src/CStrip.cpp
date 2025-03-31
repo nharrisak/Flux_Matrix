@@ -50,6 +50,7 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		Float64 fpNShape;
 		uint32_t fpd;
@@ -111,7 +112,6 @@ struct _kernel {
 		//end Gate
 		
 		//begin Timing
-		Float64 p[4099];
 		int count;
 		//end Timing
 		
@@ -132,6 +132,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 p[4099];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -496,9 +499,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (engageTiming)
 		{
 			if (count < 1 || count > 2048) {count = 2048;}
-			p[count+2048] = p[count] = inputSample;
-			inputSample = p[count+near]*nearLevel;
-			inputSample += p[count+far]*farLevel;
+			dram->p[count+2048] = dram->p[count] = inputSample;
+			inputSample = dram->p[count+near]*nearLevel;
+			inputSample += dram->p[count+far]*farLevel;
 			count -= 1;
 			//consider adding third sample just to bring out superhighs subtly, like old interpolation hacks
 			//or third and fifth samples, ditto		
@@ -610,7 +613,7 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	//end Gate
 	//begin Timing
 	register UInt32 fcount;
-	for(fcount = 0; fcount < 4098; fcount++) {p[fcount] = 0.0;}
+	for(fcount = 0; fcount < 4098; fcount++) {dram->p[fcount] = 0.0;}
 	count = 0;
 	//end Timing
 	//begin ButterComp

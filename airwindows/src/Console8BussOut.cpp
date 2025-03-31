@@ -28,6 +28,7 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		double inTrimA;
 		double inTrimB;
@@ -48,7 +49,6 @@ struct _kernel {
 		}; //fixed frequency biquad filter for ultrasonics, stereo
 		double fix[fix_total];
 		double lastSample;
-		double intermediate[18];
 		bool wasPosClip;
 		bool wasNegClip;
 		int spacing; //ClipOnly2
@@ -57,6 +57,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double intermediate[18];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -119,10 +122,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			else lastSample=-0.2491717+(lastSample*0.7390851);
 		} wasNegClip = false;
 		if (inputSample<-0.9549925859) {wasNegClip=true;inputSample=-0.7058208+(lastSample*0.2609148);}
-		intermediate[spacing] = inputSample;
+		dram->intermediate[spacing] = inputSample;
         inputSample = lastSample; //Latency is however many samples equals one 44.1k sample
-		for (int x = spacing; x > 0; x--) intermediate[x-1] = intermediate[x];
-		lastSample = intermediate[0]; //run a little buffer to handle this
+		for (int x = spacing; x > 0; x--) dram->intermediate[x-1] = dram->intermediate[x];
+		lastSample = dram->intermediate[0]; //run a little buffer to handle this
 		//ClipOnly2
 				
 		*destP = inputSample;
@@ -138,7 +141,7 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	lastSample = 0.0;
 	wasPosClip = false;
 	wasNegClip = false;
-	for (int x = 0; x < 17; x++) intermediate[x] = 0.0;
+	for (int x = 0; x < 17; x++) dram->intermediate[x] = 0.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }
 };

@@ -34,14 +34,17 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
 
-		Float64 b[35];
 		Float64 lastSample;
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 b[35];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -79,32 +82,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		//calibrated to match gain through convolution and -0.3 correction
 		if (sqdrive > 0.0){
-			b[23] = b[22]; b[22] = b[21]; b[21] = b[20]; b[20] = b[19]; b[19] = b[18]; b[18] = b[17]; b[17] = b[16]; b[16] = b[15]; 
-			b[15] = b[14]; b[14] = b[13]; b[13] = b[12]; b[12] = b[11]; b[11] = b[10]; b[10] = b[9]; b[9] = b[8]; b[8] = b[7]; 
-			b[7] = b[6]; b[6] = b[5]; b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1]; b[1] = b[0]; b[0] = inputSample * sqdrive;
-			inputSample += (b[1] * (0.38856694371895023  + (0.14001177830115491*fabs(b[1]))));
-			inputSample -= (b[2] * (0.17469488984546111  + (0.05204541941091459*fabs(b[2]))));
-			inputSample += (b[3] * (0.11643521461774288  - (0.01193121216518472*fabs(b[3]))));
-			inputSample -= (b[4] * (0.08874416268268183  - (0.05867502375036486*fabs(b[4]))));
-			inputSample += (b[5] * (0.07222999223073785  - (0.08519974113692971*fabs(b[5]))));
-			inputSample -= (b[6] * (0.06103207678880003  - (0.09230674983449150*fabs(b[6]))));
-			inputSample += (b[7] * (0.05277389277465404  - (0.08487342372497046*fabs(b[7]))));
-			inputSample -= (b[8] * (0.04631144388636078  - (0.06976851898821038*fabs(b[8]))));
-			inputSample += (b[9] * (0.04102721072495113  - (0.05337974329110802*fabs(b[9]))));
-			inputSample -= (b[10] * (0.03656047655964371  - (0.03990914278458497*fabs(b[10]))));
-			inputSample += (b[11] * (0.03268677450573373  - (0.03090433934018759*fabs(b[11]))));
-			inputSample -= (b[12] * (0.02926012259262895  - (0.02585223214266682*fabs(b[12]))));
-			inputSample += (b[13] * (0.02618257163789973  - (0.02326667039588473*fabs(b[13]))));
-			inputSample -= (b[14] * (0.02338568277879992  - (0.02167067760829789*fabs(b[14]))));
-			inputSample += (b[15] * (0.02082142324645262  - (0.02013392273267951*fabs(b[15]))));
-			inputSample -= (b[16] * (0.01845525966656259  - (0.01833038930966512*fabs(b[16]))));
-			inputSample += (b[17] * (0.01626113504980445  - (0.01631893218593511*fabs(b[17]))));
-			inputSample -= (b[18] * (0.01422084088669267  - (0.01427828125219885*fabs(b[18]))));
-			inputSample += (b[19] * (0.01231993595709338  - (0.01233991521342998*fabs(b[19]))));
-			inputSample -= (b[20] * (0.01054774630451013  - (0.01054774630542346*fabs(b[20]))));
-			inputSample += (b[21] * (0.00889548162355088  - (0.00889548162263755*fabs(b[21]))));
-			inputSample -= (b[22] * (0.00735749099304526  - (0.00735749099395860*fabs(b[22]))));
-			inputSample += (b[23] * (0.00592812350468000  - (0.00592812350376666*fabs(b[23]))));
+			dram->b[23] = dram->b[22]; dram->b[22] = dram->b[21]; dram->b[21] = dram->b[20]; dram->b[20] = dram->b[19]; dram->b[19] = dram->b[18]; dram->b[18] = dram->b[17]; dram->b[17] = dram->b[16]; dram->b[16] = dram->b[15]; 
+			dram->b[15] = dram->b[14]; dram->b[14] = dram->b[13]; dram->b[13] = dram->b[12]; dram->b[12] = dram->b[11]; dram->b[11] = dram->b[10]; dram->b[10] = dram->b[9]; dram->b[9] = dram->b[8]; dram->b[8] = dram->b[7]; 
+			dram->b[7] = dram->b[6]; dram->b[6] = dram->b[5]; dram->b[5] = dram->b[4]; dram->b[4] = dram->b[3]; dram->b[3] = dram->b[2]; dram->b[2] = dram->b[1]; dram->b[1] = dram->b[0]; dram->b[0] = inputSample * sqdrive;
+			inputSample += (dram->b[1] * (0.38856694371895023  + (0.14001177830115491*fabs(dram->b[1]))));
+			inputSample -= (dram->b[2] * (0.17469488984546111  + (0.05204541941091459*fabs(dram->b[2]))));
+			inputSample += (dram->b[3] * (0.11643521461774288  - (0.01193121216518472*fabs(dram->b[3]))));
+			inputSample -= (dram->b[4] * (0.08874416268268183  - (0.05867502375036486*fabs(dram->b[4]))));
+			inputSample += (dram->b[5] * (0.07222999223073785  - (0.08519974113692971*fabs(dram->b[5]))));
+			inputSample -= (dram->b[6] * (0.06103207678880003  - (0.09230674983449150*fabs(dram->b[6]))));
+			inputSample += (dram->b[7] * (0.05277389277465404  - (0.08487342372497046*fabs(dram->b[7]))));
+			inputSample -= (dram->b[8] * (0.04631144388636078  - (0.06976851898821038*fabs(dram->b[8]))));
+			inputSample += (dram->b[9] * (0.04102721072495113  - (0.05337974329110802*fabs(dram->b[9]))));
+			inputSample -= (dram->b[10] * (0.03656047655964371  - (0.03990914278458497*fabs(dram->b[10]))));
+			inputSample += (dram->b[11] * (0.03268677450573373  - (0.03090433934018759*fabs(dram->b[11]))));
+			inputSample -= (dram->b[12] * (0.02926012259262895  - (0.02585223214266682*fabs(dram->b[12]))));
+			inputSample += (dram->b[13] * (0.02618257163789973  - (0.02326667039588473*fabs(dram->b[13]))));
+			inputSample -= (dram->b[14] * (0.02338568277879992  - (0.02167067760829789*fabs(dram->b[14]))));
+			inputSample += (dram->b[15] * (0.02082142324645262  - (0.02013392273267951*fabs(dram->b[15]))));
+			inputSample -= (dram->b[16] * (0.01845525966656259  - (0.01833038930966512*fabs(dram->b[16]))));
+			inputSample += (dram->b[17] * (0.01626113504980445  - (0.01631893218593511*fabs(dram->b[17]))));
+			inputSample -= (dram->b[18] * (0.01422084088669267  - (0.01427828125219885*fabs(dram->b[18]))));
+			inputSample += (dram->b[19] * (0.01231993595709338  - (0.01233991521342998*fabs(dram->b[19]))));
+			inputSample -= (dram->b[20] * (0.01054774630451013  - (0.01054774630542346*fabs(dram->b[20]))));
+			inputSample += (dram->b[21] * (0.00889548162355088  - (0.00889548162263755*fabs(dram->b[21]))));
+			inputSample -= (dram->b[22] * (0.00735749099304526  - (0.00735749099395860*fabs(dram->b[22]))));
+			inputSample += (dram->b[23] * (0.00592812350468000  - (0.00592812350376666*fabs(dram->b[23]))));
 		} //the Character plugins as individual processors did this. BussColors applies an averaging factor to produce
 		// more of a consistent variation between soft and loud convolutions. For years I thought this code was a
 		//mistake and did nothing, but in fact what it's doing is producing slightly different curves for every single
@@ -148,7 +151,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 34; count++) {b[count] = 0;}
+	for(int count = 0; count < 34; count++) {dram->b[count] = 0;}
 	lastSample = 0.0;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 }

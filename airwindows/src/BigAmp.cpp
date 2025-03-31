@@ -34,6 +34,7 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		double lastSample;
 		double storeSample;
@@ -48,12 +49,9 @@ struct _kernel {
 		double iirSampleH;
 		double iirSampleI;
 		double iirSampleJ;
-		double Odd[257];
-		double Even[257];
 		bool flip;
 		int count; //amp
 		
-		double b[90];
 		double lastCabSample;
 		double smoothCabA;
 		double smoothCabB; //cab
@@ -86,6 +84,11 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		double Odd[257];
+		double Even[257];
+		double b[90];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -308,11 +311,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (flip)
 		{
-			Odd[count+128] = Odd[count] = iirSampleH;
-			resultB = (Odd[count+down] + Odd[count+side] + Odd[count+diagonal]);
+			dram->Odd[count+128] = dram->Odd[count] = iirSampleH;
+			resultB = (dram->Odd[count+down] + dram->Odd[count+side] + dram->Odd[count+diagonal]);
 		} else {
-			Even[count+128] = Even[count] = iirSampleH;
-			resultB = (Even[count+down] + Even[count+side] + Even[count+diagonal]);
+			dram->Even[count+128] = dram->Even[count] = iirSampleH;
+			resultB = (dram->Even[count+down] + dram->Even[count+side] + dram->Even[count+diagonal]);
 		}
 		count--;
 		
@@ -350,99 +353,99 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			smoothCabA = inputSample;
 			inputSample = temp;
 			
-			b[81] = b[80]; b[80] = b[79]; 
-			b[79] = b[78]; b[78] = b[77]; b[77] = b[76]; b[76] = b[75]; b[75] = b[74]; b[74] = b[73]; b[73] = b[72]; b[72] = b[71]; 
-			b[71] = b[70]; b[70] = b[69]; b[69] = b[68]; b[68] = b[67]; b[67] = b[66]; b[66] = b[65]; b[65] = b[64]; b[64] = b[63]; 
-			b[63] = b[62]; b[62] = b[61]; b[61] = b[60]; b[60] = b[59]; b[59] = b[58]; b[58] = b[57]; b[57] = b[56]; b[56] = b[55]; 
-			b[55] = b[54]; b[54] = b[53]; b[53] = b[52]; b[52] = b[51]; b[51] = b[50]; b[50] = b[49]; b[49] = b[48]; b[48] = b[47]; 
-			b[47] = b[46]; b[46] = b[45]; b[45] = b[44]; b[44] = b[43]; b[43] = b[42]; b[42] = b[41]; b[41] = b[40]; b[40] = b[39]; 
-			b[39] = b[38]; b[38] = b[37]; b[37] = b[36]; b[36] = b[35]; b[35] = b[34]; b[34] = b[33]; b[33] = b[32]; b[32] = b[31]; 
-			b[31] = b[30]; b[30] = b[29]; b[29] = b[28]; b[28] = b[27]; b[27] = b[26]; b[26] = b[25]; b[25] = b[24]; b[24] = b[23]; 
-			b[23] = b[22]; b[22] = b[21]; b[21] = b[20]; b[20] = b[19]; b[19] = b[18]; b[18] = b[17]; b[17] = b[16]; b[16] = b[15]; 
-			b[15] = b[14]; b[14] = b[13]; b[13] = b[12]; b[12] = b[11]; b[11] = b[10]; b[10] = b[9]; b[9] = b[8]; b[8] = b[7]; 
-			b[7] = b[6]; b[6] = b[5]; b[5] = b[4]; b[4] = b[3]; b[3] = b[2]; b[2] = b[1]; b[1] = b[0]; b[0] = inputSample;
+			dram->b[81] = dram->b[80]; dram->b[80] = dram->b[79]; 
+			dram->b[79] = dram->b[78]; dram->b[78] = dram->b[77]; dram->b[77] = dram->b[76]; dram->b[76] = dram->b[75]; dram->b[75] = dram->b[74]; dram->b[74] = dram->b[73]; dram->b[73] = dram->b[72]; dram->b[72] = dram->b[71]; 
+			dram->b[71] = dram->b[70]; dram->b[70] = dram->b[69]; dram->b[69] = dram->b[68]; dram->b[68] = dram->b[67]; dram->b[67] = dram->b[66]; dram->b[66] = dram->b[65]; dram->b[65] = dram->b[64]; dram->b[64] = dram->b[63]; 
+			dram->b[63] = dram->b[62]; dram->b[62] = dram->b[61]; dram->b[61] = dram->b[60]; dram->b[60] = dram->b[59]; dram->b[59] = dram->b[58]; dram->b[58] = dram->b[57]; dram->b[57] = dram->b[56]; dram->b[56] = dram->b[55]; 
+			dram->b[55] = dram->b[54]; dram->b[54] = dram->b[53]; dram->b[53] = dram->b[52]; dram->b[52] = dram->b[51]; dram->b[51] = dram->b[50]; dram->b[50] = dram->b[49]; dram->b[49] = dram->b[48]; dram->b[48] = dram->b[47]; 
+			dram->b[47] = dram->b[46]; dram->b[46] = dram->b[45]; dram->b[45] = dram->b[44]; dram->b[44] = dram->b[43]; dram->b[43] = dram->b[42]; dram->b[42] = dram->b[41]; dram->b[41] = dram->b[40]; dram->b[40] = dram->b[39]; 
+			dram->b[39] = dram->b[38]; dram->b[38] = dram->b[37]; dram->b[37] = dram->b[36]; dram->b[36] = dram->b[35]; dram->b[35] = dram->b[34]; dram->b[34] = dram->b[33]; dram->b[33] = dram->b[32]; dram->b[32] = dram->b[31]; 
+			dram->b[31] = dram->b[30]; dram->b[30] = dram->b[29]; dram->b[29] = dram->b[28]; dram->b[28] = dram->b[27]; dram->b[27] = dram->b[26]; dram->b[26] = dram->b[25]; dram->b[25] = dram->b[24]; dram->b[24] = dram->b[23]; 
+			dram->b[23] = dram->b[22]; dram->b[22] = dram->b[21]; dram->b[21] = dram->b[20]; dram->b[20] = dram->b[19]; dram->b[19] = dram->b[18]; dram->b[18] = dram->b[17]; dram->b[17] = dram->b[16]; dram->b[16] = dram->b[15]; 
+			dram->b[15] = dram->b[14]; dram->b[14] = dram->b[13]; dram->b[13] = dram->b[12]; dram->b[12] = dram->b[11]; dram->b[11] = dram->b[10]; dram->b[10] = dram->b[9]; dram->b[9] = dram->b[8]; dram->b[8] = dram->b[7]; 
+			dram->b[7] = dram->b[6]; dram->b[6] = dram->b[5]; dram->b[5] = dram->b[4]; dram->b[4] = dram->b[3]; dram->b[3] = dram->b[2]; dram->b[2] = dram->b[1]; dram->b[1] = dram->b[0]; dram->b[0] = inputSample;
 			
-			inputSample += (b[1] * (1.35472031405494242  + (0.00220914099195157*fabs(b[1]))));
-			inputSample += (b[2] * (1.63534207755253003  - (0.11406232654509685*fabs(b[2]))));
-			inputSample += (b[3] * (1.82334575691525869  - (0.42647194712964054*fabs(b[3]))));
-			inputSample += (b[4] * (1.86156386235405868  - (0.76744187887586590*fabs(b[4]))));
-			inputSample += (b[5] * (1.67332739338852599  - (0.95161997324293013*fabs(b[5]))));
-			inputSample += (b[6] * (1.25054130794899021  - (0.98410433514572859*fabs(b[6]))));
-			inputSample += (b[7] * (0.70049121047281737  - (0.87375612110718992*fabs(b[7]))));
-			inputSample += (b[8] * (0.15291791448081560  - (0.61195266024519046*fabs(b[8]))));
-			inputSample -= (b[9] * (0.37301992914152693  + (0.16755422915252094*fabs(b[9]))));
-			inputSample -= (b[10] * (0.76568539228498433  - (0.28554435228965386*fabs(b[10]))));
-			inputSample -= (b[11] * (0.95726568749937369  - (0.61659719162806048*fabs(b[11]))));
-			inputSample -= (b[12] * (1.01273552193911032  - (0.81827288407943954*fabs(b[12]))));
-			inputSample -= (b[13] * (0.93920108117234447  - (0.80077111864205874*fabs(b[13]))));
-			inputSample -= (b[14] * (0.79831898832953974  - (0.65814750339694406*fabs(b[14]))));
-			inputSample -= (b[15] * (0.64200088100452313  - (0.46135833001232618*fabs(b[15]))));
-			inputSample -= (b[16] * (0.48807302802822128  - (0.15506178974799034*fabs(b[16]))));
-			inputSample -= (b[17] * (0.36545171501947982  + (0.16126103769376721*fabs(b[17]))));
-			inputSample -= (b[18] * (0.31469581455759105  + (0.32250870039053953*fabs(b[18]))));
-			inputSample -= (b[19] * (0.36893534817945800  + (0.25409418897237473*fabs(b[19]))));
-			inputSample -= (b[20] * (0.41092557722975687  + (0.13114730488878301*fabs(b[20]))));
-			inputSample -= (b[21] * (0.38584044480710594  + (0.06825323739722661*fabs(b[21]))));
-			inputSample -= (b[22] * (0.33378434007178670  + (0.04144255489164217*fabs(b[22]))));
-			inputSample -= (b[23] * (0.26144203061699706  + (0.06031313105098152*fabs(b[23]))));
-			inputSample -= (b[24] * (0.25818342000920502  + (0.03642289242586355*fabs(b[24]))));
-			inputSample -= (b[25] * (0.28096018498822661  + (0.00976973667327174*fabs(b[25]))));
-			inputSample -= (b[26] * (0.25845682019095384  + (0.02749015358080831*fabs(b[26]))));
-			inputSample -= (b[27] * (0.26655607865953096  - (0.00329839675455690*fabs(b[27]))));
-			inputSample -= (b[28] * (0.30590085026938518  - (0.07375043215328811*fabs(b[28]))));
-			inputSample -= (b[29] * (0.32875683916470899  - (0.12454134857516502*fabs(b[29]))));
-			inputSample -= (b[30] * (0.38166643180506560  - (0.19973911428609989*fabs(b[30]))));
-			inputSample -= (b[31] * (0.49068186937289598  - (0.34785166842136384*fabs(b[31]))));
-			inputSample -= (b[32] * (0.60274753867622777  - (0.48685038872711034*fabs(b[32]))));
-			inputSample -= (b[33] * (0.65944678627090636  - (0.49844657885975518*fabs(b[33]))));
-			inputSample -= (b[34] * (0.64488955808717285  - (0.40514406499806987*fabs(b[34]))));
-			inputSample -= (b[35] * (0.55818730353434354  - (0.28029870614987346*fabs(b[35]))));
-			inputSample -= (b[36] * (0.43110859113387556  - (0.15373504582939335*fabs(b[36]))));
-			inputSample -= (b[37] * (0.37726894966096269  - (0.11570983506028532*fabs(b[37]))));
-			inputSample -= (b[38] * (0.39953242355200935  - (0.17879231130484088*fabs(b[38]))));
-			inputSample -= (b[39] * (0.36726676379100875  - (0.22013553023983223*fabs(b[39]))));
-			inputSample -= (b[40] * (0.27187029469227386  - (0.18461171768478427*fabs(b[40]))));
-			inputSample -= (b[41] * (0.21109334552321635  - (0.14497481318083569*fabs(b[41]))));
-			inputSample -= (b[42] * (0.19808797405293213  - (0.14916579928186940*fabs(b[42]))));
-			inputSample -= (b[43] * (0.16287926785495671  - (0.15146098461120627*fabs(b[43]))));
-			inputSample -= (b[44] * (0.11086621477163359  - (0.13182973443924018*fabs(b[44]))));
-			inputSample -= (b[45] * (0.07531043236890560  - (0.08062172796472888*fabs(b[45]))));
-			inputSample -= (b[46] * (0.01747364473230771  + (0.02201865873632456*fabs(b[46]))));
-			inputSample += (b[47] * (0.03080279125662693  - (0.08721756240972101*fabs(b[47]))));
-			inputSample += (b[48] * (0.02354148659185142  - (0.06376361763053796*fabs(b[48]))));
-			inputSample -= (b[49] * (0.02835772372098715  + (0.00589978513642627*fabs(b[49]))));
-			inputSample -= (b[50] * (0.08983370744565244  - (0.02350960427706536*fabs(b[50]))));
-			inputSample -= (b[51] * (0.14148947620055380  - (0.03329826628693369*fabs(b[51]))));
-			inputSample -= (b[52] * (0.17576502674572581  - (0.06507546651241880*fabs(b[52]))));
-			inputSample -= (b[53] * (0.17168865666573860  - (0.07734801128437317*fabs(b[53]))));
-			inputSample -= (b[54] * (0.14107027738292105  - (0.03136459344220402*fabs(b[54]))));
-			inputSample -= (b[55] * (0.12287163395380074  + (0.01933408169185258*fabs(b[55]))));
-			inputSample -= (b[56] * (0.12276622398112971  + (0.01983508766241737*fabs(b[56]))));
-			inputSample -= (b[57] * (0.12349721440213673  - (0.01111031415304768*fabs(b[57]))));
-			inputSample -= (b[58] * (0.08649454142716655  + (0.02252815645513927*fabs(b[58]))));
-			inputSample -= (b[59] * (0.00953083685474757  + (0.13778878548343007*fabs(b[59]))));
-			inputSample += (b[60] * (0.06045983158868478  - (0.23966318224935096*fabs(b[60]))));
-			inputSample += (b[61] * (0.09053229817093242  - (0.27190119941572544*fabs(b[61]))));
-			inputSample += (b[62] * (0.08112662178843048  - (0.22456862606452327*fabs(b[62]))));
-			inputSample += (b[63] * (0.07503525686243730  - (0.14330154410548213*fabs(b[63]))));
-			inputSample += (b[64] * (0.07372595404399729  - (0.06185193766408734*fabs(b[64]))));
-			inputSample += (b[65] * (0.06073789200080433  + (0.01261857435786178*fabs(b[65]))));
-			inputSample += (b[66] * (0.04616712695742254  + (0.05851771967084609*fabs(b[66]))));
-			inputSample += (b[67] * (0.01036235510345900  + (0.08286534414423796*fabs(b[67]))));
-			inputSample -= (b[68] * (0.03708389413229191  - (0.06695282381039531*fabs(b[68]))));
-			inputSample -= (b[69] * (0.07092204876981217  - (0.01915829199112784*fabs(b[69]))));
-			inputSample -= (b[70] * (0.09443579589460312  + (0.01210082455316246*fabs(b[70]))));
-			inputSample -= (b[71] * (0.07824038577769601  + (0.06121988546065113*fabs(b[71]))));
-			inputSample -= (b[72] * (0.00854730633079399  + (0.14468518752295506*fabs(b[72]))));
-			inputSample += (b[73] * (0.06845589924191028  - (0.18902431382592944*fabs(b[73]))));
-			inputSample += (b[74] * (0.10351569998375465  - (0.13204443060279647*fabs(b[74]))));
-			inputSample += (b[75] * (0.10513368758532179  - (0.02993199294485649*fabs(b[75]))));
-			inputSample += (b[76] * (0.08896978950235003  + (0.04074499273825906*fabs(b[76]))));
-			inputSample += (b[77] * (0.03697537734050980  + (0.09217751130846838*fabs(b[77]))));
-			inputSample -= (b[78] * (0.04014322441280276  - (0.14062297149365666*fabs(b[78]))));
-			inputSample -= (b[79] * (0.10505934581398618  - (0.16988861157275814*fabs(b[79]))));
-			inputSample -= (b[80] * (0.13937661651676272  - (0.15083294570551492*fabs(b[80]))));
-			inputSample -= (b[81] * (0.13183458845108439  - (0.06657454442471208*fabs(b[81]))));
+			inputSample += (dram->b[1] * (1.35472031405494242  + (0.00220914099195157*fabs(dram->b[1]))));
+			inputSample += (dram->b[2] * (1.63534207755253003  - (0.11406232654509685*fabs(dram->b[2]))));
+			inputSample += (dram->b[3] * (1.82334575691525869  - (0.42647194712964054*fabs(dram->b[3]))));
+			inputSample += (dram->b[4] * (1.86156386235405868  - (0.76744187887586590*fabs(dram->b[4]))));
+			inputSample += (dram->b[5] * (1.67332739338852599  - (0.95161997324293013*fabs(dram->b[5]))));
+			inputSample += (dram->b[6] * (1.25054130794899021  - (0.98410433514572859*fabs(dram->b[6]))));
+			inputSample += (dram->b[7] * (0.70049121047281737  - (0.87375612110718992*fabs(dram->b[7]))));
+			inputSample += (dram->b[8] * (0.15291791448081560  - (0.61195266024519046*fabs(dram->b[8]))));
+			inputSample -= (dram->b[9] * (0.37301992914152693  + (0.16755422915252094*fabs(dram->b[9]))));
+			inputSample -= (dram->b[10] * (0.76568539228498433  - (0.28554435228965386*fabs(dram->b[10]))));
+			inputSample -= (dram->b[11] * (0.95726568749937369  - (0.61659719162806048*fabs(dram->b[11]))));
+			inputSample -= (dram->b[12] * (1.01273552193911032  - (0.81827288407943954*fabs(dram->b[12]))));
+			inputSample -= (dram->b[13] * (0.93920108117234447  - (0.80077111864205874*fabs(dram->b[13]))));
+			inputSample -= (dram->b[14] * (0.79831898832953974  - (0.65814750339694406*fabs(dram->b[14]))));
+			inputSample -= (dram->b[15] * (0.64200088100452313  - (0.46135833001232618*fabs(dram->b[15]))));
+			inputSample -= (dram->b[16] * (0.48807302802822128  - (0.15506178974799034*fabs(dram->b[16]))));
+			inputSample -= (dram->b[17] * (0.36545171501947982  + (0.16126103769376721*fabs(dram->b[17]))));
+			inputSample -= (dram->b[18] * (0.31469581455759105  + (0.32250870039053953*fabs(dram->b[18]))));
+			inputSample -= (dram->b[19] * (0.36893534817945800  + (0.25409418897237473*fabs(dram->b[19]))));
+			inputSample -= (dram->b[20] * (0.41092557722975687  + (0.13114730488878301*fabs(dram->b[20]))));
+			inputSample -= (dram->b[21] * (0.38584044480710594  + (0.06825323739722661*fabs(dram->b[21]))));
+			inputSample -= (dram->b[22] * (0.33378434007178670  + (0.04144255489164217*fabs(dram->b[22]))));
+			inputSample -= (dram->b[23] * (0.26144203061699706  + (0.06031313105098152*fabs(dram->b[23]))));
+			inputSample -= (dram->b[24] * (0.25818342000920502  + (0.03642289242586355*fabs(dram->b[24]))));
+			inputSample -= (dram->b[25] * (0.28096018498822661  + (0.00976973667327174*fabs(dram->b[25]))));
+			inputSample -= (dram->b[26] * (0.25845682019095384  + (0.02749015358080831*fabs(dram->b[26]))));
+			inputSample -= (dram->b[27] * (0.26655607865953096  - (0.00329839675455690*fabs(dram->b[27]))));
+			inputSample -= (dram->b[28] * (0.30590085026938518  - (0.07375043215328811*fabs(dram->b[28]))));
+			inputSample -= (dram->b[29] * (0.32875683916470899  - (0.12454134857516502*fabs(dram->b[29]))));
+			inputSample -= (dram->b[30] * (0.38166643180506560  - (0.19973911428609989*fabs(dram->b[30]))));
+			inputSample -= (dram->b[31] * (0.49068186937289598  - (0.34785166842136384*fabs(dram->b[31]))));
+			inputSample -= (dram->b[32] * (0.60274753867622777  - (0.48685038872711034*fabs(dram->b[32]))));
+			inputSample -= (dram->b[33] * (0.65944678627090636  - (0.49844657885975518*fabs(dram->b[33]))));
+			inputSample -= (dram->b[34] * (0.64488955808717285  - (0.40514406499806987*fabs(dram->b[34]))));
+			inputSample -= (dram->b[35] * (0.55818730353434354  - (0.28029870614987346*fabs(dram->b[35]))));
+			inputSample -= (dram->b[36] * (0.43110859113387556  - (0.15373504582939335*fabs(dram->b[36]))));
+			inputSample -= (dram->b[37] * (0.37726894966096269  - (0.11570983506028532*fabs(dram->b[37]))));
+			inputSample -= (dram->b[38] * (0.39953242355200935  - (0.17879231130484088*fabs(dram->b[38]))));
+			inputSample -= (dram->b[39] * (0.36726676379100875  - (0.22013553023983223*fabs(dram->b[39]))));
+			inputSample -= (dram->b[40] * (0.27187029469227386  - (0.18461171768478427*fabs(dram->b[40]))));
+			inputSample -= (dram->b[41] * (0.21109334552321635  - (0.14497481318083569*fabs(dram->b[41]))));
+			inputSample -= (dram->b[42] * (0.19808797405293213  - (0.14916579928186940*fabs(dram->b[42]))));
+			inputSample -= (dram->b[43] * (0.16287926785495671  - (0.15146098461120627*fabs(dram->b[43]))));
+			inputSample -= (dram->b[44] * (0.11086621477163359  - (0.13182973443924018*fabs(dram->b[44]))));
+			inputSample -= (dram->b[45] * (0.07531043236890560  - (0.08062172796472888*fabs(dram->b[45]))));
+			inputSample -= (dram->b[46] * (0.01747364473230771  + (0.02201865873632456*fabs(dram->b[46]))));
+			inputSample += (dram->b[47] * (0.03080279125662693  - (0.08721756240972101*fabs(dram->b[47]))));
+			inputSample += (dram->b[48] * (0.02354148659185142  - (0.06376361763053796*fabs(dram->b[48]))));
+			inputSample -= (dram->b[49] * (0.02835772372098715  + (0.00589978513642627*fabs(dram->b[49]))));
+			inputSample -= (dram->b[50] * (0.08983370744565244  - (0.02350960427706536*fabs(dram->b[50]))));
+			inputSample -= (dram->b[51] * (0.14148947620055380  - (0.03329826628693369*fabs(dram->b[51]))));
+			inputSample -= (dram->b[52] * (0.17576502674572581  - (0.06507546651241880*fabs(dram->b[52]))));
+			inputSample -= (dram->b[53] * (0.17168865666573860  - (0.07734801128437317*fabs(dram->b[53]))));
+			inputSample -= (dram->b[54] * (0.14107027738292105  - (0.03136459344220402*fabs(dram->b[54]))));
+			inputSample -= (dram->b[55] * (0.12287163395380074  + (0.01933408169185258*fabs(dram->b[55]))));
+			inputSample -= (dram->b[56] * (0.12276622398112971  + (0.01983508766241737*fabs(dram->b[56]))));
+			inputSample -= (dram->b[57] * (0.12349721440213673  - (0.01111031415304768*fabs(dram->b[57]))));
+			inputSample -= (dram->b[58] * (0.08649454142716655  + (0.02252815645513927*fabs(dram->b[58]))));
+			inputSample -= (dram->b[59] * (0.00953083685474757  + (0.13778878548343007*fabs(dram->b[59]))));
+			inputSample += (dram->b[60] * (0.06045983158868478  - (0.23966318224935096*fabs(dram->b[60]))));
+			inputSample += (dram->b[61] * (0.09053229817093242  - (0.27190119941572544*fabs(dram->b[61]))));
+			inputSample += (dram->b[62] * (0.08112662178843048  - (0.22456862606452327*fabs(dram->b[62]))));
+			inputSample += (dram->b[63] * (0.07503525686243730  - (0.14330154410548213*fabs(dram->b[63]))));
+			inputSample += (dram->b[64] * (0.07372595404399729  - (0.06185193766408734*fabs(dram->b[64]))));
+			inputSample += (dram->b[65] * (0.06073789200080433  + (0.01261857435786178*fabs(dram->b[65]))));
+			inputSample += (dram->b[66] * (0.04616712695742254  + (0.05851771967084609*fabs(dram->b[66]))));
+			inputSample += (dram->b[67] * (0.01036235510345900  + (0.08286534414423796*fabs(dram->b[67]))));
+			inputSample -= (dram->b[68] * (0.03708389413229191  - (0.06695282381039531*fabs(dram->b[68]))));
+			inputSample -= (dram->b[69] * (0.07092204876981217  - (0.01915829199112784*fabs(dram->b[69]))));
+			inputSample -= (dram->b[70] * (0.09443579589460312  + (0.01210082455316246*fabs(dram->b[70]))));
+			inputSample -= (dram->b[71] * (0.07824038577769601  + (0.06121988546065113*fabs(dram->b[71]))));
+			inputSample -= (dram->b[72] * (0.00854730633079399  + (0.14468518752295506*fabs(dram->b[72]))));
+			inputSample += (dram->b[73] * (0.06845589924191028  - (0.18902431382592944*fabs(dram->b[73]))));
+			inputSample += (dram->b[74] * (0.10351569998375465  - (0.13204443060279647*fabs(dram->b[74]))));
+			inputSample += (dram->b[75] * (0.10513368758532179  - (0.02993199294485649*fabs(dram->b[75]))));
+			inputSample += (dram->b[76] * (0.08896978950235003  + (0.04074499273825906*fabs(dram->b[76]))));
+			inputSample += (dram->b[77] * (0.03697537734050980  + (0.09217751130846838*fabs(dram->b[77]))));
+			inputSample -= (dram->b[78] * (0.04014322441280276  - (0.14062297149365666*fabs(dram->b[78]))));
+			inputSample -= (dram->b[79] * (0.10505934581398618  - (0.16988861157275814*fabs(dram->b[79]))));
+			inputSample -= (dram->b[80] * (0.13937661651676272  - (0.15083294570551492*fabs(dram->b[80]))));
+			inputSample -= (dram->b[81] * (0.13183458845108439  - (0.06657454442471208*fabs(dram->b[81]))));
 			
 			temp = (inputSample + smoothCabB)/3.0;
 			smoothCabB = inputSample;
@@ -522,11 +525,11 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	iirSampleH = 0.0;
 	iirSampleI = 0.0;
 	iirSampleJ = 0.0;
-	for (int fcount = 0; fcount < 257; fcount++) {Odd[fcount] = 0.0; Even[fcount] = 0.0;}
+	for (int fcount = 0; fcount < 257; fcount++) {dram->Odd[fcount] = 0.0; dram->Even[fcount] = 0.0;}
 	count = 0;
 	flip = false; //amp
 	
-	for(int fcount = 0; fcount < 90; fcount++) {b[fcount] = 0;}
+	for(int fcount = 0; fcount < 90; fcount++) {dram->b[fcount] = 0;}
 	smoothCabA = 0.0; smoothCabB = 0.0; lastCabSample = 0.0; //cab
 	
 	for (int fcount = 0; fcount < 9; fcount++) {lastRef[fcount] = 0.0;}

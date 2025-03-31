@@ -43,12 +43,14 @@ enum { kNumTemplateParameters = 6 };
 	double barPos;
 	double inc;
 	int beatPos;
-	double beatAccent[35];
-	double beatSwing[35];
 	int beatTable[35];
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double beatAccent[35];
+	double beatSwing[35];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -67,75 +69,75 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	int beatMax = beatTable[beatCode];
 	//only some counts are literal, others are ways to do prime grooves with different subrhythms
 	for (int x = 0; x < (beatMax+1); x++) {
-		beatAccent[x] = ((double)fabs((double)beatMax-((double)x*2.0)))/(double)(beatMax*1.618033988749894);
-		if (x % 2 > 0) beatSwing[x] = 0.0;
-		else beatSwing[x] = swing;
+		dram->beatAccent[x] = ((double)fabs((double)beatMax-((double)x*2.0)))/(double)(beatMax*1.618033988749894);
+		if (x % 2 > 0) dram->beatSwing[x] = 0.0;
+		else dram->beatSwing[x] = swing;
 	} //this makes the non-accented beats drop down to quiet and back up to half volume
-	if (beatCode > 0) beatAccent[1] = 1.0; beatSwing[1] = 0.0; //first note is an accent at full crank
+	if (beatCode > 0) dram->beatAccent[1] = 1.0; dram->beatSwing[1] = 0.0; //first note is an accent at full crank
 	switch (beatCode)
 	{
 		case 0:	break; //not used
 		case 1:	break; //1
 		case 2:	break; //2
 		case 3:	break; //3
-		case 4: beatAccent[3]=0.9;
-			beatSwing[3]=bigbeat; break; //4-22
-		case 5:	beatAccent[4]=0.9;
-			beatSwing[4]=bigbeat; break; //5-32
-		case 6:	beatAccent[4]=0.9;
-			beatSwing[4]=bigbeat; break; //6-33
-		case 7:	beatAccent[5]=0.9;
-			beatSwing[5]=bigbeat; break; //7-43
-		case 8:	beatAccent[5]=0.9;
-			beatSwing[5]=bigbeat; break; //8-44
-		case 9:	beatAccent[4]=0.9; beatAccent[7]=0.8;
-			beatSwing[4]=bigbeat; beatSwing[7]=bigbeat; break; //9-333
-		case 10: beatAccent[6]=0.9;
-			beatSwing[6]=bigbeat; break; //10-55
-		case 11: beatAccent[4]=0.9;	beatAccent[7]=0.8;	beatAccent[10]=0.7;
-			beatSwing[4]=bigbeat; beatSwing[7]=bigbeat; beatSwing[10]=bigbeat; break; //11-3332
-		case 12: beatAccent[5]=0.9;	beatAccent[9]=0.8;
-			beatSwing[5]=bigbeat; beatSwing[9]=bigbeat; break; //11-443
-		case 13: beatAccent[6]=0.9;	beatAccent[11]=0.8;
-			beatSwing[6]=bigbeat; beatSwing[11]=bigbeat; break; //11-551
-		case 14: beatAccent[7]=0.9;
-			beatSwing[7]=bigbeat; break; //11-65
-		case 15: beatAccent[4]=0.9;	beatAccent[7]=0.8;	beatAccent[10]=0.7;
-			beatSwing[4]=bigbeat; beatSwing[7]=bigbeat; beatSwing[10]=bigbeat; break; //13-3334
-		case 16: beatAccent[9]=0.9;
-			beatSwing[9]=bigbeat; break; //16-88
-		case 17: beatAccent[5]=0.9;	beatAccent[9]=0.8;
-			beatSwing[5]=bigbeat; beatSwing[9]=bigbeat; break; //13-445
-		case 18: beatAccent[6]=0.9;	beatAccent[11]=0.8;
-			beatSwing[6]=bigbeat; beatSwing[11]=bigbeat; break; //13-553
-		case 19: beatAccent[5]=0.9;	beatAccent[9]=0.85;	beatAccent[13]=0.8;	beatAccent[17]=0.75;
-			beatSwing[5]=bigbeat; beatSwing[9]=bigbeat; beatSwing[13]=bigbeat; beatSwing[17]=bigbeat; break; //17-44441
-		case 20: beatAccent[6]=0.9;	beatAccent[11]=0.8;	beatAccent[16]=0.7;
-			beatSwing[6]=bigbeat; beatSwing[11]=bigbeat; beatSwing[16]=bigbeat; break; //17-5552
-		case 21: beatAccent[8]=0.9;	beatAccent[15]=0.8;
-			beatSwing[8]=bigbeat; beatSwing[15]=bigbeat; break; //17-773
-		case 22: beatAccent[9]=0.9;	beatAccent[17]=0.8;
-			beatSwing[9]=bigbeat; beatSwing[17]=bigbeat; break; //17-881
-		case 23: beatAccent[5]=0.9;	beatAccent[9]=0.85;	beatAccent[13]=0.8;	beatAccent[17]=0.75;
-			beatSwing[5]=bigbeat; beatSwing[9]=bigbeat; beatSwing[13]=bigbeat; beatSwing[17]=bigbeat; break; //19-44443
-		case 24: beatAccent[9]=0.9;	beatAccent[17]=0.8;
-			beatSwing[9]=bigbeat; beatSwing[17]=bigbeat; break; //24-888
-		case 25: beatAccent[6]=0.9;	beatAccent[11]=0.8;	beatAccent[16]=0.7;
-			beatSwing[6]=bigbeat; beatSwing[11]=bigbeat; beatSwing[16]=bigbeat; break; //19-5554
-		case 26: beatAccent[8]=0.9;	beatAccent[15]=0.8;
-			beatSwing[8]=bigbeat; beatSwing[15]=bigbeat; break; //19-775
-		case 27: beatAccent[9]=0.9;	beatAccent[17]=0.8;
-			beatSwing[9]=bigbeat; beatSwing[17]=bigbeat; break; //19-883
-		case 28: beatAccent[5]=0.9;	beatAccent[9]=0.85;	beatAccent[13]=0.8;	beatAccent[17]=0.75;	beatAccent[21]=0.7;
-			beatSwing[5]=bigbeat; beatSwing[9]=bigbeat; beatSwing[13]=bigbeat; beatSwing[17]=bigbeat; beatSwing[21]=bigbeat; break; //23-444443
-		case 29: beatAccent[6]=0.9;	beatAccent[11]=0.8;	beatAccent[16]=0.7;
-			beatSwing[6]=bigbeat; beatSwing[11]=bigbeat; beatSwing[16]=bigbeat; break; //23-5558
-		case 30: beatAccent[8]=0.9;	beatAccent[15]=0.8;	beatAccent[22]=0.7;
-			beatSwing[8]=bigbeat; beatSwing[15]=bigbeat; beatSwing[22]=bigbeat; break; //23-7772
-		case 31: beatAccent[9]=0.9;	beatAccent[17]=0.8;
-			beatSwing[9]=bigbeat; beatSwing[17]=bigbeat; break; //23-887
-		case 32: beatAccent[9]=0.9;	beatAccent[17]=0.8;	beatAccent[25]=0.7;
-			beatSwing[9]=bigbeat; beatSwing[17]=bigbeat; beatSwing[25]=bigbeat; break; //32-8888
+		case 4: dram->beatAccent[3]=0.9;
+			dram->beatSwing[3]=bigbeat; break; //4-22
+		case 5:	dram->beatAccent[4]=0.9;
+			dram->beatSwing[4]=bigbeat; break; //5-32
+		case 6:	dram->beatAccent[4]=0.9;
+			dram->beatSwing[4]=bigbeat; break; //6-33
+		case 7:	dram->beatAccent[5]=0.9;
+			dram->beatSwing[5]=bigbeat; break; //7-43
+		case 8:	dram->beatAccent[5]=0.9;
+			dram->beatSwing[5]=bigbeat; break; //8-44
+		case 9:	dram->beatAccent[4]=0.9; dram->beatAccent[7]=0.8;
+			dram->beatSwing[4]=bigbeat; dram->beatSwing[7]=bigbeat; break; //9-333
+		case 10: dram->beatAccent[6]=0.9;
+			dram->beatSwing[6]=bigbeat; break; //10-55
+		case 11: dram->beatAccent[4]=0.9;	dram->beatAccent[7]=0.8;	dram->beatAccent[10]=0.7;
+			dram->beatSwing[4]=bigbeat; dram->beatSwing[7]=bigbeat; dram->beatSwing[10]=bigbeat; break; //11-3332
+		case 12: dram->beatAccent[5]=0.9;	dram->beatAccent[9]=0.8;
+			dram->beatSwing[5]=bigbeat; dram->beatSwing[9]=bigbeat; break; //11-443
+		case 13: dram->beatAccent[6]=0.9;	dram->beatAccent[11]=0.8;
+			dram->beatSwing[6]=bigbeat; dram->beatSwing[11]=bigbeat; break; //11-551
+		case 14: dram->beatAccent[7]=0.9;
+			dram->beatSwing[7]=bigbeat; break; //11-65
+		case 15: dram->beatAccent[4]=0.9;	dram->beatAccent[7]=0.8;	dram->beatAccent[10]=0.7;
+			dram->beatSwing[4]=bigbeat; dram->beatSwing[7]=bigbeat; dram->beatSwing[10]=bigbeat; break; //13-3334
+		case 16: dram->beatAccent[9]=0.9;
+			dram->beatSwing[9]=bigbeat; break; //16-88
+		case 17: dram->beatAccent[5]=0.9;	dram->beatAccent[9]=0.8;
+			dram->beatSwing[5]=bigbeat; dram->beatSwing[9]=bigbeat; break; //13-445
+		case 18: dram->beatAccent[6]=0.9;	dram->beatAccent[11]=0.8;
+			dram->beatSwing[6]=bigbeat; dram->beatSwing[11]=bigbeat; break; //13-553
+		case 19: dram->beatAccent[5]=0.9;	dram->beatAccent[9]=0.85;	dram->beatAccent[13]=0.8;	dram->beatAccent[17]=0.75;
+			dram->beatSwing[5]=bigbeat; dram->beatSwing[9]=bigbeat; dram->beatSwing[13]=bigbeat; dram->beatSwing[17]=bigbeat; break; //17-44441
+		case 20: dram->beatAccent[6]=0.9;	dram->beatAccent[11]=0.8;	dram->beatAccent[16]=0.7;
+			dram->beatSwing[6]=bigbeat; dram->beatSwing[11]=bigbeat; dram->beatSwing[16]=bigbeat; break; //17-5552
+		case 21: dram->beatAccent[8]=0.9;	dram->beatAccent[15]=0.8;
+			dram->beatSwing[8]=bigbeat; dram->beatSwing[15]=bigbeat; break; //17-773
+		case 22: dram->beatAccent[9]=0.9;	dram->beatAccent[17]=0.8;
+			dram->beatSwing[9]=bigbeat; dram->beatSwing[17]=bigbeat; break; //17-881
+		case 23: dram->beatAccent[5]=0.9;	dram->beatAccent[9]=0.85;	dram->beatAccent[13]=0.8;	dram->beatAccent[17]=0.75;
+			dram->beatSwing[5]=bigbeat; dram->beatSwing[9]=bigbeat; dram->beatSwing[13]=bigbeat; dram->beatSwing[17]=bigbeat; break; //19-44443
+		case 24: dram->beatAccent[9]=0.9;	dram->beatAccent[17]=0.8;
+			dram->beatSwing[9]=bigbeat; dram->beatSwing[17]=bigbeat; break; //24-888
+		case 25: dram->beatAccent[6]=0.9;	dram->beatAccent[11]=0.8;	dram->beatAccent[16]=0.7;
+			dram->beatSwing[6]=bigbeat; dram->beatSwing[11]=bigbeat; dram->beatSwing[16]=bigbeat; break; //19-5554
+		case 26: dram->beatAccent[8]=0.9;	dram->beatAccent[15]=0.8;
+			dram->beatSwing[8]=bigbeat; dram->beatSwing[15]=bigbeat; break; //19-775
+		case 27: dram->beatAccent[9]=0.9;	dram->beatAccent[17]=0.8;
+			dram->beatSwing[9]=bigbeat; dram->beatSwing[17]=bigbeat; break; //19-883
+		case 28: dram->beatAccent[5]=0.9;	dram->beatAccent[9]=0.85;	dram->beatAccent[13]=0.8;	dram->beatAccent[17]=0.75;	dram->beatAccent[21]=0.7;
+			dram->beatSwing[5]=bigbeat; dram->beatSwing[9]=bigbeat; dram->beatSwing[13]=bigbeat; dram->beatSwing[17]=bigbeat; dram->beatSwing[21]=bigbeat; break; //23-444443
+		case 29: dram->beatAccent[6]=0.9;	dram->beatAccent[11]=0.8;	dram->beatAccent[16]=0.7;
+			dram->beatSwing[6]=bigbeat; dram->beatSwing[11]=bigbeat; dram->beatSwing[16]=bigbeat; break; //23-5558
+		case 30: dram->beatAccent[8]=0.9;	dram->beatAccent[15]=0.8;	dram->beatAccent[22]=0.7;
+			dram->beatSwing[8]=bigbeat; dram->beatSwing[15]=bigbeat; dram->beatSwing[22]=bigbeat; break; //23-7772
+		case 31: dram->beatAccent[9]=0.9;	dram->beatAccent[17]=0.8;
+			dram->beatSwing[9]=bigbeat; dram->beatSwing[17]=bigbeat; break; //23-887
+		case 32: dram->beatAccent[9]=0.9;	dram->beatAccent[17]=0.8;	dram->beatAccent[25]=0.7;
+			dram->beatSwing[9]=bigbeat; dram->beatSwing[17]=bigbeat; dram->beatSwing[25]=bigbeat; break; //32-8888
 		default: break;			
 	}			
 	double accent = 1.0-pow(1.0-GetParameter( kParam_F ),2);
@@ -155,8 +157,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			beatPos++;
 			if (beatPos>beatMax) beatPos=1;
 		}
-		if ((barPos < (pulseWidth+beatSwing[beatPos])) && (barPos > beatSwing[beatPos]))
-			inc = (((beatAccent[beatPos]*accent)+(1.0-accent))*chaseSpeed)+(inc*(1.0-chaseSpeed));
+		if ((barPos < (pulseWidth+dram->beatSwing[beatPos])) && (barPos > dram->beatSwing[beatPos]))
+			inc = (((dram->beatAccent[beatPos]*accent)+(1.0-accent))*chaseSpeed)+(inc*(1.0-chaseSpeed));
 		else
 			inc *= rootSpeed;
 		sinePos += inc;
@@ -188,7 +190,7 @@ int _airwindowsAlgorithm::reset(void) {
 	sinePos = 0.0;
 	barPos = 0.0;
 	beatPos = 0;
-	for (int x = 0; x < 34; x++) {beatAccent[x] = 0.0; beatSwing[x] = 0.0;}
+	for (int x = 0; x < 34; x++) {dram->beatAccent[x] = 0.0; dram->beatSwing[x] = 0.0;}
 	inc = 0.0;
 	beatTable[0]=0;
 	beatTable[1]=1;

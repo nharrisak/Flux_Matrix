@@ -30,14 +30,17 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d[1503];
 		int one, maxdelay;
 		uint32_t fpd;
 	};
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[1503];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -71,18 +74,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		if (fabs(maxdelay - maxdelayTarget) > 1500) maxdelay = maxdelayTarget;
 		if (maxdelay < maxdelayTarget)
-		{maxdelay++; d[maxdelay] = (d[0]+d[maxdelay-1]) / 2.0;}
+		{maxdelay++; dram->d[maxdelay] = (dram->d[0]+dram->d[maxdelay-1]) / 2.0;}
 		
 		if (maxdelay > maxdelayTarget)
-		{maxdelay--; d[maxdelay] = (d[0]+d[maxdelay]) / 2.0;}
+		{maxdelay--; dram->d[maxdelay] = (dram->d[0]+dram->d[maxdelay]) / 2.0;}
 		
 		allpasstemp = one - 1;
 		if (allpasstemp < 0 || allpasstemp > maxdelay) {allpasstemp = maxdelay;}
-		inputSample -= d[allpasstemp]*outallpass;
-		d[one] = inputSample;
+		inputSample -= dram->d[allpasstemp]*outallpass;
+		dram->d[one] = inputSample;
 		inputSample *= outallpass;
 		one--; if (one < 0 || one > maxdelay) {one = maxdelay;}
-		inputSample += (d[one]);
+		inputSample += (dram->d[one]);
 		
 		bridgerectifier = fabs(inputSample);
 		bridgerectifier = 1.0-cos(bridgerectifier);
@@ -105,7 +108,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 1502; count++) {d[count] = 0.0;}
+	for(int count = 0; count < 1502; count++) {dram->d[count] = 0.0;}
 	one = 1; maxdelay = 9001;
 	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
 	//coded to snap directly to the value on instantiation if the disparity is great enough

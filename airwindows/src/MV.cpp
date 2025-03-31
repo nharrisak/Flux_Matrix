@@ -36,33 +36,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
 		
-		Float64 aA[15150];
-		Float64 aB[14618];
-		Float64 aC[14358];
-		Float64 aD[13818];		
-		Float64 aE[13562];
-		Float64 aF[13046];
-		Float64 aG[11966];
-		Float64 aH[11130];
-		Float64 aI[10598];
-		Float64 aJ[9810];
-		Float64 aK[9522];
-		Float64 aL[8982];
-		Float64 aM[8786];
-		Float64 aN[8462];
-		Float64 aO[8310];
-		Float64 aP[7982];
-		Float64 aQ[7322];
-		Float64 aR[6818];
-		Float64 aS[6506];
-		Float64 aT[6002];
-		Float64 aU[5838];
-		Float64 aV[5502];
-		Float64 aW[5010];
-		Float64 aX[4850];
-		Float64 aY[4296];
-		Float64 aZ[4180];
 				
 		int alpA, delayA;
 		int alpB, delayB;
@@ -125,6 +100,34 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 aA[15150];
+		Float64 aB[14618];
+		Float64 aC[14358];
+		Float64 aD[13818];		
+		Float64 aE[13562];
+		Float64 aF[13046];
+		Float64 aG[11966];
+		Float64 aH[11130];
+		Float64 aI[10598];
+		Float64 aJ[9810];
+		Float64 aK[9522];
+		Float64 aL[8982];
+		Float64 aM[8786];
+		Float64 aN[8462];
+		Float64 aO[8310];
+		Float64 aP[7982];
+		Float64 aQ[7322];
+		Float64 aR[6818];
+		Float64 aS[6506];
+		Float64 aT[6002];
+		Float64 aU[5838];
+		Float64 aV[5502];
+		Float64 aW[5010];
+		Float64 aX[4850];
+		Float64 aY[4296];
+		Float64 aZ[4180];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -163,11 +166,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 26:
 				allpasstemp = alpA - 1;
 				if (allpasstemp < 0 || allpasstemp > delayA) {allpasstemp = delayA;}
-				inputSample -= aA[allpasstemp]*0.5;
-				aA[alpA] = inputSample;
+				inputSample -= dram->aA[allpasstemp]*0.5;
+				dram->aA[alpA] = inputSample;
 				inputSample *= 0.5;
 				alpA--; if (alpA < 0 || alpA > delayA) {alpA = delayA;}
-				inputSample += (aA[alpA]);
+				inputSample += (dram->aA[alpA]);
 				if (damp > 26) {
 				avgtemp = inputSample;
 				inputSample += avgA;
@@ -178,11 +181,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 25:
 				allpasstemp = alpB - 1;
 				if (allpasstemp < 0 || allpasstemp > delayB) {allpasstemp = delayB;}
-				inputSample -= aB[allpasstemp]*0.5;
-				aB[alpB] = inputSample;
+				inputSample -= dram->aB[allpasstemp]*0.5;
+				dram->aB[alpB] = inputSample;
 				inputSample *= 0.5;
 				alpB--; if (alpB < 0 || alpB > delayB) {alpB = delayB;}
-				inputSample += (aB[alpB]);
+				inputSample += (dram->aB[alpB]);
 				if (damp > 25) {
 				avgtemp = inputSample;
 				inputSample += avgB;
@@ -193,11 +196,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 24:
 				allpasstemp = alpC - 1;
 				if (allpasstemp < 0 || allpasstemp > delayC) {allpasstemp = delayC;}
-				inputSample -= aC[allpasstemp]*0.5;
-				aC[alpC] = inputSample;
+				inputSample -= dram->aC[allpasstemp]*0.5;
+				dram->aC[alpC] = inputSample;
 				inputSample *= 0.5;
 				alpC--; if (alpC < 0 || alpC > delayC) {alpC = delayC;}
-				inputSample += (aC[alpC]);
+				inputSample += (dram->aC[alpC]);
 				if (damp > 24) {
 				avgtemp = inputSample;
 				inputSample += avgC;
@@ -208,11 +211,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 23:
 				allpasstemp = alpD - 1;
 				if (allpasstemp < 0 || allpasstemp > delayD) {allpasstemp = delayD;}
-				inputSample -= aD[allpasstemp]*0.5;
-				aD[alpD] = inputSample;
+				inputSample -= dram->aD[allpasstemp]*0.5;
+				dram->aD[alpD] = inputSample;
 				inputSample *= 0.5;
 				alpD--; if (alpD < 0 || alpD > delayD) {alpD = delayD;}
-				inputSample += (aD[alpD]);
+				inputSample += (dram->aD[alpD]);
 				if (damp > 23) {
 				avgtemp = inputSample;
 				inputSample += avgD;
@@ -223,11 +226,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 22:
 				allpasstemp = alpE - 1;
 				if (allpasstemp < 0 || allpasstemp > delayE) {allpasstemp = delayE;}
-				inputSample -= aE[allpasstemp]*0.5;
-				aE[alpE] = inputSample;
+				inputSample -= dram->aE[allpasstemp]*0.5;
+				dram->aE[alpE] = inputSample;
 				inputSample *= 0.5;
 				alpE--; if (alpE < 0 || alpE > delayE) {alpE = delayE;}
-				inputSample += (aE[alpE]);
+				inputSample += (dram->aE[alpE]);
 				if (damp > 22) {
 				avgtemp = inputSample;
 				inputSample += avgE;
@@ -238,11 +241,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 21:
 				allpasstemp = alpF - 1;
 				if (allpasstemp < 0 || allpasstemp > delayF) {allpasstemp = delayF;}
-				inputSample -= aF[allpasstemp]*0.5;
-				aF[alpF] = inputSample;
+				inputSample -= dram->aF[allpasstemp]*0.5;
+				dram->aF[alpF] = inputSample;
 				inputSample *= 0.5;
 				alpF--; if (alpF < 0 || alpF > delayF) {alpF = delayF;}
-				inputSample += (aF[alpF]);
+				inputSample += (dram->aF[alpF]);
 				if (damp > 21) {
 				avgtemp = inputSample;
 				inputSample += avgF;
@@ -253,11 +256,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 20:
 				allpasstemp = alpG - 1;
 				if (allpasstemp < 0 || allpasstemp > delayG) {allpasstemp = delayG;}
-				inputSample -= aG[allpasstemp]*0.5;
-				aG[alpG] = inputSample;
+				inputSample -= dram->aG[allpasstemp]*0.5;
+				dram->aG[alpG] = inputSample;
 				inputSample *= 0.5;
 				alpG--; if (alpG < 0 || alpG > delayG) {alpG = delayG;}
-				inputSample += (aG[alpG]);
+				inputSample += (dram->aG[alpG]);
 				if (damp > 20) {
 				avgtemp = inputSample;
 				inputSample += avgG;
@@ -268,11 +271,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 19:
 				allpasstemp = alpH - 1;
 				if (allpasstemp < 0 || allpasstemp > delayH) {allpasstemp = delayH;}
-				inputSample -= aH[allpasstemp]*0.5;
-				aH[alpH] = inputSample;
+				inputSample -= dram->aH[allpasstemp]*0.5;
+				dram->aH[alpH] = inputSample;
 				inputSample *= 0.5;
 				alpH--; if (alpH < 0 || alpH > delayH) {alpH = delayH;}
-				inputSample += (aH[alpH]);
+				inputSample += (dram->aH[alpH]);
 				if (damp > 19) {
 				avgtemp = inputSample;
 				inputSample += avgH;
@@ -283,11 +286,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 18:
 				allpasstemp = alpI - 1;
 				if (allpasstemp < 0 || allpasstemp > delayI) {allpasstemp = delayI;}
-				inputSample -= aI[allpasstemp]*0.5;
-				aI[alpI] = inputSample;
+				inputSample -= dram->aI[allpasstemp]*0.5;
+				dram->aI[alpI] = inputSample;
 				inputSample *= 0.5;
 				alpI--; if (alpI < 0 || alpI > delayI) {alpI = delayI;}
-				inputSample += (aI[alpI]);
+				inputSample += (dram->aI[alpI]);
 				if (damp > 18) {
 				avgtemp = inputSample;
 				inputSample += avgI;
@@ -298,11 +301,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 17:
 				allpasstemp = alpJ - 1;
 				if (allpasstemp < 0 || allpasstemp > delayJ) {allpasstemp = delayJ;}
-				inputSample -= aJ[allpasstemp]*0.5;
-				aJ[alpJ] = inputSample;
+				inputSample -= dram->aJ[allpasstemp]*0.5;
+				dram->aJ[alpJ] = inputSample;
 				inputSample *= 0.5;
 				alpJ--; if (alpJ < 0 || alpJ > delayJ) {alpJ = delayJ;}
-				inputSample += (aJ[alpJ]);
+				inputSample += (dram->aJ[alpJ]);
 				if (damp > 17) {
 				avgtemp = inputSample;
 				inputSample += avgJ;
@@ -313,11 +316,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 16:
 				allpasstemp = alpK - 1;
 				if (allpasstemp < 0 || allpasstemp > delayK) {allpasstemp = delayK;}
-				inputSample -= aK[allpasstemp]*0.5;
-				aK[alpK] = inputSample;
+				inputSample -= dram->aK[allpasstemp]*0.5;
+				dram->aK[alpK] = inputSample;
 				inputSample *= 0.5;
 				alpK--; if (alpK < 0 || alpK > delayK) {alpK = delayK;}
-				inputSample += (aK[alpK]);
+				inputSample += (dram->aK[alpK]);
 				if (damp > 16) {
 				avgtemp = inputSample;
 				inputSample += avgK;
@@ -328,11 +331,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 15:
 				allpasstemp = alpL - 1;
 				if (allpasstemp < 0 || allpasstemp > delayL) {allpasstemp = delayL;}
-				inputSample -= aL[allpasstemp]*0.5;
-				aL[alpL] = inputSample;
+				inputSample -= dram->aL[allpasstemp]*0.5;
+				dram->aL[alpL] = inputSample;
 				inputSample *= 0.5;
 				alpL--; if (alpL < 0 || alpL > delayL) {alpL = delayL;}
-				inputSample += (aL[alpL]);
+				inputSample += (dram->aL[alpL]);
 				if (damp > 15) {
 				avgtemp = inputSample;
 				inputSample += avgL;
@@ -343,11 +346,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 14:
 				allpasstemp = alpM - 1;
 				if (allpasstemp < 0 || allpasstemp > delayM) {allpasstemp = delayM;}
-				inputSample -= aM[allpasstemp]*0.5;
-				aM[alpM] = inputSample;
+				inputSample -= dram->aM[allpasstemp]*0.5;
+				dram->aM[alpM] = inputSample;
 				inputSample *= 0.5;
 				alpM--; if (alpM < 0 || alpM > delayM) {alpM = delayM;}
-				inputSample += (aM[alpM]);
+				inputSample += (dram->aM[alpM]);
 				if (damp > 14) {
 				avgtemp = inputSample;
 				inputSample += avgM;
@@ -358,11 +361,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 13:
 				allpasstemp = alpN - 1;
 				if (allpasstemp < 0 || allpasstemp > delayN) {allpasstemp = delayN;}
-				inputSample -= aN[allpasstemp]*0.5;
-				aN[alpN] = inputSample;
+				inputSample -= dram->aN[allpasstemp]*0.5;
+				dram->aN[alpN] = inputSample;
 				inputSample *= 0.5;
 				alpN--; if (alpN < 0 || alpN > delayN) {alpN = delayN;}
-				inputSample += (aN[alpN]);
+				inputSample += (dram->aN[alpN]);
 				if (damp > 13) {
 				avgtemp = inputSample;
 				inputSample += avgN;
@@ -373,11 +376,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 12:
 				allpasstemp = alpO - 1;
 				if (allpasstemp < 0 || allpasstemp > delayO) {allpasstemp = delayO;}
-				inputSample -= aO[allpasstemp]*0.5;
-				aO[alpO] = inputSample;
+				inputSample -= dram->aO[allpasstemp]*0.5;
+				dram->aO[alpO] = inputSample;
 				inputSample *= 0.5;
 				alpO--; if (alpO < 0 || alpO > delayO) {alpO = delayO;}
-				inputSample += (aO[alpO]);
+				inputSample += (dram->aO[alpO]);
 				if (damp > 12) {
 				avgtemp = inputSample;
 				inputSample += avgO;
@@ -388,11 +391,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 11:
 				allpasstemp = alpP - 1;
 				if (allpasstemp < 0 || allpasstemp > delayP) {allpasstemp = delayP;}
-				inputSample -= aP[allpasstemp]*0.5;
-				aP[alpP] = inputSample;
+				inputSample -= dram->aP[allpasstemp]*0.5;
+				dram->aP[alpP] = inputSample;
 				inputSample *= 0.5;
 				alpP--; if (alpP < 0 || alpP > delayP) {alpP = delayP;}
-				inputSample += (aP[alpP]);
+				inputSample += (dram->aP[alpP]);
 				if (damp > 11) {
 				avgtemp = inputSample;
 				inputSample += avgP;
@@ -403,11 +406,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 10:
 				allpasstemp = alpQ - 1;
 				if (allpasstemp < 0 || allpasstemp > delayQ) {allpasstemp = delayQ;}
-				inputSample -= aQ[allpasstemp]*0.5;
-				aQ[alpQ] = inputSample;
+				inputSample -= dram->aQ[allpasstemp]*0.5;
+				dram->aQ[alpQ] = inputSample;
 				inputSample *= 0.5;
 				alpQ--; if (alpQ < 0 || alpQ > delayQ) {alpQ = delayQ;}
-				inputSample += (aQ[alpQ]);
+				inputSample += (dram->aQ[alpQ]);
 				if (damp > 10) {
 				avgtemp = inputSample;
 				inputSample += avgQ;
@@ -418,11 +421,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 9:
 				allpasstemp = alpR - 1;
 				if (allpasstemp < 0 || allpasstemp > delayR) {allpasstemp = delayR;}
-				inputSample -= aR[allpasstemp]*0.5;
-				aR[alpR] = inputSample;
+				inputSample -= dram->aR[allpasstemp]*0.5;
+				dram->aR[alpR] = inputSample;
 				inputSample *= 0.5;
 				alpR--; if (alpR < 0 || alpR > delayR) {alpR = delayR;}
-				inputSample += (aR[alpR]);
+				inputSample += (dram->aR[alpR]);
 				if (damp > 9) {
 				avgtemp = inputSample;
 				inputSample += avgR;
@@ -433,11 +436,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 8:
 				allpasstemp = alpS - 1;
 				if (allpasstemp < 0 || allpasstemp > delayS) {allpasstemp = delayS;}
-				inputSample -= aS[allpasstemp]*0.5;
-				aS[alpS] = inputSample;
+				inputSample -= dram->aS[allpasstemp]*0.5;
+				dram->aS[alpS] = inputSample;
 				inputSample *= 0.5;
 				alpS--; if (alpS < 0 || alpS > delayS) {alpS = delayS;}
-				inputSample += (aS[alpS]);
+				inputSample += (dram->aS[alpS]);
 				if (damp > 8) {
 				avgtemp = inputSample;
 				inputSample += avgS;
@@ -448,11 +451,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 7:
 				allpasstemp = alpT - 1;
 				if (allpasstemp < 0 || allpasstemp > delayT) {allpasstemp = delayT;}
-				inputSample -= aT[allpasstemp]*0.5;
-				aT[alpT] = inputSample;
+				inputSample -= dram->aT[allpasstemp]*0.5;
+				dram->aT[alpT] = inputSample;
 				inputSample *= 0.5;
 				alpT--; if (alpT < 0 || alpT > delayT) {alpT = delayT;}
-				inputSample += (aT[alpT]);
+				inputSample += (dram->aT[alpT]);
 				if (damp > 7) {
 				avgtemp = inputSample;
 				inputSample += avgT;
@@ -463,11 +466,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 6:
 				allpasstemp = alpU - 1;
 				if (allpasstemp < 0 || allpasstemp > delayU) {allpasstemp = delayU;}
-				inputSample -= aU[allpasstemp]*0.5;
-				aU[alpU] = inputSample;
+				inputSample -= dram->aU[allpasstemp]*0.5;
+				dram->aU[alpU] = inputSample;
 				inputSample *= 0.5;
 				alpU--; if (alpU < 0 || alpU > delayU) {alpU = delayU;}
-				inputSample += (aU[alpU]);
+				inputSample += (dram->aU[alpU]);
 				if (damp > 6) {
 				avgtemp = inputSample;
 				inputSample += avgU;
@@ -478,11 +481,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 5:
 				allpasstemp = alpV - 1;
 				if (allpasstemp < 0 || allpasstemp > delayV) {allpasstemp = delayV;}
-				inputSample -= aV[allpasstemp]*0.5;
-				aV[alpV] = inputSample;
+				inputSample -= dram->aV[allpasstemp]*0.5;
+				dram->aV[alpV] = inputSample;
 				inputSample *= 0.5;
 				alpV--; if (alpV < 0 || alpV > delayV) {alpV = delayV;}
-				inputSample += (aV[alpV]);
+				inputSample += (dram->aV[alpV]);
 				if (damp > 5) {
 				avgtemp = inputSample;
 				inputSample += avgV;
@@ -493,11 +496,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 4:
 				allpasstemp = alpW - 1;
 				if (allpasstemp < 0 || allpasstemp > delayW) {allpasstemp = delayW;}
-				inputSample -= aW[allpasstemp]*0.5;
-				aW[alpW] = inputSample;
+				inputSample -= dram->aW[allpasstemp]*0.5;
+				dram->aW[alpW] = inputSample;
 				inputSample *= 0.5;
 				alpW--; if (alpW < 0 || alpW > delayW) {alpW = delayW;}
-				inputSample += (aW[alpW]);
+				inputSample += (dram->aW[alpW]);
 				if (damp > 4) {
 				avgtemp = inputSample;
 				inputSample += avgW;
@@ -508,11 +511,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 3:
 				allpasstemp = alpX - 1;
 				if (allpasstemp < 0 || allpasstemp > delayX) {allpasstemp = delayX;}
-				inputSample -= aX[allpasstemp]*0.5;
-				aX[alpX] = inputSample;
+				inputSample -= dram->aX[allpasstemp]*0.5;
+				dram->aX[alpX] = inputSample;
 				inputSample *= 0.5;
 				alpX--; if (alpX < 0 || alpX > delayX) {alpX = delayX;}
-				inputSample += (aX[alpX]);
+				inputSample += (dram->aX[alpX]);
 				if (damp > 3) {
 				avgtemp = inputSample;
 				inputSample += avgX;
@@ -523,11 +526,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 2:
 				allpasstemp = alpY - 1;
 				if (allpasstemp < 0 || allpasstemp > delayY) {allpasstemp = delayY;}
-				inputSample -= aY[allpasstemp]*0.5;
-				aY[alpY] = inputSample;
+				inputSample -= dram->aY[allpasstemp]*0.5;
+				dram->aY[alpY] = inputSample;
 				inputSample *= 0.5;
 				alpY--; if (alpY < 0 || alpY > delayY) {alpY = delayY;}
-				inputSample += (aY[alpY]);
+				inputSample += (dram->aY[alpY]);
 				if (damp > 2) {
 				avgtemp = inputSample;
 				inputSample += avgY;
@@ -538,11 +541,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case 1:
 				allpasstemp = alpZ - 1;
 				if (allpasstemp < 0 || allpasstemp > delayZ) {allpasstemp = delayZ;}
-				inputSample -= aZ[allpasstemp]*0.5;
-				aZ[alpZ] = inputSample;
+				inputSample -= dram->aZ[allpasstemp]*0.5;
+				dram->aZ[alpZ] = inputSample;
 				inputSample *= 0.5;
 				alpZ--; if (alpZ < 0 || alpZ > delayZ) {alpZ = delayZ;}
-				inputSample += (aZ[alpZ]);
+				inputSample += (dram->aZ[alpZ]);
 				if (damp > 1) {
 				avgtemp = inputSample;
 				inputSample += avgZ;
@@ -586,32 +589,32 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
 	int count;
-	for(count = 0; count < 15149; count++) {aA[count] = 0.0;}
-	for(count = 0; count < 14617; count++) {aB[count] = 0.0;}
-	for(count = 0; count < 14357; count++) {aC[count] = 0.0;}
-	for(count = 0; count < 13817; count++) {aD[count] = 0.0;}
-	for(count = 0; count < 13561; count++) {aE[count] = 0.0;}
-	for(count = 0; count < 13045; count++) {aF[count] = 0.0;}
-	for(count = 0; count < 11965; count++) {aG[count] = 0.0;}
-	for(count = 0; count < 11129; count++) {aH[count] = 0.0;}
-	for(count = 0; count < 10597; count++) {aI[count] = 0.0;}
-	for(count = 0; count < 9809; count++) {aJ[count] = 0.0;}
-	for(count = 0; count < 9521; count++) {aK[count] = 0.0;}
-	for(count = 0; count < 8981; count++) {aL[count] = 0.0;}
-	for(count = 0; count < 8785; count++) {aM[count] = 0.0;}
-	for(count = 0; count < 8461; count++) {aN[count] = 0.0;}
-	for(count = 0; count < 8309; count++) {aO[count] = 0.0;}
-	for(count = 0; count < 7981; count++) {aP[count] = 0.0;}
-	for(count = 0; count < 7321; count++) {aQ[count] = 0.0;}
-	for(count = 0; count < 6817; count++) {aR[count] = 0.0;}
-	for(count = 0; count < 6505; count++) {aS[count] = 0.0;}
-	for(count = 0; count < 6001; count++) {aT[count] = 0.0;}
-	for(count = 0; count < 5837; count++) {aU[count] = 0.0;}
-	for(count = 0; count < 5501; count++) {aV[count] = 0.0;}
-	for(count = 0; count < 5009; count++) {aW[count] = 0.0;}
-	for(count = 0; count < 4849; count++) {aX[count] = 0.0;}
-	for(count = 0; count < 4295; count++) {aY[count] = 0.0;}
-	for(count = 0; count < 4179; count++) {aZ[count] = 0.0;}	
+	for(count = 0; count < 15149; count++) {dram->aA[count] = 0.0;}
+	for(count = 0; count < 14617; count++) {dram->aB[count] = 0.0;}
+	for(count = 0; count < 14357; count++) {dram->aC[count] = 0.0;}
+	for(count = 0; count < 13817; count++) {dram->aD[count] = 0.0;}
+	for(count = 0; count < 13561; count++) {dram->aE[count] = 0.0;}
+	for(count = 0; count < 13045; count++) {dram->aF[count] = 0.0;}
+	for(count = 0; count < 11965; count++) {dram->aG[count] = 0.0;}
+	for(count = 0; count < 11129; count++) {dram->aH[count] = 0.0;}
+	for(count = 0; count < 10597; count++) {dram->aI[count] = 0.0;}
+	for(count = 0; count < 9809; count++) {dram->aJ[count] = 0.0;}
+	for(count = 0; count < 9521; count++) {dram->aK[count] = 0.0;}
+	for(count = 0; count < 8981; count++) {dram->aL[count] = 0.0;}
+	for(count = 0; count < 8785; count++) {dram->aM[count] = 0.0;}
+	for(count = 0; count < 8461; count++) {dram->aN[count] = 0.0;}
+	for(count = 0; count < 8309; count++) {dram->aO[count] = 0.0;}
+	for(count = 0; count < 7981; count++) {dram->aP[count] = 0.0;}
+	for(count = 0; count < 7321; count++) {dram->aQ[count] = 0.0;}
+	for(count = 0; count < 6817; count++) {dram->aR[count] = 0.0;}
+	for(count = 0; count < 6505; count++) {dram->aS[count] = 0.0;}
+	for(count = 0; count < 6001; count++) {dram->aT[count] = 0.0;}
+	for(count = 0; count < 5837; count++) {dram->aU[count] = 0.0;}
+	for(count = 0; count < 5501; count++) {dram->aV[count] = 0.0;}
+	for(count = 0; count < 5009; count++) {dram->aW[count] = 0.0;}
+	for(count = 0; count < 4849; count++) {dram->aX[count] = 0.0;}
+	for(count = 0; count < 4295; count++) {dram->aY[count] = 0.0;}
+	for(count = 0; count < 4179; count++) {dram->aZ[count] = 0.0;}	
 	
 	alpA = 1; delayA = 7573; avgA = 0.0;
 	alpB = 1; delayB = 7307; avgB = 0.0;

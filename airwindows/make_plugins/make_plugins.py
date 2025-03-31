@@ -23,6 +23,7 @@ SOFTWARE.
 '''
 
 import os
+import re
 
 path = 'reports'
 files = os.listdir( path )
@@ -58,6 +59,15 @@ def matchCurly( t ):
 			if b == 0:
 				return s
 	return ''
+
+def repl( m ):
+	return m.group(1) + 'dram->' + m.group(2) + '['
+	
+def processDramSymbols( text, dramSymbols ):
+	for s in dramSymbols:
+		pat = r'([^\w\d])(' + s + r')\['
+		text = re.sub( pat, repl, text )
+	return text
 
 guids = []
 
@@ -100,6 +110,21 @@ for f in files:
 				bits = '{' + bits[1]
 				privates = matchCurly( bits )[1:-1]
 		privates = privates.replace( 'long double ', 'double ' )
+		
+		# look for large arrays and move them to dram
+		dram = ''
+		dramSymbols = []
+		for p in privates.split( '\n' ):
+			for t in [ 'double', 'float', 'Float64', 'Float32' ]:
+				pat = r'\s*' + t + r'\s+([\d\w]+)\[(\d+)\];'
+				m = re.match( pat, p )
+				if m:
+					size = int( m.group(2) )
+					# arbitrary size limit
+					if size > 16:
+						dram += p + '\n'
+						dramSymbols.append( m.group(1) )
+						privates = privates.replace( p + '\n', '' )
 
 		consts = ''
 		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
@@ -129,8 +154,10 @@ for f in files:
 				bits = bits[1].split( 'return noErr;' )
 				renderCall = bits[0]
 				renderCall = renderCall.replace( 'long double ', 'double ' )
+				renderCall = processDramSymbols( renderCall, dramSymbols )
 				bits = content.split( '::Reset(AudioUnitScope inScope, AudioUnitElement inElement)' )
 				resetCall = bits[1].split( '//~~~~~~~~~~~' )[0]
+				resetCall = processDramSymbols( resetCall, dramSymbols )
 
 			with open( os.path.join( '../src', f.replace( '.txt', '.cpp' ) ), 'w' ) as G:
 				G.write( '#include <math.h>\n#include <new>\n#include <distingnt/api.h>\n' )
@@ -161,6 +188,9 @@ for f in files:
 				G.write( '#include "../include/template1.h"\n' )
 				G.write( privates )
 				G.write( '#include "../include/template2.h"\n' )
+				G.write( 'struct _dram {\n' )
+				G.write( dram )
+				G.write( '};\n' )
 				G.write( '#include "../include/templateStereo.h"\n' )
 				G.write( 'void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {\n')
 				G.write( renderCall )
@@ -176,9 +206,11 @@ for f in files:
 				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
 				renderCall = matchCurly( bits )
 				renderCall = renderCall.replace( 'long double ', 'double ' )
+				renderCall = processDramSymbols( renderCall, dramSymbols )
 				bits = content.split( 'Kernel::Reset()', maxsplit=1 )
 				bits = '{' + bits[1].split( '{', maxsplit=1 )[1]
 				resetCall = matchCurly( bits )
+				resetCall = processDramSymbols( resetCall, dramSymbols )
 
 			with open( os.path.join( '../src', f.replace( '.txt', '.cpp' ) ), 'w' ) as G:
 				G.write( '#include <math.h>\n#include <new>\n#include <distingnt/api.h>\n' )
@@ -211,10 +243,14 @@ for f in files:
 				G.write( '\tvoid reset(void);\n' )
 				G.write( '\tfloat GetParameter( int index ) { return owner->GetParameter( index ); }\n' )
 				G.write( '\t_airwindowsAlgorithm* owner;\n' )
+				G.write( '\tstruct _dram* dram;\n' )
 				G.write( privates )
 				G.write( '};\n' )
 				G.write( '_kernel kernels[1];\n' )
 				G.write( '\n#include "../include/template2.h"\n' )
+				G.write( 'struct _dram {\n' )
+				G.write( dram )
+				G.write( '};\n' )
 				G.write( '#include "../include/templateKernels.h"\n' )
 				G.write( 'void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {\n')
 				G.write( '#define inNumChannels (1)\n')

@@ -28,8 +28,6 @@ enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
 
-		Float64 d[80002];
-		Float64 e[80002];
 		Float64 highIIRL;
 		Float64 slewIIRL;
 		Float64 highIIR2L;
@@ -49,6 +47,10 @@ enum { kNumTemplateParameters = 6 };
 		uint32_t fpdR;
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[80002];
+		Float64 e[80002];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -89,13 +91,13 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (bridgerectifier > 3.1415) bridgerectifier = 0.0;
 		bridgerectifier = sin(bridgerectifier);
 		if (gcount < 0 || gcount > 40000) {gcount = 40000;}
-		d[gcount+40000] = d[gcount] = bridgerectifier;
-		control += (d[gcount] / (offsetA+1));
-		control -= (d[gcount+offsetA] / offsetA);
+		dram->d[gcount+40000] = dram->d[gcount] = bridgerectifier;
+		control += (dram->d[gcount] / (offsetA+1));
+		control -= (dram->d[gcount+offsetA] / offsetA);
 		Float64 ramp = (control*control) * 16.0;
-		e[gcount+40000] = e[gcount] = ramp;
-		clamp += (e[gcount] / (offsetB+1));
-		clamp -= (e[gcount+offsetB] / offsetB);
+		dram->e[gcount+40000] = dram->e[gcount] = ramp;
+		clamp += (dram->e[gcount] / (offsetB+1));
+		clamp -= (dram->e[gcount+offsetB] / offsetB);
 		if (clamp > wet*8) clamp = wet*8;
 		gcount--;
 
@@ -121,13 +123,13 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (bridgerectifier > 3.1415) bridgerectifier = 0.0;
 		bridgerectifier = sin(bridgerectifier);
 		if (gcount < 0 || gcount > 40000) {gcount = 40000;}
-		d[gcount+40000] = d[gcount] = bridgerectifier;
-		control += (d[gcount] / (offsetA+1));
-		control -= (d[gcount+offsetA] / offsetA);
+		dram->d[gcount+40000] = dram->d[gcount] = bridgerectifier;
+		control += (dram->d[gcount] / (offsetA+1));
+		control -= (dram->d[gcount+offsetA] / offsetA);
 		ramp = (control*control) * 16.0;
-		e[gcount+40000] = e[gcount] = ramp;
-		clamp += (e[gcount] / (offsetB+1));
-		clamp -= (e[gcount+offsetB] / offsetB);
+		dram->e[gcount+40000] = dram->e[gcount] = ramp;
+		clamp += (dram->e[gcount] / (offsetB+1));
+		clamp -= (dram->e[gcount+offsetB] / offsetB);
 		if (clamp > wet*8) clamp = wet*8;
 		gcount--;
 
@@ -155,7 +157,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for(int count = 0; count < 80001; count++) {d[count] = 0.0; e[count] = 0.0;}
+	for(int count = 0; count < 80001; count++) {dram->d[count] = 0.0; dram->e[count] = 0.0;}
 	control = 0.0;
 	clamp = 0.0;
 	highIIRL = 0.0;

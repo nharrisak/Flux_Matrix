@@ -68,11 +68,8 @@ enum { kNumTemplateParameters = 6 };
 	//end ButterComp
 	
 	//begin Power Sag
-	Float64 dL[1000];
 	Float64 controlL;
-	Float64 bL[1000];
 	Float64 controlBL;
-	Float64 cL[1000];
 	Float64 controlCL;
 	//end Power Sag
 	
@@ -110,11 +107,8 @@ enum { kNumTemplateParameters = 6 };
 	//end ButterComp
 	
 	//begin Power Sag
-	Float64 dR[1000];
 	Float64 controlR;
-	Float64 bR[1000];
 	Float64 controlBR;
-	Float64 cR[1000];
 	Float64 controlCR;
 	//end Power Sag
 	
@@ -124,6 +118,14 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	Float64 dL[1000];
+	Float64 bL[1000];
+	Float64 cL[1000];
+	Float64 dR[1000];
+	Float64 bR[1000];
+	Float64 cR[1000];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -243,9 +245,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (gcount < 0 || gcount > 499) {gcount = 499;}
 
 		//begin first Power SagL
-		dL[gcount+499] = dL[gcount] = fabs(inputSampleL)*(intensity-((controlAposL+controlBposL+controlAnegL+controlBnegL)*powerSag));
-		controlL += (dL[gcount] / offsetA);
-		controlL -= (dL[gcount+offsetA] / offsetA);
+		dram->dL[gcount+499] = dram->dL[gcount] = fabs(inputSampleL)*(intensity-((controlAposL+controlBposL+controlAnegL+controlBnegL)*powerSag));
+		controlL += (dram->dL[gcount] / offsetA);
+		controlL -= (dram->dL[gcount+offsetA] / offsetA);
 		controlL -= 0.000001;
 		clamp = 1;
 		if (controlL < 0) {controlL = 0;}
@@ -267,9 +269,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//end first Power SagL
 		
 		//begin first Power SagR
-		dR[gcount+499] = dR[gcount] = fabs(inputSampleR)*(intensity-((controlAposR+controlBposR+controlAnegR+controlBnegR)*powerSag));
-		controlR += (dR[gcount] / offsetA);
-		controlR -= (dR[gcount+offsetA] / offsetA);
+		dram->dR[gcount+499] = dram->dR[gcount] = fabs(inputSampleR)*(intensity-((controlAposR+controlBposR+controlAnegR+controlBnegR)*powerSag));
+		controlR += (dram->dR[gcount] / offsetA);
+		controlR -= (dram->dR[gcount+offsetA] / offsetA);
 		controlR -= 0.000001;
 		clamp = 1;
 		if (controlR < 0) {controlR = 0;}
@@ -477,9 +479,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (ratioselector > 0) {
 			
 		//begin second Power SagL
-		bL[gcount+499] = bL[gcount] = fabs(inputSampleL)*(intensity-((controlAposBL+controlBposBL+controlAnegBL+controlBnegBL)*powerSag));
-		controlBL += (bL[gcount] / offsetB);
-		controlBL -= (bL[gcount+offsetB] / offsetB);
+		dram->bL[gcount+499] = dram->bL[gcount] = fabs(inputSampleL)*(intensity-((controlAposBL+controlBposBL+controlAnegBL+controlBnegBL)*powerSag));
+		controlBL += (dram->bL[gcount] / offsetB);
+		controlBL -= (dram->bL[gcount+offsetB] / offsetB);
 		controlBL -= 0.000001;
 		clamp = 1;
 		if (controlBL < 0) {controlBL = 0;}
@@ -501,9 +503,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//end second Power SagL
 		
 		//begin second Power SagR
-		bR[gcount+499] = bR[gcount] = fabs(inputSampleR)*(intensity-((controlAposBR+controlBposBR+controlAnegBR+controlBnegBR)*powerSag));
-		controlBR += (bR[gcount] / offsetB);
-		controlBR -= (bR[gcount+offsetB] / offsetB);
+		dram->bR[gcount+499] = dram->bR[gcount] = fabs(inputSampleR)*(intensity-((controlAposBR+controlBposBR+controlAnegBR+controlBnegBR)*powerSag));
+		controlBR += (dram->bR[gcount] / offsetB);
+		controlBR -= (dram->bR[gcount+offsetB] / offsetB);
 		controlBR -= 0.000001;
 		clamp = 1;
 		if (controlBR < 0) {controlBR = 0;}
@@ -700,9 +702,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			if (ratioselector > 1) {
 		
 		//begin third Power SagL
-		cL[gcount+499] = cL[gcount] = fabs(inputSampleL)*(intensity-((controlAposCL+controlBposCL+controlAnegCL+controlBnegCL)*powerSag));
-		controlCL += (cL[gcount] / offsetC);
-		controlCL -= (cL[gcount+offsetB] / offsetC);
+		dram->cL[gcount+499] = dram->cL[gcount] = fabs(inputSampleL)*(intensity-((controlAposCL+controlBposCL+controlAnegCL+controlBnegCL)*powerSag));
+		controlCL += (dram->cL[gcount] / offsetC);
+		controlCL -= (dram->cL[gcount+offsetB] / offsetC);
 		controlCL -= 0.000001;
 		clamp = 1;
 		if (controlCL < 0) {controlCL = 0;}
@@ -724,9 +726,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//end third Power SagL
 		
 		//begin third Power SagR
-		cR[gcount+499] = cR[gcount] = fabs(inputSampleR)*(intensity-((controlAposCR+controlBposCR+controlAnegCR+controlBnegCR)*powerSag));
-		controlCR += (cR[gcount] / offsetC);
-		controlCR -= (cR[gcount+offsetB] / offsetC);
+		dram->cR[gcount+499] = dram->cR[gcount] = fabs(inputSampleR)*(intensity-((controlAposCR+controlBposCR+controlAnegCR+controlBnegCR)*powerSag));
+		controlCR += (dram->cR[gcount] / offsetC);
+		controlCR -= (dram->cR[gcount+offsetB] / offsetC);
 		controlCR -= 0.000001;
 		clamp = 1;
 		if (controlCR < 0) {controlCR = 0;}
@@ -1020,7 +1022,7 @@ int _airwindowsAlgorithm::reset(void) {
 	//end ButterComps
 	
 	//begin Power Sags
-	for(int count = 0; count < 999; count++) {dL[count] = 0; bL[count] = 0; cL[count] = 0; dR[count] = 0; bR[count] = 0; cR[count] = 0;}
+	for(int count = 0; count < 999; count++) {dram->dL[count] = 0; dram->bL[count] = 0; dram->cL[count] = 0; dram->dR[count] = 0; dram->bR[count] = 0; dram->cR[count] = 0;}
 	controlL = 0; controlBL = 0; controlCL = 0;
 	controlR = 0; controlBR = 0; controlCR = 0;
 	

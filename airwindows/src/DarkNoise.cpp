@@ -34,8 +34,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
 
-		Float64 r[8193];
 		Float64 b[11][11];
 		Float64 f[11];		
 		int freq;
@@ -46,6 +46,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 r[8193];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -96,7 +99,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (freqTarget < freq) {
 			outputNoise = ((outputNoise-0.5)*(1.0-(1.0/freq)))+0.5;
-			r[freq] = 0.5;
+			dram->r[freq] = 0.5;
 			freq--;
 		}
 		if (freqTarget > freq) freq++;
@@ -106,8 +109,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		// 0 to 1 random value
 		
 		int replacementBin = randy * freq;
-		outputNoise -= r[replacementBin];
-		r[replacementBin] = lastRandy;
+		outputNoise -= dram->r[replacementBin];
+		dram->r[replacementBin] = lastRandy;
 		outputNoise += lastRandy;
 		lastRandy = randy;
 		//we update only one of the slots we're using
@@ -152,7 +155,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 8192; count++) r[count] = 0.5;
+	for(int count = 0; count < 8192; count++) dram->r[count] = 0.5;
 	for(int x = 0; x < 11; x++) {
 		f[x] = 0.0;
 		for (int y = 0; y < 11; y++) b[x][y] = 0.0;

@@ -36,8 +36,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float32 d[11000];
 		int dCount;
 		int lastWidth;
 		Float64 padFactor;
@@ -46,6 +46,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float32 d[11000];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -107,23 +110,23 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		} 
 		//drive section
 		
-		d[dCount + 5000] = d[dCount] = overspill * satComp;
+		dram->d[dCount + 5000] = dram->d[dCount] = overspill * satComp;
 		//we now have a big buffer to draw from, which is always positive amount of overspill
 		dCount--;
 		
-		padFactor += d[dCount];
+		padFactor += dram->d[dCount];
 		Float64 randy = (double(fpd)/UINT32_MAX);
 		if ((targetWidth*randy) > lastWidth) {
 			//we are expanding the buffer so we don't remove this trailing sample
 			lastWidth += 1;
 		} else {
-			padFactor -= d[dCount+lastWidth];
+			padFactor -= dram->d[dCount+lastWidth];
 			//zero change, or target is smaller and we are shrinking
 			if (targetWidth < lastWidth) {
 				lastWidth -= 1;
 				if (lastWidth < 2) lastWidth = 2;
 				//sanity check as randy can give us target zero
-				padFactor -= d[dCount+lastWidth];
+				padFactor -= dram->d[dCount+lastWidth];
 			}
 		}
 		//variable attack/release speed more rapid as comp intensity increases
@@ -153,7 +156,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int count = 0; count < 10990; count++) {d[count] = 0.0;}
+	for(int count = 0; count < 10990; count++) {dram->d[count] = 0.0;}
 	dCount = 0;
 	lastWidth = 500;
 	padFactor = 0;

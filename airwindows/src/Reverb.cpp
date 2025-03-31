@@ -29,24 +29,12 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
 		double biquadA[11];
 		double biquadB[11];
 		double biquadC[11];
 		
-		Float64 aA[8111];
-		Float64 aB[7511];
-		Float64 aC[7311];
-		Float64 aD[6911];		
-		Float64 aE[6311];
-		Float64 aF[6111];
-		Float64 aG[5511];
-		Float64 aH[4911];
-		Float64 aI[4511];
-		Float64 aJ[4311];
-		Float64 aK[3911];
-		Float64 aL[3311];
-		Float64 aM[3111];
 		
 		int countA, delayA;
 		int countB, delayB;
@@ -76,6 +64,21 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 aA[8111];
+		Float64 aB[7511];
+		Float64 aC[7311];
+		Float64 aD[6911];		
+		Float64 aE[6311];
+		Float64 aF[6111];
+		Float64 aG[5511];
+		Float64 aH[4911];
+		Float64 aI[4511];
+		Float64 aJ[4311];
+		Float64 aK[3911];
+		Float64 aL[3311];
+		Float64 aM[3111];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -141,9 +144,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
 		double drySample = inputSample;
 		
-		aM[countM] = inputSample;
+		dram->aM[countM] = inputSample;
 		countM++; if (countM < 0 || countM > delayM) {countM = 0;}
-		inputSample = aM[countM];
+		inputSample = dram->aM[countM];
 		//predelay
 		
 		double tempSample = biquadA[2]*inputSample+biquadA[3]*biquadA[7]+biquadA[4]*biquadA[8]-biquadA[5]*biquadA[9]-biquadA[6]*biquadA[10];
@@ -163,46 +166,46 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		int allpasstemp = countI + 1;
 		if (allpasstemp < 0 || allpasstemp > delayI) {allpasstemp = 0;}
-		allpassI -= aI[allpasstemp]*0.5;
-		aI[countI] = allpassI;
+		allpassI -= dram->aI[allpasstemp]*0.5;
+		dram->aI[countI] = allpassI;
 		allpassI *= 0.5;
 		countI++; if (countI < 0 || countI > delayI) {countI = 0;}		
-		allpassI += (aI[countI]);
+		allpassI += (dram->aI[countI]);
 		
 		allpasstemp = countJ + 1;
 		if (allpasstemp < 0 || allpasstemp > delayJ) {allpasstemp = 0;}
-		allpassJ -= aJ[allpasstemp]*0.5;
-		aJ[countJ] = allpassJ;
+		allpassJ -= dram->aJ[allpasstemp]*0.5;
+		dram->aJ[countJ] = allpassJ;
 		allpassJ *= 0.5;
 		countJ++; if (countJ < 0 || countJ > delayJ) {countJ = 0;}		
-		allpassJ += (aJ[countJ]);
+		allpassJ += (dram->aJ[countJ]);
 		
 		allpasstemp = countK + 1;
 		if (allpasstemp < 0 || allpasstemp > delayK) {allpasstemp = 0;}
-		allpassK -= aK[allpasstemp]*0.5;
-		aK[countK] = allpassK;
+		allpassK -= dram->aK[allpasstemp]*0.5;
+		dram->aK[countK] = allpassK;
 		allpassK *= 0.5;
 		countK++; if (countK < 0 || countK > delayK) {countK = 0;}		
-		allpassK += (aK[countK]);
+		allpassK += (dram->aK[countK]);
 		
 		allpasstemp = countL + 1;
 		if (allpasstemp < 0 || allpasstemp > delayL) {allpasstemp = 0;}
-		allpassL -= aL[allpasstemp]*0.5;
-		aL[countL] = allpassL;
+		allpassL -= dram->aL[allpasstemp]*0.5;
+		dram->aL[countL] = allpassL;
 		allpassL *= 0.5;
 		countL++; if (countL < 0 || countL > delayL) {countL = 0;}		
-		allpassL += (aL[countL]);		
+		allpassL += (dram->aL[countL]);		
 		//the big allpass in front of everything
 		
 		
-		aA[countA] = allpassL + feedbackA;
-		aB[countB] = allpassK + feedbackB;
-		aC[countC] = allpassJ + feedbackC;
-		aD[countD] = allpassI + feedbackD;
-		aE[countE] = allpassI + feedbackE;
-		aF[countF] = allpassJ + feedbackF;
-		aG[countG] = allpassK + feedbackG;
-		aH[countH] = allpassL + feedbackH;
+		dram->aA[countA] = allpassL + feedbackA;
+		dram->aB[countB] = allpassK + feedbackB;
+		dram->aC[countC] = allpassJ + feedbackC;
+		dram->aD[countD] = allpassI + feedbackD;
+		dram->aE[countE] = allpassI + feedbackE;
+		dram->aF[countF] = allpassJ + feedbackF;
+		dram->aG[countG] = allpassK + feedbackG;
+		dram->aH[countH] = allpassL + feedbackH;
 		
 		countA++; if (countA < 0 || countA > delayA) {countA = 0;}
 		countB++; if (countB < 0 || countB > delayB) {countB = 0;}
@@ -241,38 +244,38 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		int workingG = countG + offsetG;
 		int workingH = countH + offsetH;
 		
-		Float64 interpolA = (aA[workingA-((workingA > delayA)?delayA+1:0)] * (1-(offsetA-floor(offsetA))) );
-		interpolA += (aA[workingA+1-((workingA+1 > delayA)?delayA+1:0)] * ((offsetA-floor(offsetA))) );
+		Float64 interpolA = (dram->aA[workingA-((workingA > delayA)?delayA+1:0)] * (1-(offsetA-floor(offsetA))) );
+		interpolA += (dram->aA[workingA+1-((workingA+1 > delayA)?delayA+1:0)] * ((offsetA-floor(offsetA))) );
 		
-		Float64 interpolB = (aB[workingB-((workingB > delayB)?delayB+1:0)] * (1-(offsetB-floor(offsetB))) );
-		interpolB += (aB[workingB+1-((workingB+1 > delayB)?delayB+1:0)] * ((offsetB-floor(offsetB))) );
+		Float64 interpolB = (dram->aB[workingB-((workingB > delayB)?delayB+1:0)] * (1-(offsetB-floor(offsetB))) );
+		interpolB += (dram->aB[workingB+1-((workingB+1 > delayB)?delayB+1:0)] * ((offsetB-floor(offsetB))) );
 		
-		Float64 interpolC = (aC[workingC-((workingC > delayC)?delayC+1:0)] * (1-(offsetC-floor(offsetC))) );
-		interpolC += (aC[workingC+1-((workingC+1 > delayC)?delayC+1:0)] * ((offsetC-floor(offsetC))) );
+		Float64 interpolC = (dram->aC[workingC-((workingC > delayC)?delayC+1:0)] * (1-(offsetC-floor(offsetC))) );
+		interpolC += (dram->aC[workingC+1-((workingC+1 > delayC)?delayC+1:0)] * ((offsetC-floor(offsetC))) );
 		
-		Float64 interpolD = (aD[workingD-((workingD > delayD)?delayD+1:0)] * (1-(offsetD-floor(offsetD))) );
-		interpolD += (aD[workingD+1-((workingD+1 > delayD)?delayD+1:0)] * ((offsetD-floor(offsetD))) );
+		Float64 interpolD = (dram->aD[workingD-((workingD > delayD)?delayD+1:0)] * (1-(offsetD-floor(offsetD))) );
+		interpolD += (dram->aD[workingD+1-((workingD+1 > delayD)?delayD+1:0)] * ((offsetD-floor(offsetD))) );
 		
-		Float64 interpolE = (aE[workingE-((workingE > delayE)?delayE+1:0)] * (1-(offsetE-floor(offsetE))) );
-		interpolE += (aE[workingE+1-((workingE+1 > delayE)?delayE+1:0)] * ((offsetE-floor(offsetE))) );
+		Float64 interpolE = (dram->aE[workingE-((workingE > delayE)?delayE+1:0)] * (1-(offsetE-floor(offsetE))) );
+		interpolE += (dram->aE[workingE+1-((workingE+1 > delayE)?delayE+1:0)] * ((offsetE-floor(offsetE))) );
 		
-		Float64 interpolF = (aF[workingF-((workingF > delayF)?delayF+1:0)] * (1-(offsetF-floor(offsetF))) );
-		interpolF += (aF[workingF+1-((workingF+1 > delayF)?delayF+1:0)] * ((offsetF-floor(offsetF))) );
+		Float64 interpolF = (dram->aF[workingF-((workingF > delayF)?delayF+1:0)] * (1-(offsetF-floor(offsetF))) );
+		interpolF += (dram->aF[workingF+1-((workingF+1 > delayF)?delayF+1:0)] * ((offsetF-floor(offsetF))) );
 		
-		Float64 interpolG = (aG[workingG-((workingG > delayG)?delayG+1:0)] * (1-(offsetG-floor(offsetG))) );
-		interpolG += (aG[workingG+1-((workingG+1 > delayG)?delayG+1:0)] * ((offsetG-floor(offsetG))) );
+		Float64 interpolG = (dram->aG[workingG-((workingG > delayG)?delayG+1:0)] * (1-(offsetG-floor(offsetG))) );
+		interpolG += (dram->aG[workingG+1-((workingG+1 > delayG)?delayG+1:0)] * ((offsetG-floor(offsetG))) );
 		
-		Float64 interpolH = (aH[workingH-((workingH > delayH)?delayH+1:0)] * (1-(offsetH-floor(offsetH))) );
-		interpolH += (aH[workingH+1-((workingH+1 > delayH)?delayH+1:0)] * ((offsetH-floor(offsetH))) );
+		Float64 interpolH = (dram->aH[workingH-((workingH > delayH)?delayH+1:0)] * (1-(offsetH-floor(offsetH))) );
+		interpolH += (dram->aH[workingH+1-((workingH+1 > delayH)?delayH+1:0)] * ((offsetH-floor(offsetH))) );
 		
-		interpolA = ((1.0-blend)*interpolA)+(aA[workingA-((workingA > delayA)?delayA+1:0)]*blend);
-		interpolB = ((1.0-blend)*interpolB)+(aB[workingB-((workingB > delayB)?delayB+1:0)]*blend);
-		interpolC = ((1.0-blend)*interpolC)+(aC[workingC-((workingC > delayC)?delayC+1:0)]*blend);
-		interpolD = ((1.0-blend)*interpolD)+(aD[workingD-((workingD > delayD)?delayD+1:0)]*blend);
-		interpolE = ((1.0-blend)*interpolE)+(aE[workingE-((workingE > delayE)?delayE+1:0)]*blend);
-		interpolF = ((1.0-blend)*interpolF)+(aF[workingF-((workingF > delayF)?delayF+1:0)]*blend);
-		interpolG = ((1.0-blend)*interpolG)+(aG[workingG-((workingG > delayG)?delayG+1:0)]*blend);
-		interpolH = ((1.0-blend)*interpolH)+(aH[workingH-((workingH > delayH)?delayH+1:0)]*blend);
+		interpolA = ((1.0-blend)*interpolA)+(dram->aA[workingA-((workingA > delayA)?delayA+1:0)]*blend);
+		interpolB = ((1.0-blend)*interpolB)+(dram->aB[workingB-((workingB > delayB)?delayB+1:0)]*blend);
+		interpolC = ((1.0-blend)*interpolC)+(dram->aC[workingC-((workingC > delayC)?delayC+1:0)]*blend);
+		interpolD = ((1.0-blend)*interpolD)+(dram->aD[workingD-((workingD > delayD)?delayD+1:0)]*blend);
+		interpolE = ((1.0-blend)*interpolE)+(dram->aE[workingE-((workingE > delayE)?delayE+1:0)]*blend);
+		interpolF = ((1.0-blend)*interpolF)+(dram->aF[workingF-((workingF > delayF)?delayF+1:0)]*blend);
+		interpolG = ((1.0-blend)*interpolG)+(dram->aG[workingG-((workingG > delayG)?delayG+1:0)]*blend);
+		interpolH = ((1.0-blend)*interpolH)+(dram->aH[workingH-((workingH > delayH)?delayH+1:0)]*blend);
 				
 		feedbackA = (interpolA - (interpolB + interpolC + interpolD)) * regen;
 		feedbackB = (interpolB - (interpolA + interpolC + interpolD)) * regen;
@@ -330,21 +333,21 @@ void _airwindowsAlgorithm::_kernel::reset(void) {
 	feedbackH = 0.0;
 	
 	int count;
-	for(count = 0; count < 8110; count++) {aA[count] = 0.0;}
-	for(count = 0; count < 7510; count++) {aB[count] = 0.0;}
-	for(count = 0; count < 7310; count++) {aC[count] = 0.0;}
-	for(count = 0; count < 6910; count++) {aD[count] = 0.0;}
-	for(count = 0; count < 6310; count++) {aE[count] = 0.0;}
-	for(count = 0; count < 6110; count++) {aF[count] = 0.0;}
-	for(count = 0; count < 5510; count++) {aG[count] = 0.0;}
-	for(count = 0; count < 4910; count++) {aH[count] = 0.0;}
+	for(count = 0; count < 8110; count++) {dram->aA[count] = 0.0;}
+	for(count = 0; count < 7510; count++) {dram->aB[count] = 0.0;}
+	for(count = 0; count < 7310; count++) {dram->aC[count] = 0.0;}
+	for(count = 0; count < 6910; count++) {dram->aD[count] = 0.0;}
+	for(count = 0; count < 6310; count++) {dram->aE[count] = 0.0;}
+	for(count = 0; count < 6110; count++) {dram->aF[count] = 0.0;}
+	for(count = 0; count < 5510; count++) {dram->aG[count] = 0.0;}
+	for(count = 0; count < 4910; count++) {dram->aH[count] = 0.0;}
 	//maximum value needed will be delay * 100, plus 206 (absolute max vibrato depth)
-	for(count = 0; count < 4510; count++) {aI[count] = 0.0;}
-	for(count = 0; count < 4310; count++) {aJ[count] = 0.0;}
-	for(count = 0; count < 3910; count++) {aK[count] = 0.0;}
-	for(count = 0; count < 3310; count++) {aL[count] = 0.0;}
+	for(count = 0; count < 4510; count++) {dram->aI[count] = 0.0;}
+	for(count = 0; count < 4310; count++) {dram->aJ[count] = 0.0;}
+	for(count = 0; count < 3910; count++) {dram->aK[count] = 0.0;}
+	for(count = 0; count < 3310; count++) {dram->aL[count] = 0.0;}
 	//maximum value will be delay * 100
-	for(count = 0; count < 3110; count++) {aM[count] = 0.0;}	
+	for(count = 0; count < 3110; count++) {dram->aM[count] = 0.0;}	
 	//maximum value will be delay * 100
 	countA = 1; delayA = 79;
 	countB = 1; delayB = 73;

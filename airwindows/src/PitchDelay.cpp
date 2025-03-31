@@ -38,8 +38,8 @@ struct _kernel {
 	void reset(void);
 	float GetParameter( int index ) { return owner->GetParameter( index ); }
 	_airwindowsAlgorithm* owner;
+	struct _dram* dram;
  
-		Float64 d[88211];
 		Float64 prevSample;
 		Float64 regenSample;
 		Float64 delay;
@@ -53,6 +53,9 @@ struct _kernel {
 _kernel kernels[1];
 
 #include "../include/template2.h"
+struct _dram {
+		Float64 d[88211];
+};
 #include "../include/templateKernels.h"
 void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
 #define inNumChannels (1)
@@ -125,9 +128,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			
 			delay -= speed; if (delay < 0) delay += 88200.0;
 			Float64 increment = (newSample - prevSample) / speed;
-			d[pos] = prevSample;
+			dram->d[pos] = prevSample;
 			while (pos != floor(delay)) {
-				d[pos] = prevSample;
+				dram->d[pos] = prevSample;
 				prevSample += increment;
 				pos--; if (pos < 0) pos += 88200;
 			}
@@ -141,8 +144,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			Float64 newTapB = delay-(sweepOffset*vibDepth); if (newTapB < 0) newTapB += 88200.0;
 			Float64 tapAmplitudeA = (sin(sweep+(M_PI*1.5))+1.0)*0.25;
 			Float64 tapAmplitudeB = (sin(sweepOffset+(M_PI*1.5))+1.0)*0.25;
-			pos = floor(newTapA); inputSample = d[pos]*tapAmplitudeA;
-			pos = floor(newTapB); inputSample += d[pos]*tapAmplitudeB;
+			pos = floor(newTapA); inputSample = dram->d[pos]*tapAmplitudeA;
+			pos = floor(newTapB); inputSample += dram->d[pos]*tapAmplitudeB;
 			
 			regenSample = sin(inputSample);
 			
@@ -212,7 +215,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 }
 void _airwindowsAlgorithm::_kernel::reset(void) {
 {
-	for(int x = 0; x < 88210; x++) {d[x] = 0.0;}
+	for(int x = 0; x < 88210; x++) {dram->d[x] = 0.0;}
 	prevSample = 0.0;
 	regenSample = 0.0;
 	delay = 0.0;

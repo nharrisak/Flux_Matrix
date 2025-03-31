@@ -25,8 +25,6 @@ kParam0, };
 enum { kNumTemplateParameters = 6 };
 #include "../include/template1.h"
  
-	double dL[1002];
-	double dR[1002];
 	int gcount;		
 	double rateof;
 	double sweep;
@@ -34,6 +32,10 @@ enum { kNumTemplateParameters = 6 };
 	uint32_t fpdL;
 	uint32_t fpdR;
 #include "../include/template2.h"
+struct _dram {
+	double dL[1002];
+	double dR[1002];
+};
 #include "../include/templateStereo.h"
 void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR, Float32* outputL, Float32* outputR, UInt32 inFramesToProcess ) {
 
@@ -52,15 +54,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (fabs(inputSampleR)<1.18e-23) inputSampleR = fpdR * 1.18e-17;
 		
 		if (gcount < 0 || gcount > 999) gcount = 999;
-		dL[gcount] = inputSampleL; dR[gcount] = inputSampleR;
+		dram->dL[gcount] = inputSampleL; dram->dR[gcount] = inputSampleR;
 		int count = gcount;
 		double offset = depth + (depth * pow(rateof,2) * sin(sweep));
 		count += (int)floor(offset);
 		
-		inputSampleL = (dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
-		inputSampleL += (dL[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
-		inputSampleR = (dR[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
-		inputSampleR += (dR[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
+		inputSampleL = (dram->dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
+		inputSampleL += (dram->dL[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
+		inputSampleR = (dram->dR[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));
+		inputSampleR += (dram->dR[count+1-((count+1 > 999)?1000:0)] * (offset-floor(offset)));
 		
 		rateof = (rateof * (1.0-fluttertrim)) + (nextmax * fluttertrim);
 		sweep += rateof * fluttertrim;
@@ -90,7 +92,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 int _airwindowsAlgorithm::reset(void) {
 
 {
-	for (int temp = 0; temp < 1001; temp++) {dL[temp] = 0.0;dR[temp] = 0.0;}
+	for (int temp = 0; temp < 1001; temp++) {dram->dL[temp] = 0.0;dram->dR[temp] = 0.0;}
 	gcount = 0;	
 	sweep = M_PI;
 	rateof = 0.5;
