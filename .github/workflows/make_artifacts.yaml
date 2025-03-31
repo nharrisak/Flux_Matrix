@@ -3,7 +3,7 @@ name: Make Plug-ins Archive
 on:
   push:
     tags:
-      - 'v*'  # Runs action on pushed tags starting with 'v'
+      - "v*" # Runs action on pushed tags starting with 'v'
 
 jobs:
   build-and-release:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Run make in directories
         run: |
-          DIRECTORIES=("examples" "faust/examples")  # Replace with your actual directories
+          DIRECTORIES=("examples" "faust/examples" "airwindows/src")  # Replace with your actual directories
           for DIR in "${DIRECTORIES[@]}"; do
             echo "Building in $DIR"
             (cd "$DIR" && make clean && make)
@@ -46,9 +46,23 @@ jobs:
           zip -r ../plug-ins.zip programs
           cd ..
 
+      - name: Prepare directory structure for airwindowszip
+        run: |
+          mkdir -p release/airwindows/programs/plug-ins
+          DIRECTORIES=("airwindows")
+          for DIR in "${DIRECTORIES[@]}"; do
+            find "$DIR" -type f -name "*.o" -exec cp {} release/airwindows/programs/plug-ins/ \;
+          done
+
+      - name: Zip artifacts
+        run: |
+          cd release/airwindows
+          zip -r ../airwindows-plugins.zip programs
+          cd ..
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: plug-ins.zip
+          files: plug-ins.zip,airwindows-plugins.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
