@@ -1,0 +1,142 @@
+#include <math.h>
+#include <new>
+#include <distingnt/api.h>
+#define AIRWINDOWS_NAME "PeaksOnly"
+#define AIRWINDOWS_DESCRIPTION "A transformative mix check tool."
+#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','e','a' )
+#define AIRWINDOWS_KERNELS
+enum {
+
+	kNumberOfParameters=0
+};
+enum { kParamInput1, kParamOutput1, kParamOutput1mode,
+};
+static const uint8_t page2[] = { kParamInput1, kParamOutput1, kParamOutput1mode };
+static const _NT_parameter	parameters[] = {
+NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )
+NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
+};
+static const uint8_t page1[] = {
+};
+enum { kNumTemplateParameters = 3 };
+#include "../include/template1.h"
+struct _kernel {
+	void render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess );
+	void reset(void);
+	float GetParameter( int index ) { return owner->GetParameter( index ); }
+	_airwindowsAlgorithm* owner;
+ 
+		Float64 a[1503];
+		Float64 b[1503];
+		Float64 c[1503];
+		Float64 d[1503];
+		int ax, bx, cx, dx;
+		uint32_t fpd;
+	};
+_kernel kernels[1];
+
+#include "../include/template2.h"
+#include "../include/templateKernels.h"
+void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* inDestP, UInt32 inFramesToProcess ) {
+#define inNumChannels (1)
+{
+	UInt32 nSampleFrames = inFramesToProcess;
+	const Float32 *sourceP = inSourceP;
+	Float32 *destP = inDestP;
+	double overallscale = 1.0;
+	overallscale /= 44100.0;
+	overallscale *= GetSampleRate();
+
+	int am = (int)149.0 * overallscale;
+	int bm = (int)179.0 * overallscale;
+	int cm = (int)191.0 * overallscale;
+	int dm = (int)223.0 * overallscale; //these are 'good' primes, spacing out the allpasses
+	int allpasstemp = 0;
+	
+	while (nSampleFrames-- > 0) {
+		double inputSample = *sourceP;
+		if (fabs(inputSample)<1.18e-23) inputSample = fpd * 1.18e-17;
+				
+		if (inputSample > 1.0) inputSample = 1.0;
+		if (inputSample < -1.0) inputSample = -1.0;
+		//without this, you can get a NaN condition where it spits out DC offset at full blast!
+		inputSample = asin(inputSample);
+		//amplitude aspect
+
+		allpasstemp = ax - 1; if (allpasstemp < 0 || allpasstemp > am) allpasstemp = am;
+		inputSample -= a[allpasstemp]*0.5;
+		a[ax] = inputSample;
+		inputSample *= 0.5;
+		ax--; if (ax < 0 || ax > am) {ax = am;}
+		inputSample += (a[ax]);
+		//a single Midiverb-style allpass
+		
+		if (inputSample > 1.0) inputSample = 1.0;
+		if (inputSample < -1.0) inputSample = -1.0;
+		//without this, you can get a NaN condition where it spits out DC offset at full blast!
+		inputSample = asin(inputSample);
+		//amplitude aspect
+		
+		allpasstemp = bx - 1; if (allpasstemp < 0 || allpasstemp > bm) allpasstemp = bm;
+		inputSample -= b[allpasstemp]*0.5;
+		b[bx] = inputSample;
+		inputSample *= 0.5;
+		bx--; if (bx < 0 || bx > bm) {bx = bm;}
+		inputSample += (b[bx]);
+		//a single Midiverb-style allpass
+		
+		if (inputSample > 1.0) inputSample = 1.0;
+		if (inputSample < -1.0) inputSample = -1.0;
+		//without this, you can get a NaN condition where it spits out DC offset at full blast!
+		inputSample = asin(inputSample);
+		//amplitude aspect
+		
+		allpasstemp = cx - 1; if (allpasstemp < 0 || allpasstemp > cm) allpasstemp = cm;
+		inputSample -= c[allpasstemp]*0.5;
+		c[cx] = inputSample;
+		inputSample *= 0.5;
+		cx--; if (cx < 0 || cx > cm) {cx = cm;}
+		inputSample += (c[cx]);
+		//a single Midiverb-style allpass
+		
+		if (inputSample > 1.0) inputSample = 1.0;
+		if (inputSample < -1.0) inputSample = -1.0;
+		//without this, you can get a NaN condition where it spits out DC offset at full blast!
+		inputSample = asin(inputSample);
+		//amplitude aspect
+		
+		allpasstemp = dx - 1; if (allpasstemp < 0 || allpasstemp > dm) allpasstemp = dm;
+		inputSample -= d[allpasstemp]*0.5;
+		d[dx] = inputSample;
+		inputSample *= 0.5;
+		dx--; if (dx < 0 || dx > dm) {dx = dm;}
+		inputSample += (d[dx]);
+		//a single Midiverb-style allpass
+		
+		if (inputSample > 1.0) inputSample = 1.0;
+		if (inputSample < -1.0) inputSample = -1.0;
+		//without this, you can get a NaN condition where it spits out DC offset at full blast!
+		inputSample = asin(inputSample);
+		//amplitude aspect
+		
+		inputSample *= 0.63679; //scale it to 0dB output at full blast
+		
+		//begin 32 bit floating point dither
+		int expon; frexpf((float)inputSample, &expon);
+		fpd ^= fpd << 13; fpd ^= fpd >> 17; fpd ^= fpd << 5;
+		inputSample += ((double(fpd)-uint32_t(0x7fffffff)) * 5.5e-36l * pow(2,expon+62));
+		//end 32 bit floating point dither
+		
+		*destP = inputSample;
+		
+		sourceP += inNumChannels; destP += inNumChannels;
+	}
+}
+}
+void _airwindowsAlgorithm::_kernel::reset(void) {
+{
+	for(int count = 0; count < 1502; count++) {a[count] = 0.0; b[count] = 0.0; c[count] = 0.0; d[count] = 0.0;}
+	ax = 1; bx = 1; cx = 1; dx = 1;
+	fpd = 1.0; while (fpd < 16386) fpd = rand()*UINT32_MAX;
+}
+};
