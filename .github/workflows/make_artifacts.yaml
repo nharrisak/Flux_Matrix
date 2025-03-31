@@ -57,7 +57,7 @@ jobs:
       - name: Zip airwindows artifacts
         run: |
           cd release/airwindows
-          zip -r ../airwindows-plugins.zip programs
+          zip -r ../../airwindows-plugins.zip programs
           cd ..
 
       - name: Create GitHub Release
