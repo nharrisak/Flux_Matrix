@@ -24,8 +24,8 @@ static const _NT_parameter	parameters[] = {
 NT_PARAMETER_AUDIO_INPUT( "Input 1", 1, 1 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output 1", 1, 13 )
 { .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
-{ .name = "Input Drive", .min = -12000, .max = 12000, .def = 0, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
-{ .name = "Clampedness", .min = 0, .max = 10000, .def = 5000, .unit = kNT_unitNone, .scaling = kNT_scaling100, .enumStrings = NULL },
+{ .name = "Input Drive", .min = -12000, .max = 12000, .def = 0, .unit = kNT_unitDb, .scaling = kNT_scaling1000, .enumStrings = NULL },
+{ .name = "Clampedness", .min = 0, .max = 10000, .def = 5000, .unit = kNT_unitPercent, .scaling = kNT_scaling100, .enumStrings = NULL },
 { .name = "Expansiveness", .min = 50, .max = 5000, .def = 500, .unit = kNT_unitNone, .scaling = kNT_scalingNone, .enumStrings = NULL },
 { .name = "Output", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Dry/Wet", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },

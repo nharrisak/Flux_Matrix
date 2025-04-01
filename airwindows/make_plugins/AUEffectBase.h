@@ -288,6 +288,40 @@ struct AUEffectBase
 					numEnums += 1;
 				}
 			}
+			else switch( info.unit )
+			{
+			case kAudioUnitParameterUnit_Percent:
+					unit = "kNT_unitPercent";
+					break;
+			case kAudioUnitParameterUnit_Seconds:
+					unit = "kNT_unitSeconds";
+					break;
+			case kAudioUnitParameterUnit_SampleFrames:
+					unit = "kNT_unitFrames";
+					break;
+			case kAudioUnitParameterUnit_Hertz:
+					unit = "kNT_unitHz";
+					break;
+			case kAudioUnitParameterUnit_Cents:
+			case kAudioUnitParameterUnit_AbsoluteCents:
+					unit = "kNT_unitCents";
+					break;
+			case kAudioUnitParameterUnit_RelativeSemiTones:
+					unit = "kNT_unitSemitones";
+					break;
+			case kAudioUnitParameterUnit_MIDINoteNumber:
+					unit = "kNT_unitMIDINote";
+					break;
+			case kAudioUnitParameterUnit_Decibels:
+					unit = "kNT_unitDb";
+					break;
+			case kAudioUnitParameterUnit_BPM:
+					unit = "kNT_unitBPM";
+					break;
+			case kAudioUnitParameterUnit_Milliseconds:
+					unit = "kNT_unitMs";
+					break;
+			}
 			s_params << "{ .name = \"" << info.name << "\", .min = " << min << ", .max = " << max << ", .def = " << def << ", .unit = " << unit << ", .scaling = " << scaling << ", .enumStrings = " << enums << " }," << std::endl;
 		}
 		

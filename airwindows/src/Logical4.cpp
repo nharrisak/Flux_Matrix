@@ -25,10 +25,10 @@ NT_PARAMETER_AUDIO_INPUT( "Input R", 1, 2 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output L", 1, 13 )
 NT_PARAMETER_AUDIO_OUTPUT_WITH_MODE( "Output R", 1, 14 )
 { .name = "Pre/post gain", .min = -36, .max = 0, .def = -20, .unit = kNT_unitDb, .scaling = kNT_scalingNone, .enumStrings = NULL },
-{ .name = "Threshold", .min = -20000, .max = 20000, .def = 0, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
+{ .name = "Threshold", .min = -20000, .max = 20000, .def = 0, .unit = kNT_unitDb, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Ratio", .min = 1000, .max = 16000, .def = 4000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Reaction Speed", .min = 100, .max = 10000, .def = 2000, .unit = kNT_unitNone, .scaling = kNT_scaling100, .enumStrings = NULL },
-{ .name = "Makeup Gain", .min = -20000, .max = 20000, .def = 0, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
+{ .name = "Makeup Gain", .min = -20000, .max = 20000, .def = 0, .unit = kNT_unitDb, .scaling = kNT_scaling1000, .enumStrings = NULL },
 { .name = "Dry/Wet", .min = 0, .max = 1000, .def = 1000, .unit = kNT_unitNone, .scaling = kNT_scaling1000, .enumStrings = NULL },
 };
 static const uint8_t page1[] = {
