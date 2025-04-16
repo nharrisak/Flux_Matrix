@@ -45,7 +45,7 @@ with open ( '../airwindows/Airwindopedia.txt', 'r' ) as F:
 
 srcPath = '../airwindows/plugins/MacAU/'
 
-skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'PocketVerbs' ]
+skipList = [ 'BrightAmbience2', 'BrightAmbience3', 'PocketVerbs', 'PrimeFIR' ]
 
 def matchCurly( t ):
 	s = ''
