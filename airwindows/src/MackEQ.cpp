@@ -74,9 +74,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	float inTrim = GetParameter( kParam_One )*10.0f;
 	inTrim *= inTrim;
 	
-	float gainHigh = pow(GetParameter( kParam_Two ),2)*4.0f;
+	float gainHigh = powf(GetParameter( kParam_Two ),2)*4.0f;
 	float outHigh = sqrt(GetParameter( kParam_Two ));
-	float gainBass = pow(GetParameter( kParam_Three ),2)*4.0f;
+	float gainBass = powf(GetParameter( kParam_Three ),2)*4.0f;
 	float outBass = sqrt(GetParameter( kParam_Three ));
 	float outPad = GetParameter( kParam_Four );
 	float wet = GetParameter( kParam_Five );
@@ -141,7 +141,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (inputSample > 1.0f) inputSample = 1.0f;
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		inputSample -= pow(inputSample,5)*0.1768f;
+		inputSample -= powf(inputSample,5)*0.1768f;
 		
 		outSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = outSample; biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1
@@ -161,7 +161,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (gainBass != 1.0f) bassSample *= gainBass;
 		if (bassSample > 1.0f) bassSample = 1.0f;
 		if (bassSample < -1.0f) bassSample = -1.0f;
-		bassSample -= pow(bassSample,5)*0.1768f;
+		bassSample -= powf(bassSample,5)*0.1768f;
 		
 		if (fabs(iirSampleD)<1.18e-37f) iirSampleD = 0.0f;
 		iirSampleD = (iirSampleD * (1.0f - iirBassMid)) + (bassSample * iirBassMid);
@@ -184,7 +184,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (gainHigh != 1.0f) highSample *= gainHigh;
 		if (highSample > 1.0f) highSample = 1.0f;
 		if (highSample < -1.0f) highSample = -1.0f;
-		highSample -= pow(highSample,5)*0.1768f;
+		highSample -= powf(highSample,5)*0.1768f;
 		//highpassing HighSample another stage, before distorting it
 		
 		inputSample = ((bassSample*outBass) + midSample + (highSample*outHigh))*4.0f;
@@ -195,7 +195,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (inputSample > 1.0f) inputSample = 1.0f;
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		inputSample -= pow(inputSample,5)*0.1768f;
+		inputSample -= powf(inputSample,5)*0.1768f;
 		
 		outSample = biquadD[2]*inputSample+biquadD[3]*biquadD[7]+biquadD[4]*biquadD[8]-biquadD[5]*biquadD[9]-biquadD[6]*biquadD[10];
 		biquadD[8] = biquadD[7]; biquadD[7] = inputSample; inputSample = outSample; biquadD[10] = biquadD[9]; biquadD[9] = inputSample; //DF1

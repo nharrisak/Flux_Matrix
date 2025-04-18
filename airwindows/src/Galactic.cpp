@@ -132,10 +132,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	
 	float regen = 0.0625f+((1.0f-GetParameter( kParam_One ))*0.0625f);
 	float attenuate = (1.0f - (regen / 0.125f))*1.333f;
-	float lowpass = pow(1.00001f-(1.0f-GetParameter( kParam_Two )),2.0f)/sqrt(overallscale);
-	float drift = pow(GetParameter( kParam_Three ),3)*0.001f;
+	float lowpass = powf(1.00001f-(1.0f-GetParameter( kParam_Two )),2.0f)/sqrt(overallscale);
+	float drift = powf(GetParameter( kParam_Three ),3)*0.001f;
 	float size = (GetParameter( kParam_Four )*1.77f)+0.1f;
-	float wet = 1.0f-(pow(1.0f-GetParameter( kParam_Five ),3));
+	float wet = 1.0f-(powf(1.0f-GetParameter( kParam_Five ),3));
 	
 	delayI = 3407.0f*size;
 	delayJ = 1823.0f*size;

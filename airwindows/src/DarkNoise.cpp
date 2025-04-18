@@ -61,11 +61,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	int freqTarget = (int)(pow(GetParameter( kParam_One ),3)*8192.0f);
+	int freqTarget = (int)(powf(GetParameter( kParam_One ),3)*8192.0f);
 	if (freqTarget < 2) freqTarget = 2;
 	Float32 volumeScale = (1.0f/freqTarget) * sqrt(freqTarget);
 	
-	Float32 overalltaps = (pow(GetParameter( kParam_One ),2)*8.0f)+2.0f;
+	Float32 overalltaps = (powf(GetParameter( kParam_One ),2)*8.0f)+2.0f;
 	Float32 taps = overalltaps;
 	//this is our averaging, which is not integer but continuous
 	

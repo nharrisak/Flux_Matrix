@@ -74,14 +74,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	float highVol = pow(GetParameter( kParam_A )*2.0f,2.0f);
-	float midVol = pow(GetParameter( kParam_B )*2.0f,2.0f);
-	float lowVol = pow(GetParameter( kParam_C )*2.0f,2.0f);
+	float highVol = powf(GetParameter( kParam_A )*2.0f,2.0f);
+	float midVol = powf(GetParameter( kParam_B )*2.0f,2.0f);
+	float lowVol = powf(GetParameter( kParam_C )*2.0f,2.0f);
 	
-	float hFreq = pow(GetParameter( kParam_D ),overallscale);
-	float mhFreq = pow(GetParameter( kParam_E ),overallscale);
-	float mlFreq = pow(GetParameter( kParam_F ),overallscale+3.0f);
-	float lFreq = pow(GetParameter( kParam_G ),overallscale+3.0f);
+	float hFreq = powf(GetParameter( kParam_D ),overallscale);
+	float mhFreq = powf(GetParameter( kParam_E ),overallscale);
+	float mlFreq = powf(GetParameter( kParam_F ),overallscale+3.0f);
+	float lFreq = powf(GetParameter( kParam_G ),overallscale+3.0f);
 	
 	float dry = 2.0f-(GetParameter( kParam_H )*2.0f);
 	if (dry > 1.0f) dry = 1.0f; //full dry for use with inv, to 0.0f at full wet

@@ -56,7 +56,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
 	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
-	Float32 boost = 1.0f-pow(GetParameter( kParam_One ),2);
+	Float32 boost = 1.0f-powf(GetParameter( kParam_One ),2);
 	if (boost < 0.001f) boost = 0.001f; //there's a divide, we can't have this be zero
 	figure[0] = 600.0f/GetSampleRate(); //fixed frequency, 600hz
 	figure[1] = 0.023f; //resonance

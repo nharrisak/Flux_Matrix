@@ -56,12 +56,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	float trebleGain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	float trebleGain = powf(10.0f,GetParameter( kParam_One )/20.0f);
 	float trebleFreq = (4410.0f*trebleGain)/GetSampleRate();
 	if (trebleFreq > 0.45f) trebleFreq = 0.45f;
 	trebleA[0] = trebleB[0] = trebleFreq;
-	float bassGain = pow(10.0f,GetParameter( kParam_Two )/20.0f);
-	float bassFreq = pow(10.0f,-GetParameter( kParam_Two )/20.0f);
+	float bassGain = powf(10.0f,GetParameter( kParam_Two )/20.0f);
+	float bassFreq = powf(10.0f,-GetParameter( kParam_Two )/20.0f);
 	bassFreq = (8820.0f*bassFreq)/GetSampleRate();
 	if (bassFreq > 0.45f) bassFreq = 0.45f;
 	bassA[0] = bassB[0] = bassFreq;

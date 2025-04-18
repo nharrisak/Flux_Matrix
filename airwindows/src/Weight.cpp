@@ -62,11 +62,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	targetFreq = ((targetFreq+0.53f)*0.2f)/sqrt(overallscale);
 	//must use square root of what the real scale would be, to get correct output
-	Float32 alpha = pow(targetFreq,4);
+	Float32 alpha = powf(targetFreq,4);
 	Float32 out = GetParameter( kParam_Two );
 	Float32 resControl = (out*0.05f)+0.2f;
-	Float32 beta = (alpha * pow(resControl,2));	
-	alpha += ((1.0f-beta)*pow(targetFreq,3)); //correct for droop in frequency
+	Float32 beta = (alpha * powf(resControl,2));	
+	alpha += ((1.0f-beta)*powf(targetFreq,3)); //correct for droop in frequency
 		
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

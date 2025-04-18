@@ -64,8 +64,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 dry = pow(GetParameter( kParam_One ),2);
-	Float32 wet = pow(GetParameter( kParam_Two ),2);
+	Float32 dry = powf(GetParameter( kParam_One ),2);
+	Float32 wet = powf(GetParameter( kParam_Two ),2);
 	int targetdelay = (int)(44000*GetParameter( kParam_Three ));
 	Float32 feedback = (GetParameter( kParam_Four )*1.3f);
 	Float32 leanfat = GetParameter( kParam_Five );

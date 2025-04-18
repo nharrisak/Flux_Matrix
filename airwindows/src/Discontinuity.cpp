@@ -67,7 +67,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();
 	
 	float refdB = GetParameter( kParam_One );
-	float topdB = 0.000000075f * pow(10.0f,refdB/20.0f) * overallscale;
+	float topdB = 0.000000075f * powf(10.0f,refdB/20.0f) * overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

@@ -67,7 +67,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (chasespeed > 2500.0f) chasespeed = 2500.0f;
 	//bail out if it's too extreme
 	if (gainchase < -60.0f) {
-		gainchase = pow(10.0f,inputgain/20.0f);
+		gainchase = powf(10.0f,inputgain/20.0f);
 		//shouldn't even be a negative number
 		//this is about starting at whatever's set, when
 		//plugin is instantiated.
@@ -94,7 +94,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample = *sourceP;
 		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 		
-		targetgain = pow(10.0f,settingchase/20.0f);
+		targetgain = powf(10.0f,settingchase/20.0f);
 		//now we have the target in our temp variable
 		
 		chasespeed *= 0.9999f;

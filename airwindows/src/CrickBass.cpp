@@ -129,7 +129,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check		
 	
-	float inputlevelL = pow(GetParameter( kParam_One )+0.5f,2);
+	float inputlevelL = powf(GetParameter( kParam_One )+0.5f,2);
 	float inputlevelH = inputlevelL*4.0f;
 	float basstrimH = (GetParameter( kParam_Two )*0.6f)+0.2f;
 	float basstrimL = basstrimH*0.618f;
@@ -143,7 +143,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	int side = (int)(diagonal/1.4142135623730951f);
 	int down = (side + diagonal)/2;
 	//now we've got down, side and diagonal as offsets and we also use three successive samples upfront
-	float skewlevel = pow(basstrimH,2);
+	float skewlevel = powf(basstrimH,2);
 	
 	float cutoff = (15000.0f+(basstrimH*10000.0f))/GetSampleRate();
 	if (cutoff > 0.49f) cutoff = 0.49f; //don't crash if run at 44.1k

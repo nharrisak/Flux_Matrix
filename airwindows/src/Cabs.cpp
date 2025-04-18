@@ -108,22 +108,22 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
 	int speaker = (int) GetParameter( kParam_One );
-	float colorIntensity = pow(GetParameter( kParam_Two ),4);
+	float colorIntensity = powf(GetParameter( kParam_Two ),4);
 	float correctboost = 1.0f + (colorIntensity*4);
 	float correctdrygain = 1.0f - colorIntensity;
-	float threshold = pow((1.0f-GetParameter( kParam_Three )),5)+0.021f; //room loud is slew
+	float threshold = powf((1.0f-GetParameter( kParam_Three )),5)+0.021f; //room loud is slew
 	float rarefaction = cbrt(threshold);
 	float postThreshold = sqrt(rarefaction);
 	float postRarefaction = cbrt(postThreshold);
 	float postTrim = sqrt(postRarefaction);
 	float HeadBumpFreq = 0.0298f+((1.0f-GetParameter( kParam_Four ))/8.0f);
 	float LowsPad = 0.12f + (HeadBumpFreq*12.0f);
-	float dcblock = pow(HeadBumpFreq,2) / 8.0f;
-	float heavy = pow(GetParameter( kParam_Five ),3); //wet of head bump
-	float output = pow(GetParameter( kParam_Six ),2);
+	float dcblock = powf(HeadBumpFreq,2) / 8.0f;
+	float heavy = powf(GetParameter( kParam_Five ),3); //wet of head bump
+	float output = powf(GetParameter( kParam_Six ),2);
 	float dynamicconv = 5.0f;
-	dynamicconv *= pow(GetParameter( kParam_Two ),2);
-	dynamicconv *= pow(GetParameter( kParam_Three ),2);
+	dynamicconv *= powf(GetParameter( kParam_Two ),2);
+	dynamicconv *= powf(GetParameter( kParam_Three ),2);
 	//set constants for sag speed
 	int offsetA = 4+((int)(GetParameter( kParam_Four )*5.0f));
 

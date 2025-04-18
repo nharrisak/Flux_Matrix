@@ -70,10 +70,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();
 	
 	float refdB = GetParameter( kParam_One );
-	float topdB = 0.000000064f * pow(10.0f,refdB/20.0f) * overallscale;
+	float topdB = 0.000000064f * powf(10.0f,refdB/20.0f) * overallscale;
 	int dscBuf = (GetParameter( kParam_Two )*(float)(dscBufMax-1))+1;
 	int layers = (GetParameter( kParam_Three )*20.0f);
-	float f = pow(GetParameter( kParam_Four ),2);
+	float f = powf(GetParameter( kParam_Four ),2);
 	float boost = 1.0f + (f/(layers+1));
 	if (f == 0.0f) f = 0.000001f;
 	float wet = GetParameter( kParam_Five );

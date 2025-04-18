@@ -64,10 +64,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 
 	Float32 applyTarget = GetParameter( kParam_One );
-	Float32 threshold = pow((1-fabs(applyTarget)),3);
+	Float32 threshold = powf((1-fabs(applyTarget)),3);
 	if (applyTarget > 0) applyTarget *= 3;
 	
-	Float32 intensity = pow(GetParameter( kParam_Two ),2)*5.0f;
+	Float32 intensity = powf(GetParameter( kParam_Two ),2)*5.0f;
 	Float32 wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {

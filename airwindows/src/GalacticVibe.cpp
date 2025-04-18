@@ -52,7 +52,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float drift = pow(GetParameter( kParam_One ),3)*0.001f;
+	float drift = powf(GetParameter( kParam_One ),3)*0.001f;
 	float wet = GetParameter( kParam_Two );
 	int delayM = 256;
 

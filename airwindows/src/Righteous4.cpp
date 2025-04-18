@@ -103,7 +103,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 	Float32 target = GetParameter( kParam_One );
 	target += 17; //gives us scaled distortion factor based on test conditions
-	target = pow(10.0f,target/20.0f); //we will multiply and divide by this
+	target = powf(10.0f,target/20.0f); //we will multiply and divide by this
 	//ShortBuss section
 	if (target == 0) target = 1; //insanity check
 	
@@ -120,7 +120,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 gwBfactor = 1.0f - gwAfactor;
 	Float32 softness = 0.2135f;
 	Float32 hardness = 1.0f - softness;
-	Float32 refclip = pow(10.0f,-0.0058888f);	
+	Float32 refclip = powf(10.0f,-0.0058888f);	
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

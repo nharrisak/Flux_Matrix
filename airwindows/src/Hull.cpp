@@ -59,7 +59,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate(); //this one's scaled to 96k for the deepest bass
 	if (overallscale > 1.0f) overallscale = 1.0f; //and if you go for 192k, rather than crash
 	//it just cuts out the maximum (2000) depth of averaging you can get
-	Float32 hullSetting = pow(GetParameter( kParam_One ),3)*overallscale;
+	Float32 hullSetting = powf(GetParameter( kParam_One ),3)*overallscale;
 	int limitA = (hullSetting*2000.0f)+1.0f;
 	float divisorA = 1.0f/limitA;
 	int limitB = (hullSetting*1000.0f)+1.0f;

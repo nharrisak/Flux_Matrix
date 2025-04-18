@@ -107,7 +107,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (threshSample > compthreshold)
 			{compA = (compA + compA + (compthreshold / threshSample)) / 3.0f;}
 			else
-			{if (compA < 1.0f) compA += pow((1.0f-compA)*recoveryspd,7);}
+			{if (compA < 1.0f) compA += powf((1.0f-compA)*recoveryspd,7);}
 		}
 		else
 		{
@@ -116,7 +116,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (threshSample > compthreshold)
 			{compB = (compB + compB + (compthreshold / threshSample)) / 3.0f;}
 			else
-			{if (compB < 1.0f) compB += pow((1.0f-compB)*recoveryspd,7);}			
+			{if (compB < 1.0f) compB += powf((1.0f-compB)*recoveryspd,7);}			
 		}
 		previous = abSample;
 		//now the convolution
@@ -180,7 +180,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (threshSample > compthreshold)
 			{compC = (compC + compC + (compthreshold / threshSample)) / 3.0f;}
 			else
-			{if (compC < 1.0f) compC += pow((1.0f-compC)*recoveryspd,7);}
+			{if (compC < 1.0f) compC += powf((1.0f-compC)*recoveryspd,7);}
 		}
 		else
 		{
@@ -189,7 +189,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (threshSample > compthreshold)
 			{compD = (compD + compD + (compthreshold / threshSample)) / 3.0f;}
 			else
-			{if (compD < 1.0f) compD += pow((1.0f-compD)*recoveryspd,7);}			
+			{if (compD < 1.0f) compD += powf((1.0f-compD)*recoveryspd,7);}			
 		}
 		previousB = abSample;
 		//another dose of compression, please

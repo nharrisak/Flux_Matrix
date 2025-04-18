@@ -65,10 +65,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float32 alpha = pow(GetParameter( kParam_One ),4)+0.00001f;
+	Float32 alpha = powf(GetParameter( kParam_One ),4)+0.00001f;
 	if (alpha > 1.0f) alpha = 1.0f;
-	Float32 beta = (alpha * pow(GetParameter( kParam_Two ),2))+0.00001f;
-	alpha += ((1.0f-beta)*pow(GetParameter( kParam_One ),3)); //correct for droop in frequency
+	Float32 beta = (alpha * powf(GetParameter( kParam_Two ),2))+0.00001f;
+	alpha += ((1.0f-beta)*powf(GetParameter( kParam_One ),3)); //correct for droop in frequency
 	if (alpha > 1.0f) alpha = 1.0f;
 	
 	float trend;

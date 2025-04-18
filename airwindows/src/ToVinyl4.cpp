@@ -257,7 +257,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 tempMid;
 	Float32 tempSide;
 	
-	Float32 intensity = pow(GetParameter( kParam_Three ),3)*(32/overallscale);
+	Float32 intensity = powf(GetParameter( kParam_Three ),3)*(32/overallscale);
 	Float32 inputSampleL;
 	Float32 inputSampleR;
 	Float32 senseL;

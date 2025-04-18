@@ -90,13 +90,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int type = 0;
 	if (GetParameter( kParam_One ) > 0.5f) type = 1;
 	
-	dram->biquad[biq_freq] = ((pow(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate());
+	dram->biquad[biq_freq] = ((powf(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate());
 	if (dram->biquad[biq_freq] < 0.0001f) dram->biquad[biq_freq] = 0.0001f;
 	
     dram->biquad[biq_reso] = GetParameter( kParam_Three );
 	if (dram->biquad[biq_reso] < 0.0001f) dram->biquad[biq_reso] = 0.0001f;
 	
-	float nonLin = pow(GetParameter( kParam_Four ),2);
+	float nonLin = powf(GetParameter( kParam_Four ),2);
 	//if you're using a 0.5f for a lowpass fixed frequency, value is 0.25f
 	
 	float wet = GetParameter( kParam_Five );

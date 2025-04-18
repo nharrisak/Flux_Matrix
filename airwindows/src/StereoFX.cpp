@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 bridgerectifier;
 	Float32 count;
 	//Highpass section
-	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 iirAmount = powf(GetParameter( kParam_Two ),3)/overallscale;
 	Float32 tight = -0.33333333333333f;
 	Float32 offset;
 	//we are setting it up so that to either extreme we can get an audible sound,

@@ -67,7 +67,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	Float32 clamp;
-	Float32 chase = pow(GetParameter( kParam_One ),2);
+	Float32 chase = powf(GetParameter( kParam_One ),2);
 	Float32 makeup = (1.0f+(chase*1.6f)) * GetParameter( kParam_Two );
 	Float32 ratio = chase * 24.0f;
 	chase /= overallscale;

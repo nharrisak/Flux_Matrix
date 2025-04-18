@@ -228,19 +228,19 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		case 7: overallscale *= (96/44.1f); break; //96
 	}
 	nonlin *= 0.001f; //scale suitably to apply to our liveness value
-	Float32 basefeedback = 0.45f + (nonlin * pow(GetParameter( kParam_Five ),3)); //nonlin from previous sample, positive adds liveness when loud
+	Float32 basefeedback = 0.45f + (nonlin * powf(GetParameter( kParam_Five ),3)); //nonlin from previous sample, positive adds liveness when loud
 	nonlin = 0.0f; //reset it here for setting up again next time
-	Float32 tankfeedback = basefeedback + (pow(GetParameter( kParam_Two ),2) * 0.05f);
+	Float32 tankfeedback = basefeedback + (powf(GetParameter( kParam_Two ),2) * 0.05f);
 	//liveness
 	if (tankfeedback > 0.5f) tankfeedback = 0.5f;
 	if (tankfeedback < 0.4f) tankfeedback = 0.4f;
-	Float32 iirAmountC = 1.0f-pow(1.0f-GetParameter( kParam_Three ),2);
+	Float32 iirAmountC = 1.0f-powf(1.0f-GetParameter( kParam_Three ),2);
 	//most of the range is up at the top end
 	iirAmountC += (iirAmountC/overallscale);
 	iirAmountC /= 2.0f;
 	if (iirAmountC > 1.1f) iirAmountC = 1.1f;
 	//lowpass, check to see if it's working reasonably at 96K
-	Float32 iirAmount = (((1.0f-pow(GetParameter( kParam_Four ),2)) * 0.09f)/overallscale)+0.001f;
+	Float32 iirAmount = (((1.0f-powf(GetParameter( kParam_Four ),2)) * 0.09f)/overallscale)+0.001f;
 	if (iirAmount > 1.0f) iirAmount = 1.0f;
 	if (iirAmount < 0.001f) iirAmount = 0.001f;
 	Float32 wetness = GetParameter( kParam_Six );

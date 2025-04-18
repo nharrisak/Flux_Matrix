@@ -65,7 +65,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	biquadA[0] = ((pow(GetParameter( kParam_Two ),2)*4700.0f)/GetSampleRate())+0.0009963f;
+	biquadA[0] = ((powf(GetParameter( kParam_Two ),2)*4700.0f)/GetSampleRate())+0.0009963f;
 	float clipFactor = 0.91f-((1.0f-GetParameter( kParam_Two ))*0.15f);
 	
 	biquadA[1] = 0.618033988749894848204586f;
@@ -96,7 +96,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//end opamp stuff	
 	
  	float trim = 0.1f+(3.712f*biquadA[0]);
-	float wet = pow(GetParameter( kParam_Four ),2);
+	float wet = powf(GetParameter( kParam_Four ),2);
 	float aWet = 1.0f;
 	float bWet = 1.0f;
 	float cWet = 1.0f;

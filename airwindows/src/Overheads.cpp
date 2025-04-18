@@ -51,9 +51,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float ovhTrim = pow(GetParameter( kParam_One ),3);
+	float ovhTrim = powf(GetParameter( kParam_One ),3);
 	ovhTrim += 1.0f; ovhTrim *= ovhTrim;
-	int offset = (pow(GetParameter( kParam_Two ),7) * 16.0f * overallscale)+1;
+	int offset = (powf(GetParameter( kParam_Two ),7) * 16.0f * overallscale)+1;
 	float wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {

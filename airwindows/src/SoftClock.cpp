@@ -145,7 +145,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			dram->beatSwing[9]=bigbeat; dram->beatSwing[17]=bigbeat; dram->beatSwing[25]=bigbeat; break; //32-8888
 		default: break;			
 	}			
-	float accent = 1.0f-pow(1.0f-GetParameter( kParam_F ),2);
+	float accent = 1.0f-powf(1.0f-GetParameter( kParam_F ),2);
 	float chaseSpeed = ((GetParameter( kParam_H )*0.00016f)+0.000016f)/overallscale;
 	float rootSpeed = 1.0f-(chaseSpeed*((1.0f-GetParameter( kParam_H ))+0.5f)*4.0f);
 	float pulseWidth = ((GetParameter( kParam_G )*0.2f)-((1.0f-GetParameter( kParam_H ))*0.03f))/chaseSpeed;

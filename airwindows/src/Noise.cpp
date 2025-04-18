@@ -120,7 +120,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	highpass = GetParameter( kParam_Two ) * 22.0f;
 	lowcut = floor(highpass)+1;
 		
-	Float32 decay = 0.001f - ((1.0f-pow(1.0f-GetParameter( kParam_Four ),3))*0.001f);
+	Float32 decay = 0.001f - ((1.0f-powf(1.0f-GetParameter( kParam_Four ),3))*0.001f);
 	if (decay == 0.001f) decay = 0.1f;
 	Float32 wet = GetParameter( kParam_Six );
 	//removed unnecessary dry variable
@@ -171,7 +171,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			if (surge < 0.0f) surge = 0.0f;
 		}
 		
-		cutoff = pow((cutofftarget*surge),5);
+		cutoff = powf((cutofftarget*surge),5);
 		if (cutoff > 1.0f) cutoff = 1.0f;
 		invcutoff = 1.0f - cutoff;
 		//set up modified cutoff

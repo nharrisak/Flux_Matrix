@@ -60,10 +60,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float32 gain = pow(GetParameter( kParam_One )+0.5f,4);
-	biquadA[0] = (pow(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate();
+	Float32 gain = powf(GetParameter( kParam_One )+0.5f,4);
+	biquadA[0] = (powf(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate();
 	if (biquadA[0] < 0.0003f) biquadA[0] = 0.0003f;
-	Float32 clipFactor = 1.0f+(pow(GetParameter( kParam_Three ),3)*2.0f);
+	Float32 clipFactor = 1.0f+(powf(GetParameter( kParam_Three ),3)*2.0f);
 	
 	float K = tan(M_PI * biquadA[0]);
 	float norm = 1.0f / (1.0f + K / 0.7071f + K * K);

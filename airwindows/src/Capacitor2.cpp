@@ -82,8 +82,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	lowpassChase = pow(GetParameter( kParam_One ),2);
-	highpassChase = pow(GetParameter( kParam_Two ),2);
+	lowpassChase = powf(GetParameter( kParam_One ),2);
+	highpassChase = powf(GetParameter( kParam_Two ),2);
 	Float32 nonLin = 1.0f+((1.0f-GetParameter( kParam_Three ))*6.0f);
 	Float32 nonLinTrim = 1.5f/cbrt(nonLin);
 	wetChase = GetParameter( kParam_Four );

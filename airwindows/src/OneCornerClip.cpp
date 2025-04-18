@@ -63,10 +63,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
-	Float32 posThreshold = pow(10.0f,(GetParameter( kParam_Two ))/20.0f);
+	Float32 inputGain = powf(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 posThreshold = powf(10.0f,(GetParameter( kParam_Two ))/20.0f);
 	Float32 posTarget = posThreshold;
-	Float32 negThreshold = -pow(10.0f,(GetParameter( kParam_Three ))/20.0f);
+	Float32 negThreshold = -powf(10.0f,(GetParameter( kParam_Three ))/20.0f);
 	Float32 negTarget = negThreshold;
 	Float32 voicing = GetParameter( kParam_Four );
 	if (voicing == 0.618f) voicing = 0.618033988749894848204586f;

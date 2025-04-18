@@ -52,9 +52,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float drift = (pow(GetParameter( kParam_One ),4)*0.01f)/overallscale;
+	float drift = (powf(GetParameter( kParam_One ),4)*0.01f)/overallscale;
 	float offset = 3.141592653589793f + (GetParameter( kParam_Two )*6.283185307179586f);
-	float panlaw = 1.0f-pow(GetParameter( kParam_Three ),2);
+	float panlaw = 1.0f-powf(GetParameter( kParam_Three ),2);
 	float wet = GetParameter( kParam_Four );
 		
 	while (nSampleFrames-- > 0) {

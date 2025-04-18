@@ -63,8 +63,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 inputgain = powf(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Three )/20.0f);
 	Float32 ips = GetParameter( kParam_Two ) * 1.1f;
 	//slight correction to dial in convincing ips settings
 	if (ips < 1 || ips > 200){ips=33.0f;}

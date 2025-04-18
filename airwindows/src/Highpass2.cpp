@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 iirAmount = pow(GetParameter( kParam_One ),4);
+	Float32 iirAmount = powf(GetParameter( kParam_One ),4);
 	Float32 tight = GetParameter( kParam_Two );	
 	if (iirAmount < 0.0000001f) iirAmount = 0.0000001f;
 	if (iirAmount > 1) iirAmount = 1;

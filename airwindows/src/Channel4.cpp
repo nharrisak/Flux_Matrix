@@ -65,7 +65,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	int console = (int) GetParameter( kParam_One );
-	Float32 density = pow(GetParameter( kParam_Two )/100.0f,2);
+	Float32 density = powf(GetParameter( kParam_Two )/100.0f,2);
 	float bridgerectifier;
 	Float32 iirAmount = 0.005832f;
 	Float32 threshold = 0.33362176f;

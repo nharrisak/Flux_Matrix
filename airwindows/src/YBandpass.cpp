@@ -117,10 +117,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	inTrimA = inTrimB;
 	inTrimB = GetParameter( kParam_One )*10.0f;
 	
-	dram->biquad[biq_freq] = pow(GetParameter( kParam_Two ),3)*20000.0f;
+	dram->biquad[biq_freq] = powf(GetParameter( kParam_Two ),3)*20000.0f;
 	if (dram->biquad[biq_freq] < 15.0f) dram->biquad[biq_freq] = 15.0f;
 	dram->biquad[biq_freq] /= GetSampleRate();
-    dram->biquad[biq_reso] = (pow(GetParameter( kParam_Three ),2)*15.0f)+0.5571f;
+    dram->biquad[biq_reso] = (powf(GetParameter( kParam_Three ),2)*15.0f)+0.5571f;
 	dram->biquad[biq_aA0] = dram->biquad[biq_aB0];
 	//dram->biquad[biq_aA1] = dram->biquad[biq_aB1];
 	dram->biquad[biq_aA2] = dram->biquad[biq_aB2];
@@ -138,7 +138,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//for the coefficient-interpolated biquad filter
 	
 	powFactorA = powFactorB;
-	powFactorB = pow(GetParameter( kParam_Four )+0.9f,4);
+	powFactorB = powf(GetParameter( kParam_Four )+0.9f,4);
 	
 	//1.0f == target neutral
 	
@@ -184,9 +184,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		//encode/decode courtesy of torridgristle under the MIT license
 		if (inputSample > 1.0f) inputSample = 1.0f;
-		else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,powFactor);
+		else if (inputSample > 0.0f) inputSample = 1.0f - powf(1.0f-inputSample,powFactor);
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,powFactor);
+		else if (inputSample < 0.0f) inputSample = -1.0f + powf(1.0f+inputSample,powFactor);
 		
 		temp = (inputSample * dram->biquad[biq_a0]) + dram->biquad[biq_sL1];
 		dram->biquad[biq_sL1] =  -(temp * dram->biquad[biq_b1]) + dram->biquad[biq_sL2];
@@ -195,9 +195,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		//encode/decode courtesy of torridgristle under the MIT license
 		if (inputSample > 1.0f) inputSample = 1.0f;
-		else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,(1.0f/powFactor));
+		else if (inputSample > 0.0f) inputSample = 1.0f - powf(1.0f-inputSample,(1.0f/powFactor));
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,(1.0f/powFactor));
+		else if (inputSample < 0.0f) inputSample = -1.0f + powf(1.0f+inputSample,(1.0f/powFactor));
 		
 		inputSample *= outTrim;
 		

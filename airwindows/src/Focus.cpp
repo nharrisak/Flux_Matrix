@@ -67,9 +67,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
 	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
-	Float32 boost = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 boost = powf(10.0f,GetParameter( kParam_One )/20.0f);
 	figure[0] = 3515.775f/GetSampleRate(); //fixed frequency, 3.515775k
-	figure[1] = pow(pow(GetParameter( kParam_Two ),3)*2,2)+0.0001f; //resonance
+	figure[1] = powf(powf(GetParameter( kParam_Two ),3)*2,2)+0.0001f; //resonance
 	int mode = (int) GetParameter( kParam_Three );
 	Float32 output = GetParameter( kParam_Four );
 	Float32 wet = GetParameter( kParam_Five );
@@ -125,12 +125,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 				break;
 			case 3: //Mojo
-				float mojo; mojo = pow(fabs(inputSample),0.25f);
+				float mojo; mojo = powf(fabs(inputSample),0.25f);
 				if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 				//mojo is the one that flattens WAAAAY out very softly before wavefolding				
 				break;
 			case 4: //Dyno
-				float dyno; dyno = pow(fabs(inputSample),4);
+				float dyno; dyno = powf(fabs(inputSample),4);
 				if (dyno > 0.0f) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321f;
 				//dyno is the one that tries to raise peak energy				
 				break;

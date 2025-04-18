@@ -78,9 +78,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 intensity = pow(GetParameter( kParam_One ),5)*(8192/overallscale);
-	Float32 maxdess = 1.0f / pow(10.0f,GetParameter( kParam_Two )/20);
-	Float32 iirAmount = pow(GetParameter( kParam_Three ),2)/overallscale;
+	Float32 intensity = powf(GetParameter( kParam_One ),5)*(8192/overallscale);
+	Float32 maxdess = 1.0f / powf(10.0f,GetParameter( kParam_Two )/20);
+	Float32 iirAmount = powf(GetParameter( kParam_Three ),2)/overallscale;
 	Float32 offset;
 	Float32 sense;
 	Float32 recovery;

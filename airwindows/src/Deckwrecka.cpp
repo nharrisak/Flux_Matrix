@@ -85,7 +85,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 wreck = pow(GetParameter( kParam_One ),2);
+	Float32 wreck = powf(GetParameter( kParam_One ),2);
 	Float32 randy;
 	Float32 HeadBump = 0.0f;
 	Float32 HeadBumpFreq = 0.01f/overallscale;

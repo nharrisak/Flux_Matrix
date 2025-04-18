@@ -64,7 +64,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 inputgain = powf(10.0f,GetParameter( kParam_One )/20.0f);
 	Float32 bumpgain = GetParameter( kParam_Two ) * 0.1f;
 	Float32 HeadBumpFreq = 0.12f/overallscale;
 	Float32 softness = 0.618033988749894848204586f;

@@ -86,8 +86,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();	
 	
 	float bias = (GetParameter( kParam_A )*2.0f)-1.0f;
-	float underBias = (pow(bias,4)*0.25f)/overallscale;
-	float overBias = pow(1.0f-bias,3)/overallscale;
+	float underBias = (powf(bias,4)*0.25f)/overallscale;
+	float overBias = powf(1.0f-bias,3)/overallscale;
 	if (bias > 0.0f) underBias = 0.0f;
 	if (bias < 0.0f) overBias = 1.0f/overallscale;
 	

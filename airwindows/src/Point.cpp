@@ -69,12 +69,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 gaintrim = pow(10.0f,GetParameter( kParam_One )/20);
-	Float32 nibDiv = 1 / pow(GetParameter( kParam_Three )+0.2f,7);
+	Float32 gaintrim = powf(10.0f,GetParameter( kParam_One )/20);
+	Float32 nibDiv = 1 / powf(GetParameter( kParam_Three )+0.2f,7);
 	nibDiv /= overallscale;
 	Float32 nobDiv;
 	if (GetParameter( kParam_Two ) > 0) nobDiv = nibDiv / (1.001f-GetParameter( kParam_Two ));
-	else nobDiv = nibDiv * (1.001f-pow(GetParameter( kParam_Two )*0.75f,2));
+	else nobDiv = nibDiv * (1.001f-powf(GetParameter( kParam_Two )*0.75f,2));
 	Float32 nibnobFactor = 0.0f; //start with the fallthrough value, why not
 	float inputSample;
 	Float32 absolute;

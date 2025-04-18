@@ -206,11 +206,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//this sets up our presets using the existing code
 	}			
 	
-	int diffuse = pow(0.894020f,1.618033988749894848204586f)*16;
-	float iirAmt = 1.0f-pow(1.0f-paramC,1.618033988749894848204586f);
+	int diffuse = powf(0.894020f,1.618033988749894848204586f)*16;
+	float iirAmt = 1.0f-powf(1.0f-paramC,1.618033988749894848204586f);
 	float iirExt = iirAmt/overallscale;
-	float crossfade = (1.0f-pow(1.0f-paramD,1.618033988749894848204586f));
-	float wet = pow(paramE,1.618033988749894848204586f);
+	float crossfade = (1.0f-powf(1.0f-paramD,1.618033988749894848204586f));
+	float wet = powf(paramE,1.618033988749894848204586f);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSampleL = *inputL;

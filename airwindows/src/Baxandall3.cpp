@@ -69,8 +69,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float inputGain = pow(GetParameter( kParam_A )*2.0f,2.0f);
-	float trebleGain = pow(GetParameter( kParam_B )*2.0f,2.0f);
+	float inputGain = powf(GetParameter( kParam_A )*2.0f,2.0f);
+	float trebleGain = powf(GetParameter( kParam_B )*2.0f,2.0f);
 	float trebleFreq = ((2000.0f*trebleGain)+200.0f)/GetSampleRate();
 	if (trebleFreq > 0.45f) trebleFreq = 0.45f;
 	dram->baxH[bax_freq] = trebleFreq;
@@ -83,8 +83,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	dram->baxH[bax_b1] = 2.0f * (K * K - 1.0f) * norm;
 	dram->baxH[bax_b2] = (1.0f - K / dram->baxH[bax_reso] + K * K) * norm;
 	//end bax highpass
-	float bassGain = pow(GetParameter( kParam_C )*2.0f,2.0f);
-	float bassFreq = pow((1.0f-GetParameter( kParam_C ))*2.0f,2.0f);
+	float bassGain = powf(GetParameter( kParam_C )*2.0f,2.0f);
+	float bassFreq = powf((1.0f-GetParameter( kParam_C ))*2.0f,2.0f);
 	bassFreq = ((2000.0f*bassFreq)+200.0f)/GetSampleRate();
 	if (bassFreq > 0.45f) bassFreq = 0.45f;
 	dram->baxL[bax_freq] = bassFreq;

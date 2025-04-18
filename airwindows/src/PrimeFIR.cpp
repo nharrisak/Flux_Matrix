@@ -59,7 +59,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	float freq = pow(GetParameter( kParam_A ),2)*M_PI_2; if (freq < 0.0001f) freq = 0.0001f;
+	float freq = powf(GetParameter( kParam_A ),2)*M_PI_2; if (freq < 0.0001f) freq = 0.0001f;
 	float positionMiddle = sin(freq)*0.5f; //shift relative to frequency, not sample-rate
 	freq /= overallscale; //generating the FIR relative to sample rate
 	int window = (int)(GetParameter( kParam_B )*256.0f*overallscale); //so's the window size

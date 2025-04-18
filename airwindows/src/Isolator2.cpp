@@ -93,11 +93,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	dram->biquadA[biq_freq] = pow(GetParameter( kParam_One ),(2.0f*sqrt(overallscale)))*0.4999f;
+	dram->biquadA[biq_freq] = powf(GetParameter( kParam_One ),(2.0f*sqrt(overallscale)))*0.4999f;
 	if (dram->biquadA[biq_freq] < 0.0005f) dram->biquadA[biq_freq] = 0.0005f;
 	dram->biquadG[biq_freq] = dram->biquadF[biq_freq] = dram->biquadE[biq_freq] = dram->biquadD[biq_freq] = dram->biquadC[biq_freq] = dram->biquadB[biq_freq] = dram->biquadA[biq_freq];
 	
-	float reso = pow(GetParameter( kParam_Two ),2);
+	float reso = powf(GetParameter( kParam_Two ),2);
 	float resoBoost = reso+1.0f;
 	reso = 1.0f-reso;
 	

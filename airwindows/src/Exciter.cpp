@@ -55,7 +55,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	biquad[0] = ((GetParameter( kParam_One )*7000.0f)+8000.0f)/GetSampleRate();
 	biquad[1] = GetParameter( kParam_One )+GetParameter( kParam_Two )+0.7071f;
 	//tighter resonance as frequency and boost increases
-	float boost = pow(GetParameter( kParam_Two ),2.0f)*16.0f;
+	float boost = powf(GetParameter( kParam_Two ),2.0f)*16.0f;
 	float K = tan(M_PI * biquad[0]);
 	float norm = 1.0f / (1.0f + K / biquad[1] + K * K);
 	biquad[2] = K / 0.7071f * norm;

@@ -54,11 +54,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	float mid;
 	float side;
 	
-	Float32 leftgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
-	Float32 rightgain = pow(10.0f,GetParameter( kParam_Two )/20.0f);
-	Float32 midgain = pow(10.0f,GetParameter( kParam_Three )/20.0f);
-	Float32 sidegain = pow(10.0f,GetParameter( kParam_Four )/20.0f);
-	Float32 mastergain = pow(10.0f,GetParameter( kParam_Five )/20.0f) * 0.5f;
+	Float32 leftgain = powf(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 rightgain = powf(10.0f,GetParameter( kParam_Two )/20.0f);
+	Float32 midgain = powf(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 sidegain = powf(10.0f,GetParameter( kParam_Four )/20.0f);
+	Float32 mastergain = powf(10.0f,GetParameter( kParam_Five )/20.0f) * 0.5f;
 	
 	leftgain *= mastergain;
 	rightgain *= mastergain;

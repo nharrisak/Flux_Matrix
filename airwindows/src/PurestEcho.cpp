@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int loopLimit = (int)(totalsamples * 0.499f);
 	//this is a float buffer so we will be splitting it in two
 	
-	Float32 time = pow(GetParameter( kParam_One ),2) * 0.999f;
+	Float32 time = powf(GetParameter( kParam_One ),2) * 0.999f;
 	Float32 tap1 = GetParameter( kParam_Two );
 	Float32 tap2 = GetParameter( kParam_Three );
 	Float32 tap3 = GetParameter( kParam_Four );

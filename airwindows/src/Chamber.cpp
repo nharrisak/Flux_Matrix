@@ -108,10 +108,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	Float32 size = (pow(GetParameter( kParam_One ),2)*0.9f)+0.1f;
-	Float32 regen = (1.0f-(pow(1.0f-GetParameter( kParam_Two ),6)))*0.123f;
-	Float32 highpass = (pow(GetParameter( kParam_Three ),2.0f))/sqrt(overallscale);
-	Float32 lowpass = (1.0f-pow(GetParameter( kParam_Four ),2.0f))/sqrt(overallscale);
+	Float32 size = (powf(GetParameter( kParam_One ),2)*0.9f)+0.1f;
+	Float32 regen = (1.0f-(powf(1.0f-GetParameter( kParam_Two ),6)))*0.123f;
+	Float32 highpass = (powf(GetParameter( kParam_Three ),2.0f))/sqrt(overallscale);
+	Float32 lowpass = (1.0f-powf(GetParameter( kParam_Four ),2.0f))/sqrt(overallscale);
 	Float32 interpolate = size*0.381966011250105f;
 	Float32 wet = GetParameter( kParam_Five )*2.0f;
 	Float32 dry = 2.0f - wet;

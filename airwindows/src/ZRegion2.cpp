@@ -121,27 +121,27 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 mid = (high+low)*0.5f;
 	Float32 spread = 1.001f-fabs(high-low);
 	
-	dram->biquad[biq_freq] = (pow(high,3)*20000.0f)/GetSampleRate();
+	dram->biquad[biq_freq] = (powf(high,3)*20000.0f)/GetSampleRate();
 	if (dram->biquad[biq_freq] < 0.00009f) dram->biquad[biq_freq] = 0.00009f;
 	Float32 compensation = sqrt(dram->biquad[biq_freq])*6.4f*spread;
 	Float32 clipFactor = 0.75f+(dram->biquad[biq_freq]*GetParameter( kParam_Four )*37.0f);
 	
-	dram->biquadA[biq_freq] = (pow((high+mid)*0.5f,3)*20000.0f)/GetSampleRate();
+	dram->biquadA[biq_freq] = (powf((high+mid)*0.5f,3)*20000.0f)/GetSampleRate();
 	if (dram->biquadA[biq_freq] < 0.00009f) dram->biquadA[biq_freq] = 0.00009f;
 	Float32 compensationA = sqrt(dram->biquadA[biq_freq])*6.4f*spread;
 	Float32 clipFactorA = 0.75f+(dram->biquadA[biq_freq]*GetParameter( kParam_Four )*37.0f);
 	
-	dram->biquadB[biq_freq] = (pow(mid,3)*20000.0f)/GetSampleRate();
+	dram->biquadB[biq_freq] = (powf(mid,3)*20000.0f)/GetSampleRate();
 	if (dram->biquadB[biq_freq] < 0.00009f) dram->biquadB[biq_freq] = 0.00009f;
 	Float32 compensationB = sqrt(dram->biquadB[biq_freq])*6.4f*spread;
 	Float32 clipFactorB = 0.75f+(dram->biquadB[biq_freq]*GetParameter( kParam_Four )*37.0f);
 	
-	dram->biquadC[biq_freq] = (pow((mid+low)*0.5f,3)*20000.0f)/GetSampleRate();
+	dram->biquadC[biq_freq] = (powf((mid+low)*0.5f,3)*20000.0f)/GetSampleRate();
 	if (dram->biquadC[biq_freq] < 0.00009f) dram->biquadC[biq_freq] = 0.00009f;
 	Float32 compensationC = sqrt(dram->biquadC[biq_freq])*6.4f*spread;
 	Float32 clipFactorC = 0.75f+(dram->biquadC[biq_freq]*GetParameter( kParam_Four )*37.0f);
 	
-	dram->biquadD[biq_freq] = (pow(low,3)*20000.0f)/GetSampleRate();
+	dram->biquadD[biq_freq] = (powf(low,3)*20000.0f)/GetSampleRate();
 	if (dram->biquadD[biq_freq] < 0.00009f) dram->biquadD[biq_freq] = 0.00009f;
 	Float32 compensationD = sqrt(dram->biquadD[biq_freq])*6.4f*spread;
 	Float32 clipFactorD = 0.75f+(dram->biquadD[biq_freq]*GetParameter( kParam_Four )*37.0f);

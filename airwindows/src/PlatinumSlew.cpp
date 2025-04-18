@@ -106,7 +106,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float source = pow(1-GetParameter( kParam_One ),4)/overallscale;
+	float source = powf(1-GetParameter( kParam_One ),4)/overallscale;
 		
 	dram->gslew[threshold10] = source;
 	source *= 1.618033988749894848204586f;

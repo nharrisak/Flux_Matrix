@@ -310,7 +310,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	}
 	
 	
-	float regen = (1.0f-pow(1.0f-GetParameter( kParam_B ),2.0f))*0.0625f;
+	float regen = (1.0f-powf(1.0f-GetParameter( kParam_B ),2.0f))*0.0625f;
 	float derez = GetParameter( kParam_C )/overallscale;
 	if (derez < 0.0005f) derez = 0.0005f; if (derez > 1.0f) derez = 1.0f;
 	derez = 1.0f / ((int)(1.0f/derez));

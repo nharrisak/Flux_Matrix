@@ -63,9 +63,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 slewAmount = ((pow(GetParameter( kParam_One ),2.0f)*4.0f)+0.71f)/overallscale;
-	Float32 dynAmount = pow(GetParameter( kParam_Two ),2.0f);
-	Float32 wet = pow(GetParameter( kParam_Three ),5);
+	Float32 slewAmount = ((powf(GetParameter( kParam_One ),2.0f)*4.0f)+0.71f)/overallscale;
+	Float32 dynAmount = powf(GetParameter( kParam_Two ),2.0f);
+	Float32 wet = powf(GetParameter( kParam_Three ),5);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

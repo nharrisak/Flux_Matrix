@@ -56,10 +56,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	incLA = incLB; incLB = pow(GetParameter( kParam_A ),5)/overallscale;
-	incRA = incRB; incRB = pow(GetParameter( kParam_B ),5)/overallscale;
+	incLA = incLB; incLB = powf(GetParameter( kParam_A ),5)/overallscale;
+	incRA = incRB; incRB = powf(GetParameter( kParam_B ),5)/overallscale;
 	float soar = 0.3f-(GetParameter( kParam_C )*0.3f);
-	float wet = pow(GetParameter( kParam_D ),2);
+	float wet = powf(GetParameter( kParam_D ),2);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSampleL = *inputL;

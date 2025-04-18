@@ -106,7 +106,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	midGainA = midGainB; midGainB = GetParameter( kParam_Two )*2.0f;
 	bassGainA = bassGainB; bassGainB = GetParameter( kParam_Three )*2.0f;
 	//simple three band to adjust
-	float kalman = 1.0f-pow(GetParameter( kParam_Four ),2);
+	float kalman = 1.0f-powf(GetParameter( kParam_Four ),2);
 	//crossover frequency between mid/bass
 			
 	while (nSampleFrames-- > 0) {
@@ -116,16 +116,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			
 		float temp = (float)nSampleFrames/inFramesToProcess;
 		float trebleGain = (trebleGainA*temp)+(trebleGainB*(1.0f-temp));
-		if (trebleGain > 1.0f) trebleGain = pow(trebleGain,3.0f+sqrt(overallscale));
-		if (trebleGain < 1.0f) trebleGain = 1.0f-pow(1.0f-trebleGain,2);
+		if (trebleGain > 1.0f) trebleGain = powf(trebleGain,3.0f+sqrt(overallscale));
+		if (trebleGain < 1.0f) trebleGain = 1.0f-powf(1.0f-trebleGain,2);
 		
 		float midGain = (midGainA*temp)+(midGainB*(1.0f-temp));
 		if (midGain > 1.0f) midGain *= midGain;
-		if (midGain < 1.0f) midGain = 1.0f-pow(1.0f-midGain,2);
+		if (midGain < 1.0f) midGain = 1.0f-powf(1.0f-midGain,2);
 		
 		float bassGain = (bassGainA*temp)+(bassGainB*(1.0f-temp));
 		if (bassGain > 1.0f) bassGain *= bassGain;
-		if (bassGain < 1.0f) bassGain = 1.0f-pow(1.0f-bassGain,2);
+		if (bassGain < 1.0f) bassGain = 1.0f-powf(1.0f-bassGain,2);
 				
 		//begin Air3L
 		dram->air[pvSL4] = dram->air[pvAL4] - dram->air[pvAL3]; dram->air[pvSL3] = dram->air[pvAL3] - dram->air[pvAL2];

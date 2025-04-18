@@ -112,7 +112,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//begin 64 bit floating point dither
 		int expon; frexp((float)inputSample, &expon);
 		fpd ^= fpd<<13; fpd ^= fpd>>17; fpd ^= fpd<<5;
-		inputSample += (fpd*6.4e-45l*pow(2,expon+62));	
+		inputSample += (fpd*6.4e-45l*powf(2,expon+62));	
 		//end 64 bit floating point dither
 		 
 		*/

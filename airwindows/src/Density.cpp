@@ -68,7 +68,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	Float32 density = GetParameter( kParam_One );
-	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 iirAmount = powf(GetParameter( kParam_Two ),3)/overallscale;
 	Float32 output = GetParameter( kParam_Three );
 	Float32 wet = GetParameter( kParam_Four );
 	Float32 dry = 1.0f-wet;

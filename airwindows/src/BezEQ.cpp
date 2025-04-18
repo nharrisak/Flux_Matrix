@@ -88,7 +88,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	float midGain = GetParameter( kParam_C ) * 2.0f;	 midGain *= midGain;
 	
-	float derezB = pow(GetParameter( kParam_D ),4.0f)/overallscale;
+	float derezB = powf(GetParameter( kParam_D ),4.0f)/overallscale;
 	if (derezB < 0.0001f) derezB = 0.0001f; if (derezB > 1.0f) derezB = 1.0f;
 	derezB = 1.0f / ((int)(1.0f/derezB));
 	

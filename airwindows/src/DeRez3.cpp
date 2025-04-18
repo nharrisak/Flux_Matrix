@@ -77,7 +77,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();
 
 	rezA = rezB;
-	rezB = pow(GetParameter( kParam_A ),3.0f)/overallscale;
+	rezB = powf(GetParameter( kParam_A ),3.0f)/overallscale;
 	bitA = bitB;
 	bitB = (GetParameter( kParam_B)*15.0f)+1.0f;
 	wetA = wetB;
@@ -93,7 +93,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		float bit = (bitA*temp)+(bitB*(1.0f-temp));
 		float wet = (wetA*temp)+(wetB*(1.0f-temp));
 		if (rez < 0.0005f) rez = 0.0005f;
-		float bitFactor = pow(2.0f,bit);
+		float bitFactor = powf(2.0f,bit);
 		float dry = 2.0f - wet;
 		if (wet > 1.0f) wet = 1.0f;
 		if (wet < 0.0f) wet = 0.0f;

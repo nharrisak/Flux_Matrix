@@ -57,8 +57,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float dublyAmount = pow(GetParameter( kParam_One ),3)*0.16f;
-	float outlyAmount = pow(GetParameter( kParam_One ),3)*0.160618f;
+	float dublyAmount = powf(GetParameter( kParam_One ),3)*0.16f;
+	float outlyAmount = powf(GetParameter( kParam_One ),3)*0.160618f;
 	float gain = outlyAmount+1.0f;
 	float iirAmount = 0.4275f/overallscale;
 	float wet = GetParameter( kParam_Two );

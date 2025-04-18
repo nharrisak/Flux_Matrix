@@ -57,14 +57,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 
 	float inputGain = GetParameter( kParam_A )*2.0f;
-	if (inputGain > 1.0f) inputGain *= inputGain; else inputGain = 1.0f-pow(1.0f-inputGain,2);
+	if (inputGain > 1.0f) inputGain *= inputGain; else inputGain = 1.0f-powf(1.0f-inputGain,2);
 	//this is the fader curve from ConsoleX with 0.5f being unity gain
 	int stages = (int)(GetParameter( kParam_B )*12.0f)+2;
 	//each stage brings in an additional layer of harmonics on the waveshaping
 	float bright = (1.0f-GetParameter( kParam_C ))*0.15f;
 	//higher slews suppress these higher harmonics when they are sure to just alias
 	float outputGain = GetParameter( kParam_D )*2.0f;
-	if (outputGain > 1.0f) outputGain *= outputGain; else outputGain = 1.0f-pow(1.0f-outputGain,2);
+	if (outputGain > 1.0f) outputGain *= outputGain; else outputGain = 1.0f-powf(1.0f-outputGain,2);
 	outputGain *= 0.68f;
 	//this is the fader curve from ConsoleX, rescaled to work with Hypersoft
 
@@ -76,7 +76,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		inputSample = sin(inputSample); inputSample += (sin(inputSample*2.0f)/2.0f);
 		for (int count = 2; count<stages; count++){
-			inputSample += ((sin(inputSample*(float)count)/(float)pow(count,3))*fmax(0.0f,1.0f-fabs((inputSample-lastSample)*bright*(float)(count*count))));
+			inputSample += ((sin(inputSample*(float)count)/(float)powf(count,3))*fmax(0.0f,1.0f-fabs((inputSample-lastSample)*bright*(float)(count*count))));
 		}
 		lastSample = inputSample;
 		

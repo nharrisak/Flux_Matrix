@@ -111,7 +111,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (lastFXChannel < -1.0f) lastFXChannel = -1.0f;
 		//store current sample as new base for next offset
 		
-		nearZero = pow(fabs(fabs(lastFXChannel)-1.0f), 2);
+		nearZero = powf(fabs(fabs(lastFXChannel)-1.0f), 2);
 		//if the sample is very near zero this number is higher.
 		if (iirCorrect > 0) iirCorrect -= servoTrim;
 		if (iirCorrect < 0) iirCorrect += servoTrim;

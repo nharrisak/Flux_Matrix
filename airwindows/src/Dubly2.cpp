@@ -67,11 +67,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	float dublyAmount = pow(GetParameter( kParam_A ),3)*0.25f;
+	float dublyAmount = powf(GetParameter( kParam_A ),3)*0.25f;
 	float iirEncFreq = GetParameter( kParam_B )/overallscale;
 	float tapeDrv = (GetParameter( kParam_C )*2.0f)+1.0f;
 	
-	float outlyAmount = pow(GetParameter( kParam_D ),3)*0.25f;
+	float outlyAmount = powf(GetParameter( kParam_D ),3)*0.25f;
 	float iirDecFreq = GetParameter( kParam_E )/overallscale;
 	float outPad = (GetParameter( kParam_F )*2.0f)+1.0f;
 	if (tapeDrv > 1.0f) outPad += 0.005f;

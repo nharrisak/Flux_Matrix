@@ -56,7 +56,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int allpasstemp;
 	Float32 outallpass = 0.618033988749894848204586f; //golden ratio!
 	//if you see 0.6180f it's not a wild stretch to wonder whether you are working with a constant
-	int maxdelayTarget = (int)(pow(GetParameter( kParam_One ),3)*1501.0f);
+	int maxdelayTarget = (int)(powf(GetParameter( kParam_One ),3)*1501.0f);
 	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
 	Float32 bridgerectifier;

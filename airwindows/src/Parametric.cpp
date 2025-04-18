@@ -86,12 +86,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	dram->high[biqs_freq] = (((pow(GetParameter( kParam_TRF ),3)*14500.0f)+1500.0f)/GetSampleRate());
+	dram->high[biqs_freq] = (((powf(GetParameter( kParam_TRF ),3)*14500.0f)+1500.0f)/GetSampleRate());
 	if (dram->high[biqs_freq] < 0.0001f) dram->high[biqs_freq] = 0.0001f;
 	dram->high[biqs_nonlin] = GetParameter( kParam_TRG );
 	dram->high[biqs_level] = (dram->high[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->high[biqs_level] > 0.0f) dram->high[biqs_level] *= 2.0f;
-	dram->high[biqs_reso] = ((0.5f+(dram->high[biqs_nonlin]*0.5f)+sqrt(dram->high[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_TRR ),2.0f)))+0.5f+(dram->high[biqs_nonlin]*0.5f);
+	dram->high[biqs_reso] = ((0.5f+(dram->high[biqs_nonlin]*0.5f)+sqrt(dram->high[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_TRR ),2.0f)))+0.5f+(dram->high[biqs_nonlin]*0.5f);
 	float K = tan(M_PI * dram->high[biqs_freq]);
 	float norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*1.93185165f) + K * K);
 	dram->high[biqs_a0] = K / (dram->high[biqs_reso]*1.93185165f) * norm;
@@ -107,12 +107,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	dram->high[biqs_f2] = (1.0f - K / (dram->high[biqs_reso]*0.51763809f) + K * K) * norm;
 	//high
 	
-	dram->hmid[biqs_freq] = (((pow(GetParameter( kParam_HMF ),3)*6400.0f)+600.0f)/GetSampleRate());
+	dram->hmid[biqs_freq] = (((powf(GetParameter( kParam_HMF ),3)*6400.0f)+600.0f)/GetSampleRate());
 	if (dram->hmid[biqs_freq] < 0.0001f) dram->hmid[biqs_freq] = 0.0001f;
 	dram->hmid[biqs_nonlin] = GetParameter( kParam_HMG );
 	dram->hmid[biqs_level] = (dram->hmid[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->hmid[biqs_level] > 0.0f) dram->hmid[biqs_level] *= 2.0f;
-	dram->hmid[biqs_reso] = ((0.5f+(dram->hmid[biqs_nonlin]*0.5f)+sqrt(dram->hmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_HMR ),2.0f)))+0.5f+(dram->hmid[biqs_nonlin]*0.5f);
+	dram->hmid[biqs_reso] = ((0.5f+(dram->hmid[biqs_nonlin]*0.5f)+sqrt(dram->hmid[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_HMR ),2.0f)))+0.5f+(dram->hmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->hmid[biqs_freq]);
 	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*1.93185165f) + K * K);
 	dram->hmid[biqs_a0] = K / (dram->hmid[biqs_reso]*1.93185165f) * norm;
@@ -128,12 +128,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	dram->hmid[biqs_f2] = (1.0f - K / (dram->hmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//hmid
 	
-	dram->lmid[biqs_freq] = (((pow(GetParameter( kParam_LMF ),3)*2200.0f)+20.0f)/GetSampleRate());
+	dram->lmid[biqs_freq] = (((powf(GetParameter( kParam_LMF ),3)*2200.0f)+20.0f)/GetSampleRate());
 	if (dram->lmid[biqs_freq] < 0.00001f) dram->lmid[biqs_freq] = 0.00001f;
 	dram->lmid[biqs_nonlin] = GetParameter( kParam_LMG );
 	dram->lmid[biqs_level] = (dram->lmid[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->lmid[biqs_level] > 0.0f) dram->lmid[biqs_level] *= 2.0f;
-	dram->lmid[biqs_reso] = ((0.5f+(dram->lmid[biqs_nonlin]*0.5f)+sqrt(dram->lmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_LMR ),2.0f)))+0.5f+(dram->lmid[biqs_nonlin]*0.5f);
+	dram->lmid[biqs_reso] = ((0.5f+(dram->lmid[biqs_nonlin]*0.5f)+sqrt(dram->lmid[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_LMR ),2.0f)))+0.5f+(dram->lmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->lmid[biqs_freq]);
 	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*1.93185165f) + K * K);
 	dram->lmid[biqs_a0] = K / (dram->lmid[biqs_reso]*1.93185165f) * norm;

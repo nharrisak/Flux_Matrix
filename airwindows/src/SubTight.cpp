@@ -55,9 +55,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	int subStages = pow(GetParameter( kParam_Two ),2)*16.0f;
+	int subStages = powf(GetParameter( kParam_Two ),2)*16.0f;
 	if (subStages < 1) subStages = 1;
-	float subTrim = pow((GetParameter( kParam_One )*0.3f)+(pow(GetParameter( kParam_Two ),2)*0.2f),subStages)/overallscale;
+	float subTrim = powf((GetParameter( kParam_One )*0.3f)+(powf(GetParameter( kParam_Two ),2)*0.2f),subStages)/overallscale;
 	//to use this as an analog modeler for restricting digital lows, find set values that still show bass
 	//Note that this is best used sparingly, on the 'not enough subtraction' side of the node.
 	

@@ -71,7 +71,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	float speed = pow(0.32f+(GetParameter( kParam_One )/6),10);
+	float speed = powf(0.32f+(GetParameter( kParam_One )/6),10);
 	float depth = (GetParameter( kParam_Two )/60) / speed;
 	float tupi = 3.141592653589793238f * 2.0f;
 	

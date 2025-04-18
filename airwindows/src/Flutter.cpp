@@ -49,8 +49,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float depth = pow(GetParameter( kParam_One ),2)*overallscale*70;
-	float fluttertrim = (0.0024f*pow(GetParameter( kParam_One ),2))/overallscale;
+	float depth = powf(GetParameter( kParam_One ),2)*overallscale*70;
+	float fluttertrim = (0.0024f*powf(GetParameter( kParam_One ),2))/overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		float inputSampleL = *inputL;
@@ -61,7 +61,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		if (gcount < 0 || gcount > 999) gcount = 999;
 		dram->dL[gcount] = inputSampleL; dram->dR[gcount] = inputSampleR;
 		int count = gcount;
-		float offset = depth + (depth * pow(rateof,2) * sin(sweep));
+		float offset = depth + (depth * powf(rateof,2) * sin(sweep));
 		count += (int)floor(offset);
 		
 		inputSampleL = (dram->dL[count-((count > 999)?1000:0)] * (1-(offset-floor(offset))));

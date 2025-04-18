@@ -61,8 +61,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
 	Float32 overallscale = trim * 10.0f;
-	Float32 gain = overallscale + (pow(wet,3) * 0.187859642462067f);
-	trim *= (1.0f - (pow(wet,3) * 0.187859642462067f));
+	Float32 gain = overallscale + (powf(wet,3) * 0.187859642462067f);
+	trim *= (1.0f - (powf(wet,3) * 0.187859642462067f));
 	float inputSample;
 	Float32 drySample;
 	
@@ -155,7 +155,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		velocity = previousVelocity + accumulatorSample;		
 		inputSample = lastSample + velocity;
 		lastSample = inputSample;
-		previousVelocity = -velocity * pow(trim,2);
+		previousVelocity = -velocity * powf(trim,2);
 		
 		if (wet !=1.0f) {
 			inputSample = (inputSample * wet) + (drySample * (1.0f-wet));

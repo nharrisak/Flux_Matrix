@@ -108,16 +108,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();
 	float fpOld = 0.618033988749894848204586f; //golden ratio!
 
-	Float32 inputgain = pow(GetParameter( kParam_One )+1.0f,3);
+	Float32 inputgain = powf(GetParameter( kParam_One )+1.0f,3);
 	Float32 outputgain = GetParameter( kParam_Five );
 	Float32 wet = GetParameter( kParam_Six );
 	//removed unnecessary dry variable
 	Float32 trim = 0.211324865405187117745425f;
-	Float32 SoftenControl = pow(GetParameter( kParam_Two ),2);
+	Float32 SoftenControl = powf(GetParameter( kParam_Two ),2);
 	Float32 tempRandy = 0.06f + (SoftenControl/10.0f);
 	//Float32 RollAmount = (1.0f-((SoftenControl * 0.45f)/overallscale));
 	Float32 RollAmount = (1.0f-(SoftenControl * 0.45f))/overallscale;
-	Float32 HeadBumpControl = pow(GetParameter( kParam_Three ),2);
+	Float32 HeadBumpControl = powf(GetParameter( kParam_Three ),2);
 	int allpasstemp;
 	int maxdelay = (int)(floor(((HeadBumpControl+0.3f)*2.2f)*overallscale));
 	HeadBumpControl *= fabs(HeadBumpControl);
@@ -126,7 +126,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 altAmount = 1.0f - iirAmount;
 	Float32 iirHBoostAmount = 0.0001f/overallscale;
 	Float32 altHBoostAmount = 1.0f - iirAmount;
-	Float32 depth = pow(GetParameter( kParam_Four ),2)*overallscale;
+	Float32 depth = powf(GetParameter( kParam_Four ),2)*overallscale;
 	Float32 fluttertrim = 0.005f/overallscale;
 	Float32 sweeptrim = (0.0006f*depth)/overallscale;
 	Float32 offset;	

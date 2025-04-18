@@ -126,11 +126,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale *= GetSampleRate();
 
 	freqA = freqB;
-	freqB = pow(GetParameter( kParam_One ),2);
+	freqB = powf(GetParameter( kParam_One ),2);
 	if (freqB < 0.0001f) freqB = 0.0001f;
 	nonLinA = nonLinB;
-	nonLinB = pow(GetParameter( kParam_Two ),2);
-	float maxPoles = pow(GetParameter( kParam_Three ),3)*pear_total;
+	nonLinB = powf(GetParameter( kParam_Two ),2);
+	float maxPoles = powf(GetParameter( kParam_Three ),3)*pear_total;
 	wetA = wetB;
 	wetB = GetParameter( kParam_Four ); //inv-dry-wet for highpass
 	

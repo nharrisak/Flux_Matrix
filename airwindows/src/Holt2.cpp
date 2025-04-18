@@ -76,15 +76,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 alpha = pow(GetParameter( kParam_One ),4)+0.00001f;
+	Float32 alpha = powf(GetParameter( kParam_One ),4)+0.00001f;
 	if (alpha > 1.0f) alpha = 1.0f;
 	Float32 resControl = (GetParameter( kParam_Two )*0.15f)+0.12f;
-	Float32 beta = (alpha * pow(resControl,2));
+	Float32 beta = (alpha * powf(resControl,2));
 	//0.27f max resonance for full stages on white noise keeping below 0dB
 	//0.12f min resonance for not losing all the level as we go down
 	//as we remove the 'avoid zero' +0.00001f on beta, our subsonic stability improves
 	
-	alpha += ((1.0f-beta)*pow(GetParameter( kParam_One ),3)); //correct for droop in frequency
+	alpha += ((1.0f-beta)*powf(GetParameter( kParam_One ),3)); //correct for droop in frequency
 	if (alpha > 1.0f) alpha = 1.0f;
 	
 	float trend;

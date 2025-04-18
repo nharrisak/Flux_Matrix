@@ -284,8 +284,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//we now shift gears between 44.1k and 48k so our tone is the same, slight changes in delay times
 	
 	float inputPad = GetParameter( kParam_One );
-	float speed = (pow(1.0f-GetParameter( kParam_Two ),3)*80.0f)+1.0f;
-	float steedRegen = pow(GetParameter( kParam_Three ),2)*0.618f;
+	float speed = (powf(1.0f-GetParameter( kParam_Two ),3)*80.0f)+1.0f;
+	float steedRegen = powf(GetParameter( kParam_Three ),2)*0.618f;
 	float iirAmount = ((GetParameter( kParam_Four )+0.02f)*1000.0f)/downRate;
 	float wet = GetParameter( kParam_Five )*2.0f;
 	float dry = 2.0f - wet;
@@ -731,8 +731,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//gain of 1,0 gives you a super-clean one, gain of 2 is obviously compressing
 			//smaller number is maximum clamping, if too small it'll take a while to bounce back
 			inputSampleL *= gainOutL; inputSampleR *= gainOutR;
-			gainOutL += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*pow(inputSampleL,4);
-			gainOutR += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*pow(inputSampleR,4);
+			gainOutL += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*powf(inputSampleL,4);
+			gainOutR += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*powf(inputSampleR,4);
 			//4.71239f radians sined will turn to -1 which is the maximum gain reduction speed
 			//curve!
 

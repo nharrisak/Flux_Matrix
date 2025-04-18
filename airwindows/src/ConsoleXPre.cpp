@@ -201,7 +201,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	dram->highpass[hilp_freq] = ((GetParameter( kParam_HIP )*330.0f)+20.0f)/GetSampleRate();
 	bool highpassEngage = true; if (GetParameter( kParam_HIP ) == 0.0f) highpassEngage = false;
 	
-	dram->lowpass[hilp_freq] = ((pow(1.0f-GetParameter( kParam_LOP ),2)*17000.0f)+3000.0f)/GetSampleRate();
+	dram->lowpass[hilp_freq] = ((powf(1.0f-GetParameter( kParam_LOP ),2)*17000.0f)+3000.0f)/GetSampleRate();
 	bool lowpassEngage = true; if (GetParameter( kParam_LOP ) == 0.0f) lowpassEngage = false;
 	
 	float K = tan(M_PI * dram->highpass[hilp_freq]); //highpass
@@ -242,32 +242,32 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	fireGainA = fireGainB; fireGainB = GetParameter( kParam_FIR )*2.0f;
 	stoneGainA = stoneGainB; stoneGainB = GetParameter( kParam_STO )*2.0f;
 	//simple three band to adjust
-	float kalmanRange = 1.0f-(pow(GetParameter( kParam_RNG ),2)/overallscale);
+	float kalmanRange = 1.0f-(powf(GetParameter( kParam_RNG ),2)/overallscale);
 	//crossover frequency between mid/bass
 	
-	float compFThresh = pow(GetParameter( kParam_FCT ),4);
-	float compSThresh = pow(GetParameter( kParam_SCT ),4);
-	float compFRatio = 1.0f-pow(1.0f-GetParameter( kParam_FCR ),2);
-	float compSRatio = 1.0f-pow(1.0f-GetParameter( kParam_SCR ),2);
-	float compFAttack = 1.0f/(((pow(GetParameter( kParam_FCA ),3)*5000.0f)+500.0f)*overallscale);
-	float compSAttack = 1.0f/(((pow(GetParameter( kParam_SCA ),3)*5000.0f)+500.0f)*overallscale);
-	float compFRelease = 1.0f/(((pow(GetParameter( kParam_FCL ),5)*50000.0f)+500.0f)*overallscale);
-	float compSRelease = 1.0f/(((pow(GetParameter( kParam_SCL ),5)*50000.0f)+500.0f)*overallscale);
-	float gateFThresh = pow(GetParameter( kParam_FGT ),4);
-	float gateSThresh = pow(GetParameter( kParam_SGT ),4);
-	float gateFRatio = 1.0f-pow(1.0f-GetParameter( kParam_FGR ),2);
-	float gateSRatio = 1.0f-pow(1.0f-GetParameter( kParam_SGR ),2);
-	float gateFSustain = M_PI_2 * pow(GetParameter( kParam_FGS )+1.0f,4.0f);
-	float gateSSustain = M_PI_2 * pow(GetParameter( kParam_SGS )+1.0f,4.0f);
-	float gateFRelease = 1.0f/(((pow(GetParameter( kParam_FGL ),5)*500000.0f)+500.0f)*overallscale);
-	float gateSRelease = 1.0f/(((pow(GetParameter( kParam_SGL ),5)*500000.0f)+500.0f)*overallscale);
+	float compFThresh = powf(GetParameter( kParam_FCT ),4);
+	float compSThresh = powf(GetParameter( kParam_SCT ),4);
+	float compFRatio = 1.0f-powf(1.0f-GetParameter( kParam_FCR ),2);
+	float compSRatio = 1.0f-powf(1.0f-GetParameter( kParam_SCR ),2);
+	float compFAttack = 1.0f/(((powf(GetParameter( kParam_FCA ),3)*5000.0f)+500.0f)*overallscale);
+	float compSAttack = 1.0f/(((powf(GetParameter( kParam_SCA ),3)*5000.0f)+500.0f)*overallscale);
+	float compFRelease = 1.0f/(((powf(GetParameter( kParam_FCL ),5)*50000.0f)+500.0f)*overallscale);
+	float compSRelease = 1.0f/(((powf(GetParameter( kParam_SCL ),5)*50000.0f)+500.0f)*overallscale);
+	float gateFThresh = powf(GetParameter( kParam_FGT ),4);
+	float gateSThresh = powf(GetParameter( kParam_SGT ),4);
+	float gateFRatio = 1.0f-powf(1.0f-GetParameter( kParam_FGR ),2);
+	float gateSRatio = 1.0f-powf(1.0f-GetParameter( kParam_SGR ),2);
+	float gateFSustain = M_PI_2 * powf(GetParameter( kParam_FGS )+1.0f,4.0f);
+	float gateSSustain = M_PI_2 * powf(GetParameter( kParam_SGS )+1.0f,4.0f);
+	float gateFRelease = 1.0f/(((powf(GetParameter( kParam_FGL ),5)*500000.0f)+500.0f)*overallscale);
+	float gateSRelease = 1.0f/(((powf(GetParameter( kParam_SGL ),5)*500000.0f)+500.0f)*overallscale);
 	
-	dram->high[biqs_freq] = (((pow(GetParameter( kParam_TRF ),3)*14500.0f)+1500.0f)/GetSampleRate());
+	dram->high[biqs_freq] = (((powf(GetParameter( kParam_TRF ),3)*14500.0f)+1500.0f)/GetSampleRate());
 	if (dram->high[biqs_freq] < 0.0001f) dram->high[biqs_freq] = 0.0001f;
 	dram->high[biqs_nonlin] = GetParameter( kParam_TRG );
 	dram->high[biqs_level] = (dram->high[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->high[biqs_level] > 0.0f) dram->high[biqs_level] *= 2.0f;
-	dram->high[biqs_reso] = ((0.5f+(dram->high[biqs_nonlin]*0.5f)+sqrt(dram->high[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_TRR ),2.0f)))+0.5f+(dram->high[biqs_nonlin]*0.5f);
+	dram->high[biqs_reso] = ((0.5f+(dram->high[biqs_nonlin]*0.5f)+sqrt(dram->high[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_TRR ),2.0f)))+0.5f+(dram->high[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->high[biqs_freq]);
 	norm = 1.0f / (1.0f + K / (dram->high[biqs_reso]*1.93185165f) + K * K);
 	dram->high[biqs_a0] = K / (dram->high[biqs_reso]*1.93185165f) * norm;
@@ -283,12 +283,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	dram->high[biqs_f2] = (1.0f - K / (dram->high[biqs_reso]*0.51763809f) + K * K) * norm;
 	//high
 	
-	dram->hmid[biqs_freq] = (((pow(GetParameter( kParam_HMF ),3)*6400.0f)+600.0f)/GetSampleRate());
+	dram->hmid[biqs_freq] = (((powf(GetParameter( kParam_HMF ),3)*6400.0f)+600.0f)/GetSampleRate());
 	if (dram->hmid[biqs_freq] < 0.0001f) dram->hmid[biqs_freq] = 0.0001f;
 	dram->hmid[biqs_nonlin] = GetParameter( kParam_HMG );
 	dram->hmid[biqs_level] = (dram->hmid[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->hmid[biqs_level] > 0.0f) dram->hmid[biqs_level] *= 2.0f;
-	dram->hmid[biqs_reso] = ((0.5f+(dram->hmid[biqs_nonlin]*0.5f)+sqrt(dram->hmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_HMR ),2.0f)))+0.5f+(dram->hmid[biqs_nonlin]*0.5f);
+	dram->hmid[biqs_reso] = ((0.5f+(dram->hmid[biqs_nonlin]*0.5f)+sqrt(dram->hmid[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_HMR ),2.0f)))+0.5f+(dram->hmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->hmid[biqs_freq]);
 	norm = 1.0f / (1.0f + K / (dram->hmid[biqs_reso]*1.93185165f) + K * K);
 	dram->hmid[biqs_a0] = K / (dram->hmid[biqs_reso]*1.93185165f) * norm;
@@ -304,12 +304,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	dram->hmid[biqs_f2] = (1.0f - K / (dram->hmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//hmid
 	
-	dram->lmid[biqs_freq] = (((pow(GetParameter( kParam_LMF ),3)*2200.0f)+200.0f)/GetSampleRate());
+	dram->lmid[biqs_freq] = (((powf(GetParameter( kParam_LMF ),3)*2200.0f)+200.0f)/GetSampleRate());
 	if (dram->lmid[biqs_freq] < 0.0001f) dram->lmid[biqs_freq] = 0.0001f;
 	dram->lmid[biqs_nonlin] = GetParameter( kParam_LMG );
 	dram->lmid[biqs_level] = (dram->lmid[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->lmid[biqs_level] > 0.0f) dram->lmid[biqs_level] *= 2.0f;
-	dram->lmid[biqs_reso] = ((0.5f+(dram->lmid[biqs_nonlin]*0.5f)+sqrt(dram->lmid[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_LMR ),2.0f)))+0.5f+(dram->lmid[biqs_nonlin]*0.5f);
+	dram->lmid[biqs_reso] = ((0.5f+(dram->lmid[biqs_nonlin]*0.5f)+sqrt(dram->lmid[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_LMR ),2.0f)))+0.5f+(dram->lmid[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->lmid[biqs_freq]);
 	norm = 1.0f / (1.0f + K / (dram->lmid[biqs_reso]*1.93185165f) + K * K);
 	dram->lmid[biqs_a0] = K / (dram->lmid[biqs_reso]*1.93185165f) * norm;
@@ -325,12 +325,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	dram->lmid[biqs_f2] = (1.0f - K / (dram->lmid[biqs_reso]*0.51763809f) + K * K) * norm;
 	//lmid
 	
-	dram->bass[biqs_freq] = (((pow(GetParameter( kParam_BSF ),3)*570.0f)+30.0f)/GetSampleRate());
+	dram->bass[biqs_freq] = (((powf(GetParameter( kParam_BSF ),3)*570.0f)+30.0f)/GetSampleRate());
 	if (dram->bass[biqs_freq] < 0.0001f) dram->bass[biqs_freq] = 0.0001f;
 	dram->bass[biqs_nonlin] = GetParameter( kParam_BSG );
 	dram->bass[biqs_level] = (dram->bass[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->bass[biqs_level] > 0.0f) dram->bass[biqs_level] *= 2.0f;
-	dram->bass[biqs_reso] = ((0.5f+(dram->bass[biqs_nonlin]*0.5f)+sqrt(dram->bass[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_BSR ),2.0f)))+0.5f+(dram->bass[biqs_nonlin]*0.5f);
+	dram->bass[biqs_reso] = ((0.5f+(dram->bass[biqs_nonlin]*0.5f)+sqrt(dram->bass[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_BSR ),2.0f)))+0.5f+(dram->bass[biqs_nonlin]*0.5f);
 	K = tan(M_PI * dram->bass[biqs_freq]);
 	norm = 1.0f / (1.0f + K / (dram->bass[biqs_reso]*1.93185165f) + K * K);
 	dram->bass[biqs_a0] = K / (dram->bass[biqs_reso]*1.93185165f) * norm;
@@ -347,7 +347,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//bass
 	
 	float refdB = GetParameter( kParam_DSC );
-	float topdB = 0.000000075f * pow(10.0f,refdB/20.0f) * overallscale;
+	float topdB = 0.000000075f * powf(10.0f,refdB/20.0f) * overallscale;
 	
 	panA = panB; panB = GetParameter( kParam_PAN )*1.57079633f;
 	inTrimA = inTrimB; inTrimB = GetParameter( kParam_FAD )*2.0f;
@@ -566,15 +566,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		float gainL = 1.57079633f-gainR;
 		gainR = sin(gainR); gainL = sin(gainL);
 		float gain = (inTrimA*temp)+(inTrimB*(1.0f-temp));
-		if (gain > 1.0f) gain *= gain; else gain = 1.0f-pow(1.0f-gain,2);
+		if (gain > 1.0f) gain *= gain; else gain = 1.0f-powf(1.0f-gain,2);
 		gain *= 0.763932022500211f;
 		float airGain = (airGainA*temp)+(airGainB*(1.0f-temp));
-		if (airGain > 1.0f) airGain *= airGain; else airGain = 1.0f-pow(1.0f-airGain,2);
+		if (airGain > 1.0f) airGain *= airGain; else airGain = 1.0f-powf(1.0f-airGain,2);
 		float fireGain = (fireGainA*temp)+(fireGainB*(1.0f-temp));
-		if (fireGain > 1.0f) fireGain *= fireGain; else fireGain = 1.0f-pow(1.0f-fireGain,2);
+		if (fireGain > 1.0f) fireGain *= fireGain; else fireGain = 1.0f-powf(1.0f-fireGain,2);
 		float firePad = fireGain; if (firePad > 1.0f) firePad = 1.0f;
 		float stoneGain = (stoneGainA*temp)+(stoneGainB*(1.0f-temp));
-		if (stoneGain > 1.0f) stoneGain *= stoneGain; else stoneGain = 1.0f-pow(1.0f-stoneGain,2);
+		if (stoneGain > 1.0f) stoneGain *= stoneGain; else stoneGain = 1.0f-powf(1.0f-stoneGain,2);
 		float stonePad = stoneGain; if (stonePad > 1.0f) stonePad = 1.0f;
 		//set up smoothed gain controls
 		

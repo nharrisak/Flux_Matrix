@@ -101,7 +101,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (inputSample > 1.0f) inputSample = 1.0f;
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		inputSample -= pow(inputSample,5)*0.1768f;
+		inputSample -= powf(inputSample,5)*0.1768f;
 		
 		outSample = biquadB[2]*inputSample+biquadB[3]*biquadB[7]+biquadB[4]*biquadB[8]-biquadB[5]*biquadB[9]-biquadB[6]*biquadB[10];
 		biquadB[8] = biquadB[7]; biquadB[7] = inputSample; inputSample = outSample; biquadB[10] = biquadB[9]; biquadB[9] = inputSample; //DF1

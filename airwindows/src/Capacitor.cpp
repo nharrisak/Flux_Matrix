@@ -80,8 +80,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	lowpassChase = pow(GetParameter( kParam_One ),2);
-	highpassChase = pow(GetParameter( kParam_Two ),2);
+	lowpassChase = powf(GetParameter( kParam_One ),2);
+	highpassChase = powf(GetParameter( kParam_Two ),2);
 	wetChase = GetParameter( kParam_Three );
 	//should not scale with sample rate, because values reaching 1 are important
 	//to its ability to bypass when set to max

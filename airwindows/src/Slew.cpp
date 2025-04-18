@@ -60,7 +60,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 inputSample;
 	Float32 outputSample;
 	Float32 clamp;
-	Float32 threshold = pow((1-GetParameter( kParam_One )),4)/overallscale;
+	Float32 threshold = powf((1-GetParameter( kParam_One )),4)/overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		

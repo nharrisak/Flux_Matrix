@@ -118,9 +118,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 densityB = GetParameter( kParam_Two )/2.0f;
 	Float32 densityC = GetParameter( kParam_Three )/2.0f;
 
-	densityA = pow(10.0f,densityA/20.0f)-1.0f;
-	densityB = pow(10.0f,densityB/20.0f)-1.0f;
-	densityC = pow(10.0f,densityC/20.0f)-1.0f;
+	densityA = powf(10.0f,densityA/20.0f)-1.0f;
+	densityB = powf(10.0f,densityB/20.0f)-1.0f;
+	densityC = powf(10.0f,densityC/20.0f)-1.0f;
 	//convert to 0 to X multiplier with 1.0f being O db
 	//minus one gives nearly -1 to ? (should top out at 1)
 	//calibrate so that X db roughly equals X db with maximum topping out at 1 internally
@@ -142,7 +142,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 outA = fabs(densityA);
 	Float32 outB = fabs(densityB);
 	Float32 outC = fabs(densityC);
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Eight )/20.0f);
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Eight )/20.0f);
 	
 	
 	

@@ -112,7 +112,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float source = pow(1-GetParameter( kParam_One ),4)/overallscale;
+	float source = powf(1-GetParameter( kParam_One ),4)/overallscale;
 	int stages = (1.0f-GetParameter( kParam_Two ))*9.99f;
 	stages *= 5;
 	float halo = GetParameter( kParam_Three );

@@ -73,9 +73,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int allpasstemp;
 	Float32 outallpass = 0.618033988749894848204586f;
 	
-	Float32 compress = 1.0f+pow(GetParameter( kParam_One )*0.8f,2);
+	Float32 compress = 1.0f+powf(GetParameter( kParam_One )*0.8f,2);
 	
-	Float32 speed1 = 128.0f / pow(compress,2);
+	Float32 speed1 = 128.0f / powf(compress,2);
 	speed1 *= overallscale;
 	Float32 speed2 = speed1 * 1.4f;
 	Float32 speed3 = speed2 * 1.5f;

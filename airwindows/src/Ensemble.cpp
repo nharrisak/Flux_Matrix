@@ -68,7 +68,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 spd = pow(0.4f+(GetParameter( kParam_Two )/12),10);
+	Float32 spd = powf(0.4f+(GetParameter( kParam_Two )/12),10);
 	spd *= overallscale;
 	Float32 depth = 0.002f / spd;
 	Float32 tupi = 3.141592653589793238f * 2.0f;

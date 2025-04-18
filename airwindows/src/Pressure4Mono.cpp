@@ -69,7 +69,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 threshold = 1.0f - (GetParameter( kParam_One ) * 0.95f);
 	Float32 muMakeupGain = 1.0f / threshold;
 	//gain settings around threshold
-	Float32 release = pow((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
+	Float32 release = powf((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
 	release /= overallscale;
 	Float32 fastest = sqrt(release);
 	//speed settings around release
@@ -159,14 +159,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (flip)
 		{
-			if (positivemu) coefficient = pow(muCoefficientA,2);
+			if (positivemu) coefficient = powf(muCoefficientA,2);
 			else coefficient = sqrt(muCoefficientA);
 			coefficient = (coefficient*mewiness)+(muCoefficientA*unmewiness);
 			inputSample *= coefficient;
 		}
 		else
 		{
-			if (positivemu) coefficient = pow(muCoefficientB,2);
+			if (positivemu) coefficient = powf(muCoefficientB,2);
 			else coefficient = sqrt(muCoefficientB);
 			coefficient = (coefficient*mewiness)+(muCoefficientB*unmewiness);
 			inputSample *= coefficient;

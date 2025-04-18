@@ -218,11 +218,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
 	inTrimA = inTrimB;
-	inTrimB = pow(GetParameter( kParam_One ),4);
-	float regen = 1.0f-(pow(1.0f-GetParameter( kParam_Two ),4)); regen *= 0.063f;
+	inTrimB = powf(GetParameter( kParam_One ),4);
+	float regen = 1.0f-(powf(1.0f-GetParameter( kParam_Two ),4)); regen *= 0.063f;
 	float stages = GetParameter( kParam_Three );
 	wetA = wetB;
-	wetB = 1.0f-(pow(1.0f-GetParameter( kParam_Four ),4));
+	wetB = 1.0f-(powf(1.0f-GetParameter( kParam_Four ),4));
 			
 	while (nSampleFrames-- > 0) {
 		float inputSampleL = *inputL;
@@ -279,16 +279,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			if (feedbackA < 0.0078125f) feedbackA = 0.0078125f; if (feedbackA > 1.0f) feedbackA = 1.0f;
 			if (feedbackB < 0.0078125f) feedbackB = 0.0078125f; if (feedbackB > 1.0f) feedbackB = 1.0f;
 			feedbackCL *= feedbackA; feedbackLR *= feedbackB;
-			feedbackA += sin((fabs(feedbackCL*4)>1)?4:fabs(feedbackCL*4))*pow(feedbackCL,4);
-			feedbackB += sin((fabs(feedbackLR*4)>1)?4:fabs(feedbackLR*4))*pow(feedbackLR,4);
+			feedbackA += sin((fabs(feedbackCL*4)>1)?4:fabs(feedbackCL*4))*powf(feedbackCL,4);
+			feedbackB += sin((fabs(feedbackLR*4)>1)?4:fabs(feedbackLR*4))*powf(feedbackLR,4);
 			feedbackCL *= 16.0f; feedbackLR *= 16.0f;
 			
 			feedbackDL *= 0.0625f; feedbackPR *= 0.0625f;
 			if (feedbackC < 0.0078125f) feedbackC = 0.0078125f; if (feedbackC > 1.0f) feedbackC = 1.0f;
 			if (feedbackD < 0.0078125f) feedbackD = 0.0078125f; if (feedbackD > 1.0f) feedbackD = 1.0f;
 			feedbackDL *= feedbackC; feedbackPR *= feedbackD;
-			feedbackC += sin((fabs(feedbackDL*4)>1)?4:fabs(feedbackDL*4))*pow(feedbackDL,4);
-			feedbackD += sin((fabs(feedbackPR*4)>1)?4:fabs(feedbackPR*4))*pow(feedbackPR,4);
+			feedbackC += sin((fabs(feedbackDL*4)>1)?4:fabs(feedbackDL*4))*powf(feedbackDL,4);
+			feedbackD += sin((fabs(feedbackPR*4)>1)?4:fabs(feedbackPR*4))*powf(feedbackPR,4);
 			feedbackDL *= 16.0f; feedbackPR *= 16.0f;
 			
 			float iirAmount = ((feedbackA-1.0f) * -0.00007f) + 0.00001f; //kick in highpass

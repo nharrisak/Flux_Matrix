@@ -72,8 +72,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (inputSample < -1.0f) inputSample = -1.0f;
 		
 		
-		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0f) / 255;
-		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample > 0) inputSample = (powf(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample < 0) inputSample = -(powf(256,fabs(inputSample))-1.0f) / 255;
 
 		
 		

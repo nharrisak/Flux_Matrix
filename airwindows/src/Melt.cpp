@@ -65,7 +65,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 rate = 1 / (pow(GetParameter( kParam_One ),2) + 0.001f);
+	Float32 rate = 1 / (powf(GetParameter( kParam_One ),2) + 0.001f);
 	Float32 depthB = (GetParameter( kParam_Two ) * 139.5f)+2;
 	Float32 depthA = depthB * (1.0f - GetParameter( kParam_One ));
 	Float32 output = GetParameter( kParam_Three ) * 0.05f;

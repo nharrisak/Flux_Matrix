@@ -149,8 +149,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		
 		inputSample *= gain; //input trim
-		float inflamerPlus = (inputSample*2.0f)-pow(inputSample,2); //+50, very much just second harmonic
-		float inflamerMinus = inputSample+(pow(inputSample,3)*0.25f)-((pow(inputSample,2)+pow(inputSample,4))*0.0625f); //-50
+		float inflamerPlus = (inputSample*2.0f)-powf(inputSample,2); //+50, very much just second harmonic
+		float inflamerMinus = inputSample+(powf(inputSample,3)*0.25f)-((powf(inputSample,2)+powf(inputSample,4))*0.0625f); //-50
 		inputSample = (inflamerPlus * curve) + (inflamerMinus * negacurve);
 		inputSample = (inputSample * effectOut) + (drySample * (1.0f-effectOut));
 		

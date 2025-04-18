@@ -51,7 +51,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		float inputSample = *sourceP;
 		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		inputSample += ((pow(inputSample,5)/128.0f) + (pow(inputSample,9)/262144.0f)) - ((pow(inputSample,3)/8.0f) + (pow(inputSample,7)/4096.0f));
+		inputSample += ((powf(inputSample,5)/128.0f) + (powf(inputSample,9)/262144.0f)) - ((powf(inputSample,3)/8.0f) + (powf(inputSample,7)/4096.0f));
 		//crude sine. Note that because modern processors love math more than extra variables, this is optimized
 		
 		

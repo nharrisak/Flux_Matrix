@@ -112,7 +112,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	dram->biquadA[biq_freq] = ((pow(GetParameter( kParam_Two ),4)*9500.0f)/GetSampleRate())+0.00076f;
+	dram->biquadA[biq_freq] = ((powf(GetParameter( kParam_Two ),4)*9500.0f)/GetSampleRate())+0.00076f;
 	//float clipFactor = 1.212f-((1.0f-GetParameter( kParam_Two ))*0.496f);
 	dram->biquadA[biq_reso] = 1.0f;
 	dram->biquadA[biq_aA0] = dram->biquadA[biq_aB0];
@@ -137,7 +137,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	outTrimA = outTrimB;
 	outTrimB = GetParameter( kParam_Three )*10.0f;
 	wetA = wetB;
-	wetB = pow(GetParameter( kParam_Four ),2);
+	wetB = powf(GetParameter( kParam_Four ),2);
 	
 	float iirAmountA = 0.00069f/overallscale;
 	dram->fixA[fix_freq] = dram->fixB[fix_freq] = 15500.0f / GetSampleRate();

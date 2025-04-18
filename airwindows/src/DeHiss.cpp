@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 meanOut = 0;
 	Float32 meanLast;
 	Float32 average[5];
-	Float32 threshold = pow(GetParameter( kParam_One ),9);
+	Float32 threshold = powf(GetParameter( kParam_One ),9);
 	Float32 wet = GetParameter( kParam_Two );
 	
 	while (nSampleFrames-- > 0) {

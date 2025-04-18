@@ -64,7 +64,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float32 inputgain = pow(10.0f,(GetParameter( kParam_One )*14.0f)/20.0f);
+	Float32 inputgain = powf(10.0f,(GetParameter( kParam_One )*14.0f)/20.0f);
 	Float32 compfactor = 0.012f * (GetParameter( kParam_One ) / 135.0f);
 	Float32 output = GetParameter( kParam_Two );
 	Float32 wet = GetParameter( kParam_Three );
@@ -96,7 +96,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputpos *= inputpos;
 		targetpos *= divisor;
 		targetpos += (inputpos * remainder);
-		float calcpos = pow((1.0f/targetpos),2);
+		float calcpos = powf((1.0f/targetpos),2);
 		
 		float inputneg = (-inputSample) + 1.0f;
 		if (inputneg < 0.0f) inputneg = 0.0f;
@@ -105,7 +105,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputneg *= inputneg;
 		targetneg *= divisor;
 		targetneg += (inputneg * remainder);
-		float calcneg = pow((1.0f/targetneg),2);
+		float calcneg = powf((1.0f/targetneg),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		

@@ -65,7 +65,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (highres) scaleFactor = 8388608.0f;
 	else scaleFactor = 32768.0f;
 	Float32 derez = GetParameter( kParam_Two );
-	if (derez > 0.0f) scaleFactor *= pow(1.0f-derez,6);
+	if (derez > 0.0f) scaleFactor *= powf(1.0f-derez,6);
 	if (scaleFactor < 0.0001f) scaleFactor = 0.0001f;
 	Float32 outScale = scaleFactor;
 	if (outScale < 8.0f) outScale = 8.0f;

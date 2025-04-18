@@ -60,9 +60,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	float overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	float flutDepth = pow(GetParameter( kParam_A ),4)*overallscale*90;
+	float flutDepth = powf(GetParameter( kParam_A ),4)*overallscale*90;
 	if (flutDepth > 498.0f) flutDepth = 498.0f;
-	float flutFrequency = (0.02f*pow(GetParameter( kParam_B ),3))/overallscale;
+	float flutFrequency = (0.02f*powf(GetParameter( kParam_B ),3))/overallscale;
 	float wet = GetParameter( kParam_C );
 	
 	while (nSampleFrames-- > 0) {

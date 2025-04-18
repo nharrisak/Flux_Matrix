@@ -85,10 +85,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	int bufferR = 0;
 	//these are to build up the reverb tank outs
 	
-	UInt32 rangeDirect = (pow(GetParameter( kParam_Two ),2) * 156.0f) + 7.0f;
+	UInt32 rangeDirect = (powf(GetParameter( kParam_Two ),2) * 156.0f) + 7.0f;
 	//maximum safe delay is 259 * the prime tap, not including room for the pitch shift offset
 	
-	Float32 scaleDirect = (pow(GetParameter( kParam_One ),2) * (3280.0f/rangeDirect)) + 2.0f;
+	Float32 scaleDirect = (powf(GetParameter( kParam_One ),2) * (3280.0f/rangeDirect)) + 2.0f;
 	//let's try making it always be the max delay: smaller range forces scale to be longer
 	
 	Float32 outputPad = 4 * rangeDirect * sqrt(rangeDirect);

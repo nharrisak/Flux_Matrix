@@ -72,16 +72,16 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	Float32 chase = 0.00005f / overallscale;
 			
-	biquadA[0] = pow(GetParameter( kParam_One ),(3.0f*cbrt(overallscale)))*0.42f;
+	biquadA[0] = powf(GetParameter( kParam_One ),(3.0f*cbrt(overallscale)))*0.42f;
 	if (biquadA[0] < 0.0001f) biquadA[0] = 0.0001f;
 	
-	biquadB[0] = pow(GetParameter( kParam_Two ),(3.0f*cbrt(overallscale)))*0.42f;
+	biquadB[0] = powf(GetParameter( kParam_Two ),(3.0f*cbrt(overallscale)))*0.42f;
 	if (biquadB[0] < 0.0001f) biquadB[0] = 0.0001f;
 	
-	biquadC[0] = pow(GetParameter( kParam_Three ),(3.0f*cbrt(overallscale)))*0.42f;
+	biquadC[0] = powf(GetParameter( kParam_Three ),(3.0f*cbrt(overallscale)))*0.42f;
 	if (biquadC[0] < 0.0001f) biquadC[0] = 0.0001f;
 	
-    biquadA[1] = biquadB[1] = biquadC[1] = (pow(GetParameter( kParam_Four ),3)*8.0f)+0.33f;
+    biquadA[1] = biquadB[1] = biquadC[1] = (powf(GetParameter( kParam_Four ),3)*8.0f)+0.33f;
 	biquadB[1] /= 2.0f; biquadC[1] /= 4.0f;
 	
 	Float32 volumeCompensation = sqrt(biquadA[1]);

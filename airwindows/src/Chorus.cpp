@@ -66,11 +66,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float32 speed = pow(GetParameter( kParam_One ),4) * 0.001f;
+	Float32 speed = powf(GetParameter( kParam_One ),4) * 0.001f;
 	speed *= overallscale;
 	int loopLimit = (int)(totalsamples * 0.499f);
 	int count;
-	Float32 range = pow(GetParameter( kParam_Two ),4) * loopLimit * 0.499f;
+	Float32 range = powf(GetParameter( kParam_Two ),4) * loopLimit * 0.499f;
 	Float32 wet = GetParameter( kParam_Three );
 	Float32 modulation = range*wet;
 	//removed unnecessary dry variable

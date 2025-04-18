@@ -58,10 +58,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	float overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 threshold = pow(GetParameter( kParam_One ),6);
-	Float32 recovery = pow((GetParameter( kParam_Two )*0.5f),6);
+	Float32 threshold = powf(GetParameter( kParam_One ),6);
+	Float32 recovery = powf((GetParameter( kParam_Two )*0.5f),6);
 	recovery /= overallscale;
-	Float32 baseline = pow(GetParameter( kParam_Three ),6);
+	Float32 baseline = powf(GetParameter( kParam_Three ),6);
 	Float32 invrec = 1.0f - recovery;
 	
 	while (nSampleFrames-- > 0) {

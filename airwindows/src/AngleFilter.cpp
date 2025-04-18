@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	primaryA = primaryB; primaryB = pow(GetParameter( kParam_A ),overallscale+2.0f);
+	primaryA = primaryB; primaryB = powf(GetParameter( kParam_A ),overallscale+2.0f);
 	secondaryA = secondaryB; secondaryB = GetParameter( kParam_B );
 	tertiaryA = tertiaryB; tertiaryB = fmin(primaryB+GetParameter( kParam_C ),1.0f);
 	float poles = GetParameter( kParam_D );

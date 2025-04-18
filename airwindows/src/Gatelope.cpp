@@ -67,11 +67,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	//speed settings around release
-	Float32 threshold = pow(GetParameter( kParam_One ),2);
+	Float32 threshold = powf(GetParameter( kParam_One ),2);
 	//gain settings around threshold
-	Float32 trebledecay = pow(1.0f-GetParameter( kParam_Two ),2)/4196.0f;
-	Float32 bassdecay =  pow(1.0f-GetParameter( kParam_Three ),2)/8192.0f;
-	Float32 slowAttack = (pow(GetParameter( kParam_Four ),3)*3)+0.003f;
+	Float32 trebledecay = powf(1.0f-GetParameter( kParam_Two ),2)/4196.0f;
+	Float32 bassdecay =  powf(1.0f-GetParameter( kParam_Three ),2)/8192.0f;
+	Float32 slowAttack = (powf(GetParameter( kParam_Four ),3)*3)+0.003f;
 	Float32 wet = GetParameter( kParam_Five );
 	slowAttack /= overallscale;
 	trebledecay /= overallscale;

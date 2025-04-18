@@ -71,11 +71,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 fpOld = 0.618033988749894848204586f; //golden ratio!
 	Float32 fpNew = 1.0f - fpOld;
 	
-	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 inputGain = powf(10.0f,(GetParameter( kParam_One ))/20.0f);
 	Float32 softness = GetParameter( kParam_Two ) * fpNew;
 	Float32 hardness = 1.0f - softness;
 	Float32 highslift = 0.307f * GetParameter( kParam_Three );
-	Float32 adjust = pow(highslift,3) * 0.416f;
+	Float32 adjust = powf(highslift,3) * 0.416f;
 	Float32 subslift = 0.796f * GetParameter( kParam_Three );
 	Float32 calibsubs = subslift/53;
 	Float32 invcalibsubs = 1.0f - calibsubs;

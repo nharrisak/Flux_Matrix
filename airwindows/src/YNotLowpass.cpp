@@ -100,10 +100,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	float inTrim = GetParameter( kParam_One )*10.0f;
 	
-	dram->biquad[biq_freq] = pow(GetParameter( kParam_Two ),3)*20000.0f;
+	dram->biquad[biq_freq] = powf(GetParameter( kParam_Two ),3)*20000.0f;
 	if (dram->biquad[biq_freq] < 15.0f) dram->biquad[biq_freq] = 15.0f;
 	dram->biquad[biq_freq] /= GetSampleRate();
-    dram->biquad[biq_reso] = (pow(GetParameter( kParam_Three ),2)*15.0f)+0.5571f;
+    dram->biquad[biq_reso] = (powf(GetParameter( kParam_Three ),2)*15.0f)+0.5571f;
 	float K = tan(M_PI * dram->biquad[biq_freq]);
 	float norm = 1.0f / (1.0f + K / dram->biquad[biq_reso] + K * K);
 	dram->biquad[biq_a0] = K * K * norm;
@@ -113,7 +113,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	dram->biquad[biq_b2] = (1.0f - K / dram->biquad[biq_reso] + K * K) * norm;
 	//for the coefficient-interpolated biquad filter
 	
-	float powFactor = pow(GetParameter( kParam_Four )+0.9f,4);
+	float powFactor = powf(GetParameter( kParam_Four )+0.9f,4);
 	
 	//1.0f == target neutral
 	
@@ -147,9 +147,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		//encode/decode courtesy of torridgristle under the MIT license
 		if (inputSample > 1.0f) inputSample = 1.0f;
-		else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,powFactor);
+		else if (inputSample > 0.0f) inputSample = 1.0f - powf(1.0f-inputSample,powFactor);
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,powFactor);
+		else if (inputSample < 0.0f) inputSample = -1.0f + powf(1.0f+inputSample,powFactor);
 		
 		temp = (inputSample * dram->biquad[biq_a0]) + dram->biquad[biq_sL1];
 		dram->biquad[biq_sL1] = (inputSample * dram->biquad[biq_a1]) - (temp * dram->biquad[biq_b1]) + dram->biquad[biq_sL2];
@@ -158,9 +158,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		//encode/decode courtesy of torridgristle under the MIT license
 		if (inputSample > 1.0f) inputSample = 1.0f;
-		else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,(1.0f/powFactor));
+		else if (inputSample > 0.0f) inputSample = 1.0f - powf(1.0f-inputSample,(1.0f/powFactor));
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,(1.0f/powFactor));
+		else if (inputSample < 0.0f) inputSample = -1.0f + powf(1.0f+inputSample,(1.0f/powFactor));
 		
 		inputSample *= outTrim;
 		

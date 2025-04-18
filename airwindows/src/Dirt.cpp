@@ -82,11 +82,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float inTrim = ((1.0f-pow(1.0f-GetParameter( kParam_One ),2))*1.0f)+1.0f;
+	float inTrim = ((1.0f-powf(1.0f-GetParameter( kParam_One ),2))*1.0f)+1.0f;
 	float cutoff = (GetParameter( kParam_Two )*25000.0f) / GetSampleRate();
 	if (cutoff > 0.49f) cutoff = 0.49f; //don't crash if run at 44.1k
 	if (cutoff < 0.0001f) cutoff = 0.0001f; //or if cutoff's too low
-	float iirAmount = pow(GetParameter( kParam_Three ),3)*0.5f;
+	float iirAmount = powf(GetParameter( kParam_Three ),3)*0.5f;
 	if (iirAmount < 0.00000001f) iirAmount = 0.00000001f; //or if cutoff's too low
 	iirAmount /= overallscale; //highpass is very gentle
 	float outPad = GetParameter( kParam_Four );

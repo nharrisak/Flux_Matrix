@@ -74,8 +74,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 inputgain = powf(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Three )/20.0f);
 	Float32 ips = GetParameter( kParam_Two ) * 1.1f;
 	//slight correction to dial in convincing ips settings
 	if (ips < 1 || ips > 200) ips=33.0f;

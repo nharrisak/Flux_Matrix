@@ -50,7 +50,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	lowpassChase = pow(GetParameter( kParam_One ),2);
+	lowpassChase = powf(GetParameter( kParam_One ),2);
 	//should not scale with sample rate, because values reaching 1 are important
 	//to its ability to bypass when set to max
 	Float32 lowpassSpeed = 300 / (fabs( lastLowpass - lowpassChase)+1.0f);

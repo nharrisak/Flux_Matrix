@@ -138,7 +138,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check		
 	
-	float inputlevel = pow(GetParameter( kParam_One ),2);
+	float inputlevel = powf(GetParameter( kParam_One ),2);
 	float samplerate = GetSampleRate();
 	float trimEQ = 1.1f-GetParameter( kParam_Two );
 	float toneEQ = trimEQ/1.2f;

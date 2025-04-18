@@ -83,31 +83,31 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	float trebleGain = GetParameter( kParam_A )*2.0f;
 	float midGain = GetParameter( kParam_B )*2.0f;
-	float bassGain = GetParameter( kParam_C )*2.0f; //amount ends up being pow(gain,3)
+	float bassGain = GetParameter( kParam_C )*2.0f; //amount ends up being powf(gain,3)
 	//simple three band to adjust
 	
-	dram->besselA[biq_freq] = pow(GetParameter( kParam_D ),2) * (0.25f/overallscale) * 1.9047076123f;
+	dram->besselA[biq_freq] = powf(GetParameter( kParam_D ),2) * (0.25f/overallscale) * 1.9047076123f;
 	if (dram->besselA[biq_freq] < 0.00025f) dram->besselA[biq_freq] = 0.00025f;
 	if (dram->besselA[biq_freq] > 0.4999f) dram->besselA[biq_freq] = 0.4999f;
 	dram->besselA[biq_reso] = 1.02331395383f;
-	dram->besselB[biq_freq] = pow(GetParameter( kParam_D ),2) * (0.25f/overallscale) * 1.68916826762f;
+	dram->besselB[biq_freq] = powf(GetParameter( kParam_D ),2) * (0.25f/overallscale) * 1.68916826762f;
 	if (dram->besselB[biq_freq] < 0.00025f) dram->besselB[biq_freq] = 0.00025f;
 	if (dram->besselB[biq_freq] > 0.4999f) dram->besselB[biq_freq] = 0.4999f;
 	dram->besselB[biq_reso] = 0.611194546878f;
-	dram->besselC[biq_freq] = pow(GetParameter( kParam_D ),2) * (0.25f/overallscale) * 1.60391912877f;
+	dram->besselC[biq_freq] = powf(GetParameter( kParam_D ),2) * (0.25f/overallscale) * 1.60391912877f;
 	if (dram->besselC[biq_freq] < 0.00025f) dram->besselC[biq_freq] = 0.00025f;
 	if (dram->besselC[biq_freq] > 0.4999f) dram->besselC[biq_freq] = 0.4999f;
 	dram->besselC[biq_reso] = 0.510317824749f;
 	
-	dram->besselD[biq_freq] = pow(GetParameter( kParam_E ),4) * (0.25f/overallscale) * 1.9047076123f;
+	dram->besselD[biq_freq] = powf(GetParameter( kParam_E ),4) * (0.25f/overallscale) * 1.9047076123f;
 	if (dram->besselD[biq_freq] < 0.00025f) dram->besselD[biq_freq] = 0.00025f;
 	if (dram->besselD[biq_freq] > 0.4999f) dram->besselD[biq_freq] = 0.4999f;
 	dram->besselD[biq_reso] = 1.02331395383f;
-	dram->besselE[biq_freq] = pow(GetParameter( kParam_E ),4) * (0.25f/overallscale) * 1.68916826762f;
+	dram->besselE[biq_freq] = powf(GetParameter( kParam_E ),4) * (0.25f/overallscale) * 1.68916826762f;
 	if (dram->besselE[biq_freq] < 0.00025f) dram->besselE[biq_freq] = 0.00025f;
 	if (dram->besselE[biq_freq] > 0.4999f) dram->besselE[biq_freq] = 0.4999f;
 	dram->besselE[biq_reso] = 0.611194546878f;
-	dram->besselF[biq_freq] = pow(GetParameter( kParam_E ),4) * (0.25f/overallscale) * 1.60391912877f;
+	dram->besselF[biq_freq] = powf(GetParameter( kParam_E ),4) * (0.25f/overallscale) * 1.60391912877f;
 	if (dram->besselF[biq_freq] < 0.00025f) dram->besselF[biq_freq] = 0.00025f;
 	if (dram->besselF[biq_freq] > 0.4999f) dram->besselF[biq_freq] = 0.4999f;
 	dram->besselF[biq_reso] = 0.510317824749f;

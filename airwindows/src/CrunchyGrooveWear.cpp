@@ -60,7 +60,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;	
-	Float32 overallscale = (pow(GetParameter( kParam_One ),2)*19.0f)+1.0f;
+	Float32 overallscale = (powf(GetParameter( kParam_One ),2)*19.0f)+1.0f;
 	Float32 gain = overallscale;
 	//mid groove wear
 	if (gain > 1.0f) {dram->fMid[0] = 1.0f; gain -= 1.0f;} else {dram->fMid[0] = gain; gain = 0.0f;}

@@ -77,9 +77,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16; //for ClipOnly2
 	
-	Float32 threshold = 1.0f - ((1.0f-pow(1.0f-GetParameter( kParam_One ),2))*0.9f);
-	Float32 attack = ((pow(GetParameter( kParam_Two ),4)*100000.0f)+10.0f)*overallscale;
-	Float32 release = ((pow(GetParameter( kParam_Three ),5)*2000000.0f)+20.0f)*overallscale;
+	Float32 threshold = 1.0f - ((1.0f-powf(1.0f-GetParameter( kParam_One ),2))*0.9f);
+	Float32 attack = ((powf(GetParameter( kParam_Two ),4)*100000.0f)+10.0f)*overallscale;
+	Float32 release = ((powf(GetParameter( kParam_Three ),5)*2000000.0f)+20.0f)*overallscale;
 	Float32 maxRelease = release * 4.0f;
 	Float32 muPreGain = 1.0f/threshold;
 	Float32 muMakeupGain = sqrt(1.0f / threshold)*GetParameter( kParam_Four );
@@ -133,8 +133,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				muSpeedB = muNewSpeed / muSpeedB;}
 		}
 		//got coefficients, adjusted speeds
-		if (flip) inputSample *= pow(muCoefficientA,2);
-		else inputSample *= pow(muCoefficientB,2);
+		if (flip) inputSample *= powf(muCoefficientA,2);
+		else inputSample *= powf(muCoefficientB,2);
 		inputSample *= muMakeupGain;
 		flip = !flip;
 		//end compressor section

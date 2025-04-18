@@ -84,8 +84,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 speed = ((1.0f/12.0f)*note)+trim;	
 	if (speed < 0) speed *= 0.5f;
 	//include sanity check- maximum pitch lowering cannot be to 0 hz.
-	SInt32 width = (SInt32)(65536-((1-pow(1-GetParameter( kParam_Three ),2))*65530.0f));
-	Float32 bias = pow(GetParameter( kParam_Three ),3);
+	SInt32 width = (SInt32)(65536-((1-powf(1-GetParameter( kParam_Three ),2))*65530.0f));
+	Float32 bias = powf(GetParameter( kParam_Three ),3);
 	Float32 feedback = GetParameter( kParam_Four )/1.5f;
 	Float32 wet = GetParameter( kParam_Five );
 	

@@ -108,11 +108,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (isoFreq > 1.0f) isoFreq = 1.0f;
 	if (hisoFreq < 0.0f) hisoFreq = 0.0f;
 		
-	dram->biquadA[biq_freq] = pow(isoFreq,(2.0f*sqrt(overallscale)))*0.4999f;
+	dram->biquadA[biq_freq] = powf(isoFreq,(2.0f*sqrt(overallscale)))*0.4999f;
 	if (dram->biquadA[biq_freq] < 0.00025f) dram->biquadA[biq_freq] = 0.00025f;
 	dram->biquadG[biq_freq] = dram->biquadF[biq_freq] = dram->biquadE[biq_freq] = dram->biquadD[biq_freq] = dram->biquadC[biq_freq] = dram->biquadB[biq_freq] = dram->biquadA[biq_freq];
 
-	dram->hiquadA[biq_freq] = pow(hisoFreq,(2.0f*sqrt(overallscale)))*0.4999f;
+	dram->hiquadA[biq_freq] = powf(hisoFreq,(2.0f*sqrt(overallscale)))*0.4999f;
 	if (dram->hiquadA[biq_freq] < 0.00025f) dram->hiquadA[biq_freq] = 0.00025f;
 	dram->hiquadG[biq_freq] = dram->hiquadF[biq_freq] = dram->hiquadE[biq_freq] = dram->hiquadD[biq_freq] = dram->hiquadC[biq_freq] = dram->hiquadB[biq_freq] = dram->hiquadA[biq_freq];
 		

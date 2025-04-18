@@ -51,7 +51,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		float inputSample = *sourceP;
 		if (fabs(inputSample)<1.18e-23f) inputSample = fpd * 1.18e-17f;
 
-		inputSample += (pow(inputSample,3)/4.0f)+(pow(inputSample,5)/8.0f)+(pow(inputSample,7)/16.0f)+(pow(inputSample,9)/32.0f);
+		inputSample += (powf(inputSample,3)/4.0f)+(powf(inputSample,5)/8.0f)+(powf(inputSample,7)/16.0f)+(powf(inputSample,9)/32.0f);
 		//crude arcsine. Note that because modern processors love math more than extra variables, this is optimized
 		
 		

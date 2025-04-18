@@ -78,8 +78,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
-	Float32 SoftenControl = pow(GetParameter( kParam_Two ),2);
+	Float32 inputgain = powf(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 SoftenControl = powf(GetParameter( kParam_Two ),2);
 	Float32 RollAmount = (1.0f-(SoftenControl * 0.45f))/overallscale;
 	Float32 HeadBumpControl = GetParameter( kParam_Three ) * 0.25f * inputgain;
 	Float32 HeadBumpFreq = 0.12f/overallscale;
@@ -103,9 +103,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	biquadC[5] = biquadD[5] = 2.0f * (K * K - 1.0f) * norm;
 	biquadC[6] = biquadD[6] = (1.0f - K / biquadD[1] + K * K) * norm;
 	
-	Float32 depth = pow(GetParameter( kParam_Four ),2)*overallscale*70;
-	Float32 fluttertrim = (0.0024f*pow(GetParameter( kParam_Four ),2))/overallscale;
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Five )/20.0f);
+	Float32 depth = powf(GetParameter( kParam_Four ),2)*overallscale*70;
+	Float32 fluttertrim = (0.0024f*powf(GetParameter( kParam_Four ),2))/overallscale;
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Five )/20.0f);
 	
 	Float32 refclip = 0.99f;
 	Float32 softness = 0.618033988749894848204586f;
@@ -129,7 +129,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		int count = gcount;
 		if (depth != 0.0f) {
 			
-			float offset = depth + (depth * pow(rateof,2) * sin(sweep));
+			float offset = depth + (depth * powf(rateof,2) * sin(sweep));
 			
 			count += (int)floor(offset);
 			inputSample = (dram->d[count-((count > 499)?500:0)] * (1-(offset-floor(offset))) );
@@ -228,7 +228,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		
 		if (inputSample > 1.0f) inputSample = 1.0f;
 		if (inputSample < -1.0f) inputSample = -1.0f;
-		float mojo; mojo = pow(fabs(inputSample),0.25f);
+		float mojo; mojo = powf(fabs(inputSample),0.25f);
 		if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo);
 		//mojo is the one that flattens WAAAAY out very softly before wavefolding		
 		

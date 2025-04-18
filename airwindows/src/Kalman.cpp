@@ -70,7 +70,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float kalman = 1.0f-pow(GetParameter( kParam_One ),2);
+	float kalman = 1.0f-powf(GetParameter( kParam_One ),2);
 	float wet = (GetParameter( kParam_Two )*2.0f)-1.0f; //inv-dry-wet for highpass
 	float dry = 2.0f-(GetParameter( kParam_Two )*2.0f);
 	if (dry > 1.0f) dry = 1.0f; //full dry for use with inv, to 0.0f at full wet

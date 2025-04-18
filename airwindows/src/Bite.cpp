@@ -116,7 +116,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		//32 bit dither, made small and tidy.
 		int expon; frexpf((Float32)result, &expon);
-		float dither = (rand()/(RAND_MAX*7.737125245533627e+25))*pow(2,expon+62);
+		float dither = (rand()/(RAND_MAX*7.737125245533627e+25))*powf(2,expon+62);
 		result += (dither-fpNShape); fpNShape = dither;
 		//end 32 bit dither
 		

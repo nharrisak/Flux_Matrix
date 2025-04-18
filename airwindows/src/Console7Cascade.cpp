@@ -56,7 +56,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	float inputgain = 1.0f-(pow(1.0f-GetParameter( kParam_One ),2));
+	float inputgain = 1.0f-(powf(1.0f-GetParameter( kParam_One ),2));
 	//this happens to give us a boost factor where the track continues to get louder even
 	//as it saturates and loses a bit of peak energy. Console7Channel channels go to 12! (.272,etc)
 	//Neutral gain through the whole system with a full scale sine ia 0.772f on the gain knob

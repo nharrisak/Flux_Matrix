@@ -64,7 +64,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 offset = (densityside-densitymid)/2;
 	if (offset > 0) offset = sin(offset);
 	if (offset < 0) offset = -sin(-offset);
-	offset = -(pow(offset,4) * 20 * overallscale);
+	offset = -(powf(offset,4) * 20 * overallscale);
 	int near = (int)floor(fabs(offset));
 	Float32 farLevel = fabs(offset) - near;
 	int far = near + 1;

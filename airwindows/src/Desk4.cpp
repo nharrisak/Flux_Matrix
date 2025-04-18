@@ -68,12 +68,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 gain = (pow(GetParameter( kParam_One ),2)*10)+0.0001f;
-	Float32 gaintrim = (pow(GetParameter( kParam_One ),2)*2)+1.0f;
-	Float32 slewgain = (pow(GetParameter( kParam_Two ),3)*40)+0.0001f;	
+	Float32 gain = (powf(GetParameter( kParam_One ),2)*10)+0.0001f;
+	Float32 gaintrim = (powf(GetParameter( kParam_One ),2)*2)+1.0f;
+	Float32 slewgain = (powf(GetParameter( kParam_Two ),3)*40)+0.0001f;	
 	Float32 prevslew = 0.105f;
-	Float32 intensity = (pow(GetParameter( kParam_Three ),6)*15)+0.0001f;
-	Float32 depthA = (pow(GetParameter( kParam_Four ),4)*940)+0.00001f;
+	Float32 intensity = (powf(GetParameter( kParam_Three ),6)*15)+0.0001f;
+	Float32 depthA = (powf(GetParameter( kParam_Four ),4)*940)+0.00001f;
 	int offsetA = (int)(depthA * overallscale);
 	if (offsetA < 1) offsetA = 1;
 	if (offsetA > 4880) offsetA = 4880;

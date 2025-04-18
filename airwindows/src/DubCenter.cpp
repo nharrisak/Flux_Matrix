@@ -116,7 +116,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	float overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 driveone = pow(GetParameter( kParam_One )*3.0f,2);
+	Float32 driveone = powf(GetParameter( kParam_One )*3.0f,2);
 	Float32 driveoutput = GetParameter( kParam_Two );
 	Float32 iirAmount = ((GetParameter( kParam_Three )*0.33f)+0.1f)/overallscale;
 	Float32 ataLowpassL;

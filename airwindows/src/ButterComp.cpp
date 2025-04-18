@@ -66,7 +66,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	float totalmultiplier;
 	float inputSample;
 	Float32 drySample;
-	Float32 inputgain = pow(10.0f,(GetParameter( kParam_One )*14.0f)/20.0f);
+	Float32 inputgain = powf(10.0f,(GetParameter( kParam_One )*14.0f)/20.0f);
 	Float32 wet = GetParameter( kParam_Two );
 	//removed unnecessary dry variable
 	Float32 outputgain = inputgain;
@@ -90,7 +90,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputpos *= inputpos;
 		targetpos *= divisor;
 		targetpos += (inputpos * remainder);
-		calcpos = pow((1.0f/targetpos),2);
+		calcpos = powf((1.0f/targetpos),2);
 
 		inputneg = (-inputSample) + 1.0f;
 		if (inputneg < 0.0f) inputneg = 0.0f;
@@ -99,7 +99,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputneg *= inputneg;
 		targetneg *= divisor;
 		targetneg += (inputneg * remainder);
-		calcneg = pow((1.0f/targetneg),2);
+		calcneg = powf((1.0f/targetneg),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 

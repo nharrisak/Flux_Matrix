@@ -48,7 +48,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 gain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 gain = powf(10.0f,GetParameter( kParam_One )/20.0f);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;
@@ -59,7 +59,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputSample *= gain;
 		}
 		
-		float dyno = pow(fabs(inputSample),4);
+		float dyno = powf(fabs(inputSample),4);
 		if (dyno > 0.0f) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321f;
 		//dyno is the one that tries to raise peak energy
 		

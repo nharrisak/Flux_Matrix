@@ -702,8 +702,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//gain of 1,0 gives you a super-clean one, gain of 2 is obviously compressing
 			//smaller number is maximum clamping, if too small it'll take a while to bounce back
 			inputSampleL *= gainOutL; inputSampleR *= gainOutR;
-			gainOutL += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*pow(inputSampleL,4);
-			gainOutR += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*pow(inputSampleR,4);
+			gainOutL += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*powf(inputSampleL,4);
+			gainOutR += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*powf(inputSampleR,4);
 			//4.71239f radians sined will turn to -1 which is the maximum gain reduction speed
 			inputSampleL *= 4.0f; inputSampleR *= 4.0f;
 			//curve! To get a compressed effect that matches a certain other plugin

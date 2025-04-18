@@ -76,13 +76,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check	
 	
-	Float32 baseSpeed = (pow(GetParameter( kParam_One ),4)*25.0f)+1.0f;
-	Float32 feedback = pow(GetParameter( kParam_Two ),2);
+	Float32 baseSpeed = (powf(GetParameter( kParam_One ),4)*25.0f)+1.0f;
+	Float32 feedback = powf(GetParameter( kParam_Two ),2);
 	
 	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
 	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
-	regenFilter[0] = ((pow(GetParameter( kParam_Three ),3)*0.4f)+0.0001f);
-	regenFilter[1] = pow(GetParameter( kParam_Four ),2)+0.01f; //resonance
+	regenFilter[0] = ((powf(GetParameter( kParam_Three ),3)*0.4f)+0.0001f);
+	regenFilter[1] = powf(GetParameter( kParam_Four ),2)+0.01f; //resonance
 	float K = tan(M_PI * regenFilter[0]);
 	float norm = 1.0f / (1.0f + K / regenFilter[1] + K * K);
 	regenFilter[2] = K / regenFilter[1] * norm;
@@ -101,7 +101,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	outFilter[5] = 2.0f * (K * K - 1.0f) * norm;
 	outFilter[6] = (1.0f - K / outFilter[1] + K * K) * norm;
 	
-	Float32 vibSpeed = pow(GetParameter( kParam_Five ),5) * baseSpeed * ((regenFilter[0]*0.09f)+0.025f);//0.05f
+	Float32 vibSpeed = powf(GetParameter( kParam_Five ),5) * baseSpeed * ((regenFilter[0]*0.09f)+0.025f);//0.05f
 	Float32 wet = GetParameter( kParam_Six )*2.0f;
 	Float32 dry = 2.0f - wet;
 	if (wet > 1.0f) wet = 1.0f;

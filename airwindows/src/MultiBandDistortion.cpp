@@ -84,15 +84,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
-	Float32 gainH = pow(10.0f,GetParameter( kParam_Two )/20);
+	Float32 iirAmount = powf(GetParameter( kParam_One ),3)/overallscale;
+	Float32 gainH = powf(10.0f,GetParameter( kParam_Two )/20);
 
 	Float32 thresholdH = GetParameter( kParam_Four );
 	Float32 hardnessH;
 	if (thresholdH < 1.0f) hardnessH = 1.0f / (1.0f-thresholdH);
 	else hardnessH = 999999999999999999999.0f;
 
-	Float32 gainL = pow(10.0f,GetParameter( kParam_Three )/20);
+	Float32 gainL = powf(10.0f,GetParameter( kParam_Three )/20);
 	Float32 thresholdL = GetParameter( kParam_Five );
 	Float32 hardnessL;
 	if (thresholdL < 1.0f) hardnessL = 1.0f / (1.0f-thresholdL);
@@ -108,7 +108,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	outputH *= outtrim;
 	outputL *= outtrim;
 	outputD *= outtrim;
-	Float32 outputGlobal = pow(10.0f,GetParameter( kParam_Nine )/20);
+	Float32 outputGlobal = powf(10.0f,GetParameter( kParam_Nine )/20);
 	
 
 	Float32 inputSample;

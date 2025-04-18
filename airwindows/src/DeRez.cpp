@@ -60,10 +60,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 targetA = pow(GetParameter( kParam_One ),3)+0.0005f;
+	Float32 targetA = powf(GetParameter( kParam_One ),3)+0.0005f;
 	if (targetA > 1.0f) targetA = 1.0f;
 	Float32 soften = (1.0f + targetA)/2;
-	Float32 targetB = pow(1.0f-GetParameter( kParam_Two ),3) / 3;
+	Float32 targetB = powf(1.0f-GetParameter( kParam_Two ),3) / 3;
 	Float32 overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();

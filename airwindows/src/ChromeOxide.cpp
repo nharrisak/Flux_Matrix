@@ -66,8 +66,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 bassSample;
 	Float32 randy;
 	Float32 bias = GetParameter( kParam_Two )/1.31578947368421f;
-	Float32 intensity = 0.9f+pow(GetParameter( kParam_One ),2);
-	Float32 iirAmount = pow(1.0f-(intensity/(10+(bias*4.0f))),2)/overallscale;
+	Float32 intensity = 0.9f+powf(GetParameter( kParam_One ),2);
+	Float32 iirAmount = powf(1.0f-(intensity/(10+(bias*4.0f))),2)/overallscale;
 	//make 10 higher for less trashy sound in high settings
 	Float32 bridgerectifier;
 	Float32 trebleGainTrim = 1.0f;

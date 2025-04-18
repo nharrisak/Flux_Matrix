@@ -88,15 +88,15 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale *= GetSampleRate();
 		
 	//begin ButterComp
-	float inputgain = (pow(GetParameter( kParam_One ),5)*35)+1.0f;
-	float divisor = (pow(GetParameter( kParam_Two ),4) * 0.01f)+0.0005f;
+	float inputgain = (powf(GetParameter( kParam_One ),5)*35)+1.0f;
+	float divisor = (powf(GetParameter( kParam_Two ),4) * 0.01f)+0.0005f;
 	divisor /= overallscale;
 	float remainder = divisor;
 	divisor = 1.0f - divisor;
 	//end ButterComp
 	
 	//begin Gate
-	float onthreshold = (pow(GetParameter( kParam_Three ),3)/3)+0.00018f;
+	float onthreshold = (powf(GetParameter( kParam_Three ),3)/3)+0.00018f;
 	float offthreshold = onthreshold * 1.1f;	
 	float release = 0.028331119964586f;
 	float absmax = 220.9f;

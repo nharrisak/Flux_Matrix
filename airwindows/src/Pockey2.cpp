@@ -60,12 +60,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	int freq = floor(pow(GetParameter( kParam_One ),3)*32.0f*overallscale);
+	int freq = floor(powf(GetParameter( kParam_One ),3)*32.0f*overallscale);
 	//dividing of derez must always be integer values now: no freq grinding
 	
 	float rez = GetParameter( kParam_Two);
 	//4 to 16, with 12 being the default.
-	int rezFactor = (int)pow(2,rez); //256, 4096, 65536 or anything in between
+	int rezFactor = (int)powf(2,rez); //256, 4096, 65536 or anything in between
 	
 	float wet = GetParameter( kParam_Three );
 	
@@ -85,8 +85,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample /= rezFactor;
 		
 		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
-		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0f) / 255;
-		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample > 0) inputSample = (powf(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample < 0) inputSample = -(powf(256,fabs(inputSample))-1.0f) / 255;
 		//end uLaw decode
 		
 		float blur = 0.618033988749894848204586f-(fabs(inputSample - lastSample)*overallscale);

@@ -62,7 +62,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	speedChase = pow(GetParameter( kParam_One ),4);
+	speedChase = powf(GetParameter( kParam_One ),4);
 	depthChase = GetParameter( kParam_Two );
 	Float32 speedSpeed = 300 / (fabs( lastSpeed - speedChase)+1.0f);
 	Float32 depthSpeed = 300 / (fabs( lastDepth - depthChase)+1.0f);
@@ -93,8 +93,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		depthAmount = (((depthAmount*depthSpeed)+depthChase)/(depthSpeed + 1.0f));
 		speed = 0.0001f+(speedAmount/1000.0f);
 		speed /= overallscale;
-		depth = 1.0f - pow(1.0f-depthAmount,5);
-		skew = 1.0f+pow(depthAmount,9);
+		depth = 1.0f - powf(1.0f-depthAmount,5);
+		skew = 1.0f+powf(depthAmount,9);
 		density = ((1.0f-depthAmount)*2.0f) - 1.0f;		
 		
 		offset = sin(sweep);

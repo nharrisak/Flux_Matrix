@@ -309,7 +309,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		prevcloudcoat = cloudcoat;
 	}
 	
-	float gaintrim = 1.0f-pow(1.0f-GetParameter( kParam_Two ),2);
+	float gaintrim = 1.0f-powf(1.0f-GetParameter( kParam_Two ),2);
 	float sustain = gaintrim*0.086f;
 	gaintrim = 1.1f-gaintrim;
 	float wet = GetParameter( kParam_Three )*2.0f;

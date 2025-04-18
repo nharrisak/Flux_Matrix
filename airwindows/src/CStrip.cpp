@@ -165,9 +165,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	bool engageEQ = true;
 	if ( (0.0f == densityA) && (0.0f == densityB) && (0.0f == densityC) ) engageEQ = false;
 	
-	densityA = pow(10.0f,densityA/20.0f)-1.0f;
-	densityB = pow(10.0f,densityB/20.0f)-1.0f;
-	densityC = pow(10.0f,densityC/20.0f)-1.0f;
+	densityA = powf(10.0f,densityA/20.0f)-1.0f;
+	densityB = powf(10.0f,densityB/20.0f)-1.0f;
+	densityC = powf(10.0f,densityC/20.0f)-1.0f;
 	//convert to 0 to X multiplier with 1.0f being O db
 	//minus one gives nearly -1 to ? (should top out at 1)
 	//calibrate so that X db roughly equals X db with maximum topping out at 1 internally
@@ -191,7 +191,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 outC = fabs(densityC);
 	//end EQ
 	//begin Gate
-	Float32 onthreshold = (pow(GetParameter( kParam_Eight ),4)/3)+0.00018f;
+	Float32 onthreshold = (powf(GetParameter( kParam_Eight ),4)/3)+0.00018f;
 	Float32 offthreshold = onthreshold * 1.1f;
 	bool engageGate = false;
 	if (onthreshold > 0.00018f) engageGate = true;
@@ -201,7 +201,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//speed to be compensated w.r.t sample rate
 	//end Gate
 	//begin Timing
-	Float32 offset = pow(GetParameter( kParam_Eleven ),5) * 700;
+	Float32 offset = powf(GetParameter( kParam_Eleven ),5) * 700;
 	int near = (int)floor(fabs(offset));
 	Float32 farLevel = fabs(offset) - near;
 	int far = near + 1;
@@ -217,12 +217,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 outputpos;
 	Float32 outputneg;
 	Float32 totalmultiplier;
-	Float32 inputgain = (pow(GetParameter( kParam_Nine ),4)*35)+1.0f;
+	Float32 inputgain = (powf(GetParameter( kParam_Nine ),4)*35)+1.0f;
 	Float32 compoutgain = inputgain;
 	compoutgain -= 1.0f;
 	compoutgain /= 1.2f;
 	compoutgain += 1.0f;
-	Float32 divisor = (0.008f * pow(GetParameter( kParam_Ten ),2))+0.0004f;
+	Float32 divisor = (0.008f * powf(GetParameter( kParam_Ten ),2))+0.0004f;
 	//originally 0.012f
 	divisor /= compscale;
 	Float32 remainder = divisor;
@@ -230,7 +230,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	bool engageComp = false;
 	if (inputgain > 1.0f) engageComp = true;
 	//end ButterComp
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Twelve )/20.0f);
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Twelve )/20.0f);
 	
 	while (nSampleFrames-- > 0) {
 		inputSample = *sourceP;
@@ -342,7 +342,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputpos *= inputpos;
 			targetpos *= divisor;
 			targetpos += (inputpos * remainder);
-			calcpos = pow((1.0f/targetpos),2);
+			calcpos = powf((1.0f/targetpos),2);
 			
 			inputneg = (-inputSample * fpOld) + (nvgA * fpNew) + 1.0f;
 			nvgA = -inputSample;
@@ -353,7 +353,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputneg *= inputneg;
 			targetneg *= divisor;
 			targetneg += (inputneg * remainder);
-			calcneg = pow((1.0f/targetneg),2);
+			calcneg = powf((1.0f/targetneg),2);
 			//now we have mirrored targets for comp
 			//outputpos and outputneg go from 0 to 1
 			

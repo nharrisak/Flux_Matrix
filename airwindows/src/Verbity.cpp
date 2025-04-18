@@ -110,8 +110,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	Float32 size = (GetParameter( kParam_One )*1.77f)+0.1f;
 	Float32 regen = 0.0625f+(GetParameter( kParam_Two )*0.03125f); //0.09375f max;
-	Float32 lowpass = (1.0f-pow(GetParameter( kParam_Three ),2.0f))/sqrt(overallscale);
-	Float32 interpolate = pow(GetParameter( kParam_Three ),2.0f)*0.618033988749894848204586f; //has IIRlike qualities
+	Float32 lowpass = (1.0f-powf(GetParameter( kParam_Three ),2.0f))/sqrt(overallscale);
+	Float32 interpolate = powf(GetParameter( kParam_Three ),2.0f)*0.618033988749894848204586f; //has IIRlike qualities
 	Float32 thunderAmount = (0.3f-(GetParameter( kParam_Two )*0.22f))*GetParameter( kParam_Three )*0.1f;
 	Float32 wet = GetParameter( kParam_Four )*2.0f;
 	Float32 dry = 2.0f - wet;

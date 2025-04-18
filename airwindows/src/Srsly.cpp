@@ -154,8 +154,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	biquadS5[5] = 2.0f * (K * K - 1.0f) * norm;
 	biquadS5[6] = (1.0f - K / biquadS5[1] + K * K) * norm;
 	
-	Float32 depthM = pow(GetParameter( kParam_One ),2)*2.0f; //proportion to mix in the filtered stuff
-	Float32 depthS = pow(GetParameter( kParam_Two ),2)*2.0f; //proportion to mix in the filtered stuff
+	Float32 depthM = powf(GetParameter( kParam_One ),2)*2.0f; //proportion to mix in the filtered stuff
+	Float32 depthS = powf(GetParameter( kParam_Two ),2)*2.0f; //proportion to mix in the filtered stuff
 	Float32 level = GetParameter( kParam_Three ); //output pad
 	Float32 wet = GetParameter( kParam_Five ); //dry/wet
 		

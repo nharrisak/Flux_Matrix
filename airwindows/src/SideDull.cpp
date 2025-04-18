@@ -50,7 +50,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 iirAmount = pow(GetParameter( kParam_One ),3)/overallscale;
+	Float32 iirAmount = powf(GetParameter( kParam_One ),3)/overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		inputSampleL = *inputL;

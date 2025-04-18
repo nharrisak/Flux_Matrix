@@ -131,7 +131,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 contDub = GetParameter( kParam_Three )*1.3f;
 	Float32 contSub = GetParameter( kParam_Four )/2.0f;
 	
-	Float32 driveone = pow(contHigh*3.0f,2);
+	Float32 driveone = powf(contHigh*3.0f,2);
 	Float32 driveoutput = contHigh;
 	Float32 iirAmount = 0.344f/overallscale;
 	Float32 altAmount = 1.0f - iirAmount;	

@@ -56,7 +56,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 boost = pow(GetParameter( kParam_One )+1.0f,5);
+	Float32 boost = powf(GetParameter( kParam_One )+1.0f,5);
 	
 	Float32 output = GetParameter( kParam_Two );
 	Float32 wet = GetParameter( kParam_Three );

@@ -63,10 +63,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 temprectifier;
 	Float32 inputSense;
 	
-	Float32 inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	Float32 inputGain = powf(10.0f,(GetParameter( kParam_One ))/20.0f);
 	Float32 attack = ((GetParameter( kParam_Two )+0.5f)*0.006f)/overallscale;
 	Float32 decay = ((GetParameter( kParam_Two )+0.01f)*0.0004f)/overallscale;
-	Float32 outputGain = pow(10.0f,(GetParameter( kParam_Three ))/20.0f);
+	Float32 outputGain = powf(10.0f,(GetParameter( kParam_Three ))/20.0f);
 	Float32 wet;
 	Float32 maxblur;
 	Float32 blurdry;

@@ -56,7 +56,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	Float32 wet = GetParameter( kParam_One );
 	int cpu = (int)(GetParameter( kParam_Two ) * 32);
-	Float32 decay = 1.0f+(pow(GetParameter( kParam_Three ),2)/2.0f);
+	Float32 decay = 1.0f+(powf(GetParameter( kParam_Three ),2)/2.0f);
 	Float32 scale = 4;
 	int count;
 	int temp;

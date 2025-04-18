@@ -64,7 +64,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 cutoff = pow((GetParameter( kParam_One )*0.89f)+0.1f,3);
+	Float32 cutoff = powf((GetParameter( kParam_One )*0.89f)+0.1f,3);
 	if (cutoff > 1.0f) cutoff = 1.0f;
 	Float32 invcutoff = 1.0f - cutoff;
 	//this is the lowpass

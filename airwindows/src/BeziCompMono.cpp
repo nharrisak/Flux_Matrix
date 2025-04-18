@@ -75,9 +75,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
 
-	float bezCThresh = pow(GetParameter( kParam_A ),2.0f) * 64.0f;
+	float bezCThresh = powf(GetParameter( kParam_A ),2.0f) * 64.0f;
 	float bezMakeUp = sqrt(bezCThresh+1.0f);
-	float bezRez = (pow(GetParameter( kParam_B ),6.0f)+0.0001f)/overallscale; if (bezRez > 1.0f) bezRez = 1.0f;
+	float bezRez = (powf(GetParameter( kParam_B ),6.0f)+0.0001f)/overallscale; if (bezRez > 1.0f) bezRez = 1.0f;
 	float wet = GetParameter( kParam_C );
 	
 	while (nSampleFrames-- > 0) {

@@ -54,8 +54,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float32 decay = pow(GetParameter( kParam_One ),3)*32767.0f;
-	int HighsBoost = 16 - (int)(pow(GetParameter( kParam_One ),2)*16);
+	Float32 decay = powf(GetParameter( kParam_One ),3)*32767.0f;
+	int HighsBoost = 16 - (int)(powf(GetParameter( kParam_One ),2)*16);
 	Float32 wet = GetParameter( kParam_Two );
 	
 	while (nSampleFrames-- > 0) {

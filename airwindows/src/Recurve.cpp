@@ -54,8 +54,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		//smaller number is maximum clamping, if too small it'll take a while to bounce back
 		inputSampleL *= gain; inputSampleR *= gain;
 		
-		gain += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*pow(inputSampleL,4);
-		gain += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*pow(inputSampleR,4);
+		gain += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*powf(inputSampleL,4);
+		gain += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*powf(inputSampleR,4);
 		//4.71239f radians sined will turn to -1 which is the maximum gain reduction speed
 		
 		inputSampleL *= 2.0f;

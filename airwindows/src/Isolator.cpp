@@ -66,7 +66,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (high > 0.0f) bypass = false;
 	if (low < 1.0f) bypass = false;
 	
-	biquadA[0] = pow(GetParameter( kParam_One ),(2.0f*sqrt(overallscale)))*0.4999f;
+	biquadA[0] = powf(GetParameter( kParam_One ),(2.0f*sqrt(overallscale)))*0.4999f;
 	if (biquadA[0] < 0.001f) biquadA[0] = 0.001f;
 	biquadC[0] = biquadB[0] = biquadA[0];
 	

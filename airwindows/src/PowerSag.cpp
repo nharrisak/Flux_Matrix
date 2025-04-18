@@ -53,8 +53,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 intensity = pow(GetParameter( kParam_One ),5)*80.0f;
-	Float32 depthA = pow(GetParameter( kParam_Two ),2);
+	Float32 intensity = powf(GetParameter( kParam_One ),5)*80.0f;
+	Float32 depthA = powf(GetParameter( kParam_Two ),2);
 	int offsetA = (int)(depthA * 3900) + 1;	
 	Float32 clamp;
 	Float32 thickness;

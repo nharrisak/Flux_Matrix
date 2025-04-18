@@ -66,8 +66,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	
 	//begin ResEQ2 Mid Boost
-	float freqMPeak = pow(GetParameter( kParam_One )+0.15f,3);
-	float amountMPeak = pow(GetParameter( kParam_Two ),2);
+	float freqMPeak = powf(GetParameter( kParam_One )+0.15f,3);
+	float amountMPeak = powf(GetParameter( kParam_Two ),2);
 	int maxMPeak = (amountMPeak*63.0f)+1;
 	if ((freqMPeak != prevfreqMPeak)||(amountMPeak != prevamountMPeak)) {
 	for (int x = 0; x < maxMPeak; x++) {

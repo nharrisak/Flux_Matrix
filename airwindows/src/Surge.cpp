@@ -56,7 +56,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	float drySampleR;
 	
 	Float32 chaseMax = 0.0f;
-	Float32 intensity = (1.0f-(pow((1.0f-GetParameter( kParam_One )),2)))*0.7f;
+	Float32 intensity = (1.0f-(powf((1.0f-GetParameter( kParam_One )),2)))*0.7f;
 	Float32 attack = ((intensity+0.1f)*0.0005f)/overallscale;
 	Float32 decay = ((intensity+0.001f)*0.00005f)/overallscale;
 	Float32 wet = GetParameter( kParam_Two );

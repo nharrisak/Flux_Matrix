@@ -116,18 +116,18 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			case k6C:
 				//encode/decode courtesy of torridgristle under the MIT license
 				if (inputSample > 1.0f) inputSample= 1.0f;
-				else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,2.0f);
+				else if (inputSample > 0.0f) inputSample = 1.0f - powf(1.0f-inputSample,2.0f);
 				if (inputSample < -1.0f) inputSample = -1.0f;
-				else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,2.0f);
+				else if (inputSample < 0.0f) inputSample = -1.0f + powf(1.0f+inputSample,2.0f);
 				//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5f for Console6Channel
 				break; //crude sine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case k6B:
 				//encode/decode courtesy of torridgristle under the MIT license
 				if (inputSample > 1.0f) inputSample= 1.0f;
-				else if (inputSample > 0.0f) inputSample = 1.0f - pow(1.0f-inputSample,0.5f);
+				else if (inputSample > 0.0f) inputSample = 1.0f - powf(1.0f-inputSample,0.5f);
 				if (inputSample < -1.0f) inputSample = -1.0f;
-				else if (inputSample < 0.0f) inputSample = -1.0f + pow(1.0f+inputSample,0.5f);
+				else if (inputSample < 0.0f) inputSample = -1.0f + powf(1.0f+inputSample,0.5f);
 				//Inverse Square 1-(1-x)^2 and 1-(1-x)^0.5f for Console6Buss
 				break; //crude arcsine. Note that because modern processors love math more than extra variables, this is optimized
 				
@@ -148,11 +148,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				break; //Console7Buss
 				
 			case kBC:
-				inputSample += ((pow(inputSample,5)/128.0f) + (pow(inputSample,9)/262144.0f)) - ((pow(inputSample,3)/8.0f) + (pow(inputSample,7)/4096.0f));
+				inputSample += ((powf(inputSample,5)/128.0f) + (powf(inputSample,9)/262144.0f)) - ((powf(inputSample,3)/8.0f) + (powf(inputSample,7)/4096.0f));
 				break; //crude sine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case kBB:
-				inputSample += (pow(inputSample,3)/4.0f)+(pow(inputSample,5)/8.0f)+(pow(inputSample,7)/16.0f)+(pow(inputSample,9)/32.0f);
+				inputSample += (powf(inputSample,3)/4.0f)+(powf(inputSample,5)/8.0f)+(powf(inputSample,7)/16.0f)+(powf(inputSample,9)/32.0f);
 				break; //crude arcsine. Note that because modern processors love math more than extra variables, this is optimized
 				
 			case kZC:

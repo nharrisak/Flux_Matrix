@@ -55,7 +55,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample *= 0.5f;		
 		if (gain < 0.0078125f) gain = 0.0078125f; if (gain > 1.0f) gain = 1.0f;
 		inputSample *= gain;		
-		gain += sin((fabs(inputSample*4)>1)?4:fabs(inputSample*4))*pow(inputSample,4);
+		gain += sin((fabs(inputSample*4)>1)?4:fabs(inputSample*4))*powf(inputSample,4);
 		inputSample *= 2.0f;
 		
 		

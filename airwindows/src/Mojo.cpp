@@ -48,7 +48,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 gain = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 gain = powf(10.0f,GetParameter( kParam_One )/20.0f);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;
@@ -59,7 +59,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			inputSample *= gain;
 		}
 			
-		float mojo = pow(fabs(inputSample),0.25f);
+		float mojo = powf(fabs(inputSample),0.25f);
 		if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 		//mojo is the one that flattens WAAAAY out very softly before wavefolding
 		

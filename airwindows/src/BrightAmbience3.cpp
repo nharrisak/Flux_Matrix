@@ -68,7 +68,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check	
 	
 	int start = (int)(GetParameter( kParam_One ) * 400)+88;
-	int length = (int)(pow(GetParameter( kParam_Two ),2) * 487)+1;
+	int length = (int)(powf(GetParameter( kParam_Two ),2) * 487)+1;
 	if (start + length > 488) start = 488-length;
 	Float32 feedbackAmount = GetParameter( kParam_Three )*0.25f;
 	Float32 wet = GetParameter( kParam_Four );
@@ -76,7 +76,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	//[0] is frequency: 0.000001f to 0.499999f is near-zero to near-Nyquist
 	//[1] is resonance, 0.7071f is Butterworth. Also can't be zero
 	figureL[0] = figureR[0] = 1000.0f/GetSampleRate(); //fixed frequency, 3.515775k
-	figureL[1] = figureR[1] = pow(length*0.037f*feedbackAmount,2)+0.01f; //resonance
+	figureL[1] = figureR[1] = powf(length*0.037f*feedbackAmount,2)+0.01f; //resonance
 	float K = tan(M_PI * figureR[0]);
 	float norm = 1.0f / (1.0f + K / figureR[1] + K * K);
 	figureL[2] = figureR[2] = K / figureR[1] * norm;

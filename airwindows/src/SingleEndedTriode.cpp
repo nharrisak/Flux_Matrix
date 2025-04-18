@@ -55,11 +55,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 intensity = pow(GetParameter( kParam_One ),2)*8.0f;
+	Float32 intensity = powf(GetParameter( kParam_One ),2)*8.0f;
 	Float32 triode = intensity;
 	intensity +=0.001f;
-	Float32 softcrossover = pow(GetParameter( kParam_Two ),3)/8.0f;
-	Float32 hardcrossover = pow(GetParameter( kParam_Three ),7)/8.0f;
+	Float32 softcrossover = powf(GetParameter( kParam_Two ),3)/8.0f;
+	Float32 hardcrossover = powf(GetParameter( kParam_Three ),7)/8.0f;
 	Float32 wet = GetParameter( kParam_Four );
 	//removed unnecessary dry variable
 	

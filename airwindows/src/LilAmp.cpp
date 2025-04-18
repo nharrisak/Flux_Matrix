@@ -118,7 +118,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check		
 	
-	float skewlevel = pow(basstrim,2) * outputlevel;
+	float skewlevel = powf(basstrim,2) * outputlevel;
 	
 	float cutoff = (15000.0f+(GetParameter( kParam_Two )*10000.0f)) / GetSampleRate();
 	if (cutoff > 0.49f) cutoff = 0.49f; //don't crash if run at 44.1k

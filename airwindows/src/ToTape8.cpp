@@ -149,7 +149,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	int spacing = floor(overallscale); //should give us working basic scaling, usually 2 or 4
 	if (spacing < 1) spacing = 1; if (spacing > 16) spacing = 16;
 	
-	float inputGain = pow(GetParameter( kParam_A )*2.0f,2.0f);
+	float inputGain = powf(GetParameter( kParam_A )*2.0f,2.0f);
 	
 	float dublyAmount = GetParameter( kParam_B )*2.0f;
 	float outlyAmount = (1.0f-GetParameter( kParam_B ))*-2.0f;
@@ -158,12 +158,12 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	float iirDecFreq = GetParameter( kParam_C )/overallscale;
 	float iirMidFreq = ((GetParameter( kParam_C ) * 0.618f) + 0.382f)/overallscale;
 	
-	float flutDepth = pow(GetParameter( kParam_D ),6)*overallscale*50;
+	float flutDepth = powf(GetParameter( kParam_D ),6)*overallscale*50;
 	if (flutDepth > 498.0f) flutDepth = 498.0f;
-	float flutFrequency = (0.02f*pow(GetParameter( kParam_E ),3))/overallscale;
+	float flutFrequency = (0.02f*powf(GetParameter( kParam_E ),3))/overallscale;
 	float bias = (GetParameter( kParam_F )*2.0f)-1.0f;
-	float underBias = (pow(bias,4)*0.25f)/overallscale;
-	float overBias = pow(1.0f-bias,3)/overallscale;
+	float underBias = (powf(bias,4)*0.25f)/overallscale;
+	float overBias = powf(1.0f-bias,3)/overallscale;
 	if (bias > 0.0f) underBias = 0.0f;
 	if (bias < 0.0f) overBias = 1.0f/overallscale;
 		

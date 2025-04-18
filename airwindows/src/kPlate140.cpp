@@ -327,10 +327,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale *= GetSampleRate();
 	
 	float inputPad = GetParameter( kParam_A );
-	float sbScale = pow(1.0f-GetParameter( kParam_B ),3)*-0.0000001f;
-	float sbRebound = (pow(GetParameter( kParam_B ),2)*24.448f)+39.552f;
+	float sbScale = powf(1.0f-GetParameter( kParam_B ),3)*-0.0000001f;
+	float sbRebound = (powf(GetParameter( kParam_B ),2)*24.448f)+39.552f;
 	float blur = (1.0f-GetParameter( kParam_B ))*0.5f;
-	float regen = 1.0f-pow(1.0f-GetParameter(kParam_B),2);
+	float regen = 1.0f-powf(1.0f-GetParameter(kParam_B),2);
 	regen = (regen*0.0001f)+0.000195f;
 	float derez = GetParameter( kParam_C )/overallscale;
 	if (derez < 0.0005f) derez = 0.0005f; if (derez > 1.0f) derez = 1.0f;

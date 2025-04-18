@@ -93,7 +93,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	softslew *= overallscale;
 	float outslew = softslew * (1.0f-(GetParameter( kParam_One )*0.0333f));
 	float refdB = GetParameter( kParam_Two );
-	float topdB = 0.000000075f * pow(10.0f,refdB/20.0f) * overallscale;
+	float topdB = 0.000000075f * powf(10.0f,refdB/20.0f) * overallscale;
 	float wet = GetParameter( kParam_Three );
 	
 	while (nSampleFrames-- > 0) {

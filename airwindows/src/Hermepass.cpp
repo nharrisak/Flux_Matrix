@@ -40,7 +40,7 @@ struct _kernel {
 		Float32 iirC; //we introduce the second pole at the same frequency, to become a pseudo-Capacitor behavior
 		Float32 iirD;
 		Float32 iirE;
-		Float32 iirF; //our slope control will have a pow() on it so that the high orders are way to the right side
+		Float32 iirF; //our slope control will have a powf() on it so that the high orders are way to the right side
 		Float32 iirG;
 		Float32 iirH; //seven poles max, and the final pole is always at 20hz directly.
 		
@@ -70,8 +70,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 	Float32 rangescale = 0.1f / overallscale;
 	
-	Float32 cutoff = pow(GetParameter( kParam_One ),3);
-	Float32 slope = pow(GetParameter( kParam_Two ),3) * 6.0f;
+	Float32 cutoff = powf(GetParameter( kParam_One ),3);
+	Float32 slope = powf(GetParameter( kParam_Two ),3) * 6.0f;
 	
 	Float32 newA = cutoff * rangescale;
 	Float32 newB = newA; //other part of interleaved IIR is the same

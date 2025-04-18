@@ -61,10 +61,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 targetA = pow(GetParameter( kParam_One ),3)+0.0005f;
+	Float32 targetA = powf(GetParameter( kParam_One ),3)+0.0005f;
 	if (targetA > 1.0f) targetA = 1.0f;
 	Float32 soften = (1.0f + targetA)/2;
-	Float32 targetB = pow(1.0f-GetParameter( kParam_Two ),3) / 3;
+	Float32 targetB = powf(1.0f-GetParameter( kParam_Two ),3) / 3;
 	Float32 hard = GetParameter( kParam_Three );
 	Float32 wet = GetParameter( kParam_Four );
 	Float32 overallscale = 1.0f;
@@ -134,8 +134,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		temp = inputSample;		
 		if (inputSample > 1.0f) inputSample = 1.0f;
 		if (inputSample < -1.0f) inputSample = -1.0f; //this may be superfluous?
-		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0f) / 255;
-		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample > 0) inputSample = (powf(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample < 0) inputSample = -(powf(256,fabs(inputSample))-1.0f) / 255;
 		inputSample = (temp * hard) + (inputSample * (1.0f-hard)); //uLaw decode as part of soft/hard
 		
 		if (wet !=1.0f) {

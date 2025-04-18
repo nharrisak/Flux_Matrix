@@ -71,7 +71,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		gainR = sin(gainR); gainL = sin(gainL);
 		float gain = (inTrimA*temp)+(inTrimB*(1.0f-temp));
 		if (gain > 1.0f) gain *= gain;
-		if (gain < 1.0f) gain = 1.0f-pow(1.0f-gain,2);
+		if (gain < 1.0f) gain = 1.0f-powf(1.0f-gain,2);
 		gain *= 2.0f;
 				
 		inputSampleL = inputSampleL * gainL * gain;

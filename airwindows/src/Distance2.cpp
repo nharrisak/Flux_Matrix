@@ -98,7 +98,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	thresholdK = 1.603020998405568f / overallscale;
 	thresholdL = 1.763323098246125f / overallscale;
 	thresholdM = 1.939655408070737f / overallscale;	
-	Float32 softslew = (pow(GetParameter( kParam_One ),3)*24)+.6;
+	Float32 softslew = (powf(GetParameter( kParam_One ),3)*24)+.6;
 	softslew *= overallscale;
 	Float32 filter = softslew * GetParameter( kParam_Two );
 	Float32 secondfilter = filter / 3.0f;

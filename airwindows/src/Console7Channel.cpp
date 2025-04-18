@@ -83,7 +83,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		//we have our chase speed compensated for recent fader activity
 		gainchase = (((gainchase*chasespeed)+inputgain)/(chasespeed+1.0f));
 		//gainchase is chasing the target, as a simple multiply gain factor
-		if (1.0f != gainchase) inputSample *= pow(gainchase,3);
+		if (1.0f != gainchase) inputSample *= powf(gainchase,3);
 		//this trim control cuts back extra hard because we will amplify after the distortion
 		//that will shift the distortion/antidistortion curve, in order to make faded settings
 		//slightly 'expanded' and fall back in the soundstage, subtly

@@ -62,34 +62,34 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float32 gain = pow(GetParameter( kParam_One )+0.5f,4);
+	Float32 gain = powf(GetParameter( kParam_One )+0.5f,4);
 	
 	Float32 high = GetParameter( kParam_Two );
 	Float32 low = GetParameter( kParam_Three );
 	Float32 mid = (high+low)*0.5f;
 	Float32 spread = 1.001f-fabs(high-low);
 	
-	biquad[0] = (pow(high,3)*20000.0f)/GetSampleRate();
+	biquad[0] = (powf(high,3)*20000.0f)/GetSampleRate();
 	if (biquad[0] < 0.00009f) biquad[0] = 0.00009f;
 	Float32 compensation = sqrt(biquad[0])*6.4f*spread;
 	Float32 clipFactor = 0.75f+(biquad[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadA[0] = (pow((high+mid)*0.5f,3)*20000.0f)/GetSampleRate();
+	biquadA[0] = (powf((high+mid)*0.5f,3)*20000.0f)/GetSampleRate();
 	if (biquadA[0] < 0.00009f) biquadA[0] = 0.00009f;
 	Float32 compensationA = sqrt(biquadA[0])*6.4f*spread;
 	Float32 clipFactorA = 0.75f+(biquadA[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadB[0] = (pow(mid,3)*20000.0f)/GetSampleRate();
+	biquadB[0] = (powf(mid,3)*20000.0f)/GetSampleRate();
 	if (biquadB[0] < 0.00009f) biquadB[0] = 0.00009f;
 	Float32 compensationB = sqrt(biquadB[0])*6.4f*spread;
 	Float32 clipFactorB = 0.75f+(biquadB[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadC[0] = (pow((mid+low)*0.5f,3)*20000.0f)/GetSampleRate();
+	biquadC[0] = (powf((mid+low)*0.5f,3)*20000.0f)/GetSampleRate();
 	if (biquadC[0] < 0.00009f) biquadC[0] = 0.00009f;
 	Float32 compensationC = sqrt(biquadC[0])*6.4f*spread;
 	Float32 clipFactorC = 0.75f+(biquadC[0]*GetParameter( kParam_Four )*37.0f);
 	
-	biquadD[0] = (pow(low,3)*20000.0f)/GetSampleRate();
+	biquadD[0] = (powf(low,3)*20000.0f)/GetSampleRate();
 	if (biquadD[0] < 0.00009f) biquadD[0] = 0.00009f;
 	Float32 compensationD = sqrt(biquadD[0])*6.4f*spread;
 	Float32 clipFactorD = 0.75f+(biquadD[0]*GetParameter( kParam_Four )*37.0f);

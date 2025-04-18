@@ -85,9 +85,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 hiIntensity = -pow(GetParameter( kParam_One ),3)*2;
-	Float32 tripletintensity = -pow(GetParameter( kParam_Two ),3);
-	Float32 airIntensity = -pow(GetParameter( kParam_Three ),3)/2;
+	Float32 hiIntensity = -powf(GetParameter( kParam_One ),3)*2;
+	Float32 tripletintensity = -powf(GetParameter( kParam_Two ),3);
+	Float32 airIntensity = -powf(GetParameter( kParam_Three ),3)/2;
 	Float32 filterQ = 2.1f-GetParameter( kParam_Four );
 	Float32 output = GetParameter( kParam_Five );
 	Float32 wet = GetParameter( kParam_Six );

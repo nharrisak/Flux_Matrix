@@ -67,7 +67,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float32 intensity = pow(GetParameter( kParam_One ),5)*(8192/overallscale);
+	Float32 intensity = powf(GetParameter( kParam_One ),5)*(8192/overallscale);
 	Float32 sharpness = GetParameter( kParam_Two )*40.0f;
 	if (sharpness < 2) sharpness = 2;
 	Float32 speed = 0.1f / sharpness;

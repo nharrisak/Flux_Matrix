@@ -58,10 +58,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 distScaling = pow(1.0f-GetParameter( kParam_One ),2);
+	Float32 distScaling = powf(1.0f-GetParameter( kParam_One ),2);
 	if (distScaling < 0.0001f) distScaling = 0.0001f;
 	biquadA[0] = 600.0f/GetSampleRate();
-	biquadA[1] = 0.01f+(pow(GetParameter( kParam_Two ),2)*0.5f);
+	biquadA[1] = 0.01f+(powf(GetParameter( kParam_Two ),2)*0.5f);
 	float iirAmount = biquadA[1]/overallscale;
 	float K = tan(M_PI * biquadA[0]);
 	float norm = 1.0f / (1.0f + K / biquadA[1] + K * K);

@@ -55,7 +55,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 threshold = pow((1-GetParameter( kParam_One )),4)/overallscale;
+	Float32 threshold = powf((1-GetParameter( kParam_One )),4)/overallscale;
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

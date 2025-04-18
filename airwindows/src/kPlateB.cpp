@@ -288,7 +288,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	regen = (regen*0.0001f)+0.00024f;
 	float iirAmount = (GetParameter( kParam_Three )*0.1f)+0.04f;
 	iirAmount = (iirAmount*1000.0f)/downRate;
-	float earlyVolume = pow(GetParameter( kParam_Four ),2)*0.5f; //predelay to a half-second
+	float earlyVolume = powf(GetParameter( kParam_Four ),2)*0.5f; //predelay to a half-second
 	int adjPredelay = (downRate * earlyVolume);
 	float wet = GetParameter( kParam_Five )*2.0f;
 	float dry = 2.0f - wet;
@@ -382,8 +382,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//gain of 1,0 gives you a super-clean one, gain of 2 is obviously compressing
 			//smaller number is maximum clamping, if too small it'll take a while to bounce back
 			inputSampleL *= gainIn; inputSampleR *= gainIn;
-			gainIn += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*pow(inputSampleL,4);
-			gainIn += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*pow(inputSampleR,4);
+			gainIn += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*powf(inputSampleL,4);
+			gainIn += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*powf(inputSampleR,4);
 			//4.71239f radians sined will turn to -1 which is the maximum gain reduction speed
 			inputSampleL *= 2.0f; inputSampleR *= 2.0f;
 			//curve! To get a compressed effect that matches a certain other plugin
@@ -788,8 +788,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 			//gain of 1,0 gives you a super-clean one, gain of 2 is obviously compressing
 			//smaller number is maximum clamping, if too small it'll take a while to bounce back
 			inputSampleL *= gainOutL; inputSampleR *= gainOutR;
-			gainOutL += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*pow(inputSampleL,4);
-			gainOutR += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*pow(inputSampleR,4);
+			gainOutL += sin((fabs(inputSampleL*4)>1)?4:fabs(inputSampleL*4))*powf(inputSampleL,4);
+			gainOutR += sin((fabs(inputSampleR*4)>1)?4:fabs(inputSampleR*4))*powf(inputSampleR,4);
 			//4.71239f radians sined will turn to -1 which is the maximum gain reduction speed
 			inputSampleL *= 2.0f; inputSampleR *= 2.0f;
 			//curve! To get a compressed effect that matches a certain other plugin

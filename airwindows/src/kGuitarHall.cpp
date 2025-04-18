@@ -270,10 +270,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale *= GetSampleRate();
 	
 	float refdB = GetParameter( kParam_A );
-	float topdB = 0.000000075f * pow(10.0f,refdB/20.0f) * overallscale * 0.000025f;
+	float topdB = 0.000000075f * powf(10.0f,refdB/20.0f) * overallscale * 0.000025f;
 	//the final 0.0001f scales it to the internal reverb path
 	
-	float regen = (1.0f-pow(1.0f-GetParameter( kParam_B ),3.0f))*0.00029f;
+	float regen = (1.0f-powf(1.0f-GetParameter( kParam_B ),3.0f))*0.00029f;
 	float derez = GetParameter( kParam_C )/overallscale;
 	if (derez < 0.0005f) derez = 0.0005f; if (derez > 1.0f) derez = 1.0f;
 	derez = 1.0f / ((int)(1.0f/derez));

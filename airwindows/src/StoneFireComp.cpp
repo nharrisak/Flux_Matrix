@@ -79,23 +79,23 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float compFThresh = pow(GetParameter( kParam_B ),4);
-	float compFAttack = 1.0f/(((pow(GetParameter( kParam_C ),3)*5000.0f)+500.0f)*overallscale);
-	float compFRelease = 1.0f/(((pow(GetParameter( kParam_D ),5)*50000.0f)+500.0f)*overallscale);
+	float compFThresh = powf(GetParameter( kParam_B ),4);
+	float compFAttack = 1.0f/(((powf(GetParameter( kParam_C ),3)*5000.0f)+500.0f)*overallscale);
+	float compFRelease = 1.0f/(((powf(GetParameter( kParam_D ),5)*50000.0f)+500.0f)*overallscale);
 	float fireGain = GetParameter( kParam_E )*2.0f;
-	if (fireGain > 1.0f) fireGain *= fireGain; else fireGain = 1.0f-pow(1.0f-fireGain,2);
+	if (fireGain > 1.0f) fireGain *= fireGain; else fireGain = 1.0f-powf(1.0f-fireGain,2);
 	float firePad = fireGain; if (firePad > 1.0f) firePad = 1.0f;
 	
-	float compSThresh = pow(GetParameter( kParam_F ),4);
-	float compSAttack = 1.0f/(((pow(GetParameter( kParam_G ),3)*5000.0f)+500.0f)*overallscale);
-	float compSRelease = 1.0f/(((pow(GetParameter( kParam_H ),5)*50000.0f)+500.0f)*overallscale);
+	float compSThresh = powf(GetParameter( kParam_F ),4);
+	float compSAttack = 1.0f/(((powf(GetParameter( kParam_G ),3)*5000.0f)+500.0f)*overallscale);
+	float compSRelease = 1.0f/(((powf(GetParameter( kParam_H ),5)*50000.0f)+500.0f)*overallscale);
 	float stoneGain = GetParameter( kParam_I )*2.0f;
-	if (stoneGain > 1.0f) stoneGain *= stoneGain; else stoneGain = 1.0f-pow(1.0f-stoneGain,2);
+	if (stoneGain > 1.0f) stoneGain *= stoneGain; else stoneGain = 1.0f-powf(1.0f-stoneGain,2);
 	float stonePad = stoneGain; if (stonePad > 1.0f) stonePad = 1.0f;
 	
-	float kalman = 1.0f-(pow(GetParameter( kParam_J ),2)/overallscale);
+	float kalman = 1.0f-(powf(GetParameter( kParam_J ),2)/overallscale);
 	//crossover frequency between mid/bass
-	float compRatio = 1.0f-pow(1.0f-GetParameter( kParam_K ),2);
+	float compRatio = 1.0f-powf(1.0f-GetParameter( kParam_K ),2);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSampleL = *inputL;

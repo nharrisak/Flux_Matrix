@@ -63,7 +63,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 inputSample;
 	Float32 rootnote = GetParameter( kParam_One );
 	Float32 suboctave = GetParameter( kParam_Two );
-	Float32 EQ = 0.01f+((pow(GetParameter( kParam_Three ),4) / GetSampleRate())*32000.0f);
+	Float32 EQ = 0.01f+((powf(GetParameter( kParam_Three ),4) / GetSampleRate())*32000.0f);
 	Float32 dcblock = EQ / 320.0f;
 	Float32 wet = GetParameter( kParam_Four )*2.0f;
 	Float32 dry = 2.0f - wet;

@@ -65,10 +65,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	UInt32 nSampleFrames = inFramesToProcess;
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
-	Float32 speed = pow(0.1f+GetParameter( kParam_One ),6);
-	Float32 depth = (pow(GetParameter( kParam_Two ),3) / sqrt(speed))*4.0f;
-	Float32 speedB = pow(0.1f+GetParameter( kParam_Three ),6);
-	Float32 depthB = pow(GetParameter( kParam_Four ),3) / sqrt(speedB);
+	Float32 speed = powf(0.1f+GetParameter( kParam_One ),6);
+	Float32 depth = (powf(GetParameter( kParam_Two ),3) / sqrt(speed))*4.0f;
+	Float32 speedB = powf(0.1f+GetParameter( kParam_Three ),6);
+	Float32 depthB = powf(GetParameter( kParam_Four ),3) / sqrt(speedB);
 	Float32 tupi = 3.141592653589793238f * 2.0f;
 	Float32 wet = GetParameter( kParam_Five ); //note: inv/dry/wet
 	

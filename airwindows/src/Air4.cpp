@@ -80,9 +80,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();
 	
 	float airGain = GetParameter( kParam_A )*2.0f;
-	if (airGain > 1.0f) airGain = pow(airGain,3.0f+sqrt(overallscale));
+	if (airGain > 1.0f) airGain = powf(airGain,3.0f+sqrt(overallscale));
 	float gndGain = GetParameter( kParam_B )*2.0f;
-	float threshSinew = pow(GetParameter( kParam_C ),2)/overallscale;
+	float threshSinew = powf(GetParameter( kParam_C ),2)/overallscale;
 	float depthSinew = GetParameter( kParam_D );
 	
 	while (nSampleFrames-- > 0) {

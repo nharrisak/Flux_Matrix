@@ -51,7 +51,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float32 wet = pow(GetParameter( kParam_One ),5);
+	Float32 wet = powf(GetParameter( kParam_One ),5);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

@@ -35,7 +35,7 @@ enum { kNumTemplateParameters = 7 };
 	float iirC; //we introduce the second pole at the same frequency, to become a pseudo-Capacitor behavior
 	float iirD;
 	float iirE;
-	float iirF; //our slope control will have a pow() on it so that the high orders are way to the right side
+	float iirF; //our slope control will have a powf() on it so that the high orders are way to the right side
 	float iirG;
 	float iirH; //seven poles max, and the final pole is always at 20hz directly.
 	bool fpFlip;
@@ -56,8 +56,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale *= GetSampleRate();
 	
 	float rangescale = 0.1f / overallscale;
-	float cutoff = pow(GetParameter( kParam_A ),3);
-	float slope = pow(GetParameter( kParam_B ),3) * 6.0f;
+	float cutoff = powf(GetParameter( kParam_A ),3);
+	float slope = powf(GetParameter( kParam_B ),3) * 6.0f;
 	float newA = cutoff * rangescale;
 	float newB = newA; //other part of interleaved IIR is the same
 	float fpOld = 0.618033988749894848204586f; //golden ratio!

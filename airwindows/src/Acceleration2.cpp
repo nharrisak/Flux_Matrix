@@ -60,7 +60,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 intensity = pow(GetParameter( kParam_One ),3)*32;
+	Float32 intensity = powf(GetParameter( kParam_One ),3)*32;
 	Float32 wet = GetParameter( kParam_Two );	
 	int spacing = (int)(1.73f*overallscale)+1;
 	if (spacing > 16) spacing = 16;

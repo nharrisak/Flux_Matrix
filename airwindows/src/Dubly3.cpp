@@ -65,7 +65,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float inputGain = pow(GetParameter( kParam_A )*2.0f,2.0f);
+	float inputGain = powf(GetParameter( kParam_A )*2.0f,2.0f);
 	float dublyAmount = GetParameter( kParam_B )*2.0f;
 	float outlyAmount = (1.0f-GetParameter( kParam_B ))*-2.0f;
 	if (outlyAmount < -1.0f) outlyAmount = -1.0f;

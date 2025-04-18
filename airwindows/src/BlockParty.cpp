@@ -76,7 +76,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 targetthreshold = 1.01f - (1.0f-pow(1.0f-(GetParameter( kParam_One )*0.5f),4));
+	Float32 targetthreshold = 1.01f - (1.0f-powf(1.0f-(GetParameter( kParam_One )*0.5f),4));
 	Float32 wet = GetParameter( kParam_Two );
 	Float32 voicing = 0.618033988749894848204586f;
 	if (overallscale > 0.0f) voicing /= overallscale;
@@ -141,7 +141,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				muNewSpeed = muSpeedA * (muSpeedA-1);
 				muNewSpeed = muNewSpeed + fabs(inputSample*release)+fastest;
 				muSpeedA = muNewSpeed / muSpeedA;
-				lastCoefficientA = pow(muCoefficientA,2);
+				lastCoefficientA = powf(muCoefficientA,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
 				lastCoefficientA *= (1.0f-lastCorrection);
@@ -181,7 +181,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				muNewSpeed = muSpeedB * (muSpeedB-1);
 				muNewSpeed = muNewSpeed + fabs(inputSample*release)+fastest;
 				muSpeedB = muNewSpeed / muSpeedB;
-				lastCoefficientA = pow(muCoefficientB,2);
+				lastCoefficientA = powf(muCoefficientB,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
 				lastCoefficientA *= (1.0f-lastCorrection);
@@ -221,7 +221,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				muNewSpeed = muSpeedC * (muSpeedC-1);
 				muNewSpeed = muNewSpeed + fabs(inputSample*release)+fastest;
 				muSpeedC = muNewSpeed / muSpeedC;
-				lastCoefficientA = pow(muCoefficientC,2);
+				lastCoefficientA = powf(muCoefficientC,2);
 				mergedCoefficients = lastCoefficientB;
 				mergedCoefficients += lastCoefficientA;
 				lastCoefficientA *= (1.0f-lastCorrection);
@@ -267,7 +267,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			muNewSpeed = muSpeedD * (muSpeedD-1);
 			muNewSpeed = muNewSpeed + fabs(inputSample*release)+fastest;
 			muSpeedD = muNewSpeed / muSpeedD;
-			lastCoefficientC = pow(muCoefficientE,2);
+			lastCoefficientC = powf(muCoefficientE,2);
 			mergedCoefficients += lastCoefficientD;
 			mergedCoefficients += lastCoefficientC;
 			lastCoefficientC *= (1.0f-lastCorrection);
@@ -306,7 +306,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			muNewSpeed = muSpeedE * (muSpeedE-1);
 			muNewSpeed = muNewSpeed + fabs(inputSample*release)+fastest;
 			muSpeedE = muNewSpeed / muSpeedE;
-			lastCoefficientC = pow(muCoefficientE,2);
+			lastCoefficientC = powf(muCoefficientE,2);
 			mergedCoefficients += lastCoefficientD;
 			mergedCoefficients += lastCoefficientC;
 			lastCoefficientC *= (1.0f-lastCorrection);

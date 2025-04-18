@@ -97,7 +97,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	float threshold = 1.0f - (GetParameter( kParam_One ) * 0.95f);
 	float muMakeupGain = 1.0f / threshold;
 	//gain settings around threshold
-	float release = pow((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
+	float release = powf((1.28f-GetParameter( kParam_Two )),5)*32768.0f;
 	float fastest = sqrt(release);
 	release /= overallscale;
 	fastest /= overallscale;
@@ -105,7 +105,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	float mewinessRef = GetParameter( kParam_Three );
 	float pawsClaws = -(GetParameter( kParam_Four )-0.5f)*1.618033988749894848204586f;
 	// µ µ µ µ µ µ µ µ µ µ µ µ is the kitten song o/~
-	float outputGain = pow(GetParameter( kParam_Five )*2.0f,2); //max 4.0f gain
+	float outputGain = powf(GetParameter( kParam_Five )*2.0f,2); //max 4.0f gain
 	float wet = GetParameter( kParam_Six );
 	
 	dram->fixA[fix_freq] = 24000.0f / GetSampleRate();
@@ -210,13 +210,13 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		float coefficient;
 		if (flip) {
-			if (positivemu) coefficient = pow(muCoefficientA,2);
+			if (positivemu) coefficient = powf(muCoefficientA,2);
 			else coefficient = sqrt(muCoefficientA);
 			coefficient = (coefficient*mewiness)+(muCoefficientA*(1.0f-mewiness));
 			inputSampleL *= coefficient;
 			inputSampleR *= coefficient;
 		} else {
-			if (positivemu) coefficient = pow(muCoefficientB,2);
+			if (positivemu) coefficient = powf(muCoefficientB,2);
 			else coefficient = sqrt(muCoefficientB);
 			coefficient = (coefficient*mewiness)+(muCoefficientB*(1.0f-mewiness));
 			inputSampleL *= coefficient;

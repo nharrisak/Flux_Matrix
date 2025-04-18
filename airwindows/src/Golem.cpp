@@ -60,7 +60,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 range = 30.0f;
 	if (phase == 3) range = 700.0f;
 	if (phase == 4) range = 700.0f;
-	Float32 offset = pow(GetParameter( kParam_Two ),5) * range;
+	Float32 offset = powf(GetParameter( kParam_Two ),5) * range;
 	if (phase > 4) offset = 0.0f;
 	if (phase > 5)
 		{

@@ -76,16 +76,16 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale *= GetSampleRate();
 	int offset = (int)(overallscale*1.1f);
 	float maxHeight = 1.0f*overallscale;
-	float filterOut = pow((GetParameter( kParam_A )*0.618f)+0.1f,2.0f)/overallscale;
-	float filterRef = pow(((1.0f-GetParameter( kParam_B ))*0.618f)+0.1f,2.0f)/overallscale;
-	float iirCut = (pow(1.0f-GetParameter( kParam_B ),2.0f)*0.2f)/overallscale;
+	float filterOut = powf((GetParameter( kParam_A )*0.618f)+0.1f,2.0f)/overallscale;
+	float filterRef = powf(((1.0f-GetParameter( kParam_B ))*0.618f)+0.1f,2.0f)/overallscale;
+	float iirCut = (powf(1.0f-GetParameter( kParam_B ),2.0f)*0.2f)/overallscale;
 	int adjDelay = (int)(GetParameter( kParam_B )*((float)(kshort/8)*overallscale))-2.0f;
 	if (adjDelay > kshort - 1) adjDelay = kshort - 1; //don't break on silly samplerates
-	int halfTrig = fmin(0.5f+pow(GetParameter( kParam_B ),3.0f),0.999f)*adjDelay;
+	int halfTrig = fmin(0.5f+powf(GetParameter( kParam_B ),3.0f),0.999f)*adjDelay;
 	int halfRaw = 0.5f*adjDelay;
 	int halfBez = 0.5f*adjDelay;
-	float threshold = pow(GetParameter( kParam_C )*0.618f,2.0f)-0.1f;
-	float surface = (1.0f-pow(1.0f-GetParameter( kParam_D ),3.0f))*0.9f;
+	float threshold = powf(GetParameter( kParam_C )*0.618f,2.0f)-0.1f;
+	float surface = (1.0f-powf(1.0f-GetParameter( kParam_D ),3.0f))*0.9f;
 	float wet = GetParameter( kParam_E );
 	int options = 0; if (wet < 0.001f) options = 1;
 	
@@ -141,8 +141,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		float trigL = dram->aAL[(count+halfTrig)-(((count+halfTrig) > adjDelay)?adjDelay+1:0)];
 		float trigR = dram->aAR[(count+halfTrig)-(((count+halfTrig) > adjDelay)?adjDelay+1:0)];
 		
-		float deClickL = pow(fmax((fabs(trigL)-threshold)-fmax(near,far),0.0f)*16.0f,3.0f);
-		float deClickR = pow(fmax((fabs(trigR)-threshold)-fmax(near,far),0.0f)*16.0f,3.0f);
+		float deClickL = powf(fmax((fabs(trigL)-threshold)-fmax(near,far),0.0f)*16.0f,3.0f);
+		float deClickR = powf(fmax((fabs(trigR)-threshold)-fmax(near,far),0.0f)*16.0f,3.0f);
 		iirTargetL = fmax(iirTargetL-iirCut,0.0f);
 		iirTargetR = fmax(iirTargetR-iirCut,0.0f); //taper down at iirCut speed
 		if (deClickL > iirTargetL) iirTargetL = fmin(deClickL,maxHeight);

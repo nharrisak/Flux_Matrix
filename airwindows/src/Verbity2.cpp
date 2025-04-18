@@ -181,8 +181,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
 	//mulch is tone control, darken to obscure the Chrome Oxide, not as much highpass
-	Float32 size = (pow(GetParameter( kParam_One ),2.0f)*0.9f)+0.1f;
-	Float32 regen = (1.0f-pow(1.0f-GetParameter( kParam_Two ),3.0f))*0.00032f;
+	Float32 size = (powf(GetParameter( kParam_One ),2.0f)*0.9f)+0.1f;
+	Float32 regen = (1.0f-powf(1.0f-GetParameter( kParam_Two ),3.0f))*0.00032f;
 	Float32 mulchSetting = GetParameter( kParam_Three );
 	Float32 lowpass = (1.0f-(mulchSetting*0.75f))/sqrt(overallscale);
 	Float32 highpass = (0.007f+(mulchSetting*0.022f))/sqrt(overallscale);

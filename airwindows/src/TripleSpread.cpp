@@ -90,8 +90,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	UInt32 nSampleFrames = inFramesToProcess;
 	
 	Float32 speed = GetParameter( kParam_One )*0.041666666666667f;
-	SInt32 width = (SInt32)(65536-((1-pow(1-GetParameter( kParam_Two ),2))*65530.0f));
-	Float32 bias = pow(GetParameter( kParam_Two ),3);
+	SInt32 width = (SInt32)(65536-((1-powf(1-GetParameter( kParam_Two ),2))*65530.0f));
+	Float32 bias = powf(GetParameter( kParam_Two ),3);
 	Float32 wet = GetParameter( kParam_Three );
 	
 	

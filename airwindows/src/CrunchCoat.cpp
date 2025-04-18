@@ -293,8 +293,8 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	}
 	
 	
-	float regen = (1.0f-pow(1.0f-GetParameter( kParam_B ),2.0f))*0.0625f;
-	float derez = pow(GetParameter( kParam_C )*0.99f,2.0f)/overallscale;
+	float regen = (1.0f-powf(1.0f-GetParameter( kParam_B ),2.0f))*0.0625f;
+	float derez = powf(GetParameter( kParam_C )*0.99f,2.0f)/overallscale;
 	//adjustment made tp compensate for addition of lastverb
 	float wet = GetParameter( kParam_D )*2.0f;
 	float dry = 2.0f - wet;

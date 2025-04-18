@@ -70,7 +70,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 out = fabs(density);
 	while (out > 1.0f) out = out - 1.0f;
 	density = density * fabs(density);
-	Float32 iirAmount = pow(GetParameter( kParam_Two ),3)/overallscale;
+	Float32 iirAmount = powf(GetParameter( kParam_Two ),3)/overallscale;
 	Float32 output = GetParameter( kParam_Three );
 	Float32 wet = GetParameter( kParam_Four );
 	

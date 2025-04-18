@@ -52,7 +52,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 
 	float centering = GetParameter( kParam_One ) * 0.5f;
-	centering = 1.0f - pow(centering,5);
+	centering = 1.0f - powf(centering,5);
 	//we can set our centering force from zero to rather high, but
 	//there's a really intense taper on it forcing it to mostly be almost 1.0f.
 	//If it's literally 1.0f, we don't even apply it, and you get the original

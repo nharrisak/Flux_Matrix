@@ -66,7 +66,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 softslew = (pow(GetParameter( kParam_One ),3)*12)+.6;
+	Float32 softslew = (powf(GetParameter( kParam_One ),3)*12)+.6;
 	softslew *= overallscale;
 	Float32 filtercorrect = softslew / 2.0f;
 	Float32 thirdfilter = softslew / 3.0f;

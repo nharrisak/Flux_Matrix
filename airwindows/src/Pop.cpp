@@ -72,8 +72,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	Float32 highGainOffset = pow(GetParameter( kParam_One ),2)*0.023f;
-	Float32 threshold = 1.001f - (1.0f-pow(1.0f-GetParameter( kParam_One ),5));
+	Float32 highGainOffset = powf(GetParameter( kParam_One ),2)*0.023f;
+	Float32 threshold = 1.001f - (1.0f-powf(1.0f-GetParameter( kParam_One ),5));
 	Float32 muMakeupGain = sqrt(1.0f / threshold);
 	//gain settings around threshold
 	Float32 release = (GetParameter( kParam_One )*100000.0f) + 300000.0f;
@@ -170,8 +170,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 			}
 		//got coefficients, adjusted speeds
 		float coefficient = highGainOffset;
-		if (flip) coefficient += pow(muCoefficientA,2);
-		else coefficient += pow(muCoefficientB,2);
+		if (flip) coefficient += powf(muCoefficientA,2);
+		else coefficient += powf(muCoefficientB,2);
 		inputSample *= coefficient;
 		thicken = (coefficient/5)+punchiness;//0.80f;
 		thicken = (1.0f-wet)+(wet*thicken);

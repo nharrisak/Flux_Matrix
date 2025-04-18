@@ -74,9 +74,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	Float32 sum;
-	Float32 presence = pow(GetParameter( kParam_One ),5) * 8.0f;
-	Float32 high = pow(GetParameter( kParam_Two ),3) * 4.0f;
-	Float32 mid = pow(GetParameter( kParam_Three ),2);
+	Float32 presence = powf(GetParameter( kParam_One ),5) * 8.0f;
+	Float32 high = powf(GetParameter( kParam_Two ),3) * 4.0f;
+	Float32 mid = powf(GetParameter( kParam_Three ),2);
 	Float32 low = GetParameter( kParam_Four ) / 4.0f;
 	Float32 drive = GetParameter( kParam_Five ) * 2.0f;
 	Float32 bridgerectifier;

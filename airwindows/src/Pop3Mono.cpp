@@ -68,15 +68,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float compThresh = pow(GetParameter( kParam_A ),4);
-	float compRatio = 1.0f-pow(1.0f-GetParameter( kParam_B ),2);
-	float compAttack = 1.0f/(((pow(GetParameter( kParam_C ),3)*5000.0f)+500.0f)*overallscale);
-	float compRelease = 1.0f/(((pow(GetParameter( kParam_D ),5)*50000.0f)+500.0f)*overallscale);
+	float compThresh = powf(GetParameter( kParam_A ),4);
+	float compRatio = 1.0f-powf(1.0f-GetParameter( kParam_B ),2);
+	float compAttack = 1.0f/(((powf(GetParameter( kParam_C ),3)*5000.0f)+500.0f)*overallscale);
+	float compRelease = 1.0f/(((powf(GetParameter( kParam_D ),5)*50000.0f)+500.0f)*overallscale);
 	
-	float gateThresh = pow(GetParameter( kParam_E ),4);
-	float gateRatio = 1.0f-pow(1.0f-GetParameter( kParam_F ),2);
-	float gateSustain = M_PI_2 * pow(GetParameter( kParam_G )+1.0f,4.0f);
-	float gateRelease = 1.0f/(((pow(GetParameter( kParam_H ),5)*500000.0f)+500.0f)*overallscale);
+	float gateThresh = powf(GetParameter( kParam_E ),4);
+	float gateRatio = 1.0f-powf(1.0f-GetParameter( kParam_F ),2);
+	float gateSustain = M_PI_2 * powf(GetParameter( kParam_G )+1.0f,4.0f);
+	float gateRelease = 1.0f/(((powf(GetParameter( kParam_H ),5)*500000.0f)+500.0f)*overallscale);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSample = *sourceP;

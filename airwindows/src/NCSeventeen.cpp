@@ -88,7 +88,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 distSample;
 	Float32 minusSample;
 	Float32 plusSample;
-	Float32 gain = pow(10.0f,GetParameter( kParam_One )/20);
+	Float32 gain = powf(10.0f,GetParameter( kParam_One )/20);
 	Float32 outgain = GetParameter( kParam_Two );
 
 	while (nSampleFrames-- > 0) {

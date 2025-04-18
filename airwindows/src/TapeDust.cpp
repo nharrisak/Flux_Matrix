@@ -55,7 +55,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	float inputSample;
 	Float32 drySample;
-	Float32 rRange = pow(GetParameter( kParam_One ),2)*5.0f;
+	Float32 rRange = powf(GetParameter( kParam_One ),2)*5.0f;
 	Float32 xfuzz = rRange * 0.002f;
 	Float32 rOffset = (rRange*0.4f) + 1.0f;
 	Float32 rDepth; //the randomly fluctuating value

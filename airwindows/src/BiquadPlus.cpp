@@ -88,7 +88,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	int type = GetParameter( kParam_One);
 	
-	dram->biquad[biq_freq] = ((pow(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate());
+	dram->biquad[biq_freq] = ((powf(GetParameter( kParam_Two ),3)*20000.0f)/GetSampleRate());
 	if (dram->biquad[biq_freq] < 0.0001f) dram->biquad[biq_freq] = 0.0001f;
 	
     dram->biquad[biq_reso] = GetParameter( kParam_Three );

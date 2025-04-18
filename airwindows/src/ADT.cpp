@@ -64,12 +64,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	
 	Float32 gain = GetParameter( kParam_One ) * 0.636f;
-	Float32 targetA = pow(GetParameter( kParam_Two ),4) * 4790.0f;
+	Float32 targetA = powf(GetParameter( kParam_Two ),4) * 4790.0f;
 	Float32 fractionA;
 	Float32 minusA;
 	Float32 intensityA = GetParameter( kParam_Three ) / 2.0f;
 	//first delay
-	Float32 targetB = (pow(GetParameter( kParam_Four ),4) * 4790.0f);
+	Float32 targetB = (powf(GetParameter( kParam_Four ),4) * 4790.0f);
 	Float32 fractionB;
 	Float32 minusB;
 	Float32 intensityB = GetParameter( kParam_Five ) / 2.0f;

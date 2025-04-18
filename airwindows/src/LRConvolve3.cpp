@@ -46,7 +46,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float smooth = pow(GetParameter( kParam_A ),4)*(0.5f/overallscale);
+	float smooth = powf(GetParameter( kParam_A ),4)*(0.5f/overallscale);
 	float channel = GetParameter( kParam_B );
 	
 	while (nSampleFrames-- > 0) {

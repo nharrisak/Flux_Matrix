@@ -67,10 +67,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	
 	float note = GetParameter( kParam_One );// -12 to +12
 	float bend = GetParameter( kParam_Two );// -12.0f to +12.0f
-	float speed = pow(2,note/12.0f)*pow(2,bend/12.0f);
+	float speed = powf(2,note/12.0f)*powf(2,bend/12.0f);
 	
 	float grindRef = (1.0f/261.6f)*GetSampleRate(); //samples per Middle C cycle
-	float grindNote = pow(2,GetParameter( kParam_Three )/12.0f); // -36 to 36
+	float grindNote = powf(2,GetParameter( kParam_Three )/12.0f); // -36 to 36
 	float width = grindRef / grindNote;
 	if (width > 9990) width = 9990; //safety check
 	float feedback = GetParameter( kParam_Four );

@@ -82,11 +82,11 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//previous run through the buffer is still in the filter, so we move it
 	//to the A section and now it's the new starting point.
 	
-	dram->biqs[biqs_freq] = (((pow(GetParameter( kParam_A ),4)*19980.0f)+20.0f)/GetSampleRate());	
+	dram->biqs[biqs_freq] = (((powf(GetParameter( kParam_A ),4)*19980.0f)+20.0f)/GetSampleRate());	
 	dram->biqs[biqs_nonlin] = GetParameter( kParam_B );
 	dram->biqs[biqs_levelB] = (dram->biqs[biqs_nonlin]*2.0f)-1.0f;
 	if (dram->biqs[biqs_levelB] > 0.0f) dram->biqs[biqs_levelB] *= 2.0f;
-	dram->biqs[biqs_reso] = ((0.5f+(dram->biqs[biqs_nonlin]*0.5f)+sqrt(dram->biqs[biqs_freq]))-(1.0f-pow(1.0f-GetParameter( kParam_C ),2.0f)))+0.5f+(dram->biqs[biqs_nonlin]*0.5f);
+	dram->biqs[biqs_reso] = ((0.5f+(dram->biqs[biqs_nonlin]*0.5f)+sqrt(dram->biqs[biqs_freq]))-(1.0f-powf(1.0f-GetParameter( kParam_C ),2.0f)))+0.5f+(dram->biqs[biqs_nonlin]*0.5f);
 
 	float K = tan(M_PI * dram->biqs[biqs_freq]);
 	float norm = 1.0f / (1.0f + K / (dram->biqs[biqs_reso]*1.93185165f) + K * K);

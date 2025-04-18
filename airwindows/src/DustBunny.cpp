@@ -64,7 +64,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	unsigned int bunny = (unsigned int)(pow((1.255f-GetParameter( kParam_One )),5)*1000);
+	unsigned int bunny = (unsigned int)(powf((1.255f-GetParameter( kParam_One )),5)*1000);
 	bunny = (bunny*bunny);
 	Float32 inputSample;
 	

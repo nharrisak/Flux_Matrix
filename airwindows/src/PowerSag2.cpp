@@ -54,7 +54,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 
-	Float32 depth = pow(GetParameter( kParam_One ),4);
+	Float32 depth = powf(GetParameter( kParam_One ),4);
 	int offset = (int)(depth * 16383) + 1;	
 	Float32 wet = GetParameter( kParam_Two );
 

@@ -66,9 +66,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	float freqMin = 0.08f / overallscale;
-	freqA = freqB; freqB = (pow(1.0f-GetParameter( kParam_One ),3)*(0.618033988749894848204586f-freqMin))+freqMin;
+	freqA = freqB; freqB = (powf(1.0f-GetParameter( kParam_One ),3)*(0.618033988749894848204586f-freqMin))+freqMin;
 	//freq is always engaged at least a little
-	rezA = rezB; rezB = pow(GetParameter( kParam_Two )*0.618033988749894848204586f,3)+0.000244140625f;
+	rezA = rezB; rezB = powf(GetParameter( kParam_Two )*0.618033988749894848204586f,3)+0.000244140625f;
 	//rez is always at least 12 bit truncation
 	float wet = GetParameter( kParam_Three );
 	
@@ -102,8 +102,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		inputSample *= (1.0f - rez);
 			
 		if (inputSample > 1.0f) inputSample = 1.0f; if (inputSample < -1.0f) inputSample = -1.0f;
-		if (inputSample > 0) inputSample = (pow(256,fabs(inputSample))-1.0f) / 255;
-		if (inputSample < 0) inputSample = -(pow(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample > 0) inputSample = (powf(256,fabs(inputSample))-1.0f) / 255;
+		if (inputSample < 0) inputSample = -(powf(256,fabs(inputSample))-1.0f) / 255;
 		//end uLaw decode
 		
 		position += freq;

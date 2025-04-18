@@ -135,12 +135,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
 	Float32 vibSpeed = 0.06f+GetParameter( kParam_Three );
-	Float32 vibDepth = (0.027f+pow(GetParameter( kParam_Four ),3))*100.0f;
-	Float32 size = (pow(GetParameter( kParam_Five ),2)*90.0f)+10.0f;
-	Float32 depthFactor = 1.0f-pow((1.0f-(0.82f-((GetParameter( kParam_Two )*0.5f)+(size*0.002f)))),4);
+	Float32 vibDepth = (0.027f+powf(GetParameter( kParam_Four ),3))*100.0f;
+	Float32 size = (powf(GetParameter( kParam_Five ),2)*90.0f)+10.0f;
+	Float32 depthFactor = 1.0f-powf((1.0f-(0.82f-((GetParameter( kParam_Two )*0.5f)+(size*0.002f)))),4);
 	Float32 blend = 0.955f-(size*0.007f);
 	Float32 crossmod = (GetParameter( kParam_Six )-0.5f)*2.0f;
-	crossmod = pow(crossmod,3)*0.5f;
+	crossmod = powf(crossmod,3)*0.5f;
 	Float32 regen = depthFactor * (0.5f - (fabs(crossmod)*0.031f));
 	Float32 wet = GetParameter( kParam_Seven );
 	

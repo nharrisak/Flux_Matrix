@@ -59,9 +59,9 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 drop = 1.0f+(GetParameter( kParam_One )*(0.001f/overallscale)); //more is briefer bass
 	Float32 zone = GetParameter( kParam_Two )*0.01f; //the max exponentiality of the falloff
 	Float32 start = GetParameter( kParam_Three ); //higher attack
-	Float32 envelope = 9.0f-((1.0f-pow(1.0f-GetParameter( kParam_Four ),2))*4.0f); //higher is allowing more subs before gate
+	Float32 envelope = 9.0f-((1.0f-powf(1.0f-GetParameter( kParam_Four ),2))*4.0f); //higher is allowing more subs before gate
 	envelope *= ((start*0.4f)+0.6f);
-	Float32 threshold = pow(GetParameter( kParam_Five ),3); // trigger threshold
+	Float32 threshold = powf(GetParameter( kParam_Five ),3); // trigger threshold
 	Float32 wet = GetParameter( kParam_Six )*2.0f;
 	Float32 dry = 2.0f - wet;
 	if (wet > 1.0f) wet = 1.0f;

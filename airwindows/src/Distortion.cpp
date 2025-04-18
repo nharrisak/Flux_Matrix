@@ -65,9 +65,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 *destP = inDestP;
 	int stages = (int)floor(GetSampleRate()/25000.0f);
 	if (stages > 8) stages = 8;
-	Float32 input = pow(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 input = powf(10.0f,GetParameter( kParam_One )/20.0f);
 	int mode = (int) GetParameter( kParam_Two );
-	Float32 output = pow(10.0f,GetParameter( kParam_Three )/20.0f);
+	Float32 output = powf(10.0f,GetParameter( kParam_Three )/20.0f);
 	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {
@@ -105,12 +105,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 				inputSample = sin(inputSample * fabs(inputSample)) / ((fabs(inputSample) == 0.0f) ?1:fabs(inputSample));
 				break;
 			case 3: //Mojo
-				float mojo; mojo = pow(fabs(inputSample),0.25f);
+				float mojo; mojo = powf(fabs(inputSample),0.25f);
 				if (mojo > 0.0f) inputSample = (sin(inputSample * mojo * M_PI * 0.5f) / mojo) * 0.987654321f;
 				//mojo is the one that flattens WAAAAY out very softly before wavefolding				
 				break;
 			case 4: //Dyno
-				float dyno; dyno = pow(fabs(inputSample),4);
+				float dyno; dyno = powf(fabs(inputSample),4);
 				if (dyno > 0.0f) inputSample = (sin(inputSample * dyno) / dyno) * 1.1654321f;
 				//dyno is the one that tries to raise peak energy				
 				break;

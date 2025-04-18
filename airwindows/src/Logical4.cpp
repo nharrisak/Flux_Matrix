@@ -156,7 +156,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 outputpos;
 	Float32 outputneg;
 	Float32 totalmultiplier;
-	Float32 inputgain = pow(10.0f,(-GetParameter( kParam_One ))/20.0f);
+	Float32 inputgain = powf(10.0f,(-GetParameter( kParam_One ))/20.0f);
 	//fussing with the controls to make it hit the right threshold values
 	Float32 compoutgain = inputgain; //let's try compensating for this
 	
@@ -233,7 +233,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	Float32 outSampleCR = 0.0f;
 	//what we interpolate between using ratio
 	
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Four )/20.0f);
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Four )/20.0f);
 	Float32 wet = GetParameter( kParam_Five );
 	//removed unnecessary dry variable
 	
@@ -316,7 +316,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetposL *= dynamicDivisor;
 		targetposL += (inputpos * dynamicRemainder);
-		calcpos = pow((1.0f/targetposL),2);
+		calcpos = powf((1.0f/targetposL),2);
 		//extra tiny, quick, if the inputpos of this polarity is high
 		
 		inputneg = (-inputSampleL * fpOld) + (nvgAL * fpNew) + 1.0f;
@@ -335,7 +335,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetnegL *= dynamicDivisor;
 		targetnegL += (inputneg * dynamicRemainder);
-		calcneg = pow((1.0f/targetnegL),2);
+		calcneg = powf((1.0f/targetnegL),2);
 		//now we have mirrored targets for comp
 		//each calc is a blowed up chased target from tiny (at high levels of that polarity) to 1 at no input
 		//calc is the one we want to react differently: go tiny quick, 
@@ -408,7 +408,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetposR *= dynamicDivisor;
 		targetposR += (inputpos * dynamicRemainder);
-		calcpos = pow((1.0f/targetposR),2);
+		calcpos = powf((1.0f/targetposR),2);
 		//extra tiny, quick, if the inputpos of this polarity is high
 		
 		inputneg = (-inputSampleR * fpOld) + (nvgAR * fpNew) + 1.0f;
@@ -427,7 +427,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetnegR *= dynamicDivisor;
 		targetnegR += (inputneg * dynamicRemainder);
-		calcneg = pow((1.0f/targetnegR),2);
+		calcneg = powf((1.0f/targetnegR),2);
 		//now we have mirrored targets for comp
 		//each calc is a blowed up chased target from tiny (at high levels of that polarity) to 1 at no input
 		//calc is the one we want to react differently: go tiny quick, 
@@ -549,7 +549,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetposBL *= dynamicDivisor;
 		targetposBL += (inputpos * dynamicRemainder);
-		calcpos = pow((1.0f/targetposBL),2);
+		calcpos = powf((1.0f/targetposBL),2);
 		
 		inputneg = (-inputSampleL * fpOld) + (nvgBL * fpNew) + 1.0f;
 		nvgBL = -inputSampleL;
@@ -567,7 +567,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetnegBL *= dynamicDivisor;
 		targetnegBL += (inputneg * dynamicRemainder);
-		calcneg = pow((1.0f/targetnegBL),2);
+		calcneg = powf((1.0f/targetnegBL),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		if (inputSampleL > 0)
@@ -635,7 +635,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetposBR *= dynamicDivisor;
 		targetposBR += (inputpos * dynamicRemainder);
-		calcpos = pow((1.0f/targetposBR),2);
+		calcpos = powf((1.0f/targetposBR),2);
 		
 		inputneg = (-inputSampleR * fpOld) + (nvgBR * fpNew) + 1.0f;
 		nvgBR = -inputSampleR;
@@ -653,7 +653,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetnegBR *= dynamicDivisor;
 		targetnegBR += (inputneg * dynamicRemainder);
-		calcneg = pow((1.0f/targetnegBR),2);
+		calcneg = powf((1.0f/targetnegBR),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		if (inputSampleR > 0)
@@ -771,7 +771,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetposCL *= dynamicDivisor;
 		targetposCL += (inputpos * dynamicRemainder);
-		calcpos = pow((1.0f/targetposCL),2);
+		calcpos = powf((1.0f/targetposCL),2);
 		
 		inputneg = (-inputSampleL * fpOld) + (nvgCL * fpNew) + 1.0f;
 		nvgCL = -inputSampleL;
@@ -789,7 +789,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetnegCL *= dynamicDivisor;
 		targetnegCL += (inputneg * dynamicRemainder);
-		calcneg = pow((1.0f/targetnegCL),2);
+		calcneg = powf((1.0f/targetnegCL),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		if (inputSampleL > 0)
@@ -857,7 +857,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetposCL *= dynamicDivisor;
 		targetposCL += (inputpos * dynamicRemainder);
-		calcpos = pow((1.0f/targetposCR),2);
+		calcpos = powf((1.0f/targetposCR),2);
 		
 		inputneg = (-inputSampleR * fpOld) + (nvgCR * fpNew) + 1.0f;
 		nvgCR = -inputSampleR;
@@ -875,7 +875,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 		
 		targetnegCR *= dynamicDivisor;
 		targetnegCR += (inputneg * dynamicRemainder);
-		calcneg = pow((1.0f/targetnegCR),2);
+		calcneg = powf((1.0f/targetnegCR),2);
 		//now we have mirrored targets for comp
 		//outputpos and outputneg go from 0 to 1
 		if (inputSampleR > 0)

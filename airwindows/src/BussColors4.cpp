@@ -106,8 +106,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	}
 	offsetA = (int)(offsetA * overallscale); //we extend the sag buffer too, at high sample rates
 	if (offsetA < 3) offsetA = 3; //are we getting divides by zero?
-	gain *= pow(10.0f,GetParameter( kParam_Two )/14.0f); //add adjustment factor
-	outgain *= pow(10.0f,(GetParameter( kParam_Three )+3.3f)/14.0f); //add adjustment factor
+	gain *= powf(10.0f,GetParameter( kParam_Two )/14.0f); //add adjustment factor
+	outgain *= powf(10.0f,(GetParameter( kParam_Three )+3.3f)/14.0f); //add adjustment factor
 	Float32 wet = GetParameter( kParam_Four );
 	//removed unnecessary dry variable
 	

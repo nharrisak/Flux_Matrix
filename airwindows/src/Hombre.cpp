@@ -75,7 +75,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		slide = (slide * 0.9997f)+(target*0.0003f);
 
-		offsetA = ((pow(slide,2)) * 77)+3.2f;
+		offsetA = ((powf(slide,2)) * 77)+3.2f;
 		offsetB = (3.85f * offsetA)+41;
 		offsetA *= overallscale;
 		offsetB *= overallscale;

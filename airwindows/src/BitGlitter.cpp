@@ -66,15 +66,15 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	Float32 factor = GetParameter( kParam_Two )+1.0f;
-	factor = pow(factor,7)+2.0f;
+	factor = powf(factor,7)+2.0f;
 	int divvy = (int)(factor*overallscale);
 	Float32 rateA = 1.0f / divvy;
 	Float32 rezA = 0.0016666666666667f; //looks to be a fixed bitcrush
 	Float32 rateB = 1.61803398875f / divvy;
 	Float32 rezB = 0.0026666666666667f; //looks to be a fixed bitcrush
 	Float32 offset;
-	Float32 ingain = pow(10.0f,GetParameter( kParam_One )/14.0f); //add adjustment factor
-	Float32 outgain = pow(10.0f,GetParameter( kParam_Three )/14.0f); //add adjustment factor
+	Float32 ingain = powf(10.0f,GetParameter( kParam_One )/14.0f); //add adjustment factor
+	Float32 outgain = powf(10.0f,GetParameter( kParam_Three )/14.0f); //add adjustment factor
 	Float32 wet = GetParameter( kParam_Four );
 
 	

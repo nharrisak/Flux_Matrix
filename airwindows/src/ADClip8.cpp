@@ -77,7 +77,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//refclip*hardness = 1.0f  to use ClipOnly as a prefab code-chunk.
 	//refclip*softness = 0.618033988749894f	Seven decimal places is plenty as it's
 	//not related to the original sound much: it's an arbitrary position in softening.
-	float inputGain = pow(10.0f,(GetParameter( kParam_One ))/20.0f);
+	float inputGain = powf(10.0f,(GetParameter( kParam_One ))/20.0f);
 
 	float ceiling = (1.0f+(GetParameter( kParam_Two )*0.23594733f))*0.5f;
 	int mode = (int) GetParameter( kParam_Three );

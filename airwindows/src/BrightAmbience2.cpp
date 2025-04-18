@@ -54,10 +54,10 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 
 	UInt32 nSampleFrames = inFramesToProcess;
 	
-	int start = (int)(pow(GetParameter( kParam_One ),2) * 480)+1;
-	int length = (int)(pow(GetParameter( kParam_Two ),2) * 480)+1;
+	int start = (int)(powf(GetParameter( kParam_One ),2) * 480)+1;
+	int length = (int)(powf(GetParameter( kParam_Two ),2) * 480)+1;
 	if (start + length > 488) start = 488-length;
-	Float32 feedbackAmount = 1.0f-(pow(1.0f-GetParameter( kParam_Three ),2));
+	Float32 feedbackAmount = 1.0f-(powf(1.0f-GetParameter( kParam_Three ),2));
 	Float32 wet = GetParameter( kParam_Four );
 	
 	while (nSampleFrames-- > 0) {

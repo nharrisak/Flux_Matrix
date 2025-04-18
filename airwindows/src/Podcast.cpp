@@ -61,9 +61,9 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 
-	Float32 compress = 1.0f + pow(GetParameter( kParam_One ),2);
+	Float32 compress = 1.0f + powf(GetParameter( kParam_One ),2);
 	Float32 wet = GetParameter( kParam_Two );
-	Float32 speed1 = 64.0f / pow(compress,2);
+	Float32 speed1 = 64.0f / powf(compress,2);
 	speed1 *= overallscale;
 	Float32 speed2 = speed1 * 1.4f;
 	Float32 speed3 = speed2 * 1.5f;

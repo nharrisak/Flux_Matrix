@@ -115,7 +115,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 		if (lastFXBuss < -1.0f) lastFXBuss = -1.0f;
 		//build new signal off what was present in output last time
 		
-		nearZero = pow(fabs(fabs(lastFXBuss)-1.0f), 2);
+		nearZero = powf(fabs(fabs(lastFXBuss)-1.0f), 2);
 		//if the sample is very near zero this number is higher.
 		if (iirCorrect > 0) iirCorrect -= servoTrim;
 		if (iirCorrect < 0) iirCorrect += servoTrim;

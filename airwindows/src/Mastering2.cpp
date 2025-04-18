@@ -185,14 +185,14 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
 	
-	float iirSide = pow(GetParameter( kParam_A ),3) * (0.1f / overallscale);
+	float iirSide = powf(GetParameter( kParam_A ),3) * (0.1f / overallscale);
 
 	float threshSinew = (0.25f+((1.0f-GetParameter( kParam_B ))*0.333f))/overallscale;
-	float depthSinew = 1.0f-pow(1.0f-GetParameter( kParam_B ),2.0f);
+	float depthSinew = 1.0f-powf(1.0f-GetParameter( kParam_B ),2.0f);
 	
 	float trebleZoom = GetParameter( kParam_C )-0.5f;
 	float trebleGain = (trebleZoom*fabs(trebleZoom))+1.0f;
-	if (trebleGain > 1.0f) trebleGain = pow(trebleGain,3.0f+sqrt(overallscale));
+	if (trebleGain > 1.0f) trebleGain = powf(trebleGain,3.0f+sqrt(overallscale));
 	//this boost is necessary to adapt to higher sample rates
 	
 	float midZoom = GetParameter( kParam_D )-0.5f;

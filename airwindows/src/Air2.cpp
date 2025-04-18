@@ -98,13 +98,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	if (hiIntensity < 0.0f) hiIntensity *= 0.57525f;
 	if (tripletIntensity < 0.0f) tripletIntensity *= 0.71325f;
 	if (airIntensity < 0.0f) airIntensity *= 0.5712f;
-	hiIntensity = -pow(hiIntensity,3);
-	tripletIntensity = -pow(tripletIntensity,3);
-	airIntensity = -pow(airIntensity,3);
+	hiIntensity = -powf(hiIntensity,3);
+	tripletIntensity = -powf(tripletIntensity,3);
+	airIntensity = -powf(airIntensity,3);
 	Float32 hiQ = 1.5f+fabs(hiIntensity*0.5f);
 	Float32 tripletQ = 1.5f+fabs(tripletIntensity*0.5f);
 	Float32 airQ = 1.5f+fabs(airIntensity*0.5f);
-	Float32 intensity = (pow(GetParameter( kParam_Four ),3)*4.0f) + 0.0001f;
+	Float32 intensity = (powf(GetParameter( kParam_Four ),3)*4.0f) + 0.0001f;
 	Float32 mix = GetParameter( kParam_Five );
 	Float32 drymix = (1.0f-mix)*4.0f;
 	if (drymix > 1.0f) drymix = 1.0f;

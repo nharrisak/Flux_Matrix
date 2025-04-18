@@ -100,7 +100,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	biquadC[0] = biquadB[0] = biquadA[0] = ((pow(GetParameter( kParam_One ),2)*9900.0f)+100.0f) / GetSampleRate();
+	biquadC[0] = biquadB[0] = biquadA[0] = ((powf(GetParameter( kParam_One ),2)*9900.0f)+100.0f) / GetSampleRate();
 	biquadA[1] = 0.618033988749894848204586f;
 	biquadB[1] = (GetParameter( kParam_One )*0.5f)+0.118033988749894848204586f;
     biquadC[1] = 0.5f;
@@ -129,10 +129,10 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	biquadC[5] = 2.0f * (K * K - 1.0f) * norm;
 	biquadC[6] = (1.0f - K / biquadC[1] + K * K) * norm;
 	
-	Float32 size = (pow(GetParameter( kParam_Two ),2)*99.0f)+1.0f;
-	Float32 damping = pow(GetParameter( kParam_Three ),2)*0.5f;
+	Float32 size = (powf(GetParameter( kParam_Two ),2)*99.0f)+1.0f;
+	Float32 damping = powf(GetParameter( kParam_Three ),2)*0.5f;
 	Float32 rawPass = GetParameter( kParam_Four );
-	Float32 feedback = 1.0f-(pow(1.0f-GetParameter( kParam_Five ),4));
+	Float32 feedback = 1.0f-(powf(1.0f-GetParameter( kParam_Five ),4));
 	Float32 wet = GetParameter( kParam_Six );
 	
 	delayA = 79*size;

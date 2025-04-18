@@ -121,7 +121,7 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
 	Float32 size = (GetParameter( kParam_One )*0.9f)+0.1f;
-	Float32 regen = (1.0f-(pow(1.0f-GetParameter( kParam_Two ),2)))*0.123f;
+	Float32 regen = (1.0f-(powf(1.0f-GetParameter( kParam_Two ),2)))*0.123f;
 	Float32 echoScale = 1.0f-GetParameter( kParam_Three );
 	Float32 echo = 0.618033988749894848204586f+((1.0f-0.618033988749894848204586f)*echoScale);
 	Float32 interpolate = (1.0f-echo)*0.381966011250105f;

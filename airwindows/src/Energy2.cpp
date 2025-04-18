@@ -153,14 +153,14 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	//this is going to be 2 for 88.1f or 96k, 3 for silly people, 4 for 176 or 192k
 	if (cycle > cycleEnd-1) cycle = cycleEnd-1; //sanity check
 	
-	Float32 duoIntensity = -pow(GetParameter( kParam_One ),3);
-	Float32 tripletIntensity = -pow(GetParameter( kParam_Two ),3);
-	Float32 quadIntensity = -pow(GetParameter( kParam_Three ),3);
-	Float32 quintIntensity = -pow(GetParameter( kParam_Four ),3);
-	Float32 sextIntensity = -pow(GetParameter( kParam_Five ),3);
-	Float32 septIntensity = -pow(GetParameter( kParam_Six ),3);
-	Float32 octIntensity = -pow(GetParameter( kParam_Seven ),3);
-	Float32 nintIntensity = -pow(GetParameter( kParam_Eight ),3);
+	Float32 duoIntensity = -powf(GetParameter( kParam_One ),3);
+	Float32 tripletIntensity = -powf(GetParameter( kParam_Two ),3);
+	Float32 quadIntensity = -powf(GetParameter( kParam_Three ),3);
+	Float32 quintIntensity = -powf(GetParameter( kParam_Four ),3);
+	Float32 sextIntensity = -powf(GetParameter( kParam_Five ),3);
+	Float32 septIntensity = -powf(GetParameter( kParam_Six ),3);
+	Float32 octIntensity = -powf(GetParameter( kParam_Seven ),3);
+	Float32 nintIntensity = -powf(GetParameter( kParam_Eight ),3);
 	Float32 mix = GetParameter( kParam_Nine );
 	//all types of air band are running in parallel, not series
 	

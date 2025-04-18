@@ -76,7 +76,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	overallscale *= GetSampleRate();
 	
 	float airGain = GetParameter( kParam_One )*2.0f;
-	if (airGain > 1.0f) airGain = pow(airGain,3.0f+sqrt(overallscale));
+	if (airGain > 1.0f) airGain = powf(airGain,3.0f+sqrt(overallscale));
 	float gndGain = GetParameter( kParam_Two )*2.0f;
 	
 	while (nSampleFrames-- > 0) {

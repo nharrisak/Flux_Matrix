@@ -244,11 +244,11 @@ void _airwindowsAlgorithm::render( const Float32* inputL, const Float32* inputR,
 	derez = 1.0f / ((int)(1.0f/derez));
 	//this hard-locks derez to exact subdivisions of 1.0f
 	
-	int diffuse = pow(GetParameter( kParam_B ),1.618033988749894848204586f)*16;
-	float iirAmt = 1.0f-pow(1.0f-GetParameter( kParam_C ),1.618033988749894848204586f);
+	int diffuse = powf(GetParameter( kParam_B ),1.618033988749894848204586f)*16;
+	float iirAmt = 1.0f-powf(1.0f-GetParameter( kParam_C ),1.618033988749894848204586f);
 	float iirExt = iirAmt/overallscale;
-	float crossfade = (1.0f-pow(1.0f-GetParameter( kParam_D ),1.618033988749894848204586f));
-	float wet = pow(GetParameter( kParam_E ),1.618033988749894848204586f);
+	float crossfade = (1.0f-powf(1.0f-GetParameter( kParam_D ),1.618033988749894848204586f));
+	float wet = powf(GetParameter( kParam_E ),1.618033988749894848204586f);
 	
 	while (nSampleFrames-- > 0) {
 		float inputSampleL = *inputL;

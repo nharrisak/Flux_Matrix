@@ -83,8 +83,8 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	const Float32 *sourceP = inSourceP;
 	Float32 *destP = inDestP;
 	
-	Float32 inputgain = pow(10.0f,GetParameter( kParam_One )/20.0f);
-	Float32 outputgain = pow(10.0f,GetParameter( kParam_Six )/20.0f);
+	Float32 inputgain = powf(10.0f,GetParameter( kParam_One )/20.0f);
+	Float32 outputgain = powf(10.0f,GetParameter( kParam_Six )/20.0f);
 	Float32 ips = GetParameter( kParam_Two ) * 1.1f;
 	//slight correction to dial in convincing ips settings
 	if (ips < 1 || ips > 200){ips=33.0f;}
@@ -109,7 +109,7 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 overallscale = 1.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 depth = pow(GetParameter( kParam_Four ),2)*overallscale;
+	Float32 depth = powf(GetParameter( kParam_Four ),2)*overallscale;
 	Float32 fluttertrim = 0.00581f/overallscale;
 	Float32 sweeptrim = (0.0005f*depth)/overallscale;
 	Float32 offset;	

@@ -66,13 +66,13 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 	Float32 overallscale = 2.0f;
 	overallscale /= 44100.0f;
 	overallscale *= GetSampleRate();
-	Float32 threshold = 1.001f - (1.0f-pow(1.0f-GetParameter( kParam_One ),3));
+	Float32 threshold = 1.001f - (1.0f-powf(1.0f-GetParameter( kParam_One ),3));
 	Float32 muMakeupGain = sqrt(1.0f / threshold);
 	muMakeupGain = (muMakeupGain + sqrt(muMakeupGain))/2.0f;
 	muMakeupGain = sqrt(muMakeupGain);
 	Float32 outGain = sqrt(muMakeupGain);
 	//gain settings around threshold
-	Float32 release = pow((1.15f-GetParameter( kParam_Two )),5)*32768.0f;
+	Float32 release = powf((1.15f-GetParameter( kParam_Two )),5)*32768.0f;
 	release /= overallscale;
 	Float32 fastest = sqrt(release);
 	//speed settings around release
@@ -151,12 +151,12 @@ void _airwindowsAlgorithm::_kernel::render( const Float32* inSourceP, Float32* i
 
 		if (flip)
 			{
-			coefficient = (muCoefficientA + pow(muCoefficientA,2))/2.0f;
+			coefficient = (muCoefficientA + powf(muCoefficientA,2))/2.0f;
 			inputSample *= coefficient;
 			}
 		else
 			{
-			coefficient = (muCoefficientB + pow(muCoefficientB,2))/2.0f;
+			coefficient = (muCoefficientB + powf(muCoefficientB,2))/2.0f;
 			inputSample *= coefficient;
 			}
 		//applied compression with vari-vari-µ-µ-µ-µ-µ-µ-is-the-kitten-song o/~
