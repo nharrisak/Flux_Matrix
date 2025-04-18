@@ -126,6 +126,7 @@ for f in files:
 				content = bits[1]
 
 		privates = ''
+		static_data = ''
 		with open( src.replace( '.cpp', '.h' ), 'r', encoding='mac_roman' ) as G:
 			content = G.read()
 			bits = content.split( 'private:' )
@@ -134,6 +135,9 @@ for f in files:
 			if len(bits) == 2:
 				bits = '{' + bits[1]
 				privates = matchCurly( bits )[1:-1]
+			m = re.findall( r'static int (\w+)\[\] = ({[\d,\s]+});', content )
+			for n in m:
+				static_data += 'static const int ' + n[0] + '[] = ' + n[1] + ';\n'
 		privates = adjustFloatTypes( privates )
 		
 		# look for large arrays and move them to dram
@@ -201,6 +205,7 @@ for f in files:
 				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
 				G.write( enums )
 				G.write( consts )
+				G.write( static_data )
 				G.write( 'enum { kParamInputL, kParamInputR, kParamOutputL, kParamOutputLmode, kParamOutputR, kParamOutputRmode,\n' )
 				G.write( 'kParamPrePostGain,\n' )
 				for i in range( numParameters ):
@@ -259,6 +264,7 @@ for f in files:
 				G.write( '#define AIRWINDOWS_KERNELS\n' )
 				G.write( enums )
 				G.write( consts )
+				G.write( static_data )
 				G.write( 'enum { kParamInput1, kParamOutput1, kParamOutput1mode,\n' )
 				G.write( 'kParamPrePostGain,\n' )
 				for i in range( numParameters ):
