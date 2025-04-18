@@ -52,15 +52,16 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	{
 		float* temp0 = NT_globals.workBuffer;
 
+		const float* input = in0;
 		if ( pre != 0 )
 		{
 			for ( int i=0; i<numFrames; ++i )
 				temp0[i] = in0[i] * preGain;
-			in0 = temp0;
+			input = temp0;
 			temp0 = NT_globals.workBuffer + numFrames;
 		}
 		
-		pThis->kernels[i].render( in0, replace0 ? out0 : temp0, numFrames );
+		pThis->kernels[i].render( input, replace0 ? out0 : temp0, numFrames );
 	
 		if ( pre != 0 )
 		{
