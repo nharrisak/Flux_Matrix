@@ -45,7 +45,7 @@ with open ( '../airwindows/Airwindopedia.txt', 'r' ) as F:
 
 srcPath = '../airwindows/plugins/MacAU/'
 
-skipList = [ 'PocketVerbs' ]
+skipList = []
 
 def matchCurly( t ):
 	s = ''
