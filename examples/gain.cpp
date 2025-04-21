@@ -109,6 +109,7 @@ static const _NT_factory factory =
 	.parameterChanged = parameterChanged,
 	.step = step,
 	.draw = draw,
+	.tags = kNT_tagUtility,
 };
 
 uintptr_t pluginEntry( _NT_selector selector, uint32_t data )

@@ -36,8 +36,9 @@ enum _NT_version
 	kNT_apiVersion2,
 	kNT_apiVersion3,				// Adds MIDI handling. Compatible with v2.
 	kNT_apiVersion4,				// Add specifications. Breaks compatibility.
+	kNT_apiVersion5,				// Add tags. Compatible with v4.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion4
+	kNT_apiVersionCurrent 		= kNT_apiVersion5
 };
 
 /*
@@ -273,6 +274,19 @@ struct _NT_specification
 };
 
 /*
+ * Values for the tags field of _NT_factory.
+ */
+enum _NT_tag
+{
+	kNT_tagInstrument		= (1<<0),
+	kNT_tagEffect			= (1<<1),
+	kNT_tagReverb			= (1<<2),
+	kNT_tagDelay			= (1<<3),
+	kNT_tagUtility			= (1<<4),
+	kNT_tagFilterEQ			= (1<<5),
+};
+
+/*
  * Structure that defines an algorithm factory.
  *
  * Returned from pluginEntry().
@@ -351,6 +365,8 @@ struct _NT_factory
      * two or three byte messages that include a MIDI channel.
      */
     void			(*midiMessage)( _NT_algorithm* self, uint8_t byte0, uint8_t byte1, uint8_t byte2 );
+
+    uint32_t		tags;			// Logical OR of _NT_tag
 };
 
 extern "C" {
