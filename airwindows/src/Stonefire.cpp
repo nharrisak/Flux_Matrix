@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Stonefire"
 #define AIRWINDOWS_DESCRIPTION "The non-EQ EQ designed for ConsoleX."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','S','t','p' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

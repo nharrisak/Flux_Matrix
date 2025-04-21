@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Lowpass2"
 #define AIRWINDOWS_DESCRIPTION "An unusual-sounding variable-slope lowpass filter."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','L','o','x' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

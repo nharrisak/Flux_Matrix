@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "NonlinearSpace"
 #define AIRWINDOWS_DESCRIPTION "A flexible reverb plugin."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','N','o','n' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_One =0,

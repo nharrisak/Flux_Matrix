@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Galactic3"
 #define AIRWINDOWS_DESCRIPTION "Exactly Galactic again, but with better undersampling."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','G','a','n' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_A =0,

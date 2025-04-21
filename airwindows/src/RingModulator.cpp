@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "RingModulator"
 #define AIRWINDOWS_DESCRIPTION "Repitches sounds mathematically, not harmonically."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','R','i','n' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 enum {
 
 	kParam_A =0,

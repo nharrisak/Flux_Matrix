@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Isolator2"
 #define AIRWINDOWS_DESCRIPTION "Isolator, but with control smoothing and a new resonance booster."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','I','s','p' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

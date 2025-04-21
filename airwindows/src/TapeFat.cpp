@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "TapeFat"
 #define AIRWINDOWS_DESCRIPTION "The tone control from TapeDelay."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','T','a','v' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

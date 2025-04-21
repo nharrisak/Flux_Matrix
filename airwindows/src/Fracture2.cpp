@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Fracture2"
 #define AIRWINDOWS_DESCRIPTION "A wavefolder that allows more extreme disruption."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','F','r','b' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

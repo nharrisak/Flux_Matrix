@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "PocketVerbs"
 #define AIRWINDOWS_DESCRIPTION "My popular old special effects reverbs plugin!"
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','o','c' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 #define AIRWINDOWS_KERNELS
 enum {
 

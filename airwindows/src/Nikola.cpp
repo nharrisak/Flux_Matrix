@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Nikola"
 #define AIRWINDOWS_DESCRIPTION "An Audio Tesla Coil plugin! Note: audio tesla coils don't sound nice."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','N','i','k' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

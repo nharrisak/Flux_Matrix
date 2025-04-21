@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Capacitor"
 #define AIRWINDOWS_DESCRIPTION "A lowpass/highpass filter of a new type."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','a','p' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

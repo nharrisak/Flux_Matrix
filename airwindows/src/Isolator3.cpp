@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Isolator3"
 #define AIRWINDOWS_DESCRIPTION "Isolator2, but on one slider, with a band-narrower control."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','I','s','q' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

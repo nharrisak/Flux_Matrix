@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Pear2"
 #define AIRWINDOWS_DESCRIPTION "My Pear filter plus nonlinearity."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','e','c' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 enum {
 
 	kParam_One =0,

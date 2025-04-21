@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Reverb"
 #define AIRWINDOWS_DESCRIPTION "Simplified and tuned MatrixVerb, adjusting everything for each optimum verb size."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','R','e','v' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 #define AIRWINDOWS_KERNELS
 enum {
 

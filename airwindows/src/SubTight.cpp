@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "SubTight"
 #define AIRWINDOWS_DESCRIPTION "Uses a variation on the Creature algorithm to tighten sub-lows."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','S','u','b' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

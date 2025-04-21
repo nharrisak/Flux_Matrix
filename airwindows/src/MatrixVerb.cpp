@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "MatrixVerb"
 #define AIRWINDOWS_DESCRIPTION "A wildly adjustable, strangely colorful reverb for deep and flexible spaces."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','M','a','u' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 #define AIRWINDOWS_KERNELS
 enum {
 

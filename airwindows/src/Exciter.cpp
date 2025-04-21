@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Exciter"
 #define AIRWINDOWS_DESCRIPTION "An Aural Exciter plugin that can be both subtle and extreme."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','E','x','c' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

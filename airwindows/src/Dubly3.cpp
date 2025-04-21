@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Dubly3"
 #define AIRWINDOWS_DESCRIPTION "Refines and transforms the Dubly sound."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','D','u','i' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

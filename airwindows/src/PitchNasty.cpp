@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "PitchNasty"
 #define AIRWINDOWS_DESCRIPTION "A primitive pitch shifter that also has primitive time-stretch artifacts."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','i','u' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

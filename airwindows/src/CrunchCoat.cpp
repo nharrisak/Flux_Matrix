@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "CrunchCoat"
 #define AIRWINDOWS_DESCRIPTION "A cursed retro digital reverb!"
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','r','u' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_A =0,

@@ -31,6 +31,9 @@ files = [ f for f in files if os.path.isfile( os.path.join( path, f ) ) and f.en
 files.sort()
 
 descriptions = {}
+tag_effects = []
+tag_reverb = []
+tag_filter = []
 with open ( '../airwindows/Airwindopedia.txt', 'r' ) as F:
 	lines = F.readlines()
 	for line in lines:
@@ -42,6 +45,18 @@ with open ( '../airwindows/Airwindopedia.txt', 'r' ) as F:
 					d = d[3:]
 				d = d[:1].upper() + d[1:]
 				descriptions[ bits[1] ] = d
+		elif line.startswith( 'Effects:' ):
+			bits = line[8:].split( ',' )
+			for b in bits:
+				tag_effects.append( b.strip() )
+		elif line.startswith( 'Filter:' ):
+			bits = line[7:].split( ',' )
+			for b in bits:
+				tag_filter.append( b.strip() )
+		elif line.startswith( 'Reverb:' ):
+			bits = line[7:].split( ',' )
+			for b in bits:
+				tag_reverb.append( b.strip() )
 
 srcPath = '../airwindows/plugins/MacAU/'
 
@@ -186,6 +201,14 @@ for f in files:
 			i = ord(' ') + ( ( i - ord(' ') ) % ( ord('z') - ord(' ') ) )
 			guid[3] = chr( i )
 		guids.append( guid )
+		
+		tags = ''
+		if name in tag_reverb:
+			tags = 'kNT_tagEffect | kNT_tagReverb'
+		elif name in tag_filter:
+			tags = 'kNT_tagFilterEQ'
+		elif name in tag_effects:
+			tags = 'kNT_tagEffect'
 
 		if ( lines[0] == 'STEREO\n' ):
 			with open( src, 'r', encoding='mac_roman' ) as G:
@@ -204,6 +227,8 @@ for f in files:
 				G.write( '#define AIRWINDOWS_NAME "' + name + '"\n' )
 				G.write( '#define AIRWINDOWS_DESCRIPTION "' + description + '"\n' )
 				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
+				if len(tags) > 0:
+					G.write( f'#define AIRWINDOWS_TAGS {tags}\n' )
 				G.write( enums )
 				G.write( consts )
 				G.write( static_data )
@@ -262,6 +287,8 @@ for f in files:
 				G.write( '#define AIRWINDOWS_NAME "' + name + '"\n' )
 				G.write( '#define AIRWINDOWS_DESCRIPTION "' + description + '"\n' )
 				G.write( "#define AIRWINDOWS_GUID NT_MULTICHAR( '" + guid[0] + "','" + guid[1] + "','" + guid[2] + "','" + guid[3] + "' )\n" )
+				if len(tags) > 0:
+					G.write( f'#define AIRWINDOWS_TAGS {tags}\n' )
 				G.write( '#define AIRWINDOWS_KERNELS\n' )
 				G.write( enums )
 				G.write( consts )

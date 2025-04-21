@@ -63,6 +63,9 @@ static const _NT_factory factory =
 	.parameterChanged = parameterChanged,
 	.step = step,
 	.draw = NULL,
+#ifdef AIRWINDOWS_TAGS
+	.tags = AIRWINDOWS_TAGS,
+#endif
 };
 
 uintptr_t pluginEntry( _NT_selector selector, uint32_t data )

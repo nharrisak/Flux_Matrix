@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Dubly2"
 #define AIRWINDOWS_DESCRIPTION "A key part of seventies sonics!"
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','D','u','h' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

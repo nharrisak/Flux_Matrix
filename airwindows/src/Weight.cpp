@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Weight"
 #define AIRWINDOWS_DESCRIPTION "A very accurate sub-bass boost based on Holt."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','W','e','i' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Hull"
 #define AIRWINDOWS_DESCRIPTION "An alternate form of highpass/lowpass filter."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','H','u','l' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "kCathedral3"
 #define AIRWINDOWS_DESCRIPTION "A giant cathedral-like space using Bezier undersampling."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','k','C','c' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_A =0,

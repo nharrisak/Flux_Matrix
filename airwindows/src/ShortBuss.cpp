@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "ShortBuss"
 #define AIRWINDOWS_DESCRIPTION "Chases second harmonic, to add or remove it."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','S','h','o' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

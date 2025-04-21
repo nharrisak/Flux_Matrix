@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "GuitarConditioner"
 #define AIRWINDOWS_DESCRIPTION "Like a Tube Screamer voicing without the squishiness and indistinctness."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','G','u','i' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "kPlateC"
 #define AIRWINDOWS_DESCRIPTION "A plate reverb, not unlike its namesake atop Abbey Road."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','k','P','p' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_One =0,

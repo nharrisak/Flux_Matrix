@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "TremoSquare"
 #define AIRWINDOWS_DESCRIPTION "A squarewave tremolo effect that only switches on zero crossings."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','T','r','e' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

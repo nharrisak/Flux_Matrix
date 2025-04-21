@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Facet"
 #define AIRWINDOWS_DESCRIPTION "A new kind of hard clip that adds two sharp corners into the wave."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','F','a','c' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

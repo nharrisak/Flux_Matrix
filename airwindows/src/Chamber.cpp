@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Chamber"
 #define AIRWINDOWS_DESCRIPTION "A feedforward reverb based on the golden ratio."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','h','a' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 #define AIRWINDOWS_KERNELS
 enum {
 

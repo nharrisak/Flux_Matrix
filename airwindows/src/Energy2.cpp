@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Energy2"
 #define AIRWINDOWS_DESCRIPTION "Electrifying fixed-frequency treble boosts for high sample rate."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','E','n','f' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

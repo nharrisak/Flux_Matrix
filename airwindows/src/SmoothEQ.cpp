@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "SmoothEQ"
 #define AIRWINDOWS_DESCRIPTION "A sharp, accurate, transparent three-band filter."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','S','m','p' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

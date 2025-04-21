@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "kCathedral2"
 #define AIRWINDOWS_DESCRIPTION "A giant reverby space modeled after the Bricasti Cathedral."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','k','C','b' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_One =0,

@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Highpass"
 #define AIRWINDOWS_DESCRIPTION "A time warp, for retro midrangey sounds."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','H','i','i' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

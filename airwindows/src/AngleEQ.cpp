@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "AngleEQ"
 #define AIRWINDOWS_DESCRIPTION "A strange and colorful EQ."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','A','n','g' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

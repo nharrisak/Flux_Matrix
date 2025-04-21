@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Holt"
 #define AIRWINDOWS_DESCRIPTION "A synth-like resonant lowpass filter focussed on bass frequencies."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','H','o','l' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 

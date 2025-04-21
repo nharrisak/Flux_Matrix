@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "PowerSag2"
 #define AIRWINDOWS_DESCRIPTION "My improved circuit-starve plugin, now with inverse effect!"
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','o','x' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

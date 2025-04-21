@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "Gringer"
 #define AIRWINDOWS_DESCRIPTION "A full-wave rectifier plugin, like a Green Ringer guitar effect."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','G','r','j' )
+#define AIRWINDOWS_TAGS kNT_tagEffect
 #define AIRWINDOWS_KERNELS
 enum {
 

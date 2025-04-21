@@ -4,6 +4,7 @@
 #define AIRWINDOWS_NAME "kPlate240"
 #define AIRWINDOWS_DESCRIPTION "For the texture of smaller, gold foil reverb."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','k','P','m' )
+#define AIRWINDOWS_TAGS kNT_tagEffect | kNT_tagReverb
 enum {
 
 	kParam_A =0,
