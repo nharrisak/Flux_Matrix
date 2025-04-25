@@ -398,6 +398,9 @@ void		NT_setParameterRange( _NT_parameter* ptr, float init, float min, float max
 // global structure - always available
 extern const _NT_globals NT_globals;
 
+// Utility function, mainly for profiling.
+uint32_t	NT_getCpuCycleCount(void);
+
 // drawing - use from within draw() only
 //
 
