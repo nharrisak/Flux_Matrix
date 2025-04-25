@@ -84,6 +84,17 @@ enum _NT_shape
 };
 
 /*
+ * Bitmask for MIDI destinations.
+ */
+enum _NT_midiDestination
+{
+	kNT_destinationBreakout 	= (1<<0),
+	kNT_destinationSelectBus 	= (1<<1),
+	kNT_destinationUSB 			= (1<<2),
+	kNT_destinationInternal 	= (1<<3),
+};
+
+/*
  * Macro to construct the four character guids used to identify plug-ins.
  */
 #define NT_MULTICHAR( a, b, c, d )	( ( (uint32_t)a << 0 ) | ( (uint32_t)b << 8 ) | ( (uint32_t)c << 16 ) | ( (uint32_t)d << 24 ) )
@@ -409,6 +420,15 @@ void		NT_drawShapeF( _NT_shape shape, float x0, float y0, float x1, float y1, fl
 
 int			NT_intToString( char* buffer, int32_t value );
 int			NT_floatToString( char* buffer, float value, int decimalPlaces=2 );
+
+// MIDI
+// May be called from a plug-in's step(), parameterChanged(), midiRealtime(), or midiMessage().
+// destination is a logical OR of _NT_midiDestination values.
+//
+
+void		NT_sendMidiByte( uint32_t destination, uint8_t b0 );
+void		NT_sendMidi2ByteMessage( uint32_t destination, uint8_t b0, uint8_t b1 );				// e.g. aftertouch, b0 = 0xD0
+void		NT_sendMidi3ByteMessage( uint32_t destination, uint8_t b0, uint8_t b1, uint8_t b2 );	// e.g. CC, b0 = 0xB0
 
 }
 
