@@ -88,7 +88,7 @@ void 	step( _NT_algorithm* self, float* busFrames, int numFramesBy4 )
 	
 	if ( pThis->countdown <= 0 )
 	{
-		// new message at 0.5Hz
+		// new message at 2Hz
 		pThis->countdown = NT_globals.sampleRate / 2;
 		
 		switch ( pThis->v[kParamType] )
