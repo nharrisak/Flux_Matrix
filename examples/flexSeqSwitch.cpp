@@ -57,13 +57,11 @@ enum ParamIndex
 };
 
 /* ───── specifications ───── */
-// Add const
 static const _NT_specification gSpecs[] = {
-    {"Channels", 1, 2, 1, kNT_typeGeneric},               // SPEC_CHANNELS
-    {"Inputs", 1, MAX_INPUT_GROUPS, 1, kNT_typeGeneric},  // SPEC_INPUTS
-    {"Outputs", 1, MAX_OUTPUT_GROUPS, 2, kNT_typeGeneric} // SPEC_OUTPUTS
+    {.name = "Channels", .min = 1, .max = 2, .def = 1, .type = kNT_typeGeneric},               // SPEC_CHANNELS
+    {.name = "Inputs", .min = 1, .max = MAX_INPUT_GROUPS, .def = 1, .type = kNT_typeGeneric},  // SPEC_INPUTS
+    {.name = "Outputs", .min = 1, .max = MAX_OUTPUT_GROUPS, .def = 2, .type = kNT_typeGeneric} // SPEC_OUTPUTS
 };
-// Check if NUM_SPECS matches gSpecs size
 static_assert(NUM_SPECS == sizeof(gSpecs) / sizeof(gSpecs[0]), "SpecIndex enum size mismatch");
 
 /* short fixed-name tables */
@@ -117,50 +115,50 @@ struct Switch : _NT_algorithm
     bool demux;
 
     // --- Runtime State ---
-    uint8_t idx; // Current active index
-    bool clkHi, rstHi;
+    uint8_t active_index; // Current active index
+    bool clock_high, reset_high;
 
     // --- Fade State ---
     bool is_fading_out = false;
     bool is_fading_in = false;
-    uint8_t pending_idx; // Index switching TO
+    uint8_t pending_active_index; // Index switching TO
     uint32_t fade_samples_remaining;
     uint32_t current_fade_samples; // Set by parameter, default 0
+    float fade_sample_reciprocal;  // Cached 1.0 / current_fade_samples
 
     // --- Parameter Storage ---
-    uint8_t numParamsActual;
-    _NT_parameter params[MAX_PARAMS_ACTUAL];     // Increased size
-    uint8_t pageIdxRouting[MAX_PARAMS_POSSIBLE]; // Max possible routing params
-    uint8_t pageIdxAudio[1];                     // For Anti-Click param
-    _NT_parameterPage pageDefs[2];               // Routing Page + Audio Page
+    uint8_t num_params_actual;
+    _NT_parameter params[MAX_PARAMS_ACTUAL];
+    uint8_t page_idx_routing[MAX_PARAMS_POSSIBLE];
+    uint8_t page_idx_audio[1];
+    _NT_parameterPage page_defs[2];
     _NT_parameterPages pages;
 
     // --- Parameter Index Mapping (set in construct) ---
-    // These store the ACTUAL calculated index for key parameters based on config
-    int paramIdxClk = PARAM_IDX_INVALID;
-    int paramIdxRst = PARAM_IDX_INVALID;
-    int paramIdxMuxOutL = PARAM_IDX_INVALID;
-    int paramIdxMuxOutR = PARAM_IDX_INVALID;       // Only valid if lanes=2
-    int paramIdxFadeSamples = PARAM_IDX_INVALID;   // Renamed from paramIdxAntiClick
-    int firstGroupInputParam = PARAM_IDX_INVALID;  // Mux Mode: Index of "Input 1 L"
-    int firstGroupOutputParam = PARAM_IDX_INVALID; // Demux Mode: Index of "Output 1 L"
+    int param_idx_clk = PARAM_IDX_INVALID;
+    int param_idx_rst = PARAM_IDX_INVALID;
+    int param_idx_mux_out_l = PARAM_IDX_INVALID;
+    int param_idx_mux_out_r = PARAM_IDX_INVALID;
+    int param_idx_fade_samples = PARAM_IDX_INVALID;
+    int first_group_input_param = PARAM_IDX_INVALID;
+    int first_group_output_param = PARAM_IDX_INVALID;
 
     // Constructor can initialize members if desired (though construct() does it)
     Switch() : lanes(0), gIn(0), gOut(0), demux(false),
-               idx(0), clkHi(false), rstHi(false),
-               is_fading_out(false), is_fading_in(false), pending_idx(0),
-               fade_samples_remaining(0), current_fade_samples(0),
-               numParamsActual(0), pageDefs{}, pages{} {}
+               active_index(0), clock_high(false), reset_high(false),
+               is_fading_out(false), is_fading_in(false), pending_active_index(0),
+               fade_samples_remaining(0), current_fade_samples(0), fade_sample_reciprocal(0.0f),
+               num_params_actual(0), page_defs{}, pages{} {}
 };
 
 /* helpers */
 // Use const float* b, const int N? No, buffer is modified by algorithm eventually.
 // Use size_t N? API uses int. Stick to int.
-static inline float *bus(float *b, int busIdx, int N)
+static inline float *bus(float *b, int bus_idx, int N)
 {
     // Use MAX_BUSSES? API uses 28 directly in param definitions.
     // Keep check simple as before.
-    return (busIdx > 0) ? (b + (busIdx - 1) * N) : nullptr;
+    return (bus_idx > 0) ? (b + (bus_idx - 1) * N) : nullptr;
 }
 // Use const float v
 static inline bool rise(const float v, bool &state)
@@ -180,33 +178,33 @@ static void calcReq(_NT_algorithmRequirements &r, const int32_t *const sp)
     const int gIn = sp[SPEC_INPUTS];
     const int gOut = sp[SPEC_OUTPUTS];
     const bool demux = (gIn == 1);
-    int numParams = 0; // Calculate locally
+    int num_params = 0; // Calculate locally
 
     if (demux)
     { // 1 -> N
         if (lanes == 1)
         {
-            numParams = 1 /*Sig*/ + 2 /*Clk+Rst*/ + gOut * 2 /*Out+Mode*/;
+            num_params = 1 /*Sig*/ + 2 /*Clk+Rst*/ + gOut * 2 /*Out+Mode*/;
         }
         else
         { // lanes == 2
-            numParams = 2 /*Sig L+R*/ + 2 /*Clk+Rst*/ + gOut * 4 /*OutL+ModeL+OutR+ModeR*/;
+            num_params = 2 /*Sig L+R*/ + 2 /*Clk+Rst*/ + gOut * 4 /*OutL+ModeL+OutR+ModeR*/;
         }
     }
     else
     { // N -> 1
         if (lanes == 1)
         {
-            numParams = gIn * 1 /*In*/ + 2 /*Clk+Rst*/ + 2 /*SigOut+Mode*/;
+            num_params = gIn * 1 /*In*/ + 2 /*Clk+Rst*/ + 2 /*SigOut+Mode*/;
         }
         else
         { // lanes == 2
-            numParams = gIn * 2 /*InL+InR*/ + 2 /*Clk+Rst*/ + 4 /*SigOutL+ModeL+SigOutR+ModeR*/;
+            num_params = gIn * 2 /*InL+InR*/ + 2 /*Clk+Rst*/ + 4 /*SigOutL+ModeL+SigOutR+ModeR*/;
         }
     }
 
     // Add the Anti-Click parameter
-    numParams += 1;
+    num_params += 1;
 
     // Validation using constants
     const bool invalid_config = (lanes * gIn > MAX_INPUT_GROUPS) ||
@@ -214,7 +212,7 @@ static void calcReq(_NT_algorithmRequirements &r, const int32_t *const sp)
                                 (gIn == 1) == (gOut == 1); // XOR implies gIn=1 AND gOut=1, or gIn!=1 AND gOut!=1
 
     // Report total calculated parameters
-    r.numParameters = invalid_config ? 0 : numParams; // Let's signal invalidity with 0 params
+    r.numParameters = invalid_config ? 0 : num_params; // Let's signal invalidity with 0 params
 
     // Ensure it doesn't exceed our adjusted max
     if (r.numParameters > MAX_PARAMS_ACTUAL)
@@ -254,10 +252,10 @@ static _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &m,
     self->gIn = gIn;
     self->gOut = gOut;
     self->demux = (gIn == 1);
-    self->idx = 0;
-    self->clkHi = false;
-    self->rstHi = false;
-    // self->numParamsActual will be set below
+    self->active_index = 0;
+    self->clock_high = false;
+    self->reset_high = false;
+    // self->num_params_actual will be set below
 
     int p = 0; // Parameter index counter
 
@@ -273,8 +271,8 @@ static _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &m,
         }
     }
     else
-    {                                   // N -> 1 : Define group inputs
-        self->firstGroupInputParam = p; // Store index of "Input 1 L"
+    {                                      // N -> 1 : Define group inputs
+        self->first_group_input_param = p; // Store index of "Input 1 L"
         for (int g = 0; g < self->gIn; ++g)
         {
             setP(self->params[p++], self->lanes == 1 ? monoIn[g] : sterInL[g], 0, MAX_BUSSES, 0, kNT_unitAudioInput); // Allow 'None', default 0
@@ -286,15 +284,15 @@ static _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &m,
     }
 
     /* Clock / Reset */
-    self->paramIdxClk = p;                                               // Store Clock index
+    self->param_idx_clk = p;                                             // Store Clock index
     setP(self->params[p++], "Clock", 0, MAX_BUSSES, 0, kNT_unitCvInput); // Allow 'None', default 0
-    self->paramIdxRst = p;                                               // Store Reset index
+    self->param_idx_rst = p;                                             // Store Reset index
     setP(self->params[p++], "Reset", 0, MAX_BUSSES, 0, kNT_unitCvInput); // Allow 'None', default 0
 
     /* Outputs */
     if (self->demux)
-    {                                    // 1 -> N : Define group outputs
-        self->firstGroupOutputParam = p; // Store index of "Output 1 L"
+    {                                       // 1 -> N : Define group outputs
+        self->first_group_output_param = p; // Store index of "Output 1 L"
         for (int g = 0; g < self->gOut; ++g)
         {
             setP(self->params[p++], self->lanes == 1 ? monoOut[g] : sterOutL[g], 1, MAX_BUSSES, 1, kNT_unitAudioOutput); // Force selection, default 1
@@ -309,68 +307,70 @@ static _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &m,
     }
     else
     {                                                                                      // N -> 1 : Define Sig L/[R] outputs
-        self->paramIdxMuxOutL = p;                                                         // Store Sig L Out index
+        self->param_idx_mux_out_l = p;                                                     // Store Sig L Out index
         setP(self->params[p++], "Sig Left Output", 1, MAX_BUSSES, 1, kNT_unitAudioOutput); // Force selection, default 1
         setP(self->params[p++], "Sig Left mode", 0, 1, 0, kNT_unitOutputMode);
         if (self->lanes == 2)
         {
-            self->paramIdxMuxOutR = p;                                                          // Store Sig R Out index
+            self->param_idx_mux_out_r = p;                                                      // Store Sig R Out index
             setP(self->params[p++], "Sig Right Output", 1, MAX_BUSSES, 1, kNT_unitAudioOutput); // Force selection, default 1
             setP(self->params[p++], "Sig Right mode", 0, 1, 0, kNT_unitOutputMode);
         }
     }
 
-    const int numRoutingParams = p; // Number of parameters defined so far
+    const int num_routing_params = p; // Number of parameters defined so far
 
     // --- Define Audio Parameters ---
-    self->paramIdxFadeSamples = p;           // Store index of this param (Renamed)
+    self->param_idx_fade_samples = p;        // Store index of this param
     const uint16_t default_fade_samples = 0; // Reset default to 0 = OFF
     const uint16_t max_fade_samples = 512;   // Reset max fade duration (~10.7ms @ 48k)
     setP(self->params[p++], "Fade Samples", 0, max_fade_samples, default_fade_samples, kNT_unitFrames);
     // No enum strings needed
 
     // --- Final Setup ---
-    self->numParamsActual = p;
+    self->num_params_actual = p;
 
     // --- Parameter Pages ---
     // Routing Page
-    int routingPageParamCount = 0;
-    for (int i = 0; i < numRoutingParams; ++i)
+    int routing_page_param_count = 0;
+    for (int i = 0; i < num_routing_params; ++i)
     {
-        self->pageIdxRouting[routingPageParamCount++] = i;
+        self->page_idx_routing[routing_page_param_count++] = i;
     }
-    self->pageDefs[0] = {"Routing", (uint8_t)routingPageParamCount, self->pageIdxRouting};
+    self->page_defs[0] = {.name = "Routing", .numParams = (uint8_t)routing_page_param_count, .params = self->page_idx_routing}; // Use designated initializers
 
     // Audio Page
-    self->pageIdxAudio[0] = self->paramIdxFadeSamples; // Use renamed variable
-    self->pageDefs[1] = {"Audio", 1, self->pageIdxAudio};
+    self->page_idx_audio[0] = self->param_idx_fade_samples;
+    self->page_defs[1] = {.name = "Audio", .numParams = 1, .params = self->page_idx_audio}; // Use designated initializers
 
     // Assign pages struct
-    self->pages = {2, self->pageDefs}; // 2 pages now
+    self->pages = {.numPages = 2, .pages = self->page_defs}; // Use designated initializers
 
-    self->parameters = self->params;     // Point to our params array
-    self->parameterPages = &self->pages; // Point to our pages struct
+    self->parameters = self->params;
+    self->parameterPages = &self->pages;
 
     // Initialize fade state
     self->fade_samples_remaining = 0;
-    self->current_fade_samples = default_fade_samples; // Initialize based on default
+    self->current_fade_samples = default_fade_samples;
+    self->fade_sample_reciprocal = (default_fade_samples > 0) ? (1.0f / (float)default_fade_samples) : 0.0f;
     self->is_fading_out = false;
     self->is_fading_in = false;
-    self->pending_idx = 0;
+    self->pending_active_index = 0;
 
     // NOTE: Relying on host to call parameterChanged after construct if needed for presets/defaults.
     return self;
 }
 
-// Implement parameterChanged to update fade duration
+// Update internal state when parameters change
 static void parameterChanged(_NT_algorithm *self_base, int p)
 {
-    Switch *mutable_self = static_cast<Switch *>(self_base); // Need non-const self
-    const Switch *self = mutable_self;                       // Const self for reading v[]
+    Switch *self = static_cast<Switch *>(self_base); // Rename mutable_self to self
 
-    if (p == self->paramIdxFadeSamples)
-    {                                                    // Check if "Fade Samples" param changed (Use renamed variable)
-        mutable_self->current_fade_samples = self->v[p]; // Update stored fade duration
+    if (p == self->param_idx_fade_samples)
+    {                                  // Check if "Fade Samples" param changed
+        uint32_t samples = self->v[p]; // Use self
+        self->current_fade_samples = samples;
+        self->fade_sample_reciprocal = (samples > 0) ? (1.0f / (float)samples) : 0.0f;
     }
 }
 
@@ -385,29 +385,25 @@ struct Lane
 // Use const int nBy4
 static void step(_NT_algorithm *b, float *buf, const int nBy4)
 {
-    // Casts (mutable needed for state updates)
-    Switch *mutable_self = static_cast<Switch *>(b);
-    const Switch *self = mutable_self;
-    const int N = nBy4 * 4; // Number of frames
-
-    // --- Get parameters (fade duration stored in struct) ---
-    // const bool antiClickEnabled = self->v[self->paramIdxFadeSamples]; // UNUSED
+    // Casts
+    Switch *self = static_cast<Switch *>(b); // Rename mutable_self to self
+    const int N = nBy4 * 4;
 
     // --- Get Clock/Reset pointers ---
-    const int busIdxClk = self->v[self->paramIdxClk];
-    const int busIdxRst = self->v[self->paramIdxRst];
-    float *clk = bus(buf, busIdxClk, N);
-    float *rst = bus(buf, busIdxRst, N);
+    const int bus_idx_clk = self->v[self->param_idx_clk];
+    const int bus_idx_rst = self->v[self->param_idx_rst];
+    float *clk = bus(buf, bus_idx_clk, N);
+    float *rst = bus(buf, bus_idx_rst, N);
 
     // --- Get Main Output pointers (Mux mode only) ---
     float *outL = nullptr;
     float *outR = nullptr;
     if (!self->demux)
     {
-        outL = bus(buf, self->v[self->paramIdxMuxOutL], N);
+        outL = bus(buf, self->v[self->param_idx_mux_out_l], N);
         if (self->lanes == 2)
         {
-            outR = bus(buf, self->v[self->paramIdxMuxOutR], N);
+            outR = bus(buf, self->v[self->param_idx_mux_out_r], N);
         }
     }
     // --- Get Main Input pointers (Demux mode only) ---
@@ -415,10 +411,10 @@ static void step(_NT_algorithm *b, float *buf, const int nBy4)
     float *inR = nullptr;
     if (self->demux)
     {
-        inL = bus(buf, self->v[PARAM_IDX_DEMUX_SIG_L_IN], N); // Param 0
+        inL = bus(buf, self->v[PARAM_IDX_DEMUX_SIG_L_IN], N);
         if (self->lanes == 2)
         {
-            inR = bus(buf, self->v[PARAM_IDX_DEMUX_SIG_R_IN], N); // Param 1
+            inR = bus(buf, self->v[PARAM_IDX_DEMUX_SIG_R_IN], N);
         }
     }
 
@@ -429,21 +425,21 @@ static void step(_NT_algorithm *b, float *buf, const int nBy4)
     float *side_ptr[MAX_INPUT_GROUPS][2] = {}; // Pointers only
 
     // Calculate starting parameter index for side lanes
-    int paramIdxSideStart = self->demux ? self->firstGroupOutputParam
-                                        : self->firstGroupInputParam;
-    int currentParamIdx = paramIdxSideStart;
+    int param_idx_side_start = self->demux ? self->first_group_output_param
+                                           : self->first_group_input_param;
+    int current_param_idx = param_idx_side_start;
 
     for (int g = 0; g < groups; ++g)
     {
-        const int busIdxL = self->v[currentParamIdx];
-        side_ptr[g][0] = bus(buf, busIdxL, N);
-        currentParamIdx += self->demux ? 2 : 1; // Skip mode param if demux
+        const int bus_idx_l = self->v[current_param_idx];
+        side_ptr[g][0] = bus(buf, bus_idx_l, N);
+        current_param_idx += self->demux ? 2 : 1;
 
         if (self->lanes == 2)
         {
-            const int busIdxR = self->v[currentParamIdx];
-            side_ptr[g][1] = bus(buf, busIdxR, N);
-            currentParamIdx += self->demux ? 2 : 1; // Skip mode param if demux
+            const int bus_idx_r = self->v[current_param_idx];
+            side_ptr[g][1] = bus(buf, bus_idx_r, N);
+            current_param_idx += self->demux ? 2 : 1;
         }
     }
 
@@ -453,111 +449,106 @@ static void step(_NT_algorithm *b, float *buf, const int nBy4)
     for (int n = 0; n < N; ++n)
     {
         /* --- Clock & Reset Logic --- */
-        if (clk && rise(clk[n], mutable_self->clkHi))
+        if (clk && rise(clk[n], self->clock_high))
         {
             // Clock edge: Trigger a switch if currently idle
-            if (!mutable_self->is_fading_out && !mutable_self->is_fading_in)
-            { // If idle
+            if (!self->is_fading_out && !self->is_fading_in)
+            {
                 if (self->current_fade_samples > 0 && !self->demux)
                 {
-                    // Start fade OUT (don't switch idx yet)
-                    mutable_self->is_fading_out = true;
-                    mutable_self->fade_samples_remaining = self->current_fade_samples;
+                    // Start fade OUT (don't switch active_index yet)
+                    self->pending_active_index = (self->active_index + 1) % groups;
+                    self->is_fading_out = true;
+                    self->fade_samples_remaining = self->current_fade_samples;
                 }
                 else
                 {
                     // Instant switch (fade=0 or Demux mode)
-                    mutable_self->idx = (mutable_self->idx + 1) % groups;
+                    self->active_index = (self->active_index + 1) % groups;
                 }
             }
             // Else: Ignore clock edges during fade (implicit)
         }
-        if (rst && rise(rst[n], mutable_self->rstHi))
+        if (rst && rise(rst[n], self->reset_high))
         {
             // Reset edge: Always reset instantly, cancel fade
-            mutable_self->idx = 0;
-            mutable_self->is_fading_out = false;
-            mutable_self->is_fading_in = false;
+            self->active_index = 0;
+            self->is_fading_out = false;
+            self->is_fading_in = false;
         }
 
         // --- Determine gain and index based on state ---
         float current_gain = 1.0f;
-        uint8_t index_to_use = self->idx;
+        uint8_t index_to_use = self->active_index;
 
-        if (mutable_self->is_fading_out)
+        if (self->is_fading_out)
         {
-            if (mutable_self->fade_samples_remaining > 0)
+            if (self->fade_samples_remaining > 0)
             {
-                mutable_self->fade_samples_remaining--;
-                // Calculate fade out gain (1 -> 0)
-                current_gain = (self->current_fade_samples > 0)
-                                   ? ((float)mutable_self->fade_samples_remaining / (float)self->current_fade_samples)
-                                   : 0.0f;
-                index_to_use = self->idx; // Still using the old index
+                self->fade_samples_remaining--;
+                // Calculate fade out gain (1 -> 0) using reciprocal
+                current_gain = (float)self->fade_samples_remaining * self->fade_sample_reciprocal;
+                index_to_use = self->active_index; // Still using the old index
             }
             else
             {
                 // Fade out finished: Switch index, start fade in
-                mutable_self->idx = (mutable_self->idx + 1) % groups; // Switch index now
-                mutable_self->is_fading_out = false;
-                mutable_self->is_fading_in = true;
-                mutable_self->fade_samples_remaining = self->current_fade_samples; // Reset counter
-                index_to_use = self->idx;                                          // Use the NEW index now
-                // Calculate gain for the FIRST sample of fade-in
-                current_gain = (self->current_fade_samples > 0)
-                                   ? (1.0f - (float)mutable_self->fade_samples_remaining / (float)self->current_fade_samples)
-                                   : 1.0f;
+                self->active_index = self->pending_active_index;
+                self->is_fading_out = false;
+                self->is_fading_in = true;
+                self->fade_samples_remaining = self->current_fade_samples; // Reset counter using original samples value
+                index_to_use = self->active_index;                         // Use the NEW index now
+                // Calculate gain for the FIRST sample of fade-in using reciprocal
+                current_gain = 1.0f - (float)self->fade_samples_remaining * self->fade_sample_reciprocal;
                 // Decrement counter for this first sample of fade-in
-                if (mutable_self->fade_samples_remaining > 0)
-                    mutable_self->fade_samples_remaining--;
+                if (self->fade_samples_remaining > 0)
+                    self->fade_samples_remaining--;
             }
         }
-        else if (mutable_self->is_fading_in)
+        else if (self->is_fading_in)
         {
-            if (mutable_self->fade_samples_remaining > 0)
+            if (self->fade_samples_remaining > 0)
             {
-                mutable_self->fade_samples_remaining--;
-                // Calculate fade in gain (0 -> 1) - Linear
-                current_gain = (self->current_fade_samples > 0)
-                                   ? (1.0f - (float)mutable_self->fade_samples_remaining / (float)self->current_fade_samples)
-                                   : 1.0f;
-                index_to_use = self->idx; // Using the new index
+                self->fade_samples_remaining--;
+                // Calculate fade in gain (0 -> 1) - Linear using reciprocal
+                current_gain = 1.0f - (float)self->fade_samples_remaining * self->fade_sample_reciprocal;
+                index_to_use = self->active_index; // Using the new index
             }
             else
             {
                 // Fade in finished
-                mutable_self->is_fading_in = false;
+                self->is_fading_in = false;
                 current_gain = 1.0f;
-                index_to_use = self->idx;
+                index_to_use = self->active_index;
             }
         }
         else
         { // Idle state
             current_gain = 1.0f;
-            index_to_use = self->idx;
+            index_to_use = self->active_index;
         }
 
         /* --- Apply Switching / Fading --- */
         if (self->demux) /* 1 → N (Demux) - STILL NO FADE */
         {
-            // NOTE: This uses self->idx directly, not index_to_use, so it remains instant switch
-            const int modeLParamIdx = self->firstGroupOutputParam + self->idx * (self->lanes == 1 ? 2 : 4) + 1;
-            const bool replaceL = self->v[modeLParamIdx];
-            float *destL = side_ptr[self->idx][0]; // Uses self->idx
+            // NOTE: This uses self->active_index directly, not index_to_use, so it remains instant switch
+            const int mode_l_param_idx = self->first_group_output_param + self->active_index * (self->lanes == 1 ? 2 : 4) + 1;
+            const bool replace_l = self->v[mode_l_param_idx];
+            float *dest_l = side_ptr[self->active_index][0];
 
-            if (destL && inL)
+            if (dest_l && inL)
             {
-                destL[n] = replaceL ? inL[n] : destL[n] + inL[n];
+                dest_l[n] = replace_l ? inL[n] : dest_l[n] + inL[n];
             }
 
             if (self->lanes == 2)
             {
-                const int modeRParamIdx = self->firstGroupOutputParam + self->idx * 4 + 3;
-                const bool replaceR = self->v[modeRParamIdx];
-                float *destR = side_ptr[self->idx][1]; // Uses self->idx
-                if (destR && inR)
+                const int mode_r_param_idx = self->first_group_output_param + self->active_index * 4 + 3;
+                const bool replace_r = self->v[mode_r_param_idx];
+                float *dest_r = side_ptr[self->active_index][1];
+                if (dest_r && inR)
                 {
-                    destR[n] = replaceR ? inR[n] : destR[n] + inR[n];
+                    dest_r[n] = replace_r ? inR[n] : dest_r[n] + inR[n];
                 }
             }
         }
@@ -588,19 +579,24 @@ static void step(_NT_algorithm *b, float *buf, const int nBy4)
 /* ───── factory & entry ───── */
 // Make factory const
 static const _NT_factory gFactory = {
-    NT_MULTICHAR('S', 'S', 'W', '1'), "Seq Switch Flex",
-    "Seq Switch (Mux/Demux, Clk, Rst). Mux: N->1 (Sig Out). Demux: 1->N (Sig In).", // Updated description
-    sizeof(gSpecs) / sizeof(gSpecs[0]), gSpecs,
-    nullptr, // No static requirements
-    nullptr, // No static init
-    calcReq,
-    construct,
-    parameterChanged,
-    step,
-    nullptr, // No draw function
-    nullptr, // No midi realtime
-    nullptr, // No midi message
-    kNT_tagUtility};
+    .guid = NT_MULTICHAR('S', 'S', 'W', '1'),
+    .name = "Seq Switch Flex",
+    .description = "Seq Switch (Mux/Demux, Clk, Rst). Mux: N->1 (Sig Out). Demux: 1->N (Sig In).",
+    .numSpecifications = sizeof(gSpecs) / sizeof(gSpecs[0]),
+    .specifications = gSpecs,
+    .calculateStaticRequirements = nullptr,
+    .initialise = nullptr,
+    .calculateRequirements = calcReq,
+    .construct = construct,
+    .parameterChanged = parameterChanged,
+    .step = step,
+    .draw = nullptr,
+    .midiRealtime = nullptr,
+    .midiMessage = nullptr,
+    .tags = kNT_tagUtility,
+    .hasCustomUi = nullptr, // Explicitly initialize omitted members
+    .customUi = nullptr,
+    .setupUi = nullptr};
 
 extern "C" uintptr_t pluginEntry(_NT_selector s, uint32_t i)
 {
