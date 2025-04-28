@@ -1,5 +1,5 @@
 /*
- * Sequential Switch (Flex) - disting EX Algorithm
+ * Sequential Switch (Flex)
  * Author: Thorinside / Idea by Jodok31283 / Code by AI
  */
 
