@@ -37,8 +37,9 @@ enum _NT_version
 	kNT_apiVersion3,				// Adds MIDI handling. Compatible with v2.
 	kNT_apiVersion4,				// Add specifications. Breaks compatibility.
 	kNT_apiVersion5,				// Add tags. Compatible with v4.
+	kNT_apiVersion6,				// Add custom UI support. Compatible with v4-5.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion5
+	kNT_apiVersionCurrent 		= kNT_apiVersion6
 };
 
 /*
@@ -298,6 +299,47 @@ enum _NT_tag
 };
 
 /*
+ * Values for the buttons field of _NT_uiData.
+ */
+enum _NT_buttons
+{
+	kNT_button1			= (1<<0),
+	kNT_button2			= (1<<1),
+	kNT_button3			= (1<<2),
+	kNT_button4			= (1<<3),
+	kNT_potButtonL		= (1<<4),
+	kNT_potButtonC		= (1<<5),
+	kNT_potButtonR		= (1<<6),
+	kNT_encoderButtonL	= (1<<7),
+	kNT_encoderButtonR	= (1<<8),
+};
+
+/*
+ * Values for the potChange field of _NT_uiData.
+ */
+enum _NT_pots
+{
+	kNT_potL	 = (1<<0),
+	kNT_potC	 = (1<<1),
+	kNT_potR	 = (1<<2),
+};
+
+/*
+ * Structure supplied to customUi().
+ */
+struct _NT_uiData
+{
+	float		pots[3];		// current pot positions [0.0-1.0]
+	uint16_t	buttons;		// current button states
+	uint16_t 	lastButtons;	// previous button states
+	int8_t		encoders[2];	// encoder change ±1 or 0
+	uint8_t		potChange;		// bitmask of which pots changed
+	uint8_t		unused;
+};
+
+typedef float _NT_float3[3];
+
+/*
  * Structure that defines an algorithm factory.
  *
  * Returned from pluginEntry().
@@ -378,6 +420,23 @@ struct _NT_factory
     void			(*midiMessage)( _NT_algorithm* self, uint8_t byte0, uint8_t byte1, uint8_t byte2 );
 
     uint32_t		tags;			// Logical OR of _NT_tag
+
+    /*
+     * Called by the host to allow the plug-in to define a custom user interface.
+     * Return true from hasCustomUi() to bypass the standard UI,
+     * in which case customUi() will then be called.
+     */
+    bool			(*hasCustomUi)( _NT_algorithm* self );
+    void			(*customUi)( _NT_algorithm* self, const _NT_uiData& data );
+
+    /*
+     * If the plug-in uses customUi() to redefine the behaviour of the pots,
+     * it can also define this function, which  is called whenever the algorithm’s UI
+     * appears for the first time (for example, when you switch from the overview display
+     * to the algorithm display) in order to sync up the soft takeover values.
+     * Write the current pot values (in the range 0.0-1.0) into pots[].
+     */
+    void			(*setupUi)( _NT_algorithm* self, _NT_float3& pots );
 };
 
 extern "C" {
@@ -400,6 +459,20 @@ extern const _NT_globals NT_globals;
 
 // Utility function, mainly for profiling.
 uint32_t	NT_getCpuCycleCount(void);
+
+// return the index of the given algorithm, or -1 if not found.
+int32_t		NT_algorithmIndex( const _NT_algorithm* algorithm );
+
+// Set an algorithm parameter.
+// May be called from a plug-in's step(), parameterChanged(), midiRealtime(), or midiMessage().
+void		NT_setParameterFromAudio( uint32_t algorithmIndex, uint32_t parameter, int16_t value );
+
+// Set an algorithm parameter. Safe to call from anywhere.
+void		NT_setParameterFromUi( uint32_t algorithmIndex, uint32_t parameter, int16_t value );
+
+// Returns the offset between plug-in parameter indices and global parameter indices.
+// Typically used as e.g. NT_setParameterFromUi( NT_algorithmIndex(self), param + NT_parameterOffset(), value ).
+uint32_t	NT_parameterOffset(void);
 
 // drawing - use from within draw() only
 //
