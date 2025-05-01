@@ -88,9 +88,8 @@ struct _fluxAlgorithm : public _NT_algorithm
     // Size: numOutputs * numInputs
     float *previousInterpolatedGains;
 
-    // UI State
-    uint32_t selectedIn;
-    uint32_t selectedOut;
+    uint32_t selectedInUI;       // Input selected by Pot 1 (UI)
+    uint32_t selectedOutUI;      // Output selected by Pot 2 (UI)
 
     // --- Internal state for triggered shifting ---
     float triggeredXShift; // Accumulated triggered shift [0.0, 1.0)
@@ -114,8 +113,8 @@ struct _fluxAlgorithm : public _NT_algorithm
           pageParamsGains(pageParamsGainsMem),
           pageParamsTransform(pageParamsTransformMem),
           previousInterpolatedGains(previousInterpolatedGainsMem),
-          selectedIn(UINT32_MAX),
-          selectedOut(UINT32_MAX),
+          selectedInUI(0),         // Default UI selection to top-left cell
+          selectedOutUI(0),
           triggeredXShift(0.0f),
           triggeredYShift(0.0f),
           previousStepTriggerState(false),
@@ -266,6 +265,28 @@ struct _fluxAlgorithm : public _NT_algorithm
         parameters = parameterDefs;
         parameterPages = &pagesDefs;
     }
+
+    // Helper to get the gain parameter index for a given UI cell
+    // Returns UINT32_MAX if coordinates are invalid (shouldn't happen with uint32_t)
+    // or if gain parameters aren't set up yet.
+    uint32_t getGainParameterIndex(uint32_t out_idx, uint32_t in_idx) const {
+        if (in_idx >= numInputs || out_idx >= numOutputs) {
+            return UINT32_MAX; // Invalid coordinates
+        }
+        // Calculate dynamic start index of gain parameters (same logic as in constructor/step)
+        uint32_t numRoutingParams_Base = numInputs + numOutputs * 2;
+        uint32_t gainParamOffset = kNumFixedParams + numRoutingParams_Base;
+        uint32_t gainIndexRelative = out_idx * numInputs + in_idx;
+        uint32_t gainParamIdxAbsolute = gainParamOffset + gainIndexRelative;
+
+        // Boundary check (ensure it's within the total number of parameters)
+        uint32_t totalParams = gainParamOffset + numInputs * numOutputs;
+         if (gainParamIdxAbsolute >= totalParams) {
+              return UINT32_MAX; // Should not happen if calculation is correct
+         }
+
+        return gainParamIdxAbsolute;
+    }
 };
 
 // --- Factory Functions ---
@@ -367,6 +388,7 @@ _NT_algorithm *construct(const _NT_algorithmMemoryPtrs &ptrs, const _NT_algorith
     return alg;
 }
 
+/*
 void parameterChanged(_NT_algorithm *self, int p)
 {
     _fluxAlgorithm *pThis = (_fluxAlgorithm *)self;
@@ -391,6 +413,139 @@ void parameterChanged(_NT_algorithm *self, int p)
         // Reset selection highlight if focus moves off a gain cell
         pThis->selectedIn = UINT32_MAX;
         pThis->selectedOut = UINT32_MAX;
+    }
+}*/
+
+bool fluxHasCustomUi(_NT_algorithm *self)
+{
+    return true; // Enable custom UI handling
+}
+
+void fluxSetupUi(_NT_algorithm *self, _NT_float3 &pots)
+{
+    _fluxAlgorithm *pThis = (_fluxAlgorithm *)self;
+
+    // Pot 1 (Left): Represents selectedInUI
+    // Map [0, numInputs-1] to [0.0, 1.0]
+    if (pThis->numInputs > 1) {
+        pots[0] = (float)pThis->selectedInUI / (float)(pThis->numInputs - 1);
+    } else {
+        pots[0] = 0.5f; // Center if only one input
+    }
+    pots[0] = fmaxf(0.0f, fminf(1.0f, pots[0])); // Clamp just in case
+
+    // Pot 2 (Centre): Represents selectedOutUI
+    // Map [0, numOutputs-1] to [0.0, 1.0]
+     if (pThis->numOutputs > 1) {
+        pots[1] = (float)pThis->selectedOutUI / (float)(pThis->numOutputs - 1);
+    } else {
+        pots[1] = 0.5f; // Center if only one output
+    }
+    pots[1] = fmaxf(0.0f, fminf(1.0f, pots[1])); // Clamp
+
+    // Pot 3 (Right): Represents gain of the cell at (selectedOutUI, selectedInUI)
+    uint32_t gainParamIdx = pThis->getGainParameterIndex(pThis->selectedOutUI, pThis->selectedInUI);
+    if (gainParamIdx != UINT32_MAX && gainParamIdx < (kNumFixedParams + (pThis->numInputs + pThis->numOutputs * 2) + (pThis->numInputs*pThis->numOutputs)) ) // Check validity and bounds
+    {
+        // Parameter value is [0, 100], map to [0.0, 1.0]
+        pots[2] = (float)pThis->v[gainParamIdx] / 100.0f;
+    } else {
+         pots[2] = 0.0f; // Default to 0 if selection is invalid (shouldn't be)
+    }
+     pots[2] = fmaxf(0.0f, fminf(1.0f, pots[2])); // Clamp
+}
+
+void fluxCustomUi(_NT_algorithm *self, const _NT_uiData &data)
+{
+    _fluxAlgorithm *pThis = (_fluxAlgorithm *)self;
+    int32_t algoIndex = NT_algorithmIndex(self); // Get algorithm index once
+
+    // --- Handle Pot 1 (Left) - Select Input (X-axis) ---
+    if (data.potChange & kNT_potL)
+    {
+        uint32_t newSelectedIn = 0;
+        if (pThis->numInputs > 0) {
+             newSelectedIn = (uint32_t)roundf(data.pots[0] * (float)(pThis->numInputs - 1));
+             newSelectedIn = (newSelectedIn >= pThis->numInputs) ? (pThis->numInputs > 0 ? pThis->numInputs - 1 : 0) : newSelectedIn;
+        }
+        if (newSelectedIn != pThis->selectedInUI) {
+            pThis->selectedInUI = newSelectedIn;
+        }
+    }
+
+    // --- Handle Pot 2 (Centre) - Select Output (Y-axis) ---
+    if (data.potChange & kNT_potC)
+    {
+         uint32_t newSelectedOut = 0;
+         if (pThis->numOutputs > 0) {
+            newSelectedOut = (uint32_t)roundf(data.pots[1] * (float)(pThis->numOutputs - 1));
+            newSelectedOut = (newSelectedOut >= pThis->numOutputs) ? (pThis->numOutputs > 0 ? pThis->numOutputs - 1 : 0) : newSelectedOut;
+         }
+        if (newSelectedOut != pThis->selectedOutUI) {
+            pThis->selectedOutUI = newSelectedOut;
+        }
+    }
+
+    // --- Handle Pot 3 (Right) - Adjust Gain for selected cell ---
+    if (data.potChange & kNT_potR)
+    {
+        uint32_t gainParamIdx = pThis->getGainParameterIndex(pThis->selectedOutUI, pThis->selectedInUI);
+        if (gainParamIdx != UINT32_MAX && algoIndex >= 0)
+        {
+             int16_t newValue = (int16_t)roundf(data.pots[2] * 100.0f);
+             newValue = (newValue < 0) ? 0 : (newValue > 100 ? 100 : newValue);
+             NT_setParameterFromUi((uint32_t)algoIndex, gainParamIdx + NT_parameterOffset(), newValue);
+        }
+    }
+
+    // --- Handle Encoder 1 (Left) - Modify X Offset ---
+    if (data.encoders[0] != 0 && algoIndex >= 0) // Left encoder changed
+    {
+        // Get current value of X Offset parameter
+        int16_t currentValue = pThis->v[kParamXOffset];
+        // Calculate new value - let 1 encoder click = 1% change
+        int16_t newValue = currentValue + data.encoders[0];
+        // Clamp to parameter range [-100, 100]
+        newValue = (newValue < -100) ? -100 : (newValue > 100 ? 100 : newValue);
+        // Set the parameter
+        NT_setParameterFromUi((uint32_t)algoIndex, kParamXOffset + NT_parameterOffset(), newValue);
+    }
+
+    // --- Handle Encoder 2 (Right) - Modify Y Offset ---
+     if (data.encoders[1] != 0 && algoIndex >= 0) // Right encoder changed
+    {
+        // Get current value of Y Offset parameter
+        int16_t currentValue = pThis->v[kParamYOffset];
+        // Calculate new value - let 1 encoder click = 1% change
+        int16_t newValue = currentValue + data.encoders[1];
+        // Clamp to parameter range [-100, 100]
+        newValue = (newValue < -100) ? -100 : (newValue > 100 ? 100 : newValue);
+        // Set the parameter
+        NT_setParameterFromUi((uint32_t)algoIndex, kParamYOffset + NT_parameterOffset(), newValue);
+    }
+
+    // --- Handle Button 3 - Step Sequence ---
+    // Check for rising edge (pressed now, wasn't pressed before)
+    if ((data.buttons & kNT_button3) && !(data.lastButtons & kNT_button3))
+    {
+        // Replicate logic from step() function for Step Trigger
+        // Get current increment values
+        float xIncNorm = pThis->v[kParamXIncrement] / 100.0f;
+        float yIncNorm = pThis->v[kParamYIncrement] / 100.0f;
+
+        // Apply increments to internal triggered shift state using fmodf for wrapping
+        // Add 1.0f before fmodf to handle negative increments correctly with fmodf result range.
+        pThis->triggeredXShift = nh::fmodf(pThis->triggeredXShift + xIncNorm + 1.0f, 1.0f);
+        pThis->triggeredYShift = nh::fmodf(pThis->triggeredYShift + yIncNorm + 1.0f, 1.0f);
+    }
+
+    // --- Handle Button 4 - Reset Sequence ---
+    // Check for rising edge
+    if ((data.buttons & kNT_button4) && !(data.lastButtons & kNT_button4))
+    {
+        // Replicate logic from step() function for Reset Trigger
+        pThis->triggeredXShift = 0.0f;
+        pThis->triggeredYShift = 0.0f;
     }
 }
 
@@ -757,7 +912,7 @@ bool fluxDraw(_NT_algorithm *self)
             int cellY = gridStartY + m * cellHeight;
 
             // Check if this cell corresponds to the focused PARAMETER
-            bool isSelected = (m == pThis->selectedOut && n == pThis->selectedIn);
+            bool isSelected = (m == pThis->selectedOutUI && n == pThis->selectedInUI); // Check if this cell is selected by Pots
 
             // === Calculate EFFECTIVE gain using effective shifts ===
             float n_shifted = (float)n - effectiveXShift * (float)numInputs;  // Use effective
@@ -852,7 +1007,7 @@ static const _NT_specification specifications[] = {
 static const _NT_factory factory =
     {
         .guid = NT_MULTICHAR('F', 'l', 'u', 'x'),
-        .name = "Flux",
+        .name = "Flux Matrix",
         .description = "A matrix mixer with shift/step transformations.",
         .numSpecifications = ARRAY_SIZE(specifications),
         .specifications = specifications,
@@ -860,11 +1015,15 @@ static const _NT_factory factory =
         .initialise = NULL,
         .calculateRequirements = calculateRequirements,
         .construct = construct,
-        .parameterChanged = parameterChanged,
+        .parameterChanged = NULL,
         .step = step,
-        .draw = fluxDraw,
+        .draw = fluxDraw,                     // Keep existing draw function
         .midiRealtime = NULL,
         .midiMessage = NULL,
+        .tags = kNT_tagEffect | kNT_tagUtility, // Add appropriate tags
+        .hasCustomUi = fluxHasCustomUi,         // Add pointer to hasCustomUi
+        .customUi = fluxCustomUi,               // Add pointer to customUi
+        .setupUi = fluxSetupUi,                 // Add pointer to setupUi
 };
 
 // --- Plugin Entry Point ---
