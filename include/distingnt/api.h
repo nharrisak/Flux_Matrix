@@ -38,8 +38,9 @@ enum _NT_version
 	kNT_apiVersion4,				// Add specifications. Breaks compatibility.
 	kNT_apiVersion5,				// Add tags. Compatible with v4.
 	kNT_apiVersion6,				// Add custom UI support. Compatible with v4-5.
+	kNT_apiVersion7,				// Add serialisation. Compatible with v4-6.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion6
+	kNT_apiVersionCurrent 		= kNT_apiVersion7
 };
 
 /*
@@ -437,6 +438,19 @@ struct _NT_factory
      * Write the current pot values (in the range 0.0-1.0) into pots[].
      */
     void			(*setupUi)( _NT_algorithm* self, _NT_float3& pots );
+
+    /*
+     * Called by the host to allow the plug-in to write custom data to the preset JSON.
+     * When called, the stream is within a JSON object, so the first call within serialise()
+     * should be addMemberName().
+     */
+    void			(*serialise)( _NT_algorithm* self, class _NT_jsonStream& stream );
+
+    /*
+     * Called by the host to allow the plug-in to parse the data it wrote in serialise().
+     * Return boolean success.
+     */
+    bool			(*deserialise)( _NT_algorithm* self, class _NT_jsonParse& parse );
 };
 
 extern "C" {
