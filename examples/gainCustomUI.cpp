@@ -119,14 +119,14 @@ bool	draw( _NT_algorithm* self )
 	return false;
 }
 
-bool	hasCustomUi( _NT_algorithm* self )
+uint32_t	hasCustomUi( _NT_algorithm* self )
 {
-	return true;
+	return kNT_potC;
 }
 
 void	customUi( _NT_algorithm* self, const _NT_uiData& data )
 {
-	if ( data.potChange & kNT_potC )
+	if ( data.controls & kNT_potC )
 	{
 		int value = round( 100.0f * data.pots[1] );
 		NT_setParameterFromUi( NT_algorithmIndex( self ), kParamGain + NT_parameterOffset(), value );

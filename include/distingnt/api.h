@@ -39,8 +39,9 @@ enum _NT_version
 	kNT_apiVersion5,				// Add tags. Compatible with v4.
 	kNT_apiVersion6,				// Add custom UI support. Compatible with v4-5.
 	kNT_apiVersion7,				// Add serialisation. Compatible with v4-6.
+	kNT_apiVersion8,				// Change hasCustomUi() to return uint32_t; remove _NT_pots; rename _NT_uiData.buttons; remove  _NT_uiData.potChange. Compatible with v4-7.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion7
+	kNT_apiVersionCurrent 		= kNT_apiVersion8
 };
 
 /*
@@ -300,9 +301,9 @@ enum _NT_tag
 };
 
 /*
- * Values for the buttons field of _NT_uiData.
+ * Values for the buttons field of _NT_uiData, and for the return value from hasCustomUi().
  */
-enum _NT_buttons
+enum _NT_controls
 {
 	kNT_button1			= (1<<0),
 	kNT_button2			= (1<<1),
@@ -313,16 +314,11 @@ enum _NT_buttons
 	kNT_potButtonR		= (1<<6),
 	kNT_encoderButtonL	= (1<<7),
 	kNT_encoderButtonR	= (1<<8),
-};
-
-/*
- * Values for the potChange field of _NT_uiData.
- */
-enum _NT_pots
-{
-	kNT_potL	 = (1<<0),
-	kNT_potC	 = (1<<1),
-	kNT_potR	 = (1<<2),
+	kNT_encoderL		= (1<<9),
+	kNT_encoderR		= (1<<10),
+	kNT_potL			= (1<<11),
+	kNT_potC			= (1<<12),
+	kNT_potR			= (1<<13),
 };
 
 /*
@@ -331,11 +327,10 @@ enum _NT_pots
 struct _NT_uiData
 {
 	float		pots[3];		// current pot positions [0.0-1.0]
-	uint16_t	buttons;		// current button states
+	uint16_t	controls;		// current button states, and which pots changed (_NT_controls)
 	uint16_t 	lastButtons;	// previous button states
 	int8_t		encoders[2];	// encoder change ±1 or 0
-	uint8_t		potChange;		// bitmask of which pots changed
-	uint8_t		unused;
+	uint8_t		unused[2];
 };
 
 typedef float _NT_float3[3];
@@ -424,10 +419,10 @@ struct _NT_factory
 
     /*
      * Called by the host to allow the plug-in to define a custom user interface.
-     * Return true from hasCustomUi() to bypass the standard UI,
-     * in which case customUi() will then be called.
+     * Return from hasCustomUi() a logical OR of _NT_controls which the plug-in overrides.
+     * If the return is non-zero, customUi() will then be called.
      */
-    bool			(*hasCustomUi)( _NT_algorithm* self );
+    uint32_t		(*hasCustomUi)( _NT_algorithm* self );
     void			(*customUi)( _NT_algorithm* self, const _NT_uiData& data );
 
     /*
