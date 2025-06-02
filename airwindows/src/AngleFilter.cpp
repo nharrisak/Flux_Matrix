@@ -2,8 +2,9 @@
 #include <new>
 #include <distingnt/api.h>
 #define AIRWINDOWS_NAME "AngleFilter"
-#define AIRWINDOWS_DESCRIPTION "AngleFilter"
+#define AIRWINDOWS_DESCRIPTION "The synth-style extension of AngleEQ."
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','A','n','h' )
+#define AIRWINDOWS_TAGS kNT_tagFilterEQ
 #define AIRWINDOWS_KERNELS
 enum {
 
