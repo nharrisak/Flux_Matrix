@@ -515,6 +515,11 @@ void		NT_sendMidiByte( uint32_t destination, uint8_t b0 );
 void		NT_sendMidi2ByteMessage( uint32_t destination, uint8_t b0, uint8_t b1 );				// e.g. aftertouch, b0 = 0xD0
 void		NT_sendMidi3ByteMessage( uint32_t destination, uint8_t b0, uint8_t b1, uint8_t b2 );	// e.g. CC, b0 = 0xB0
 
+// Sends a System Exclusive message.
+// NT_sendMidiSysEx() may be called repeatedly with partial messages, with 'end' set to false.
+// Set 'end' to true for the final call. You do not need to include the 0xF7 byte to end the SysEx message.
+void		NT_sendMidiSysEx( uint32_t destination, const uint8_t* data, size_t count, bool end );
+
 }
 
 #endif // _DISTINGNT_API_H
