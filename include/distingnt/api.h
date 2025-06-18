@@ -40,8 +40,9 @@ enum _NT_version
 	kNT_apiVersion6,				// Add custom UI support. Compatible with v4-5.
 	kNT_apiVersion7,				// Add serialisation. Compatible with v4-6.
 	kNT_apiVersion8,				// Change hasCustomUi() to return uint32_t; remove _NT_pots; rename _NT_uiData.buttons; remove  _NT_uiData.potChange. Compatible with v4-7.
+	kNT_apiVersion9,				// Add midiSysEx. Compatible with v4-8.
 
-	kNT_apiVersionCurrent 		= kNT_apiVersion8
+	kNT_apiVersionCurrent 		= kNT_apiVersion9
 };
 
 /*
@@ -446,6 +447,12 @@ struct _NT_factory
      * Return boolean success.
      */
     bool			(*deserialise)( _NT_algorithm* self, class _NT_jsonParse& parse );
+
+    /*
+     * Called by the host to allow the plug-in to respond to MIDI
+     * System Exclusive messages.
+     */
+    void			(*midiSysEx)( const uint8_t* message, size_t count );
 };
 
 extern "C" {
@@ -471,6 +478,15 @@ uint32_t	NT_getCpuCycleCount(void);
 
 // return the index of the given algorithm, or -1 if not found.
 int32_t		NT_algorithmIndex( const _NT_algorithm* algorithm );
+
+// return the number of algorithms in the preset.
+uint32_t	NT_algorithmCount(void);
+
+/*
+ * Populates an opaque wrapper class allowing access to an algorithm in the preset.
+ * Returns boolean success (iff index < NT_algorithmCount()).
+ */
+bool		NT_getSlot( class _NT_slot& slot, uint32_t index );
 
 // Set an algorithm parameter.
 // May be called from a plug-in's step(), parameterChanged(), midiRealtime(), or midiMessage().
