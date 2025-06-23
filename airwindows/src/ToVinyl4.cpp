@@ -3,7 +3,7 @@
 #include <distingnt/api.h>
 #define AIRWINDOWS_NAME "ToVinyl4"
 #define AIRWINDOWS_DESCRIPTION "A vinyl-mastering simulator bringing several vinyl-type colors."
-#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','T','o','X' )
+#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','T','o','Z' )
 enum {
 
 	kParam_One =0,

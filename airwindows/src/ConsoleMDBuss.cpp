@@ -3,7 +3,7 @@
 #include <distingnt/api.h>
 #define AIRWINDOWS_NAME "ConsoleMDBuss"
 #define AIRWINDOWS_DESCRIPTION "Goes for the tone shaping of the classic MCI console!"
-#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','o','4' )
+#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','o','6' )
 enum {
 
 	kParam_One =0,

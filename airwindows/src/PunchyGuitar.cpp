@@ -3,7 +3,7 @@
 #include <distingnt/api.h>
 #define AIRWINDOWS_NAME "PunchyGuitar"
 #define AIRWINDOWS_DESCRIPTION "PunchyGuitar"
-#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','u','n' )
+#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','P','u','o' )
 #define AIRWINDOWS_KERNELS
 enum {
 

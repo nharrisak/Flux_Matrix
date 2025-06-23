@@ -3,7 +3,7 @@
 #include <distingnt/api.h>
 #define AIRWINDOWS_NAME "ContentHideD"
 #define AIRWINDOWS_DESCRIPTION "Mutes audio except for brief glimpses."
-#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','o','9' )
+#define AIRWINDOWS_GUID NT_MULTICHAR( 'A','C','o',';' )
 enum {
 
 	//Add your parameters here...

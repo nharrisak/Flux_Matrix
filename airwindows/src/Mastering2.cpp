@@ -2,7 +2,7 @@
 #include <new>
 #include <distingnt/api.h>
 #define AIRWINDOWS_NAME "Mastering2"
-#define AIRWINDOWS_DESCRIPTION "Mastering2"
+#define AIRWINDOWS_DESCRIPTION "Airwindows style, and can do elliptical EQ now!"
 #define AIRWINDOWS_GUID NT_MULTICHAR( 'A','M','a','t' )
 enum {
 
