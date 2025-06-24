@@ -452,7 +452,7 @@ struct _NT_factory
      * Called by the host to allow the plug-in to respond to MIDI
      * System Exclusive messages.
      */
-    void			(*midiSysEx)( const uint8_t* message, size_t count );
+    void			(*midiSysEx)( const uint8_t* message, uint32_t count );
 };
 
 extern "C" {
