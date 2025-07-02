@@ -416,9 +416,16 @@ void parameterChanged(_NT_algorithm *self, int p)
     }
 }*/
 
-bool fluxHasCustomUi(_NT_algorithm *self)
+uint32_t fluxHasCustomUi(_NT_algorithm *self)
 {
-    return true; // Enable custom UI handling
+    return 
+    kNT_potL | 
+    kNT_potC |
+    kNT_potR | 
+    kNT_encoderL | 
+    kNT_encoderR | 
+    kNT_button3 | 
+    kNT_button4 ;
 }
 
 void fluxSetupUi(_NT_algorithm *self, _NT_float3 &pots)
@@ -461,7 +468,7 @@ void fluxCustomUi(_NT_algorithm *self, const _NT_uiData &data)
     int32_t algoIndex = NT_algorithmIndex(self); // Get algorithm index once
 
     // --- Handle Pot 1 (Left) - Select Input (X-axis) ---
-    if (data.potChange & kNT_potL)
+    if (data.controls & kNT_potL)
     {
         uint32_t newSelectedIn = 0;
         if (pThis->numInputs > 0) {
@@ -474,7 +481,7 @@ void fluxCustomUi(_NT_algorithm *self, const _NT_uiData &data)
     }
 
     // --- Handle Pot 2 (Centre) - Select Output (Y-axis) ---
-    if (data.potChange & kNT_potC)
+    if (data.controls & kNT_potC)
     {
          uint32_t newSelectedOut = 0;
          if (pThis->numOutputs > 0) {
@@ -487,7 +494,7 @@ void fluxCustomUi(_NT_algorithm *self, const _NT_uiData &data)
     }
 
     // --- Handle Pot 3 (Right) - Adjust Gain for selected cell ---
-    if (data.potChange & kNT_potR)
+    if (data.controls & kNT_potR)
     {
         uint32_t gainParamIdx = pThis->getGainParameterIndex(pThis->selectedOutUI, pThis->selectedInUI);
         if (gainParamIdx != UINT32_MAX && algoIndex >= 0)
@@ -526,7 +533,7 @@ void fluxCustomUi(_NT_algorithm *self, const _NT_uiData &data)
 
     // --- Handle Button 3 - Step Sequence ---
     // Check for rising edge (pressed now, wasn't pressed before)
-    if ((data.buttons & kNT_button3) && !(data.lastButtons & kNT_button3))
+    if ((data.controls & kNT_button3) && !(data.lastButtons & kNT_button3))
     {
         // Replicate logic from step() function for Step Trigger
         // Get current increment values
@@ -541,7 +548,7 @@ void fluxCustomUi(_NT_algorithm *self, const _NT_uiData &data)
 
     // --- Handle Button 4 - Reset Sequence ---
     // Check for rising edge
-    if ((data.buttons & kNT_button4) && !(data.lastButtons & kNT_button4))
+    if ((data.controls & kNT_button4) && !(data.lastButtons & kNT_button4))
     {
         // Replicate logic from step() function for Reset Trigger
         pThis->triggeredXShift = 0.0f;
